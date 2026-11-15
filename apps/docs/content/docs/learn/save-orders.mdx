@@ -47,6 +47,8 @@ Use Bun's SQLite driver in `src/services/database/service.ts`. Replace the scaff
   /_snippets/source/apps/docs/examples/orders-tutorial/steps/database/src/services/database/service.ts
 </include>
 
+The example opens SQLite with `bun:sqlite`, so it runs on Bun. To run the same service on Node.js, open the database with `openSqliteDatabase` from `@relkit/drizzle/sqlite`; see [Runtimes](/docs/modules/deployment/runtimes).
+
 Replace `src/platform/env.ts` to keep the existing log-level setting and add the SQLite file path:
 
 <include
@@ -184,13 +186,13 @@ in-memory path so the migration cannot quietly target the wrong database.
 
 Generate and review the initial SQL migration, then apply it and start the app:
 
-Use installed RelKit migration tooling, which selects the Bun-native SQLite driver.
+Use installed RelKit migration tooling, which selects the SQLite driver of the runtime that runs it.
 Keep generated SQL and required metadata tracked beside the database service in
 `src/services/database/migrations`; do not copy runner code into the application.
 
 ```sh title="Terminal — relkit-orders"
 export DATABASE_PATH=./orders.sqlite
-bun --bun drizzle-kit generate --name=initial
+bun x drizzle-kit generate --name=initial
 bun run relkit db migrate
 bun run check
 bun run typecheck

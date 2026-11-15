@@ -1,9 +1,13 @@
 /**
  * Validates native schema JSON, prefixes mounted paths and component identities,
- * and removes token requirements from browser-session documentation. This pure
- * projection is called by AuthOpenApi; malformed metadata throws at that adapter.
+ * and removes token requirements from browser-session documentation. It also makes the document
+ * true to what the endpoints send: OpenAPI 3.1 nullability, the success answers the SDK's generator
+ * describes wrongly, and the oversize and media-type answers. This pure projection is called by
+ * AuthOpenApi; malformed metadata throws at that adapter.
  */
 import { assertJsonValue, type JsonValue } from "relkit/contracts";
+import { nullableToType } from "./openapi-nullable.js";
+import { correctAuthResponses } from "./openapi-responses.js";
 
 /**
  * Detaches and projects one native OpenAPI document without changing SDK metadata.
@@ -18,14 +22,15 @@ export function projectAuthOpenApi<Input>(document: Input, basePath = "/api/auth
   if (!isRecord(document) || !isRecord(document.paths))
     throw new TypeError("Better Auth generated an invalid OpenAPI document");
   const names = new Map<string, string>();
+  const mount = basePath.replace(/\/$/, "");
   const components = renameComponents(document.components, names);
   const paths = Object.fromEntries(
     Object.entries(document.paths).map(([path, item]) => [
-      `${basePath.replace(/\/$/, "")}${path}`,
+      `${mount}${path}`,
       projectPath(item, path),
     ]),
   );
-  return rewriteReferences(
+  const projected = rewriteReferences(
     {
       paths,
       components,
@@ -33,6 +38,7 @@ export function projectAuthOpenApi<Input>(document: Input, basePath = "/api/auth
     },
     names,
   );
+  return correctAuthResponses(nullableToType(projected) as { [key: string]: JsonValue }, mount);
 }
 
 /**

@@ -7,6 +7,7 @@ import {
 import { Effect, Result } from "effect";
 import { OpenApiGenerationError } from "./generate-error.js";
 import { observeOpenApi } from "./generate-observability.js";
+import { PROBLEM_REFERENCE, PROBLEM_SCHEMA, problemComponent } from "./generate-problem.js";
 import { serviceContextEffect, serviceForEffect } from "./generate-services.js";
 import { SESSION_SECURITY, SESSION_SECURITY_SCHEME } from "./generate-security.js";
 import { documentTagsEffect } from "./generate-tags.js";
@@ -32,6 +33,7 @@ export type {
   OpenApiSchema,
 } from "./generate.types.js";
 export type { OpenApiTag } from "./generate-tags.types.js";
+export { PROBLEM_SCHEMA, problemSchema } from "./generate-problem.js";
 
 /** Generate a deterministic OpenAPI 3.1 document from a graph.
  * @param graph - Serializable RelKit application graph.
@@ -110,9 +112,7 @@ export const generateOpenApiEffect = Effect.fn("OpenApi.generate")((graph: Appli
         jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
         ...(tags.length === 0 ? {} : { tags }),
         paths,
-        ...(usesSession(paths)
-          ? { components: { securitySchemes: { [SESSION_SECURITY]: SESSION_SECURITY_SCHEME } } }
-          : {}),
+        ...componentsFor(paths),
         "x-relkit": {
           version: CONTRACT_VERSION,
           contractVersion: CONTRACT_VERSION,
@@ -190,6 +190,33 @@ function isHttpTrigger(node: GraphNode): node is HttpGraphTrigger {
 /** Check for a non-array object. */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+/** The shared components the operations use: the Problem schema and the session scheme. */
+function componentsFor(
+  paths: Readonly<Record<string, OpenApiPathItem>>,
+): Pick<OpenApiDocument, "components"> {
+  const schemas = usesProblem(paths) ? { schemas: { [PROBLEM_SCHEMA]: problemComponent() } } : {};
+  const security = usesSession(paths)
+    ? { securitySchemes: { [SESSION_SECURITY]: SESSION_SECURITY_SCHEME } }
+    : {};
+  return Object.keys(schemas).length + Object.keys(security).length === 0
+    ? {}
+    : { components: { ...schemas, ...security } };
+}
+
+/** Whether any response refers to the shared Problem schema. */
+function usesProblem(paths: Readonly<Record<string, OpenApiPathItem>>): boolean {
+  const reference = JSON.stringify(PROBLEM_REFERENCE).slice(1, -1);
+  return Object.values(paths).some((item) =>
+    Object.values(item).some((operation) =>
+      Object.values(operation?.responses ?? {}).some((response) =>
+        Object.values(response.content ?? {}).some((media) =>
+          JSON.stringify(media.schema).includes(reference),
+        ),
+      ),
+    ),
+  );
 }
 
 /** Whether any operation requires the session security scheme. */

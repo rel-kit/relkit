@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { observeOpenApi } from "./generate-observability.js";
+import { runtimeProblems } from "./generate-problem.js";
 import { buildRequestEffect } from "./generate-request.js";
 import { buildResponsesEffect } from "./generate-response.js";
 import { operationSecurity } from "./generate-security.js";
@@ -38,6 +39,15 @@ export const buildOperationEffect = Effect.fn("OpenApi.buildOperation")(
         );
         const tags = yield* operationTagsEffect(service, trigger.config.tags);
         const protection = operationSecurity(trigger, target);
+        const sent =
+          target === undefined
+            ? {}
+            : runtimeProblems({
+                body: request.body !== undefined,
+                input:
+                  request.parameters.length > 0 || request.body !== undefined || hasInput(target),
+                rateLimited: trigger.config.rateLimit !== undefined,
+              });
         return {
           operationId,
           ...(trigger.config.title === undefined ? {} : { summary: trigger.config.title }),
@@ -50,6 +60,7 @@ export const buildOperationEffect = Effect.fn("OpenApi.buildOperation")(
           ...(protection.security === undefined ? {} : { security: protection.security }),
           responses: {
             ...protection.responses,
+            ...sent,
             ...(target === undefined
               ? { default: { description: "Response returned by the route handler" } }
               : yield* buildResponsesEffect(trigger.config.responses, target)),
@@ -69,6 +80,24 @@ export const buildOperationEffect = Effect.fn("OpenApi.buildOperation")(
       }),
     ),
 );
+
+/** Whether a function's input schema describes any field a request could get wrong. */
+function hasInput(target: FunctionNode): boolean {
+  const input = target.input;
+  if (!isObject(input)) return false;
+  const schema = input.$relkit === "schema" ? input.jsonSchema : input;
+  if (!isObject(schema)) return false;
+  const { properties, required } = schema;
+  return (
+    (isObject(properties) && Object.keys(properties).length > 0) ||
+    (Array.isArray(required) && required.length > 0)
+  );
+}
+
+/** Narrow a value to a non-array object. */
+function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
 
 /** Convert authored parameter syntax to OpenAPI path templates.
  * @param value - Authored route path.

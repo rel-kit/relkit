@@ -44,6 +44,8 @@ test.each(["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"])(
       responses: { default: { description: "Response returned by the route handler" } },
       "x-relkit": { routeId: "raw.details", middleware: [], transforms: [] },
     });
+    // A raw handler answers for itself: no Problem schema is added for it.
+    expect(document).not.toHaveProperty("components");
     expect(generateOpenApiJson(graph(undefined, method))).toBe(
       generateOpenApiJson(graph(undefined, method)),
     );

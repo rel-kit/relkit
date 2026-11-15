@@ -22,8 +22,10 @@ override the transport only when the public HTTP contract needs it. Keep reusabl
 | Invalid function output or an internal defect | Problem `500` without internal detail    |
 
 Runtime failures can also produce responses such as provider failure `502` or timeout `504`.
-The inferred OpenAPI list is not an exhaustive list of infrastructure or middleware failures.
-Undeclared exceptions are not a way to create a public error contract.
+The generated OpenAPI document lists the statuses the server sends for each operation (see
+[the generated contract](/docs/modules/http/openapi#what-the-contract-lists)), but not every
+infrastructure or middleware failure. Undeclared exceptions are not a way to create a public error
+contract.
 
 ## Read an error response
 
@@ -38,7 +40,8 @@ Every error response is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Probl
   "code": "orders.not-found",
   "detail": "Order order-1 was not found",
   "data": { "orderId": "order-1" },
-  "traceId": "4bf92f3577b34da6a3ce929d0e0e4736"
+  "traceId": "4bf92f3577b34da6a3ce929d0e0e4736",
+  "requestId": "0d3c5a52-6a1e-4f0b-9a52-3f2f0f6b9d11"
 }
 ```
 
@@ -46,25 +49,73 @@ Every error response is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Probl
   `detail`, which is text for people.
 - `data` is the error's validated data. Only declared errors carry it, and rate limits.
 - `issues` appears on validation problems, with one `code`, `message` and `path` per issue.
-- `traceId` matches the request's trace, so you can find it in the Inspector and in your logs.
+- `requestId` and `traceId` identify the request; see [Find a request](#find-a-request).
 - A declared error that retries later, and a rate-limit rejection, also send `Retry-After` in seconds.
 
-| Status | `code`                         | When                                                  |
-| ------ | ------------------------------ | ----------------------------------------------------- |
-| `401`  | `unauthenticated`              | The route requires a session and the request has none |
-| `403`  | `origin-denied`, `csrf-denied` | The transport policy rejects a state-changing request |
-| `404`  | `not-found`                    | No route matches the path                             |
-| `405`  | `method-not-allowed`           | The path exists for other methods, listed in `Allow`  |
-| `413`  | `payload-too-large`            | The body is larger than the server's limit            |
-| `422`  | `validation`                   | Request mapping or input validation failed            |
-| `429`  | `rate-limited`                 | The route's rate limit is exhausted                   |
-| `499`  | `cancelled`                    | The client went away before the response              |
-| `500`  | `internal-error`               | An unexpected defect or invalid output                |
-| `502`  | `provider-failure`             | A dependency of the request failed                    |
-| `504`  | `timeout`                      | The request ran past its deadline                     |
+## See what the framework sends by itself
 
-In production, `500` and `502` problems never contain internal detail. In development and test, their
-`detail` names the redacted cause.
+These answers come from RelKit, not from your function:
+
+| Status | `code`                         | When                                                                                     |
+| ------ | ------------------------------ | ---------------------------------------------------------------------------------------- |
+| `401`  | `unauthenticated`              | The route requires a session, or the function's access rule needs one, and there is none |
+| `403`  | `access-denied`                | The caller lacks the role or permission the function's access rule names                 |
+| `403`  | `origin-denied`, `csrf-denied` | The transport policy rejects a state-changing request                                    |
+| `404`  | `not-found`                    | No route matches the path                                                                |
+| `405`  | `method-not-allowed`           | The path exists for other methods, listed in `Allow`                                     |
+| `413`  | `payload-too-large`            | The body is larger than the server's `maxBodyBytes` or the route's own limit             |
+| `422`  | `validation`                   | The body is not valid JSON, has the wrong content type, or the input fails validation    |
+| `429`  | `rate-limited`                 | The route's rate limit is exhausted                                                      |
+| `499`  | `cancelled`                    | The client went away before the response                                                 |
+| `500`  | `internal-error`               | An unexpected defect or invalid output                                                   |
+| `502`  | `provider-failure`             | A dependency of the request failed                                                       |
+| `504`  | `timeout`                      | The request ran past its deadline                                                        |
+
+Some details that surprise people:
+
+- **Access comes before input.** When a function's access rule names roles or permissions, an
+  anonymous caller gets `401` and a caller without the role gets `403` before RelKit reads or
+  validates the input, so the answer names no field. A rule with an `allow` predicate reads the
+  input, so it runs after validation.
+- **Oversize is `413` on every path.** A body over the server's limit or over a route's own
+  `maxBodyBytes` answers `413` with `payload-too-large`, whether or not the client declared
+  `Content-Length`. Inside the request mapping the same condition is the `body-too-large` issue;
+  clients never see it as a `422`.
+- **Malformed JSON and a wrong content type are `422`.** The `issues` carry the codes
+  `malformed-json`, `content-type`, `malformed-multipart`, and `body-not-object` for a JSON body
+  that is `null`, an array, a string or a number where the route maps fields.
+- **JSON strings are not converted.** Path, query, header and cookie values are text, so RelKit
+  converts them to the numbers and booleans your schema expects. A JSON body is validated as sent:
+  `{"quantity":"3"}` fails an integer field with `422`.
+- **`OPTIONS` and `HEAD` are automatic.** A plain `OPTIONS` request (not a CORS preflight) to a path
+  that has routes answers `204` with an empty body and `Allow` listing the methods, `OPTIONS`
+  included. A `405` also lists them. `HEAD` runs the `GET` handler and drops the body; its
+  `Content-Length` is the `GET` body's length.
+- **`500` and `502` say nothing about the cause.** Their `detail` is a generic sentence in every
+  mode; see [Internal failures](#internal-failures).
+
+## Find a request
+
+Every response carries an `x-request-id` header, including the `/_relkit/v1/*` endpoints. A Problem
+Details body carries the same value as `requestId` and also a `traceId`. They are two different
+values: the request ID names the HTTP request, and the trace ID names the trace that the request's
+spans and logs belong to.
+
+To find the request in the [Inspector](/docs/modules/operations/inspector), paste either ID into the
+Requests page's text filter or into the command palette (⌘K), which opens the matching request or
+trace. In your logs, search for the request ID or the trace ID: both appear on the lines of one
+request.
+
+## Internal failures
+
+A `500` or `502` response never carries the cause of the failure: its `detail` reads "The request
+failed unexpectedly." or "A dependency of this request failed.", in development and production
+alike. The cause is recorded instead:
+
+- Under `relkit dev`, the terminal prints the redacted cause on the line under the request line
+  (`GET /orders → 500`), with the request and trace IDs; `--verbose` adds the stack. The Inspector
+  shows the same cause on the request.
+- In production, the log and the request's span name only the failure's class, without message text.
 
 ## Choose one successful status
 
@@ -131,9 +182,9 @@ adapter that owns redirects, binary bodies, or another HTTP protocol, consider a
 ## Distinguish request failures from server failures
 
 Input schema and mapping failures return `422` by default. That includes malformed JSON and
-unsupported body content types in the request mapper. The framework's global Content-Length
-check can reject an oversized request with `413`; a byte-limit failure encountered later while
-mapping the body is a validation response. Test the layer your client actually reaches.
+unsupported body content types in the request mapper. An oversized body is the exception: it is
+`413` wherever the limit is hit, as described in
+[what the framework sends by itself](#see-what-the-framework-sends-by-itself).
 
 Function output is validated by the invocation engine. Invalid output is a server defect, not
 a caller's `422`. Additional explicit response-schema checks run in development and test mode;

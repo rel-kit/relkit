@@ -22,7 +22,7 @@ bun run check
 ```
 
 Inspect `.relkit/generated/openapi.json` when no server is running. The file is generated; fix route or
-schema source when it is wrong.
+schema source when it is wrong. It describes your application's routes only.
 
 ### Inspect the runtime document
 
@@ -33,6 +33,13 @@ curl http://localhost:3000/_relkit/v1/openapi.json
 With your existing app's [Echo endpoint](/docs/modules/http/define#expose-one-public-function) running, confirm
 `openapi` is `3.1.0` and find `POST /echo`. Use the configured backend port if it differs.
 The commerce example uses `4000` and also includes `/orders/{orderId}`.
+
+The served document is larger than the generated file. It adds the operations of a mounted
+[Better Auth service](/docs/modules/auth/better-auth), such as `POST /api/auth/sign-in/email`, under
+the Authentication tag. Do not compare the two expecting the same paths: the generated file has
+only your routes. `HEAD`
+and `OPTIONS` operations are in neither; see
+[what the framework sends by itself](/docs/modules/http/responses#see-what-the-framework-sends-by-itself).
 
 ### Open the interactive reference
 
@@ -55,6 +62,27 @@ Error responses use the `application/problem+json` media type. Each declared err
 problem schema, with its `code` and `type` fixed to the error's ID and `data` set to the error's data
 schema. The validation and rate-limit problems have schemas too. See
 [Read an error response](/docs/modules/http/responses#read-an-error-response).
+
+## What the contract lists
+
+Each operation lists the Problem Details responses the server can send for it, in addition to the
+responses its route declares:
+
+| Status | Declared when                                                                |
+| ------ | ---------------------------------------------------------------------------- |
+| `401`  | The route has `auth: "required"`, or the function has an access rule         |
+| `403`  | The function has an access rule                                              |
+| `413`  | The request mapping reads a body                                             |
+| `422`  | The operation reads path, query, header or body input                        |
+| `429`  | The route has a rate limit, with the `RateLimit-*` and `Retry-After` headers |
+| `500`  | Always, for a function-backed route                                          |
+
+The error bodies refer to one `Problem` schema in `components.schemas`; the validation, oversize and
+rate-limit bodies narrow it with `allOf`. A response that the route declares itself replaces the
+generated one for that status. A status the server cannot send for an operation is not listed: a
+`GET` without input has no `422` and no `413`. Raw handlers keep a single `default` response. The
+document leaves out answers that depend on deployment, such as `403` from the transport policy and
+`502`; see the table of [framework answers](/docs/modules/http/responses#see-what-the-framework-sends-by-itself).
 
 ## Trace a field back to source
 

@@ -1,6 +1,6 @@
 /** Projects route authentication and function access rules into OpenAPI security metadata. */
 import type { JsonValue } from "../contracts/index.js";
-import { problemSchema } from "./generate-response.js";
+import { problemResponse } from "./generate-problem.js";
 import type {
   FunctionNode,
   HttpGraphTrigger,
@@ -42,18 +42,14 @@ export function operationSecurity(
   return {
     security: [{ [SESSION_SECURITY]: [] }],
     responses: {
-      "401": problem("No signed-in session"),
+      "401": problemResponse("No signed-in session"),
       ...(access === undefined
         ? {}
-        : { "403": problem("The caller does not pass the access rule") }),
+        : { "403": problemResponse("The caller does not pass the access rule") }),
     },
     relkit: {
       ...(required ? { auth: "required" as const } : {}),
       ...(access === undefined ? {} : { access }),
     },
   };
-}
-
-function problem(description: string): OpenApiResponse {
-  return { description, content: { "application/problem+json": { schema: problemSchema() } } };
 }
