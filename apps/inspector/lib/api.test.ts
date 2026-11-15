@@ -51,6 +51,29 @@ describe("inspector API client", () => {
     expect(requests).toHaveLength(2);
   });
 
+  test("a read that asks for the current state is never answered from the cache", async () => {
+    let state = "connected";
+    let requests = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 10_000,
+      fetch: async () => {
+        requests += 1;
+        return envelope({ application: { state } });
+      },
+    });
+    const read = (cache?: RequestCache) =>
+      client.request<{ application: { state: string } }>("/_relkit/v1/storage", {
+        ...(cache === undefined ? {} : { cache }),
+      });
+
+    expect((await read()).application.state).toBe("connected");
+    state = "disconnected";
+    // The tab's cache still holds the first answer for an ordinary read.
+    expect((await read()).application.state).toBe("connected");
+    expect((await read("no-store")).application.state).toBe("disconnected");
+    expect(requests).toBe(2);
+  });
+
   test("retries transient GET failures during backend startup", async () => {
     let attempts = 0;
     const client = createInspectorApiClient({

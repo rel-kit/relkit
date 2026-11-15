@@ -194,7 +194,7 @@ test("a channel's params start from its declared parameters and a refused connec
   await expect(page.getByText("60,000 ms retention")).toBeVisible();
   await page.getByRole("button", { name: "Connect fresh" }).click();
   const alert = page.getByRole("alert").filter({ hasText: "refused or concealed" });
-  await expect(alert).toContainText("this browser's session for the application's origin");
+  await expect(alert).toContainText("connects as an anonymous visitor without a user session");
 });
 
 /** Makes `orders.created` require an order id. */

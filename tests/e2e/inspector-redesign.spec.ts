@@ -48,7 +48,7 @@ test("centers select labels before and after changing selection", async ({ page 
 
 test("supports keyboard search and accessible route table quick views", async ({ page }) => {
   await page.goto("/routes");
-  await expect(page.getByRole("heading", { name: "Routes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Routes", exact: true })).toBeVisible();
   await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
   await page.keyboard.press("ControlOrMeta+K");
   const search = page.getByRole("dialog", { name: "Search inspector" });

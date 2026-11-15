@@ -112,6 +112,9 @@ export class InspectorApiTransport {
     const key = `${method}:${url}`;
     const ttl = this.cacheTtlMs === 0 ? 0 : Math.max(this.cacheTtlMs, cacheTtlMs ?? 0);
     if (method !== "GET" || ttl === 0) return this.send<T>(path, sent, ttl);
+    // A read that asks for the current state (the status behind the application banner) is
+    // neither answered from the tab's cache nor joined to a request already under way.
+    if (sent.cache === "no-store") return this.send<T>(path, sent, 0);
     const cached = this.cache.get(key);
     if (cached !== undefined && cached.expiresAt > Date.now()) return cached.value as T;
     this.cache.delete(key);
