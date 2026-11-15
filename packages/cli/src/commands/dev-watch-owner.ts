@@ -3,6 +3,7 @@ import { Cause, Effect, Exit, Queue, Ref, Scope } from "effect";
 import { observeCli } from "../cli-runtime.js";
 import { CliCleanup, cleanupEffect } from "../services/cleanup.service.js";
 import { devWatchCallbacks } from "./dev-watch-callbacks.js";
+import { createWatchContentLedger } from "./dev-watch-content.js";
 import { devWatchRegistrar } from "./dev-watch-register.js";
 import type { DevSession } from "./dev-session.js";
 import type { DevWatchOwner, DevWatchState } from "./dev-watch-owner.types.js";
@@ -23,6 +24,7 @@ export const makeDevWatchOwner = Effect.fn("Dev.watchOwner")(function* (session:
     stops: [],
     configStops: new Map(),
     configPaths: new Set(),
+    content: createWatchContentLedger(session.projectRoot),
   };
   const callbacks = devWatchCallbacks(session, state);
   const closeEffect = observeCli(

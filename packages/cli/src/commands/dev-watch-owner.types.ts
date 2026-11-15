@@ -1,6 +1,7 @@
 /** Invocation-owned watch admission, failure receipts and joined worker lifetime. */
 import type { Effect, Queue, Ref, Scope } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
+import type { WatchContentLedger } from "./dev-watch-content.js";
 import type { EffectDevSourceWatcher } from "./dev-watch.types.js";
 
 export interface DevWatchState {
@@ -12,6 +13,8 @@ export interface DevWatchState {
   readonly stops: Array<() => void>;
   readonly configStops: Map<string, () => void>;
   readonly configPaths: Set<string>;
+  /** Content last seen per file; an event for an unchanged file does not rebuild. */
+  readonly content: WatchContentLedger;
 }
 export interface DevWatchCallbacks {
   /** @param files - Bounded changed-file batch. @returns No value; only enqueues admission. */
