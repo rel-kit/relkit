@@ -6,6 +6,7 @@ import { validateLocalRecord } from "relkit/observability/local/record";
 import type { LocalRecord } from "relkit/observability/local/record";
 import { Effect } from "effect";
 import { duckdbError } from "./duckdb-error.js";
+import { wellFormedValue } from "./well-formed.js";
 import { readDuckdbSql } from "./duckdb-sql.js";
 import type { DuckdbConnectionPort } from "./duckdb-driver.types.js";
 import type { PreparedDuckdbRecord, AssignedDuckdbRecord } from "./duckdb-batch.types.js";
@@ -21,8 +22,10 @@ export const prepareDuckdbBatch = Effect.fn("ObservabilityDuckdb.batch.prepare")
       const values = new Map<string, PreparedDuckdbRecord>();
       for (const item of records) {
         validateLocalRecord(item);
-        const safe = admitObservabilityRecord(item.record, redaction);
-        if (!safe) throw new TypeError("Telemetry record could not be admitted");
+        const admitted = admitObservabilityRecord(item.record, redaction);
+        if (!admitted) throw new TypeError("Telemetry record could not be admitted");
+        // DuckDB's JSON column refuses unpaired surrogates, and one refused record fails its batch.
+        const safe = wellFormedValue(admitted);
         const payload = canonicalJson(safe);
         if (!values.has(item.key)) values.set(item.key, { item, safe, payload });
       }
