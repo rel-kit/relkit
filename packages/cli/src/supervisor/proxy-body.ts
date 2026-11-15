@@ -34,8 +34,15 @@ export const ownProxyBody = Effect.fn("SupervisorProxy.ownBody")(function* (
   const fail = (reason: unknown): void => {
     if (ended) return;
     ended = true;
-    if (options.client?.aborted === true) downstream?.close();
-    else downstream?.error(reason);
+    if (options.client?.aborted !== true) {
+      downstream?.error(reason);
+      return;
+    }
+    try {
+      downstream?.close();
+    } catch {
+      // Already cancelled by the client: `close` throws on a stream that is no longer readable.
+    }
   };
   /** Errors an outstanding native body pull without aborting the caller. @returns Nothing after settlement. */
   const aborted = (): void => {
