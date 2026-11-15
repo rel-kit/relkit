@@ -166,7 +166,9 @@ const collectCurrent = Effect.fn("Inspector.collectCurrent")(function* (
     sessionId,
     through: batch.through,
     error: undefined,
-    incomplete: batch.incomplete || batch.gap,
+    // A gap is reported by one batch only; the records it skipped stay missing for the session.
+    incomplete:
+      batch.incomplete || batch.gap || (value.sessionId === sessionId && value.incomplete),
     droppedRecords: batch.droppedRecords,
     lossKey: batch.lossKey,
     producerFailed: batch.producerFailed,
