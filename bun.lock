@@ -524,6 +524,7 @@
         "esbuild": "0.28.2",
         "hono": "catalog:",
         "relkit": "workspace:*",
+        "ws": "8.22.0",
       },
       "devDependencies": {
         "@effect/vitest": "catalog:",
@@ -531,6 +532,7 @@
         "@modelcontextprotocol/server": "2.3.0",
         "@relkit/local": "workspace:*",
         "@relkit/pulumi": "workspace:*",
+        "@types/ws": "8.18.1",
         "relkit-typescript": "workspace:*",
         "vitest": "catalog:",
       },

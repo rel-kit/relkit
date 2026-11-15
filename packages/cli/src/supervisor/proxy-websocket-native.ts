@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { WebSocket as NodeWebSocket } from "ws";
 import type { ProxyDownstream } from "./proxy-websocket.types.js";
 
 /** Awaits native acceptance and unregisters handshake listeners on interruption.
@@ -61,7 +62,8 @@ export function closeDownstream(
   if (socket?.readyState === WebSocket.OPEN) socket.close(code, reason);
 }
 
-/** Closes an upstream client at once: Bun's `terminate`, or a normal close on Node.
+/** Closes an upstream client at once with `terminate` (Bun's client and `ws` have it), or a
+ * normal close on a client without it.
  * @param upstream - Owned upstream client. @returns After requesting closure. */
 export function terminateUpstream(upstream: WebSocket): void {
   const native = upstream as WebSocket & { readonly terminate?: () => void };
@@ -88,13 +90,22 @@ export function frameBytes(data: string | ArrayBuffer | Uint8Array): string | Ui
   return data instanceof ArrayBuffer ? new Uint8Array(data) : data;
 }
 
-/** Opens the upstream client; Node delivers binary frames as `ArrayBuffer` rather than `Blob`.
+/** Opens the upstream client with the forwarded handshake headers, `Host` included, so the worker
+ * judges `Origin` against the public authority. Bun's client keeps a given `Host`; Node's global
+ * client replaces it with the address it connects to, so Node uses `ws`, which keeps it.
  * @param url - Upstream URL. @param init - Forwarded headers and protocols. @returns The client. */
 export function openUpstream(
   url: URL,
   init: { readonly headers: Record<string, string>; readonly protocols: string[] | undefined },
 ): WebSocket {
-  const socket = new WebSocket(url, { headers: init.headers, protocols: init.protocols });
-  if (typeof process.versions.bun !== "string") socket.binaryType = "arraybuffer";
-  return socket;
+  if (typeof process.versions.bun === "string")
+    return new WebSocket(url, { headers: init.headers, protocols: init.protocols });
+  const socket = new NodeWebSocket(url, init.protocols ?? [], { headers: init.headers });
+  // Binary frames arrive as `ArrayBuffer`, text frames as strings, as on the global client.
+  socket.binaryType = "arraybuffer";
+  // An emitter `error` without a listener throws; the tunnel's listeners come and go with it.
+  socket.on("error", () => undefined);
+  // `ws` implements the WebSocket event surface the tunnel uses (listeners, `readyState`,
+  // `send`, `close`, `terminate`), with the same ready-state values.
+  return socket as unknown as WebSocket;
 }
