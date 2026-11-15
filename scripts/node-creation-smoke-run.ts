@@ -1,110 +1,101 @@
 /**
  * Node creation smoke, run with Node and no Bun: serves the prepared candidate from a local
  * registry, creates a project with `npx create-relkit` (npm) or `pnpm dlx create-relkit` (pnpm),
- * starts `<manager> run dev` and waits until the example route answers. The prepare step of
- * `node-creation-smoke.ts` bundles this file to `smoke.mjs` next to the registry it serves.
+ * then exercises the commands a project uses, each as a named step: `relkit add database`,
+ * `db:generate` and `db:migrate` reading `.env`, `check`, the diagnostic for a Bun-only import,
+ * `start` before a build, `dev` reading the database and stopping on SIGINT, and the Inspector.
+ * The prepare step of `node-creation-smoke.ts` bundles this file to `smoke.mjs` next to the
+ * registry it serves.
  *
  *   node smoke.mjs --package-manager npm|pnpm [--template minimal] [--require-no-bun] [--keep]
+ *                  [--postgres <admin-url>]
  */
-import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { assertCandidateInstalled, type Candidate } from "./node-creation-candidate.js";
+import {
+  addDatabase,
+  bunImportIsDiagnosed,
+  checkPasses,
+  migrateFromDotenv,
+  startWithoutBuildFails,
+  type DatabaseSetup,
+} from "./node-creation-commands.js";
+import { devReadsDatabase } from "./node-creation-dev.js";
+import { inspectorListens } from "./node-creation-inspector.js";
+import { flag, option, runCaptured } from "./node-creation-process.js";
+import { postgresLeg } from "./node-creation-postgres.js";
 import { startPreparedRegistry, type PreparedRegistryIndex } from "./node-creation-registry.js";
+import { step, summarize, type Project, type StepResult } from "./node-creation-steps.js";
 
-/** Reads one `--name value` option. @param name - Option name. @returns Its value. */
-function option(name: string): string | undefined {
-  const index = process.argv.indexOf(`--${name}`);
-  return index < 0 ? undefined : process.argv[index + 1];
-}
+const SQLITE: DatabaseSetup = {
+  dialect: "sqlite",
+  // A path other than the scaffold's default proves `.env` is read.
+  dotenv: "DATABASE_PATH=./.relkit/state/node-smoke.sqlite\n",
+  file: ".relkit/state/node-smoke.sqlite",
+};
 
 /**
- * Runs one command to completion with inherited output.
- * @param command - Executable and arguments.
- * @param cwd - Working directory.
- * @param env - Complete environment.
- * @returns Completion; a non-zero exit throws.
+ * Creates a project with `npx create-relkit` or `pnpm dlx create-relkit`.
+ * @param candidate - The prepared candidate.
+ * @param manager - Package manager creating and installing the project.
+ * @param env - Environment of every command.
+ * @param parent - Directory the project is created in.
+ * @param name - Project directory name.
+ * @param results - Step collector.
+ * @returns The project.
  */
-function run(command: readonly string[], cwd: string, env: NodeJS.ProcessEnv): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const child = spawn(command[0]!, command.slice(1), { cwd, env, stdio: "inherit" });
-    child.once("error", reject);
-    child.once("exit", (code) =>
-      code === 0 ? resolve() : reject(new Error(`${command.join(" ")} exited with ${code}`)),
-    );
+async function createProject(
+  candidate: Candidate,
+  manager: "npm" | "pnpm",
+  env: NodeJS.ProcessEnv,
+  parent: string,
+  name: string,
+  results: StepResult[],
+): Promise<Project> {
+  const version = candidate.index.packages.find((entry) => entry.manifest.name === "create-relkit")
+    ?.manifest.version;
+  if (version === undefined) throw new Error("The prepared registry has no create-relkit.");
+  const project: Project = { manager, directory: join(parent, name), env };
+  await step(results, `create ${name} with ${manager === "npm" ? "npx" : "pnpm dlx"}`, async () => {
+    const create = [
+      `create-relkit@${version}`,
+      name,
+      "--template",
+      option("template") ?? "minimal",
+      "--no-git",
+    ];
+    const command = manager === "npm" ? ["npx", "--yes", ...create] : ["pnpm", "dlx", ...create];
+    const finished = await runCaptured(command, parent, env);
+    if (finished.code !== 0) throw new Error(`${command.join(" ")} exited with ${finished.code}`);
+    const lockfile = manager === "npm" ? "package-lock.json" : "pnpm-lock.yaml";
+    if (!existsSync(join(project.directory, lockfile)))
+      throw new Error(`The project was not installed with ${manager} (no ${lockfile}).`);
+    await assertCandidateInstalled(candidate, project, ["relkit", "@relkit/cli"]);
   });
-}
-
-/** @returns A loopback port no listener holds right now. */
-function freePort(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.once("error", reject);
-    server.listen(0, "127.0.0.1", () => {
-      const address = server.address();
-      server.close(() => resolve(typeof address === "object" && address ? address.port : 0));
-    });
-  });
-}
-
-/**
- * Stops a detached process group: SIGINT, then SIGKILL after a grace period.
- * @param child - Group leader.
- * @returns Completion once the leader exited.
- */
-async function stopGroup(child: ChildProcess): Promise<void> {
-  if (child.exitCode !== null || child.pid === undefined) return;
-  const exited = new Promise<void>((resolve) => child.once("exit", () => resolve()));
-  process.kill(-child.pid, "SIGINT");
-  const timer = setTimeout(() => process.kill(-child.pid!, "SIGKILL"), 15_000);
-  await exited;
-  clearTimeout(timer);
-}
-
-/**
- * Waits until the development server answers the example route.
- * @param port - Development port.
- * @param child - Running `run dev` process.
- * @returns The response text.
- */
-async function waitForRoute(port: number, child: ChildProcess): Promise<string> {
-  const deadline = Date.now() + 240_000;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) throw new Error(`run dev exited with ${child.exitCode}.`);
-    const text = await fetch(`http://127.0.0.1:${port}/hello?name=RelKit`).then(
-      (response) => (response.status === 200 ? response.text() : undefined),
-      () => undefined,
-    );
-    if (text !== undefined) return text;
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-  throw new Error("The development server did not answer within 240 seconds.");
+  return project;
 }
 
 async function main(): Promise<void> {
   const manager = option("package-manager");
   if (manager !== "npm" && manager !== "pnpm") throw new Error("--package-manager npm|pnpm");
-  const template = option("template") ?? "minimal";
-  if (
-    process.argv.includes("--require-no-bun") &&
-    spawnSync("bun", ["--version"]).error === undefined
-  )
+  if (flag("require-no-bun") && spawnSync("bun", ["--version"]).error === undefined)
     throw new Error("bun is on PATH; this smoke must run without Bun.");
   const directory = dirname(fileURLToPath(import.meta.url));
   const index = JSON.parse(
     await readFile(join(directory, "index.json"), "utf8"),
   ) as PreparedRegistryIndex;
-  const version = index.packages.find((entry) => entry.manifest.name === "create-relkit")?.manifest
-    .version;
-  if (version === undefined) throw new Error("The prepared registry has no create-relkit.");
   const registry = await startPreparedRegistry(directory);
+  const candidate: Candidate = { directory, index, registryUrl: registry.url };
   const temporary = await mkdtemp(join(tmpdir(), `relkit-node-${manager}-`));
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     CI: "1",
+    NO_COLOR: "1",
     npm_config_registry: registry.url,
     npm_config_cache: join(temporary, "npm-cache"),
     // Fresh caches: the candidate shares its version with the published release.
@@ -115,33 +106,41 @@ async function main(): Promise<void> {
   // pnpm 11 reads `pnpm_config_*`; earlier releases read `npm_config_*`.
   for (const name of ["registry", "store_dir", "cache_dir"])
     env[`pnpm_config_${name}`] = env[`npm_config_${name}`];
-  delete env["npm_config_user_agent"];
-  let dev: ChildProcess | undefined;
+  // The connection lives only in `.env`, never in the process environment.
+  for (const name of ["npm_config_user_agent", "FORCE_COLOR", "DATABASE_PATH", "DATABASE_URL"])
+    delete env[name];
+  const results: StepResult[] = [];
+  const runtime = `Node ${process.version}`;
   try {
-    const create = [`create-relkit@${version}`, "smoke-app", "--template", template, "--no-git"];
-    await run(
-      manager === "npm" ? ["npx", "--yes", ...create] : ["pnpm", "dlx", ...create],
-      temporary,
-      env,
+    const project = await createProject(candidate, manager, env, temporary, "smoke-app", results);
+    await addDatabase(candidate, project, results, SQLITE);
+    await migrateFromDotenv(project, results, SQLITE);
+    await checkPasses(project, results);
+    await bunImportIsDiagnosed(project, results);
+    await startWithoutBuildFails(project, results);
+    await devReadsDatabase(project, results, runtime);
+    await inspectorListens(candidate, project, results);
+    const admin = option("postgres");
+    if (admin !== undefined) {
+      const second = await createProject(
+        candidate,
+        manager,
+        env,
+        temporary,
+        "smoke-pg-app",
+        results,
+      );
+      await postgresLeg(candidate, second, results, admin, runtime);
+    }
+    console.log(
+      `\nAll ${results.length} steps passed on ${runtime} with ${manager}:\n${summarize(results)}`,
     );
-    const project = join(temporary, "smoke-app");
-    const lockfile = manager === "npm" ? "package-lock.json" : "pnpm-lock.yaml";
-    if (!existsSync(join(project, lockfile)))
-      throw new Error(`The project was not installed with ${manager} (no ${lockfile}).`);
-    const port = await freePort();
-    dev = spawn(manager, ["run", "dev"], {
-      cwd: project,
-      env: { ...env, PORT: String(port) },
-      stdio: "inherit",
-      detached: true,
-    });
-    const body = await waitForRoute(port, dev);
-    const runtime = `Node ${process.version}`;
-    console.log(`${manager} run dev on ${runtime} answered GET /hello: ${body.slice(0, 200)}`);
+  } catch (cause) {
+    console.error(`\nSteps before the failure:\n${summarize(results)}`);
+    throw cause;
   } finally {
-    if (dev !== undefined) await stopGroup(dev);
     await registry.close();
-    if (!process.argv.includes("--keep")) await rm(temporary, { recursive: true, force: true });
+    if (!flag("keep")) await rm(temporary, { recursive: true, force: true });
     else console.log(`kept ${temporary}`);
   }
 }
