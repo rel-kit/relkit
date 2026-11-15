@@ -1,0 +1,16 @@
+name: RelKit CodeQL
+
+# Local input (the command line, the environment, files) counts as untrusted for the code RelKit
+# ships: a project's files must not make the CLI run or request something their author did not
+# write. Remote input is always untrusted.
+threat-models: local
+
+# Maintainer scripts and tests run with the authority of the developer who starts them, on input
+# that developer chose. With local input untrusted, nearly every finding there was noise: 22 of the
+# 27 alerts open on main before this file were in `scripts/` or in tests.
+paths-ignore:
+  - scripts/**
+  - tests/**
+  - "**/tests/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
