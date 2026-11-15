@@ -222,3 +222,9 @@
 - [x] 22.1 RK-36: write a test that calls a route with an access rule through the in-process HTTP client of `@relkit/testing` as an anonymous caller, a caller without the permission and a permitted caller; if the rule is not evaluated, make the harness run the same access path as the served application; verify 401, 403 and success, and that existing harness tests still pass.
 - [x] 22.2 RK-12: bind a bucket's declared limits to the clients the harness wires for replacement providers (`packages/testing/src/provider-replacements.ts`, `bindBucketPolicy` from `relkit/engine`); verify a replacement provider refuses a disallowed upload in a harness test.
 
+## 23. Better Auth release without the advisories
+
+**Findings:** RK-20 (the part group 7 could not close). **Owns:** the `better-auth` catalog pin and the manifests the sync script rewrites, `packages/better-auth/**`, `packages/cli/src/scaffolding/render-auth*.ts`, `examples/auth-drizzle/**`, the auth pages of the documentation, `docs/dependencies.md`.
+
+- [ ] 23.1 RK-20: move the scaffolded and tested `better-auth` version to the first release without the advisories `npm audit` reports (1.7.7 or later in the same minor line), make the generated authentication schema, the examples and the package's tests match what that release accepts (it rejects the `account.issuer` column the current schema declares), and give existing projects a documented way forward (a `relkit migrate` rule or a doctor finding with the exact schema change and migration to run); verify the Better Auth package suite, a generated project with authentication on Bun and on Node, and that `npm audit` on a fresh project with authentication and a database attributes nothing to a version RelKit pins or writes.
+
