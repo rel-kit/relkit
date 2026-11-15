@@ -42,11 +42,13 @@ export async function readManifests(
  * Builds and packs the fixture package closure sequentially into its owned artifact directory.
  * @param temporary - Owned directory receiving this packing run and its artifacts.
  * @param manifests - Current workspace release package identities and source locations.
+ * @param extraRoots - Workspace packages packed in addition to the creation closure.
  * @returns Freshly built tarball paths indexed by package name after sequential packing completes.
  */
 export async function packPackages(
   temporary: string,
   manifests: Map<string, { directory: string; manifest: Manifest }>,
+  extraRoots: readonly string[] = [],
 ): Promise<Map<string, string>> {
   const names = packingWorkspaceClosure(
     [
@@ -64,6 +66,7 @@ export async function packPackages(
       "@relkit/s3",
       "@relkit/postgres",
       "@relkit/cloudflare",
+      ...extraRoots,
     ],
     manifests,
     new Set(toolPackageVersions(resolve(import.meta.dir, "..")).keys()),
