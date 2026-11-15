@@ -207,7 +207,32 @@ test("offers the recorded outcomes and shows a rejected filter at its field", as
   // A link with a value the page would not send: the Inspector rejects it and the page says so.
   await page.goto("/requests?status=abc");
   await expect(page.getByText("These filters were not accepted.")).toBeVisible();
-  await expect(page.getByLabel("Status", { exact: true })).toHaveAccessibleDescription(message);
+  await expect(page.getByLabel("Status", { exact: true })).toHaveAccessibleDescription(
+    /status is invalid/,
+  );
+});
+
+test("shows the Inspector's own message for a rejected filter at the field it names", async ({
+  page,
+  request,
+}) => {
+  await seedHistory(request);
+  await page.goto("/requests?status=999");
+  const status = page.getByLabel("Status", { exact: true });
+  await expect(page.getByText("These filters were not accepted.")).toBeVisible();
+  // The server's message names the parameter and the rule, and replaces the page's own sentence.
+  await expect(status).toHaveAccessibleDescription(
+    "Observability query status is invalid: expected an HTTP status from 100 to 599 or a class from 1xx to 5xx",
+  );
+  await expect(status).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByText(/Status must be a code from 100 to 599/)).toHaveCount(0);
+
+  // Editing the field drops the refused value's message; a valid value loads the list again.
+  await status.fill("404");
+  await expect(status).not.toHaveAttribute("aria-invalid", "true");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page).toHaveURL(/status=404/);
+  await expect(page.getByText("These filters were not accepted.")).toHaveCount(0);
 });
 
 test("a declared error names its identifier and links to its contract", async ({

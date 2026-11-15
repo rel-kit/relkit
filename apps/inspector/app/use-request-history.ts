@@ -8,6 +8,7 @@ import {
   INSPECTOR_BACKEND_CONNECTED_EVENT,
 } from "../lib/client";
 import { eventRecord, matchesQuery, mergeLiveItems, signalKey } from "../lib/observability-model";
+import type { FilterRejection } from "../lib/request-rejection";
 import { signalEventTypes } from "../lib/signal-events";
 
 export interface RequestHistory {
@@ -17,6 +18,8 @@ export interface RequestHistory {
   readonly liveState: string;
   /** Number of requests the filters select; undefined while it is being counted or unknown. */
   readonly total: number | undefined;
+  /** The server's message and parameter when it refused the filters; set while `state` is "rejected". */
+  readonly rejection: FilterRejection | undefined;
 }
 
 /**
@@ -31,6 +34,7 @@ export function useRequestHistory(query: InspectorQuery, filterKey: string): Req
   const [state, setState] = useState<RequestHistory["state"]>("loading");
   const [liveState, setLiveState] = useState("connecting");
   const [total, setTotal] = useState<number>();
+  const [rejection, setRejection] = useState<FilterRejection>();
   const queryKey = JSON.stringify(query);
 
   useEffect(() => {
@@ -60,14 +64,20 @@ export function useRequestHistory(query: InspectorQuery, filterKey: string): Req
         listed.current = page.items;
         setItems(page.items);
         setNextCursor(page.nextCursor);
+        setRejection(undefined);
         setState("ready");
       } catch (error) {
         if (!mounted || number !== requestNumber) return;
-        setState(
-          error instanceof InspectorApiError && error.code === "RELKIT_OBSERVABILITY_QUERY_INVALID"
-            ? "rejected"
-            : "error",
-        );
+        if (
+          error instanceof InspectorApiError &&
+          error.code === "RELKIT_OBSERVABILITY_QUERY_INVALID"
+        ) {
+          setRejection({ message: error.message, parameter: error.parameter });
+          setState("rejected");
+        } else {
+          setRejection(undefined);
+          setState("error");
+        }
       }
     };
     void refresh(true);
@@ -100,5 +110,5 @@ export function useRequestHistory(query: InspectorQuery, filterKey: string): Req
     };
   }, [queryKey]);
 
-  return { items, nextCursor, state, liveState, total };
+  return { items, nextCursor, state, liveState, total, rejection };
 }

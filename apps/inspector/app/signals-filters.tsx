@@ -145,6 +145,7 @@ export function SignalsFilters({
           allLabel="All outcomes"
           options={REQUEST_OUTCOME_OPTIONS}
           onChange={update}
+          problem={problem("outcome")}
         />
       </div>
       <details className="border-t border-border px-4 py-2" open={moreActive || undefined}>
@@ -163,6 +164,7 @@ export function SignalsFilters({
             value={value.from}
             type="datetime-local"
             onChange={update}
+            problem={problem("from")}
           />
           <Field
             label="To"
@@ -171,6 +173,7 @@ export function SignalsFilters({
             value={value.to}
             type="datetime-local"
             onChange={update}
+            problem={problem("to")}
           />
         </div>
       </details>

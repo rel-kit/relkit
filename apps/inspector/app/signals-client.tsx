@@ -12,6 +12,7 @@ import {
   type SignalFilters,
 } from "../lib/observability-model";
 import { countLabel, filterProblems, hasActiveFilters } from "../lib/request-filters";
+import { listRejectionMessage, withRejection } from "../lib/request-rejection";
 import {
   DEFAULT_PAGE_SIZE,
   newerCursor,
@@ -87,8 +88,12 @@ export function SignalsClient() {
     go({ filters: next, limit });
   };
   // Problems show once applied was tried, and for a URL that carries a value the API refuses.
-  const shown = submitted || JSON.stringify(draft) === filtersKey ? problems : [];
-  const rejection = shown[0]?.message ?? REJECTED;
+  // The server's own message for a refused value replaces the page's message at that field.
+  const own = submitted || JSON.stringify(draft) === filtersKey ? problems : [];
+  const refused = history.state === "rejected" ? history.rejection : undefined;
+  const shown = withRejection(own, refused, filters, draft);
+  const listMessage = listRejectionMessage(refused);
+  const rejection = refused?.message ?? shown[0]?.message ?? REJECTED;
   const total = history.total;
   const filtered = hasActiveFilters(filters);
 
@@ -117,7 +122,11 @@ export function SignalsClient() {
         value={draft}
         limit={limit}
         problems={shown}
-        rejected={history.state === "rejected" && shown.length === 0 ? REJECTED : undefined}
+        rejected={
+          history.state === "rejected" && shown.length === 0
+            ? (listMessage ?? REJECTED)
+            : listMessage
+        }
         onChange={setDraft}
         onLimitChange={(value) => go({ filters, limit: value })}
         onSubmit={() => apply(draft)}
