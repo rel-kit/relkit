@@ -71,7 +71,7 @@
 
 - [ ] 7.1 RK-26: declare 401 and 403 for operations with an access rule, the validation and oversize responses for operations with input, and 500, in the generated document (`generate-response.ts:70-110`); correct the Better Auth operation schemas the harness found wrong or record them as upstream; verify the harness contract group reports no undeclared status for application routes.
 - [ ] 7.2 RK-20: move `@hono/node-server` and the scaffolded `better-auth` version to releases without the advisories found by `npm audit`, or record why a pin must stay; verify `npm audit` on a fresh project attributes nothing to RelKit pins and the package suites pass.
-- [ ] 7.3 Document what is by design: 422 for malformed JSON and wrong content type and 413 `payload-too-large` for oversize (also for a route-level limit); request ID versus trace ID and how to find a request from either; dotenv precedence under `relkit dev` and for one-shot commands; the generated OpenAPI file versus the served document; the release-source rule for local-only bindings; that the Inspector's interface needs Node.js on `PATH` (also under `bun --bun`) and what its status fields mean; regenerate the generated reference pages and snippets (`bun run --cwd apps/docs generate`) so the CLI reference and the example snippets match the new help and messages; verify the docs build, its freshness check and its link check.
+- [ ] 7.3 Document what is by design: 422 for malformed JSON and wrong content type and 413 `payload-too-large` for oversize (also for a route-level limit); request ID versus trace ID and how to find a request from either; dotenv precedence under `relkit dev` and for one-shot commands; the generated OpenAPI file versus the served document; the release-source rule for local-only bindings; that the Inspector's interface needs Node.js on `PATH` (also under `bun --bun`) and what its status fields mean; verify the pages' own tests (the generated reference pages are regenerated once, in task 21.1).
 
 ## 8. Environment files and database commands on Node
 
@@ -208,7 +208,7 @@
 
 ## 21. Re-audit and integration
 
-- [ ] 21.1 Merge every group, resolve seams, and run once on the merged branch with nothing else running: the full `packages/relkit` suite, `test:packages`, `test:inspector`, the Inspector end-to-end suite, `typecheck`, `check`, `lint`, `konsistent`, then `prepush`; verify all pass.
+- [ ] 21.1 Merge every group, resolve seams, regenerate the generated documentation pages and snippets (`bun run --cwd apps/docs generate`) and pass their freshness check, and run once on the merged branch with nothing else running: the full `packages/relkit` suite, `test:packages`, `test:inspector`, the Inspector end-to-end suite, `typecheck`, `check`, `lint`, `konsistent`, then `prepush`; verify all pass.
 - [ ] 21.2 Pack candidates from the merged branch and install them through the fixture registry with isolated caches into fresh npm and Bun worktrees of the application; verify the installed files come from the candidates.
 - [ ] 21.3 Re-run the request harness and the command surface in both environments, including `npm run dev` on Node; verify every baseline failure passes or is recorded as by design with its diagnostic, and no row regressed.
 - [ ] 21.4 Re-run the Inspector page walk and the interactive checks; verify each `IN` finding with a before and after capture.
