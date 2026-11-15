@@ -85,7 +85,7 @@
       "dependencies": [
         {
           "package": "better-auth",
-          "supportedRange": "1.7.1",
+          "supportedRange": "1.7.7",
           "installSection": "dependencies",
           "capabilities": [
             "better-auth"
