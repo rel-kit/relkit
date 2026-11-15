@@ -153,7 +153,7 @@ it.effect("a lock conflict after history reopened names its holder again", () =>
       yield* Ref.update(current, (value) => ({ ...value, history: undefined }));
       yield* TestClock.adjust(1000);
       expect(warnings).toHaveLength(3);
-      expect(warnings[2]).toContain("locked by another process");
+      expect(warnings[2]).toContain("already holds this project's history");
       yield* Fiber.interrupt(fiber);
     }),
   ),
