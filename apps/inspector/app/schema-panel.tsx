@@ -151,7 +151,11 @@ function PropertyRows({
               <code className="min-w-0 truncate bg-transparent p-0 font-mono text-xs text-foreground">
                 {name}
               </code>
-              {requiredSet.has(name) ? <Mark tone="strong">required</Mark> : <Mark>optional</Mark>}
+              {requiredSet.has(name) && property.default === undefined ? (
+                <Mark tone="strong">required</Mark>
+              ) : (
+                <Mark>optional</Mark>
+              )}
               <span className="ml-auto min-w-0 shrink-0 pl-2 text-right">
                 <TypeLabel schema={property} />
               </span>

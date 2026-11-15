@@ -19,7 +19,8 @@ export function schemaFields(value: unknown): readonly SchemaField[] {
     return {
       key,
       type: schemaType(propertySchema),
-      required: required.has(key),
+      // A field with a default is optional for the caller, even when the decoded schema lists it.
+      required: required.has(key) && propertySchema.default === undefined,
       ...(schemaText(propertySchema.description)
         ? { description: schemaText(propertySchema.description) }
         : {}),
@@ -27,6 +28,22 @@ export function schemaFields(value: unknown): readonly SchemaField[] {
       ...(propertySchema.default === undefined ? {} : { defaultValue: propertySchema.default }),
     };
   });
+}
+
+/** "required", "optional", or "optional · default <value>" for a field that has a default. */
+export function fieldRequirement(field: {
+  readonly required: boolean;
+  readonly defaultValue?: unknown;
+}): string {
+  if (field.required) return "required";
+  if (field.defaultValue === undefined) return "optional";
+  let shown: string;
+  try {
+    shown = JSON.stringify(field.defaultValue) ?? String(field.defaultValue);
+  } catch {
+    shown = String(field.defaultValue);
+  }
+  return `optional · default ${shown}`;
 }
 
 export function schemaInput(

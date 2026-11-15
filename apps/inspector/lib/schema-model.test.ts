@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { asInputSchema, schemaFields, schemaInput, schemaTemplate } from "./schema-model";
+import {
+  asInputSchema,
+  fieldRequirement,
+  schemaFields,
+  schemaInput,
+  schemaTemplate,
+} from "./schema-model";
 
 describe("a template from a declared schema", () => {
   test("holds the required properties with a value of the right type", () => {
@@ -89,9 +95,34 @@ describe("forms read the input schema", () => {
     expect(schemaInput(withDefault, {}).errors).toEqual(["id is required."]);
   });
 
-  test("falls back to the decoded schema when no input schema is declared", () => {
+  test("a decoded schema lists a defaulted field as required, and it is still optional", () => {
     const decoded = { $relkit: "schema", jsonSchema: withDefault.jsonSchema };
-    expect(schemaFields(decoded).every((field) => field.required)).toBe(true);
+    expect(schemaFields(decoded).map((field) => [field.key, field.required])).toEqual([
+      ["limit", false],
+      ["id", true],
+    ]);
+    expect(schemaFields(decoded)[0]?.defaultValue).toBe(10);
+    expect(schemaInput(decoded, { id: "a" })).toEqual({ value: { id: "a" }, errors: [] });
+  });
+
+  test("a field without a default stays required when only the decoded schema is declared", () => {
+    const decoded = {
+      $relkit: "schema",
+      jsonSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+    };
+    expect(schemaFields(decoded).map((field) => field.required)).toEqual([true]);
+  });
+
+  test("describes a field's requirement, with its default when it has one", () => {
+    expect(fieldRequirement({ required: true })).toBe("required");
+    expect(fieldRequirement({ required: false })).toBe("optional");
+    expect(fieldRequirement({ required: false, defaultValue: 10 })).toBe("optional · default 10");
+    expect(fieldRequirement({ required: false, defaultValue: "world" })).toBe(
+      'optional · default "world"',
+    );
+    expect(fieldRequirement({ required: false, defaultValue: false })).toBe(
+      "optional · default false",
+    );
   });
 
   test("shows a contract as its input schema", () => {

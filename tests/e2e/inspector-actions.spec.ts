@@ -77,7 +77,7 @@ test("a refused invocation shows the application's answer and says no session is
   await page.goto("/functions/orders.get");
   await expect(page.getByText("This function has an access rule.")).toBeVisible();
   // The field with a default is optional, as the route form already says.
-  await expect(page.getByText("(integer) · optional")).toBeVisible();
+  await expect(page.getByText("(integer) · optional · default 10")).toBeVisible();
   await expect(page.getByText("(string) · required")).toBeVisible();
   await expect(page.getByText("seen 12 times")).toBeVisible();
 
