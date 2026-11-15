@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
 import { nodeRuntime } from "relkit/runtime/node";
+import { burst, closeAfter, MALFORMED_FRAMES } from "./rpc-websocket-hygiene.case.ts";
 import { firstFrame, foreignHandshake, startSessionGuardServer } from "./realtime-session-guard.case.ts";
 
 let server: Awaited<ReturnType<typeof startSessionGuardServer>>;
@@ -21,4 +22,13 @@ test("on Node, an upgrade from a foreign origin is refused with 403 origin-denie
   expect(answer.status).toBe(403);
   expect(answer.raw).toContain("content-type: application/problem+json");
   expect(answer.raw).toMatch(/x-request-id: request-/u);
+});
+
+for (const [name, frame] of MALFORMED_FRAMES)
+  test(`on Node, ${name} closes the socket as invalid data`, async () => {
+    expect((await closeAfter(server.origin, frame)).code).toBe(1007);
+  });
+
+test("on Node, a burst of 300 valid frames is answered on an open socket", async () => {
+  expect(await burst(server.origin, 300)).toEqual({ answers: 300, open: true });
 });

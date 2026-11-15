@@ -106,7 +106,9 @@ export async function startSessionGuardServer(runtime: RuntimeAdapter) {
     } as unknown as typeof WebSocket,
   });
   const close = async () => {
-    await server.stop(true);
+    // Bun 1.3's `stop(true)` never settles once the server closed a socket whose client runs in
+    // the same process (the hygiene cases do); the listener is closed by then.
+    await Promise.race([server.stop(true), new Promise((resolve) => setTimeout(resolve, 1_000))]);
     await rm(root, { recursive: true, force: true });
   };
   return { origin, http, socket, close };

@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { bunRuntime } from "relkit/runtime/bun";
+import { burst, closeAfter, MALFORMED_FRAMES } from "./rpc-websocket-hygiene.case.ts";
 import { firstFrame, foreignHandshake, startSessionGuardServer } from "./realtime-session-guard.case.ts";
 
 let server: Awaited<ReturnType<typeof startSessionGuardServer>>;
@@ -21,4 +22,13 @@ test("on Bun, an upgrade from a foreign origin is refused with 403 origin-denied
   expect(answer.raw).toContain("content-type: application/problem+json");
   expect(answer.raw).toMatch(/x-request-id: request-/u);
   expect(answer.raw).toContain('"code":"origin-denied"');
+});
+
+for (const [name, frame] of MALFORMED_FRAMES)
+  test(`on Bun, ${name} closes the socket as invalid data`, async () => {
+    expect((await closeAfter(server.origin, frame)).code).toBe(1007);
+  });
+
+test("on Bun, a burst of 300 valid frames is answered on an open socket", async () => {
+  expect(await burst(server.origin, 300)).toEqual({ answers: 300, open: true });
 });

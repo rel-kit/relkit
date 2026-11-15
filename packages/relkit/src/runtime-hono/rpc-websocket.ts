@@ -6,6 +6,7 @@ import type { UpgradeWebSocket } from "hono/ws";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { createRpcRouter, type RpcContext } from "./rpc.js";
 import { errorStatusInterceptor, rpcHeadersInterceptor } from "./rpc-handler-options.js";
+import { isRpcFrame } from "./rpc-websocket-frame.js";
 import { contextProblem } from "./problem-details.js";
 import { assertWebSocketRequest, TransportSecurityError } from "./transport-security.js";
 
@@ -61,6 +62,10 @@ export function installRpcWebSocket(
         onMessage(event, socket) {
           if (encodedBytes(event.data) > REALTIME_RUNTIME_LIMITS.transportFrameBytes) {
             socket.close(1009, "RelKit frame exceeds the transport limit.");
+            return;
+          }
+          if (!isRpcFrame(event.data)) {
+            socket.close(1007, "RelKit RPC frame is not valid.");
             return;
           }
           const peer = (socket.raw ?? socket) as MinimalWebsocket;
