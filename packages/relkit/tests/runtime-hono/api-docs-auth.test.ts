@@ -90,3 +90,16 @@ test("preserves application servers, security and schemas and rejects conflictin
     "Duplicate authentication OpenAPI path",
   );
 });
+
+test("the Authentication section names the error format and keeps the application's description", () => {
+  const application = { ...document, info: { ...document.info, description: "Every route." } };
+  const merged = mergeAuthDocument(application, authDocument) as {
+    info: { description: string };
+  };
+  const [own, authentication] = merged.info.description.split("### Authentication");
+  expect(own?.trim()).toBe("Every route.");
+  expect(authentication).toContain("Better Auth's format");
+  expect(authentication).toContain("`BetterAuthError`");
+  expect(authentication).toContain("not as Problem Details");
+  expect(authentication).toContain("`HEAD` and `OPTIONS`");
+});

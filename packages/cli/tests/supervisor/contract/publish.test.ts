@@ -66,3 +66,26 @@ test("leaves other requests to the proxy and stops serving once closed", () => {
     contracts.intercept(new Request(`http://127.0.0.1:3000${CLIENT_CONTRACT_EVENTS_PATH}`)),
   ).toBeUndefined();
 });
+
+test("each stream's response names its own request", async () => {
+  const contracts = createContractPublisher();
+  const open = () => {
+    const controller = new AbortController();
+    const response = contracts.intercept(
+      new Request(`http://127.0.0.1:3000${CLIENT_CONTRACT_EVENTS_PATH}`, {
+        signal: controller.signal,
+      }),
+    )!;
+    return { controller, response };
+  };
+  const first = open();
+  const second = open();
+  const firstId = (await first.response).headers.get("x-request-id");
+  const secondId = (await second.response).headers.get("x-request-id");
+  expect(firstId).toMatch(/^request-[0-9a-f-]{36}$/);
+  expect(secondId).toMatch(/^request-[0-9a-f-]{36}$/);
+  expect(secondId).not.toBe(firstId);
+  first.controller.abort();
+  second.controller.abort();
+  expect(contracts.connections()).toBe(0);
+});

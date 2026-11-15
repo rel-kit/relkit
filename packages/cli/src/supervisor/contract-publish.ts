@@ -108,6 +108,8 @@ export function createContractPublisher(
           headers: {
             "content-type": "text/event-stream",
             "cache-control": "no-store",
+            // The supervisor answers this itself, so no worker adds the ID its answers carry.
+            "x-request-id": `request-${crypto.randomUUID()}`,
             "access-control-allow-origin": request.headers.get("origin") ?? "*",
             "access-control-allow-credentials": "true",
             vary: "origin",

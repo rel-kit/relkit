@@ -1094,6 +1094,67 @@ declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L22)
 
+## `openapi-errors.ts`
+
+Declares the error body Better Auth's endpoints send. The SDK's generator gives every error
+response an inline schema with `message` alone; the endpoints send `message`, in most cases
+`code`, `issues` on a validation failure, or no body at all. Those errors keep their format
+(clients built on the SDK read it), so the document says what it is. The shapes were measured on
+a served application and read from the SDK's error constructors.
+
+### AUTH_ERROR
+
+Component name of the error body, already carrying the projection's prefix.
+
+**Signature**
+
+```ts
+declare const AUTH_ERROR: "BetterAuthError";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-errors.ts#L13)
+
+### authErrorReference
+
+A reference to the shared error schema.
+
+**Signature**
+
+```ts
+declare const authErrorReference: () => JsonObject;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-errors.ts#L20)
+
+### authErrorSchema
+
+The body of an error from a Better Auth endpoint.
+
+**Signature**
+
+```ts
+declare const authErrorSchema: () => JsonObject;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-errors.ts#L28)
+
+### declareAuthErrors
+
+Points an operation's error responses at the shared schema and lists the Problem that RelKit's
+transport policy sends for a state-changing request before Better Auth runs.
+
+**Signature**
+
+```ts
+declare const declareAuthErrors: (
+  responses: JsonObject,
+  method: string,
+  problem: JsonObject,
+) => JsonObject;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-errors.ts#L71)
+
 ## `openapi-nullable.ts`
 
 Better Auth describes optional values with the OpenAPI 3.0 keyword `nullable: true`. RelKit's
@@ -1211,7 +1272,43 @@ Applies the corrections to an already mounted and renamed document.
 declare const correctAuthResponses: (document: JsonObject, basePath: string) => JsonObject;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-responses.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-responses.ts#L79)
+
+## `openapi-served.ts`
+
+Leaves out of the native document an operation the configured instance does not serve. The SDK's
+generator lists the endpoints of the enabled plugins only, so the one case is an endpoint the
+router matches but a setting turns off: it answers 405 to every request.
+
+### ServedOperations (interface)
+
+Settings of the activated instance that turn a documented operation off.
+
+**Signature**
+
+```ts
+export interface ServedOperations {
+  /** `session.deferSessionRefresh`: without it `POST /get-session` answers 405. */
+  readonly sessionByPost: boolean;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-served.ts#L9)
+
+### withoutUnservedOperations
+
+Removes the operations the instance answers 405 to.
+
+**Signature**
+
+```ts
+declare const withoutUnservedOperations: (
+  document: JsonValue,
+  served: ServedOperations,
+) => JsonValue;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-served.ts#L20)
 
 ## `openapi.ts`
 
@@ -1230,7 +1327,7 @@ Native metadata projection with no request identity or database ownership.
 declare class AuthOpenApi
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L21)
 
 ### generateBetterAuthOpenApi
 
@@ -1251,7 +1348,7 @@ declare const generateBetterAuthOpenApi: (
 ) => Promise<JsonValue>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi.ts#L78)
 
 ## `react.ts`
 

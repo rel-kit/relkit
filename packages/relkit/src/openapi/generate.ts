@@ -5,6 +5,7 @@ import {
   GRAPH_VERSION,
 } from "../contracts/index.js";
 import { Effect, Result } from "effect";
+import { SERVER_ANSWERS_DESCRIPTION } from "./generate-description.js";
 import { OpenApiGenerationError } from "./generate-error.js";
 import { observeOpenApi } from "./generate-observability.js";
 import { PROBLEM_REFERENCE, PROBLEM_SCHEMA, problemComponent } from "./generate-problem.js";
@@ -108,7 +109,11 @@ export const generateOpenApiEffect = Effect.fn("OpenApi.generate")((graph: Appli
       );
       return {
         openapi: "3.1.0" as const,
-        info: { title: graph.appId ?? "RelKit application", version: String(CONTRACT_VERSION) },
+        info: {
+          title: graph.appId ?? "RelKit application",
+          version: String(CONTRACT_VERSION),
+          description: SERVER_ANSWERS_DESCRIPTION,
+        },
         jsonSchemaDialect: "https://json-schema.org/draft/2020-12/schema",
         ...(tags.length === 0 ? {} : { tags }),
         paths,

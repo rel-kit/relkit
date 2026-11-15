@@ -92,7 +92,12 @@ export interface OpenApiSecurityScheme {
  */
 export interface OpenApiDocument {
   readonly openapi: "3.1.0";
-  readonly info: { readonly title: string; readonly version: string };
+  readonly info: {
+    readonly title: string;
+    readonly version: string;
+    /** What every route answers without a listed operation: `HEAD`, `OPTIONS` and 431. */
+    readonly description: string;
+  };
   readonly jsonSchemaDialect: string;
   readonly tags?: readonly OpenApiTag[];
   readonly paths: Readonly<Record<string, OpenApiPathItem>>;
