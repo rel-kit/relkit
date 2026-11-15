@@ -19,7 +19,9 @@ test("centers select labels before and after changing selection", async ({ page 
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     for (const [path, label, initial, selected] of [
-      ["/jobs", "Status", "All", "available"],
+      // The Jobs status filter lists run states; "available" was a state of the legacy queue
+      // runtime, which was removed (relkit#175), so the spec picks a state the page offers.
+      ["/jobs", "Status", "All", "queued"],
       ["/routes", "Kind", "All", "POST"],
     ] as const) {
       await page.goto(path);

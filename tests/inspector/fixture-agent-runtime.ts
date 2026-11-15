@@ -129,7 +129,9 @@ export function createAgentApplicationFixture() {
       publicFingerprint: "sha256:commerce-inspector-public",
       provider: () => provider,
     },
-    internalEndpoints: { mode: "development" },
+    // Agent inspection routes answer 404 without an inspection session or an explicit check
+    // (RK-03); this loopback fixture has no dev supervisor, so it allows its own browser.
+    internalEndpoints: { mode: "development", authorize: () => true },
   });
   return { app, reset: () => (session += 1) };
 }
