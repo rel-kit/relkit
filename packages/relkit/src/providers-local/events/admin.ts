@@ -58,10 +58,13 @@ export function createEventAdmin(router: EventRouter, options: EventAdminOptions
     assertVersion(request);
     validateQuery(request);
     const snapshot = router.snapshot();
-    const all = snapshot.deliveries
+    const matching = snapshot.deliveries
       .map(toDelivery)
-      .filter((delivery) => matches(delivery, request))
-      .filter((delivery) => afterCursor(delivery, request.cursor));
+      .filter((delivery) => matches(delivery, request));
+    const all = matching.filter((delivery) => afterCursor(delivery, request.cursor));
+    // Total and per-state counts of the filter come from the same snapshot: no further reads.
+    const counts: Record<string, number> = {};
+    for (const delivery of matching) counts[delivery.state] = (counts[delivery.state] ?? 0) + 1;
     const limit = pageLimit(request.limit);
     const items = all.slice(0, limit);
     const next = all.length > limit ? all[limit - 1] : undefined;
@@ -90,6 +93,8 @@ export function createEventAdmin(router: EventRouter, options: EventAdminOptions
       items: Object.freeze(items),
       deliveries: Object.freeze(items),
       deadLetters: Object.freeze(items.filter(isDeadLetter)),
+      total: matching.length,
+      counts: Object.freeze(counts),
       ...(next === undefined ? {} : { nextCursor: nextCursor(next) }),
     });
   };

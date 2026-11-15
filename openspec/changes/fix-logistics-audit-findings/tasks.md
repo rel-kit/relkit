@@ -155,7 +155,7 @@
 - [x] 15.4 IN-20: record requests handled by the authentication mount, health endpoints and RPC with stable route identifiers and list them as system routes; emit a graph edge from functions with an access rule to the authentication service; verify the harness's authentication requests are attributed and the auth domain lists its users.
 - [x] 15.5 IN-21, IN-22, IN-16: add status, method, path and declared error identifier filters, text search and a match count to history queries, in the query contract and the DuckDB store; verify each filter and the count against a seeded history.
 - [x] 15.6 IN-29: carry the function identifier on logs written inside an invocation (`runtime-effect/logger-record.ts:75`); verify provider operation logs of a request are found by function.
-- [ ] 15.7 IN-13, IN-14: expose retry, a true re-delivery of a stored publication, and per-state delivery counts from the local event provider (`providers-local/events/provider.ts`, `delivery-utils.ts`), so the Inspector's retry works on a dead-lettered delivery, replay keeps the publication's identity, and the event page can show counts; verify through the inspection API of a generated runtime.
+- [x] 15.7 IN-13, IN-14: expose retry, a true re-delivery of a stored publication, and per-state delivery counts from the local event provider (`providers-local/events/provider.ts`, `delivery-utils.ts`), so the Inspector's retry works on a dead-lettered delivery, replay keeps the publication's identity, and the event page can show counts; verify through the inspection API of a generated runtime.
 
 ## 16. Inspector pages: requests and request detail
 

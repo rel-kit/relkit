@@ -12,10 +12,11 @@ export function promiseDelivery(service: EventDeliveryEffects): EventDelivery {
   return Object.freeze<EventDelivery>({
     triggerId: service.triggerId,
     capabilities: EVENT_DELIVERY_CAPABILITIES,
-    accept: (input) => runLocal(service.accept(input)),
+    accept: (input, replayId) => runLocal(service.accept(input, replayId)),
     deliver: (input) => runLocal(service.deliver(input)),
     runNext: (id) => runLocal(service.runNext(id)),
     retry: (id) => runLocal(service.retry(id)),
+    cancel: (id) => runLocal(service.cancel(id)),
     recover: (now) => runLocal(service.recover(now)),
     drain: () => runLocal(service.drain()),
     snapshot: () => runLocalSync(service.snapshot()),

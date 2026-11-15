@@ -17,6 +17,7 @@ import { createEventRouter } from "./router.js";
 import { createEventAdmin } from "./admin.js";
 import type { EventQueryRequest } from "./admin-contracts.js";
 import { housekeeping, withApplicationSuccessLogs } from "./provider-housekeeping.js";
+import { providerActions } from "./provider-actions.js";
 
 export type { LocalEventProvider, LocalEventEffects } from "./provider.types.js";
 
@@ -42,10 +43,13 @@ export async function createLocalEventProvider(root: string): Promise<LocalEvent
     throw error;
   }
   let closed = false;
-  return Object.freeze({
+  return Object.freeze<LocalEventProvider>({
     registerContract: (contract: unknown) => runLocal(service.registerContract(contract)),
     registerTrigger: (binding: EventRouterTrigger) => runLocal(service.registerTrigger(binding)),
     query: (request?: EventQueryRequest) => runLocal(service.query(request)),
+    retry: (target) => runLocal(service.retry(target)),
+    cancel: (target) => runLocal(service.cancel(target)),
+    replay: (target) => runLocal(service.replay(target)),
     publish: (payload: unknown, options: EventPublishOptions, context: EventOperationContext) =>
       runLocal(service.publish(payload, options, context)),
     close: async () => {
@@ -177,6 +181,7 @@ export const makeLocalEventService = Effect.fn("Events.open")(
     return LocalEventService.of({
       health,
       publish,
+      ...providerActions(router),
       query: (request: EventQueryRequest = {}) =>
         housekeeping(
           localOperation(

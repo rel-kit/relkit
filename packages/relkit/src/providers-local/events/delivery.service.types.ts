@@ -14,7 +14,16 @@ type Operation<F> = F extends (...args: infer Args) => infer Value
 /** One trigger's durable operations and immutable identity. */
 export type EventDeliveryEffects = { readonly triggerId: string } & {
   readonly [
-    K in "accept" | "deliver" | "runNext" | "retry" | "recover" | "drain" | "snapshot" | "close"
+    K in
+      | "accept"
+      | "deliver"
+      | "runNext"
+      | "retry"
+      | "cancel"
+      | "recover"
+      | "drain"
+      | "snapshot"
+      | "close"
   ]: Operation<EventDelivery[K]>;
 };
 

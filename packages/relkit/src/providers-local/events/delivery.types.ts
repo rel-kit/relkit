@@ -82,10 +82,19 @@ export interface EventDeliverySnapshot {
 export interface EventDelivery {
   readonly triggerId: string;
   readonly capabilities: EventDeliveryCapabilities;
-  readonly accept: (envelope: UnknownEventEnvelope) => Promise<EventDeliveryResult>;
+  /**
+   * Durably accepts a delivery of a publication. With `replayId` it accepts a replay: a new
+   * delivery of the same publication under that identity, which the runner marks as replayed.
+   */
+  readonly accept: (
+    envelope: UnknownEventEnvelope,
+    replayId?: string,
+  ) => Promise<EventDeliveryResult>;
   readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EventDeliveryResult>;
   readonly runNext: (deliveryId?: string) => Promise<EventDeliveryResult | undefined>;
   readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled delivery; a running or finished one is refused. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
   readonly drain: () => Promise<readonly EventDeliveryResult[]>;
   readonly recover: (now?: number) => Promise<readonly EventDeliveryLedgerRecord[]>;
   readonly snapshot: () => EventDeliverySnapshot;

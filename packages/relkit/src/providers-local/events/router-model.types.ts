@@ -107,6 +107,10 @@ export interface EventRouter {
   readonly runNext: (triggerId?: string) => Promise<EventDeliveryResult | undefined>;
   readonly drain: () => Promise<readonly EventDeliveryResult[]>;
   readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled durable delivery. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Delivers a routed publication again, as a replay, to every trigger of its event. */
+  readonly replay: (publicationId: string) => Promise<EventFanoutResult>;
   readonly snapshot: () => EventRouterSnapshot;
   readonly close: () => Promise<void>;
 }

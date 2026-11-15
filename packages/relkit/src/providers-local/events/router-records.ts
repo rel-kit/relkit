@@ -77,6 +77,31 @@ export function makeDeliveryId(eventInstanceId: string, triggerId: string): stri
   );
 }
 
+/** Prefix of the delivery identity of a replay; the identity is persisted, so the mark survives. */
+const REPLAY_PREFIX = "replay.";
+
+/** Derives the identity of one replay of a publication to a trigger: a new delivery of it.
+ * @param eventInstanceId - Publication instance identity, kept by the replay.
+ * @param triggerId - Registered trigger identity.
+ * @param token - Alphanumeric token distinguishing this replay from earlier ones.
+ * @returns A delivery identity distinct from the publication's first delivery.
+ */
+export function makeReplayDeliveryId(
+  eventInstanceId: string,
+  triggerId: string,
+  token: string,
+): string {
+  return normalizeId(`${REPLAY_PREFIX}${token}.${makeDeliveryId(eventInstanceId, triggerId)}`);
+}
+
+/** Tells a replay delivery from a publication's own delivery.
+ * @param deliveryId - Durable delivery identity.
+ * @returns Whether the delivery was created by a replay.
+ */
+export function isReplayDeliveryId(deliveryId: string): boolean {
+  return deliveryId.startsWith(REPLAY_PREFIX);
+}
+
 /** Appends delivery acceptance before acknowledging durable fanout.
  * @param store - Owning persisted-state or journal operations.
  * @param envelope - Validated event envelope.
