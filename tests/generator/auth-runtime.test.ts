@@ -8,6 +8,7 @@
  */
 import { expect, test as nativeTest } from "bun:test";
 import { spawn } from "node:child_process";
+import { connect } from "node:net";
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import {
@@ -63,16 +64,24 @@ async function newestMigration(root: string) {
 
 /**
  * Starts the application on one runtime and returns its origin, output and stop function: Bun
- * runs `relkit dev`; Node builds and runs `relkit start` through the built CLI. (Behind the Node
- * development proxy a same-origin `Origin` is refused as `origin-denied`, independently of auth.)
+ * runs `relkit dev`; Node builds and runs `relkit start` through the built CLI, and `node-dev`
+ * runs `relkit dev` through the built CLI on Node.
  */
-async function serve(runtime: "bun" | "node", root: string, env: Record<string, string>) {
+async function serve(
+  runtime: "bun" | "node" | "node-dev",
+  root: string,
+  env: Record<string, string>,
+) {
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
   const command =
     runtime === "bun"
       ? [process.execPath, join(repository, "packages/cli/src/bin.ts"), "dev"]
-      : ["node", join(repository, "packages/cli/dist/bin.js"), "start"];
+      : [
+          "node",
+          join(repository, "packages/cli/dist/bin.js"),
+          runtime === "node" ? "start" : "dev",
+        ];
   if (runtime === "node") {
     const built = await runOn("node", root, ["build"], env);
     expect(built.code, built.stdout + built.stderr).toBe(0);
@@ -146,6 +155,29 @@ async function signFlow(origin: string, email: string, signUp: boolean) {
   const signedIn = await post(origin, "sign-in/email", { email, password: credentials.password });
   expect(signedIn.status, signedIn.text).toBe(200);
   expect((await session(origin, signedIn.cookie))?.user?.email).toBe(email);
+  // RK-41: sign-out is a POST with no body and no content type, with and without Content-Length.
+  for (const framing of ["", "Content-Length: 0\r\n"]) {
+    const answer = await rawSignOut(origin, signedIn.cookie ?? "", framing);
+    expect(answer, `sign-out ${JSON.stringify(framing)}`).toMatch(/^HTTP\/1\.1 200 /u);
+  }
+}
+
+/** Sends `POST /api/auth/sign-out` framed exactly as given and returns the raw answer. */
+async function rawSignOut(origin: string, cookie: string, framing: string): Promise<string> {
+  const { hostname, port, host } = new URL(origin);
+  const socket = connect(Number(port), hostname);
+  let raw = "";
+  socket.on("data", (chunk: Buffer) => (raw += chunk.toString()));
+  socket.write(
+    `POST /api/auth/sign-out HTTP/1.1\r\nHost: ${host}\r\nOrigin: ${origin}\r\n` +
+      `Cookie: ${cookie}\r\n${framing}Connection: close\r\n\r\n`,
+  );
+  await new Promise<void>((done) => {
+    socket.once("close", () => done());
+    socket.once("error", () => done());
+    setTimeout(() => socket.destroy(), 5_000);
+  });
+  return raw;
 }
 
 /** Creates a throwaway database, runs the case and drops the database. */
@@ -173,7 +205,7 @@ test(
       generate(root, env, "auth");
       const migrated = await runOn("node", root, ["db", "migrate"], env);
       expect(migrated.code, migrated.stdout + migrated.stderr).toBe(0);
-      for (const runtime of ["bun", "node"] as const) {
+      for (const runtime of ["bun", "node", "node-dev"] as const) {
         const server = await serve(runtime, root, env);
         try {
           await signFlow(server.origin, `${runtime}@example.com`, true);

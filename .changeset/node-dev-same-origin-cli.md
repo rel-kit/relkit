@@ -13,3 +13,8 @@ socket work from a browser. Node's `WebSocket` client also replaced `Host` on th
 socket, so the worker refused every browser socket and the development server answered 502. On
 Node the proxy now opens that socket with `ws`, which keeps `Host` and forwards the browser's
 cookies and `Origin`; Bun keeps its own client. Cross-origin sockets are still refused.
+
+The development proxy no longer invents a request body: a request whose client sent none (no
+`Transfer-Encoding`, and no `Content-Length` or `Content-Length: 0`) is forwarded without one,
+where on Node it used to be forwarded as an empty chunked body, so Better Auth's sign-out answered
+415 under `relkit dev` on Node.

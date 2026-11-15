@@ -44,7 +44,7 @@ export function forwardProxyRequest(
   };
   let bodyEnded = true;
   // Re-stream decoded bytes: Bun 1.3.10's native chunked passthrough can produce empty 400s.
-  if (request.method !== "GET" && request.method !== "HEAD" && request.body !== null) {
+  if (request.method !== "GET" && request.method !== "HEAD" && declaresBody(request)) {
     bodyEnded = false;
     const progress = new TransformStream<Uint8Array, Uint8Array>({
       flush: () => {
@@ -73,6 +73,17 @@ const earlyAnswers = new WeakSet<Response>();
  * its body was never read. */
 export function answeredBeforeBody(response: Response): boolean {
   return earlyAnswers.has(response);
+}
+
+/** Tells whether the client sent a request body, so the proxy never invents one (RK-41): only
+ * `Transfer-Encoding` or a `Content-Length` above zero declare one, whatever stream the listener
+ * attached. @param request - Incoming request. @returns True when the body must be forwarded. */
+function declaresBody(
+  request: Request,
+): request is Request & { readonly body: ReadableStream<Uint8Array> } {
+  if (request.body === null) return false;
+  if (request.headers.has("transfer-encoding")) return true;
+  return Number(request.headers.get("content-length") ?? 0) > 0;
 }
 
 /** Builds the established drain rejection. @returns Uncached JSON503 response. */
