@@ -142,7 +142,7 @@ function McpToolCard({
           onChange={(event) => setInput(event.target.value)}
         />
         <div>
-          <Button type="submit" disabled={pending || !callable}>
+          <Button type="submit" isDisabled={pending || !callable}>
             Call {tool.id}
           </Button>
         </div>

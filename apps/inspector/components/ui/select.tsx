@@ -33,7 +33,7 @@ export function SelectField({ label, items, value, onChange, compact = false }: 
   return (
     <Select
       className="grid gap-1.5"
-      selectedKey={value}
+      {...(value === undefined ? {} : { selectedKey: value })}
       onSelectionChange={(key) => onChange(String(key))}
     >
       <Label className={compact ? "sr-only" : "text-xs font-medium"}>{label}</Label>
@@ -53,7 +53,7 @@ export function ComboboxField({ label, items, value, onChange, onSelect }: Choic
   return (
     <ComboBox
       className="grid gap-1.5"
-      inputValue={value}
+      {...(value === undefined ? {} : { inputValue: value })}
       onInputChange={onChange}
       onSelectionChange={(key) => key !== null && (onSelect ?? onChange)(String(key))}
     >

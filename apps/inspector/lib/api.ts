@@ -109,8 +109,8 @@ export class InspectorApiClient extends InspectorApiTransport {
     id: string | undefined,
     body: InspectorObject = {},
   ): Promise<T> {
-    return jobScheduleActionRequest(
-      (path, options) => this.request<T>(path, options),
+    return jobScheduleActionRequest<T>(
+      (path, options) => this.request(path, options),
       action,
       id,
       body,
@@ -121,7 +121,7 @@ export class InspectorApiClient extends InspectorApiTransport {
     action: "cancel" | "retry",
     body: InspectorObject = {},
   ): Promise<T> {
-    return jobControlRequest((path, options) => this.request<T>(path, options), id, action, body);
+    return jobControlRequest<T>((path, options) => this.request(path, options), id, action, body);
   }
   bucketObjects(
     bucketId: string,

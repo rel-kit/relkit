@@ -84,7 +84,9 @@ function requestRoute(request: InspectorObject): unknown {
 }
 
 function record(value: unknown): InspectorObject {
-  return value !== null && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as InspectorObject)
+    : {};
 }
 
 function text(value: unknown): string {

@@ -181,11 +181,7 @@ export function ResourceTable<Item extends ResourceTableItem>({
         description={`Quick ${noun} inspection; the canonical URL remains shareable.`}
         isOpen={selected !== undefined}
         onOpenChange={(open) => !open && setSelected(undefined)}
-        trigger={
-          <Button className="sr-only" tabIndex={-1}>
-            Open quick view
-          </Button>
-        }
+        trigger={<Button className="sr-only">Open quick view</Button>}
       >
         {selected && (
           <ContentTabs

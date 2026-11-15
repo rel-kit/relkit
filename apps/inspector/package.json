@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "next build --webpack",
-    "check": "tsc --noEmit",
+    "check": "tsc --noEmit -p tsconfig.check.json",
     "dev": "next dev --hostname 127.0.0.1",
     "test": "bun test lib"
   },

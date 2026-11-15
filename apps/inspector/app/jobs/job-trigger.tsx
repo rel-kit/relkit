@@ -71,7 +71,7 @@ export function JobTrigger({
           onChange={(event) => setInput(event.target.value)}
         />
         <div>
-          <Button type="submit" disabled={pending}>
+          <Button type="submit" isDisabled={pending}>
             Trigger job
           </Button>
         </div>

@@ -65,6 +65,7 @@ describe("inspector event projections", () => {
   test("derives consumers only through exact-event trigger edges", () => {
     const data = graph.graph as { nodes: unknown[]; edges: Array<{ kind: string }> };
     const disconnected = {
+      ...graph,
       graph: { ...data, edges: data.edges.filter((edge) => edge.kind !== "targets-function") },
     } as InspectorGraph;
     expect(eventView(disconnected, runtime, "orders.created")?.consumers).toEqual([]);

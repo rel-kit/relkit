@@ -4,7 +4,7 @@ export class InspectorProxyBodyError extends Error {}
 /** Streams app uploads to their route limits; control bodies remain bounded before forwarding. */
 export async function readInspectorProxyBody(
   request: Request,
-): Promise<Uint8Array | ReadableStream<Uint8Array> | undefined> {
+): Promise<Uint8Array<ArrayBuffer> | ReadableStream<Uint8Array<ArrayBuffer>> | undefined> {
   if (request.body === null) return undefined;
   if (!/^\/_relkit\/backend\/(?:_relkit\/v1|rpc)(\/|$)/.test(new URL(request.url).pathname))
     return request.body;

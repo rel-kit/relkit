@@ -222,7 +222,7 @@ describe("inspector API client", () => {
     const second = await client.query("logs", {
       functionId: "sum",
       limit: 1,
-      cursor: first.nextCursor,
+      ...(first.nextCursor === undefined ? {} : { cursor: first.nextCursor }),
     });
 
     expect(first.items).toEqual([{ functionId: "sum", signal: "log", id: "first" }]);

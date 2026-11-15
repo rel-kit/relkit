@@ -84,6 +84,7 @@ function makeToolView(
   const approval = runtimeViews.flatMap((item) =>
     item.approval?.state === "pending" ? [item.approval] : [],
   );
+  const timeoutMs = number(node.timeoutMs);
   const spanViews = spans.flatMap((item) => {
     const value = spanView(item);
     return value === undefined ? [] : [value];
@@ -94,7 +95,7 @@ function makeToolView(
     description: text(node.description),
     sideEffect: text(node.sideEffect) || "none",
     approvalPolicy: text(node.approval) || "never",
-    ...(number(node.timeoutMs) === undefined ? {} : { timeoutMs: number(node.timeoutMs) }),
+    ...(timeoutMs === undefined ? {} : { timeoutMs }),
     ...(target?.input === undefined ? {} : { input: target.input }),
     ...(target?.output === undefined ? {} : { output: target.output }),
     ...(target?.errors === undefined ? {} : { errors: target.errors }),

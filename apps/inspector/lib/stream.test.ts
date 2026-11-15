@@ -46,13 +46,13 @@ async function waitFor(predicate: () => boolean): Promise<void> {
 describe("inspector SSE client", () => {
   test("persists cursors, counts gaps, and invalidates affected caches", async () => {
     const saved = storage();
-    const invalidations: readonly string[][] = [];
+    const invalidations: string[][] = [];
     const client = createInspectorStream({
       storage: saved,
       reconnectDelayMs: 0,
       maxReconnectAttempts: 0,
       fetch: async () => response(`${event(1, "span.updated")}${event(3)}`),
-      onInvalidate: (tags) => invalidations.push(tags),
+      onInvalidate: (tags) => invalidations.push([...tags]),
     });
     client.start();
     await waitFor(() => client.snapshot.cursor === "3");
