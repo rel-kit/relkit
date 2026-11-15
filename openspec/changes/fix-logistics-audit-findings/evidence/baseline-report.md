@@ -67,6 +67,7 @@ Severity: **high** = unsafe, data exposed, valid work fails, or a documented pat
 | RK-36 | medium | `@relkit/testing` in-process HTTP client | Evaluates function access rules like the served application | Every call to a route with a permission rule answered 500 in process (anonymous, unpermitted and permitted alike): the harness built its auth runtime without the access resolver and mapped access failures to an internal error. The application's tests start a real server for every file to avoid it. Confirmed on 0.9.0 by the fix task's first test |
 | RK-37 | medium | `relkit add` in a pnpm project under CI | The install after `add` succeeds | `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH`: `add` has just changed the manifest and the workspace file, and runs a plain `pnpm install`, which is frozen when `CI` is set. Found by the extended Node acceptance run during the fix phase |
 | RK-38 | low | Messages after `relkit add` in npm and pnpm projects | Name the project's package manager | The failure text says "Run `bun install`" and the next steps say "bun install / bun run check". Found by the same run |
+| RK-39 | high | `relkit dev` on Node, state-changing requests | A same-origin `POST` is served | Reported during the fix phase: behind the Node development proxy a `POST` whose `Origin` is the server's own public origin answers 403 `origin-denied`; Bun `dev` and Node `start` are fine. To be confirmed by the fix task's first test |
 
 ## List B: what the Inspector failed to deliver
 

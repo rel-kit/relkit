@@ -235,3 +235,10 @@
 - [ ] 24.1 RK-37: make the install that `relkit add` runs succeed in a pnpm, npm and Bun project when `CI` is set, by telling each package manager that the lockfile may change (`packages/create-relkit/src/package-manager.ts`, around line 58), without changing what a plain install does elsewhere; verify with a test per manager and the pnpm leg of the Node acceptance run.
 - [ ] 24.2 RK-38: name the project's package manager in every message `relkit add` prints (the failed-install text and the next steps), and in the other commands' next steps where the scan finds a hard-coded `bun`; verify with tests for an npm and a pnpm project.
 
+## 25. Same-origin requests under `relkit dev` on Node
+
+**Findings:** RK-39. **Owns:** the request forwarding of the development proxy and the generated server on Node (`packages/cli/src/supervisor/proxy-*.ts`, `packages/cli/src/commands/build-server-http.ts` `forwardedRequest`, `packages/relkit/src/runtime/node/**`), `packages/relkit/src/runtime-hono/transport-security.ts`, `scripts/node-creation-smoke-*.ts`.
+
+- [ ] 25.1 RK-39: write a test that starts `relkit dev` on Node and sends a `POST` with a JSON body and an `Origin` equal to the server's public origin, and the same on Bun; find why Node answers 403 `origin-denied` and fix it so the origin check compares against the origin the client used on every runtime; add a same-origin `POST` (and a cross-origin one expecting 403) to the `dev` step of the Node acceptance run; verify the test on both runtimes and the acceptance run for npm.
+- [ ] 25.2 Remove the remaining statements that Better Auth is kept at 1.7.1 or that the account table has an `issuer` column: the template skill reference (`templates/default/v1/*/.agents/skills/relkit/references/data-apis.md`, with the template digest), the documentation's tutorial project script and example steps under `apps/docs/scripts` and `apps/docs/examples`; verify the template consistency test, the digest test and the docs tests that read those examples.
+
