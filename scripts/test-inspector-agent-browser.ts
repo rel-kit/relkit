@@ -42,11 +42,17 @@ export async function runAgentGraphAcceptance(driver: BrowserAcceptanceDriver): 
 
   await run("open", `${baseUrl}/graph?node=support.order`);
   await run("wait", '[aria-label="Interactive capability graph"]');
-  await run("wait", "--text", "Live execution");
+  // The section title is upper-cased by CSS, so match its textContent, not the rendered text.
+  await run(
+    "wait",
+    "--fn",
+    "[...document.querySelectorAll('.explorer-section__title')].some(title => title.textContent.startsWith('Live execution'))",
+  );
+  // The first view opens on the route card ("Route /orders"), beside the outline tree.
   includes(
     await run(
       "eval",
-      "Boolean(document.querySelector('.explorer-card[data-category=\"service\"]') && document.querySelector('.explorer-tree'))",
+      "Boolean(document.querySelector('.explorer-card[data-type=\"service\"][data-category=\"route\"]') && document.querySelector('.explorer-tree'))",
     ),
     "true",
   );
