@@ -154,6 +154,7 @@ export function OverviewShell({
         <RecentRequests requests={signals.requests} />
         <GenerationHistory
           generations={signals.generations}
+          application={application}
           {...(generationId === undefined ? {} : { generationId })}
         />
       </div>

@@ -8,17 +8,24 @@ import { EmptyState } from "../../components/neon/empty-state";
 import { Timeline, type TimelineItem } from "../../components/neon/timeline";
 import { formatDuration, formatTimestamp } from "../../lib/format";
 import { generationHistory, type GenerationGroup } from "../../lib/overview-generations";
+import type { ApplicationSession } from "../../lib/stream-application";
 import type { SampleState } from "./use-overview-signals";
 
 /** Development sessions, reloads, restarts and failed reloads, newest first, grouped by run. */
 export function GenerationHistory({
   generations,
   generationId,
+  application,
 }: {
   readonly generations: SampleState;
   readonly generationId?: string;
+  /** The Inspector's session with the application: only a connected session has a current run. */
+  readonly application: ApplicationSession;
 }) {
-  const groups = generationHistory(generations.items, 8);
+  const groups = generationHistory(generations.items, 8, {
+    state: application.state,
+    since: application.since,
+  });
   return (
     <Section
       id="overview-generations"
@@ -45,7 +52,7 @@ export function GenerationHistory({
             <RunGroup
               key={group.runId ?? `run-${index}`}
               group={group}
-              labelled={groups.length > 1 || group.runId !== undefined}
+              labelled={groups.length > 1 || group.runId !== undefined || group.current}
               {...(generationId === undefined ? {} : { generationId })}
             />
           ))}
@@ -64,8 +71,11 @@ function RunGroup({
   readonly labelled: boolean;
   readonly generationId?: string;
 }) {
-  const heading =
-    group.runId === undefined
+  const heading = group.current
+    ? group.startedAt === undefined
+      ? "Current development session, start not retained"
+      : `Current development session, started ${formatTimestamp(group.startedAt)}`
+    : group.runId === undefined
       ? "Earlier sessions"
       : group.startedAt === undefined
         ? "Development session"
@@ -106,7 +116,13 @@ function RunGroup({
       {labelled ? (
         <h3 className="m-0 mb-1.5 text-[11px] font-medium text-muted-foreground">{heading}</h3>
       ) : null}
-      <Timeline label={label} items={items} />
+      {items.length === 0 ? (
+        <p className="m-0 text-xs text-muted-foreground">
+          This session is connected, but the history holds none of its generation events.
+        </p>
+      ) : (
+        <Timeline label={label} items={items} />
+      )}
     </div>
   );
 }
