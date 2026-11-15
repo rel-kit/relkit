@@ -27,9 +27,19 @@ export const ownProxyBody = Effect.fn("SupervisorProxy.ownBody")(function* (
     await run(Deferred.done(options.completed, exit));
     await run(options.join());
   };
+  let ended = false;
+  /** Ends the downstream body with a failure; quietly when the client went away, since the error
+   * would reach only the listener's own log (`Error: aborted` on Node, 26.6 c).
+   * @param reason - Why the body ends. */
+  const fail = (reason: unknown): void => {
+    if (ended) return;
+    ended = true;
+    if (options.client?.aborted === true) downstream?.close();
+    else downstream?.error(reason);
+  };
   /** Errors an outstanding native body pull without aborting the caller. @returns Nothing after settlement. */
   const aborted = (): void => {
-    if (!finished) downstream?.error(options.signal.reason);
+    if (!finished) fail(options.signal.reason);
   };
   options.signal.addEventListener("abort", aborted, { once: true });
   yield* Scope.addFinalizer(
@@ -39,7 +49,7 @@ export const ownProxyBody = Effect.fn("SupervisorProxy.ownBody")(function* (
         options.signal.removeEventListener("abort", aborted);
         if (!finished) {
           finished = true;
-          downstream?.error(
+          fail(
             options.signal.aborted
               ? options.signal.reason
               : new Error("Supervisor proxy request closed."),
@@ -65,15 +75,16 @@ export const ownProxyBody = Effect.fn("SupervisorProxy.ownBody")(function* (
       async pull(controller) {
         try {
           const chunk = await reader.read();
-          if (finished) return;
+          if (finished || ended) return;
           if (chunk.done) {
             await settle(Exit.void);
+            ended = true;
             controller.close();
           } else controller.enqueue(chunk.value);
         } catch (error) {
-          if (finished) return;
+          if (finished || ended) return;
           await settle(Exit.fail(error));
-          controller.error(error);
+          fail(error);
         }
       },
       /** Cancels the actual upstream reader before releasing its lease. @param reason - Native reason. @returns Joined cleanup. */

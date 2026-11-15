@@ -64,6 +64,7 @@ export const proxyRequest = Effect.fn("SupervisorProxy.request")(function* (
         scope,
         completed,
         signal: bodySignal,
+        client: request.signal,
         join: () => (worker === undefined ? Effect.void : Fiber.await(worker)),
       });
       if (answeredBeforeBody(response)) owned.headers.set("connection", "close");
