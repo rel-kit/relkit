@@ -10,6 +10,8 @@
  * lower scheduling priority than the reload path. The Scope that acquired it stops the process
  * and everything it started (the project's native compiler runs behind a JavaScript launcher
  * that does not forward signals), and releases the output reader; see `watch-process.ts`.
+ * A file saved while the checker's first pass runs would never be checked, so that pass is not
+ * reported and the checker is started again; see `typecheck-stale.ts`.
  */
 import { existsSync } from "node:fs";
 import { setPriority } from "node:os";
@@ -21,10 +23,13 @@ import { parseTypecheckLine } from "./typecheck-output.js";
 import type { DevLog } from "../commands/dev.types.js";
 import type { TypecheckDiagnostic } from "./typecheck-output.types.js";
 import { projectCompilerCommand } from "../compiler/typescript-compiler.js";
+import { sourceSavedSince } from "./typecheck-stale.js";
 import { spawnWatchProcess, stopWatchProcess } from "./watch-process.js";
 
 /** Diagnostics included in one log record; the count is always complete. */
 const REPORTED_DIAGNOSTICS = 20;
+/** Times the checker is started again because a file was saved during its first pass. */
+const STALE_RESTARTS = 2;
 
 /**
  * Starts the watch process in the caller's Scope.
@@ -46,7 +51,7 @@ export const acquireTypecheckWatch = Effect.fn("Dev.typecheckWatch")(function* (
     (watch) =>
       cleanupEffect(
         "dev.typecheck.stop",
-        Effect.promise(() => stopWatchProcess(watch)),
+        Effect.promise(() => watch.stop()),
       ),
   );
 });
@@ -78,38 +83,61 @@ function typecheckCommand(projectRoot: string): readonly string[] | undefined {
  * @param projectRoot - Working directory.
  * @param command - Checker command line.
  * @param log - Session log.
- * @returns The running process and its output reader.
+ * @returns A stop for the checker that is running when it is called.
  */
 function startWatch(projectRoot: string, command: readonly string[], log: DevLog) {
-  const watch = spawnWatchProcess(command, {
-    cwd: projectRoot,
-    stdin: "ignore",
-    stderr: "ignore",
-    env: { ...process.env, NO_COLOR: "1" },
-  });
-  yieldToReloads(watch.child.pid);
-  let pass: TypecheckDiagnostic[] = [];
-  let buffer = "";
-  const decoder = new TextDecoder();
-  void (async () => {
-    for (;;) {
-      const { done, value } = await watch.reader.read();
-      if (done || value === undefined) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() ?? "";
-      for (const line of lines) {
-        const parsed = parseTypecheckLine(line, projectRoot);
-        if (parsed.kind === "diagnostic") pass.push(parsed.diagnostic);
-        if (parsed.kind === "started") pass = [];
-        if (parsed.kind === "finished") {
+  let restarts = 0;
+  let stopped = false;
+  const run = () => {
+    const startedAt = Date.now();
+    const watch = spawnWatchProcess(command, {
+      cwd: projectRoot,
+      stdin: "ignore",
+      stderr: "ignore",
+      env: { ...process.env, NO_COLOR: "1" },
+    });
+    yieldToReloads(watch.child.pid);
+    let first = true;
+    let pass: TypecheckDiagnostic[] = [];
+    let buffer = "";
+    const decoder = new TextDecoder();
+    void (async () => {
+      for (;;) {
+        const { done, value } = await watch.reader.read();
+        if (done || value === undefined) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const parsed = parseTypecheckLine(line, projectRoot);
+          if (parsed.kind === "diagnostic") pass.push(parsed.diagnostic);
+          if (parsed.kind === "started") pass = [];
+          if (parsed.kind !== "finished") continue;
+          // The first pass read the project before the checker watched it.
+          const stale =
+            first && restarts < STALE_RESTARTS && sourceSavedSince(projectRoot, startedAt);
+          first = false;
+          if (stale && !stopped) {
+            restarts += 1;
+            void stopWatchProcess(watch).then(() => {
+              if (!stopped) current = run();
+            });
+            return;
+          }
           report(log, pass, parsed.errors);
           pass = [];
         }
       }
-    }
-  })().catch(() => undefined);
-  return watch;
+    })().catch(() => undefined);
+    return watch;
+  };
+  let current = run();
+  return {
+    stop: async (): Promise<void> => {
+      stopped = true;
+      await stopWatchProcess(current);
+    },
+  };
 }
 
 /**

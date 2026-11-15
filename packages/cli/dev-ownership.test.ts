@@ -7,6 +7,7 @@ import { expect, test } from "bun:test";
 import { startDev, type DevOptions } from "./src/commands/dev.js";
 
 import { startDevSourceWatcher } from "./src/commands/dev-watch.js";
+import { developmentEnvironmentFiles } from "./src/commands/dev-environment-files.js";
 
 import { makeRoot, options, waitFor, adoptSession } from "../../tests/fixtures/cli/dev-fixture.js";
 import { registerDevCleanup } from "../../tests/fixtures/cli/dev-fixture.js";
@@ -79,7 +80,10 @@ test("forwards source, directory, and root configuration changes through the wat
     const beforeDirectory = builds;
     await mkdir(join(root, "src/routes/live/[id]/details"), { recursive: true });
     await waitFor(() => builds > beforeDirectory && session.stateMachine.state === "active");
-    for (const file of ["relkit.config.ts", ".env", ".env.local", "package.json", "bun.lock"]) {
+    // The watched dotenv files follow the process mode: a test runner sets NODE_ENV=test, where
+    // `.env.local` is not an input, so the local override of the current mode is written.
+    const localOverride = developmentEnvironmentFiles(process.env.NODE_ENV).at(-1)!;
+    for (const file of ["relkit.config.ts", ".env", localOverride, "package.json", "bun.lock"]) {
       const before = builds;
       await writeFile(join(root, file), "changed\n");
       await waitFor(
