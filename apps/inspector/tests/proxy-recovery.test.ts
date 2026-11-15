@@ -1,6 +1,6 @@
 /** Exercises unavailable/recovered loopback upstreams without retrying mutations or weakening origin checks. */
 import { afterEach, expect, test } from "bun:test";
-import { POST } from "../app/%5Frelkit/backend/[...path]/route";
+import { GET, POST } from "../app/%5Frelkit/backend/[...path]/route";
 
 const previous = process.env.RELKIT_BACKEND_URL;
 let backend: ReturnType<typeof Bun.serve> | undefined;
@@ -49,4 +49,24 @@ test("unavailable upstream yields safe JSON and later requests recover without r
   expect(recovered.status).toBe(200);
   expect(await recovered.json()).toEqual({ message: "owned-probe" });
   expect(calls).toBe(1);
+});
+
+test("a rebinding name is refused before the upstream is called, for reads and writes", async () => {
+  let calls = 0;
+  backend = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    fetch: () => {
+      calls++;
+      return Response.json({});
+    },
+  });
+  process.env.RELKIT_BACKEND_URL = `http://127.0.0.1:${backend.port}`;
+  const context = { params: Promise.resolve({ path: ["echo"] }) };
+  const url = "http://rebind.attacker.example:3210/_relkit/backend/echo";
+  const origin = "http://rebind.attacker.example:3210";
+  const write = await POST(new Request(url, { method: "POST", headers: { origin } }), context);
+  const read = await GET(new Request(url), context);
+  expect([write.status, read.status]).toEqual([403, 403]);
+  expect(calls).toBe(0);
 });

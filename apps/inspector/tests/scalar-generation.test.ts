@@ -25,7 +25,7 @@ test("embeds the document and stamps the current generation on local requests", 
       },
     );
   });
-  const response = await GET(new Request("http://inspector/scalar"));
+  const response = await GET(new Request("http://localhost:3210/scalar"));
   expect(response.status).toBe(200);
   expect(response.headers.get("content-type")).toBe("text/html; charset=utf-8");
   expect(response.headers.get("cache-control")).toBe("no-store");
@@ -50,7 +50,7 @@ test("adopts the reloaded generation and document before sending", async () => {
   serve(() =>
     Response.json({ openapi: "3.1.0" }, { headers: { "x-relkit-generation-id": "one" } }),
   );
-  const html = await (await GET(new Request("http://inspector/scalar"))).text();
+  const html = await (await GET(new Request("http://localhost:3210/scalar"))).text();
   const reloaded = { openapi: "3.1.0", info: { title: "reloaded" } };
   const page = await bootstrap(html, () =>
     Response.json(reloaded, { headers: { "x-relkit-generation-id": "two" } }),
@@ -76,7 +76,7 @@ test("keeps the embedded generation when the current one cannot be read", async 
   serve(() =>
     Response.json({ openapi: "3.1.0" }, { headers: { "x-relkit-generation-id": "one" } }),
   );
-  const html = await (await GET(new Request("http://inspector/scalar"))).text();
+  const html = await (await GET(new Request("http://localhost:3210/scalar"))).text();
   const page = await bootstrap(html, () => {
     throw new TypeError("offline");
   });
@@ -91,7 +91,7 @@ for (const response of [
 ]) {
   test(`fails closed for an unavailable or invalid document (${response.status})`, async () => {
     serve(() => response.clone());
-    const result = await GET(new Request("http://inspector/scalar"));
+    const result = await GET(new Request("http://localhost:3210/scalar"));
     expect(result.status).toBe(503);
     const html = await result.text();
     expect(html).toContain("API reference unavailable");
