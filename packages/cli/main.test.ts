@@ -84,12 +84,14 @@ test("keeps command and create failures structured in JSON", async () => {
   const unavailable = io();
   expect(
     await runCli(["--json", "unknown"], { io: unavailable.io, installSignalHandlers: false }),
-  ).toBe(CLI_EXIT_CODES.failure);
+  ).toBe(CLI_EXIT_CODES.usage);
   expect(JSON.parse(unavailable.stdout[0]!)).toEqual({
     ok: false,
     error: {
-      code: "RELKIT_COMMAND_UNAVAILABLE",
-      message: "Command is not implemented: unknown",
+      code: "RELKIT_UNKNOWN_COMMAND",
+      message: expect.stringMatching(
+        /^Unknown command "unknown"\. Available commands: create, add, .*, client\.$/u,
+      ),
     },
   });
 
@@ -256,9 +258,9 @@ test("generates completions, suggestions, help metadata, and command status", as
 
   const typo = io();
   expect(await runCli(["--json", "chek"], { io: typo.io, installSignalHandlers: false })).toBe(
-    CLI_EXIT_CODES.failure,
+    CLI_EXIT_CODES.usage,
   );
-  expect(JSON.parse(typo.stdout[0]!).error.message).toContain("check");
+  expect(JSON.parse(typo.stdout[0]!).error.message).toContain("Did you mean check?");
 
   const model = getCliHelpModel("test-version");
   expect(JSON.parse(JSON.stringify(model))).toEqual(model);

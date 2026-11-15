@@ -13,6 +13,6 @@ export const cliInvocationCodes = [
     code: "RELKIT_UNKNOWN_COMMAND",
     title: "Unknown relkit command",
     happened: "`relkit` has no command with the name you typed.",
-    fix: "Run `relkit --help` to see every command, or check the spelling against the suggestion in the message.",
+    fix: "Run `relkit --help` to see every command, or `relkit <command> --help` to see its subcommands.",
   },
 ] as const satisfies readonly DiagnosticCodeEntry[];
