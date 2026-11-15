@@ -51,8 +51,9 @@ export const recoverInspection = Effect.fn("Inspector.recover")(function* (
   const current = yield* Ref.get(state);
   yield* Ref.update(state, (value) => ({
     ...value,
+    // A failure loses no record by itself: the application keeps what was not acknowledged,
+    // and the next batch reports a gap if its buffer evicted any meanwhile.
     error: error.operation,
-    incomplete: true,
     ...(historyFailure ? { history: undefined } : {}),
     ...(error.operation === "history.foreign-project"
       ? { selection: { state: "disconnected" as const, rejected: 1 } }

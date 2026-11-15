@@ -19,7 +19,11 @@ Live operations are forwarded once; bridge rejections retain their HTTP status i
 
 ### forwardBackend
 
-Preserves native cookies, authorization, operation IDs and streaming bodies.
+Sends an accepted page request to the application as the Inspector's own call, authenticated
+by the session's bridge token. Inspection actions (`/_relkit/v1/...`) and route requests from
+the composer are both sent without the browser's `Origin`, `Referer`, `Sec-Fetch-*` and
+cookies, so they run without a user session; `Authorization` a developer typed, operation IDs
+and streaming bodies are kept.
 
 **Signature**
 
@@ -32,7 +36,7 @@ declare const forwardBackend: (
 ) => Effect.Effect<Response, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L15)
 
 ## `backend-history.ts`
 
@@ -73,6 +77,38 @@ declare const historyResponse: (
 ## `bin.ts`
 
 Native standalone entry; signals interrupt and join the tool's complete resource Scope.
+
+## `browser-boundary.ts`
+
+The Inspector is the boundary between a browser and the application's inspection bridge: it
+refuses a change a page of another site asked for, and forwards what it accepts as its own
+call, without the browser's provenance or the developer's application cookies.
+
+### crossSiteRefusal
+
+Refuses a state-changing request that a browser marked as sent from another origin. The
+Inspector's UI server has already required the page's `Origin` (or `Referer`) to be its own;
+this check holds even where an `Origin` is absent or was rewritten on the way.
+
+**Signature**
+
+```ts
+declare const crossSiteRefusal: (request: Request) => Response | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/browser-boundary.ts#L21)
+
+### inspectorCallHeaders
+
+Copies a browser request's headers for the Inspector's own call to the application.
+
+**Signature**
+
+```ts
+declare const inspectorCallHeaders: (incoming: Headers) => Headers;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/browser-boundary.ts#L50)
 
 ## `collection.schemas.ts`
 
@@ -451,6 +487,65 @@ declare const validateHistoryReply: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-reply.ts#L17)
+
+## `history-state.ts`
+
+What the tool says about history and its collection. An application that stopped answering
+loses no stored record, so it is told apart from history that cannot be written or read.
+
+### CollectionState (type alias)
+
+Where collection into history stands; see `collectionState`.
+
+**Signature**
+
+```ts
+type CollectionState =
+  | "collecting"
+  | "waiting-for-application"
+  | "application-unreachable"
+  | "application-invalid"
+  | "history-unavailable";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L27)
+
+### collectionState
+
+Names where collection stands, for the `/_relkit/v1/storage` answer.
+
+**Signature**
+
+```ts
+declare const collectionState: (current: InspectorToolState) => CollectionState;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L43)
+
+### historyFailure
+
+Tells a failure of the tool's own history (its database, or the collection loop) from one of
+the application it collects from.
+
+**Signature**
+
+```ts
+declare const historyFailure: (error: string) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L13)
+
+### historyReadable
+
+Whether retained history is open and readable.
+
+**Signature**
+
+```ts
+declare const historyReadable: (current: InspectorToolState) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L22)
 
 ## `history.service.ts`
 
@@ -3153,7 +3248,7 @@ declare const inspectorBackend: (
 ) => (request: Request) => Effect.Effect<Response, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L51)
 
 ## `tool-history.ts`
 
@@ -3186,7 +3281,7 @@ PID; only that number is echoed, never the file path or the rest of the message.
 declare const historyFailureHint: (error: InspectionConnectionError) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L70)
 
 ### recoverInspection
 

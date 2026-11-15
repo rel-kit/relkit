@@ -14,6 +14,8 @@ import { historyResponse, backendError } from "./backend-history.js";
 import { forwardBackend } from "./backend-forward.js";
 import { ExecutionSuccessLogs } from "relkit/contracts/operation";
 import { publishSelectionState } from "./live-events.js";
+import { crossSiteRefusal } from "./browser-boundary.js";
+import { collectionState, historyFailure, historyReadable } from "./history-state.js";
 
 /**
  * The Inspector's session with the application, apart from the UI's own stream to the Inspector.
@@ -97,6 +99,8 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
     !timingSafeEqual(expected, received)
   )
     return backendError("Unauthorized", 401);
+  const crossSite = crossSiteRefusal(request);
+  if (crossSite) return crossSite;
   const current = yield* Ref.get(state);
   const url = new URL(request.url);
   if (url.pathname === "/health/live") return Response.json({ state: "listening" });
@@ -154,10 +158,16 @@ function backendStatus(
       {
         protocol: "relkit.observability.query",
         version: 1,
-        state: current.history && current.error === undefined ? "ready" : "degraded",
+        // `degraded` only when history itself is unavailable; an application outage keeps
+        // retained history readable and is said by `collection`.
+        state: historyReadable(current) ? "ready" : "degraded",
+        collection: collectionState(current),
         connection: current.selection.state,
         application: applicationStatus(current),
-        error: current.error,
+        // Pages read any `error` as a history failure, so an application's failure is apart.
+        error: current.error && historyFailure(current.error) ? current.error : undefined,
+        applicationError:
+          current.error && !historyFailure(current.error) ? current.error : undefined,
         incomplete: current.incomplete,
         recordsLostBeforeHistory: {
           // Records the application's producer could not hand to its inspection buffer.

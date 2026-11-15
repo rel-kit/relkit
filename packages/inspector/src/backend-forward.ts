@@ -3,8 +3,15 @@ import { Effect, Option, Schema } from "effect";
 import type { InspectionConnectionFile } from "relkit/inspector-api/connection";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import { backendError } from "./backend-history.js";
+import { inspectorCallHeaders } from "./browser-boundary.js";
 
-/** Preserves native cookies, authorization, operation IDs and streaming bodies. */
+/**
+ * Sends an accepted page request to the application as the Inspector's own call, authenticated
+ * by the session's bridge token. Inspection actions (`/_relkit/v1/...`) and route requests from
+ * the composer are both sent without the browser's `Origin`, `Referer`, `Sec-Fetch-*` and
+ * cookies, so they run without a user session; `Authorization` a developer typed, operation IDs
+ * and streaming bodies are kept.
+ */
 export const forwardBackend = Effect.fn("Inspector.forwardBackend")(function* (
   remote: InspectorRemoteOperations,
   connection: InspectionConnectionFile,
@@ -12,10 +19,7 @@ export const forwardBackend = Effect.fn("Inspector.forwardBackend")(function* (
   target?: string,
 ) {
   const url = new URL(request.url);
-  const headers = new Headers(request.headers);
-  headers.delete("x-relkit-inspector-token");
-  headers.delete("connection");
-  headers.delete("transfer-encoding");
+  const headers = inspectorCallHeaders(request.headers);
   const response = yield* remote.request(
     connection,
     `${url.pathname}${url.search}`,

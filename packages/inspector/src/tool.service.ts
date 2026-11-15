@@ -77,7 +77,8 @@ const runTool = Effect.fn("Inspector.run")(function* (
       sessionId: undefined,
       through: 0,
       error: undefined,
-      incomplete: true,
+      // Nothing is known to be missing until a batch reports a gap or a loss.
+      incomplete: false,
       droppedRecords: 0,
     });
     const token = randomBytes(32).toString("base64url");
