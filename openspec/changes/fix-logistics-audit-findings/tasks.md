@@ -234,6 +234,7 @@
 
 - [x] 24.1 RK-37: make the install that `relkit add` runs succeed in a pnpm, npm and Bun project when `CI` is set, by telling each package manager that the lockfile may change (`packages/create-relkit/src/package-manager.ts`, around line 58), without changing what a plain install does elsewhere; verify with a test per manager and the pnpm leg of the Node acceptance run.
 - [x] 24.2 RK-38: name the project's package manager in every message `relkit add` prints (the failed-install text and the next steps), and in the other commands' next steps where the scan finds a hard-coded `bun`; verify with tests for an npm and a pnpm project.
+- [ ] 24.3 RK-38: make the diagnostics catalogue and the launcher name no package manager's command where the project may use another (`packages/relkit/src/diagnostics/codes/{cli,compiler,mcp,launcher,inspector}.ts`, `packages/relkit/src/launcher/index.ts`): say what to install or run and give the npm, pnpm and Bun forms only where a command is needed; run the type check of `relkit migrate layout` with the project's package manager (`packages/cli/src/migration/layout-validation.ts`); verify the catalogue tests, the launcher tests and a failed `relkit add` in an npm project.
 
 ## 25. Same-origin requests under `relkit dev` on Node
 
