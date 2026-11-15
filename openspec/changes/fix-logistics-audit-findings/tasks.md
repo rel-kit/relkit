@@ -192,6 +192,7 @@
 - [x] 18.6 Make the Inspector application's own `check` script type-check its sources (today its configuration lists no files, so it checks nothing) and fix the errors it then reports; verify `bun run check` in `apps/inspector` fails on an introduced type error and passes on the branch.
 - [x] 18.7 IN-09: report from the Inspector's status endpoint whether a development session was ever connected in this run and the last session's identifier and end time (`packages/inspector/src/tool-backend.ts`, `tool-loop.ts`), and use it in the interface instead of the per-tab memory, so "stopped answering" and "waiting for a session" are told apart in every tab; verify with a tool test and the application-state unit tests.
 - [x] 18.8 Run the whole Inspector end-to-end suite once on the merged pages and fix every failure that is not a screenshot baseline (known: the Routes heading now matches two headings in `tests/e2e/inspector.spec.ts`; the jobs status select in `tests/e2e/inspector-redesign.spec.ts`); list the screenshot baselines that must be regenerated in CI; verify the suite's non-screenshot tests all pass.
+- [ ] 18.9 Update the agent-driven Inspector acceptance script (`scripts/test-inspector-*-browser.ts`, run by `test:inspector:browser`) to the pages this change produced: the PDF preview element, the text shown for objects without a preview, the confirmation dialogs and result texts of event actions, and the two selectors of the agent page; verify the whole script and its recovery probe pass in one run.
 
 ## 19. Node acceptance coverage
 
