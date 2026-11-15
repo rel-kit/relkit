@@ -189,7 +189,16 @@ export async function startDev(
   };
   const request = (path: string, init: RequestInit = {}) =>
     fetch(`http://127.0.0.1:${port}${path}`, { signal: AbortSignal.timeout(5_000), ...init });
-  return { origin: `http://127.0.0.1:${port}`, get, request, waitFor, output: () => output, stop };
+  return {
+    pid: child.pid,
+    exited: child.exited,
+    origin: `http://127.0.0.1:${port}`,
+    get,
+    request,
+    waitFor,
+    output: () => output,
+    stop,
+  };
 }
 
 const TSCONFIG = `${JSON.stringify(
