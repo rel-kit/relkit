@@ -12,6 +12,7 @@ import {
   normalizeAddRequest,
   planAdd,
 } from "../../packages/cli/src/scaffolding/index.ts";
+import { errorLines } from "../../packages/cli/src/main-support.js";
 import { packageManagerCommands } from "../../packages/create-relkit/src/package-manager.ts";
 import { addTest as test, project, registerAddCleanup } from "./add-acceptance-fixture.js";
 
@@ -106,6 +107,23 @@ for (const { name, field } of MANAGERS) {
       code: "RELKIT_ADD_INSTALLATION_FAILED",
       message: `${manager.installText} failed: registry unreachable`,
     });
+  }, 60_000);
+
+  test(`the whole printed ${name} install failure names no other package manager`, async () => {
+    const root = await projectFor(field);
+    const { result } = run(root, ["inspector"], 1, "registry unreachable");
+    const failure = await result.then(
+      () => undefined,
+      (cause: { readonly code: string; readonly message: string }) => cause,
+    );
+    expect(failure?.code).toBe("RELKIT_ADD_INSTALLATION_FAILED");
+    const lines = errorLines(failure!.code, failure!.message);
+    expect(lines).toEqual([
+      `RELKIT_ADD_INSTALLATION_FAILED: ${manager.installText} failed: registry unreachable`,
+      expect.stringMatching(/^ {2}next: Install the project's dependencies again/),
+      "  docs: https://relkit.dev/docs/errors/relkit-add-installation-failed",
+    ]);
+    for (const line of lines) expect(line).not.toMatch(/\bbun\b/i);
   }, 60_000);
 }
 

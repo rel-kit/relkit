@@ -736,7 +736,7 @@ export const compilerCodes = [
     title: "Integration package is missing",
     happened:
       "The app needs an integration package that is not installed or has no RelKit details.",
-    fix: "Install the integration package named in the error with `bun add`, then run `relkit build` again.",
+    fix: "Add the integration package named in the error to the project's dependencies, then run `relkit build` again.",
   },
   {
     code: "RELKIT_RUNTIME_INTEGRATION_PLAN_REFERENCE_INVALID",

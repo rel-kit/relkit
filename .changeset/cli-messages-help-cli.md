@@ -11,3 +11,5 @@ An unknown command or subcommand now fails with `RELKIT_UNKNOWN_COMMAND` and exi
 `relkit check --json` lists each generated file under `outputs` as `{ path, sha256, bytes }` instead of embedding its text (a project with many services printed one line of hundreds of kilobytes); pass `--include-outputs` to add the text as `content`. Nothing in the RelKit repository read the embedded text from the JSON, and the in-process check result keeps it.
 
 `relkit <command> --help` shows examples written for each command that a new user runs (`create`, `add`, `dev`, `check`, `build`, `start`, `db migrate`, `inspector`, `doctor`, `env`, `graph`, `jobs`, `local`) instead of repeating the description. `relkit build --help` states the `--runtime` default and `relkit start --help` says that `relkit build` must have succeeded first.
+
+`relkit migrate layout` runs the project's `typecheck` script with its own package manager (`npm run`, `pnpm run` or `bun run`) instead of always calling `bun`, so it works in a project without Bun.

@@ -7,21 +7,21 @@ export const launcherCodes = [
     title: "The installed CLI package is damaged",
     happened:
       "The `relkit` command found `@relkit/cli` in the project, but its `package.json` names no `relkit` command or points outside the package.",
-    fix: "Reinstall the CLI with `bun add -d @relkit/cli`, then run the command again.",
+    fix: "Reinstall `@relkit/cli` as a development dependency of the project, then run the command again.",
   },
   {
     code: "RELKIT_PROJECT_CLI_REQUIRED",
     title: "The project does not install the RelKit CLI",
     happened:
       "The `relkit` command runs the `@relkit/cli` package installed in your project, and the project does not declare or install it.",
-    fix: "Run `bun add -d @relkit/cli` in the project, then run the command again.",
+    fix: "Add `@relkit/cli` to the project's development dependencies, then run the command again.",
   },
   {
     code: "RELKIT_PROJECT_CLI_VERSION",
     title: "The project's CLI version differs from relkit",
     happened:
       "The `relkit` command and the project's `@relkit/cli` have different versions. Every RelKit package is released with the same version.",
-    fix: "Install matching versions, for example `bun add relkit@<version>` and `bun add -d @relkit/cli@<version>` with the same version, then run the command again.",
+    fix: "Install the same version of `relkit` and `@relkit/cli` in the project, then run the command again.",
   },
   {
     code: "RELKIT_PROJECT_REQUIRED",
