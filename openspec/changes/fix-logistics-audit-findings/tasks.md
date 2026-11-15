@@ -204,13 +204,13 @@
 
 **Starts after group 9 is merged.** In the application's repository, branch `audit-fixes`.
 
-- [ ] 20.1 Declare `@relkit/client`, commit the request harness and the Inspector walk under `scripts/audit/`, and correct the README (runner per script, npm, the two inexact sentences); verify `typecheck` and the unit suite.
-- [ ] 20.2 Move the database service to the runtime-selecting client so the application runs on Node; verify `npm run check`, `npm run dev` and `npm run db:migrate` against the packed candidates.
+- [x] 20.1 Declare `@relkit/client`, commit the request harness and the Inspector walk under `scripts/audit/`, and correct the README (runner per script, npm, the two inexact sentences); verify `typecheck` and the unit suite.
+- [x] 20.2 Move the database service to the runtime-selecting client so the application runs on Node; verify `npm run check`, `npm run dev` and `npm run db:migrate` against the packed candidates.
 
 ## 21. Re-audit and integration
 
 - [ ] 21.1 Merge every group, resolve seams, regenerate the generated documentation pages and snippets (`bun run --cwd apps/docs generate`) and pass their freshness check, and run once on the merged branch with nothing else running: the full `packages/relkit` suite, `test:packages`, `test:inspector`, the Inspector end-to-end suite, `typecheck`, `check`, `lint`, `konsistent`, then `prepush`; verify all pass.
-- [ ] 21.2 Pack candidates from the merged branch and install them through the fixture registry with isolated caches into fresh npm and Bun worktrees of the application; verify the installed files come from the candidates.
+- [x] 21.2 Pack candidates from the merged branch and install them through the fixture registry with isolated caches into fresh npm and Bun worktrees of the application; verify the installed files come from the candidates.
 - [ ] 21.3 Re-run the request harness and the command surface in both environments, including `npm run dev` on Node; verify every baseline failure passes or is recorded as by design with its diagnostic, and no row regressed.
 - [ ] 21.4 Re-run the Inspector page walk and the interactive checks; verify each `IN` finding with a before and after capture.
 - [ ] 21.5 Have the full diff reviewed without the lead's notes, and run exploratory requests outside the harness matrix; verify every confirmed finding is fixed or recorded.
