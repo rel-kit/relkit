@@ -30,9 +30,12 @@ export function forwardProxyRequest(
   url.protocol = "http:";
   url.hostname = target.hostname;
   url.port = String(target.port);
+  // GET and HEAD bodies are not forwarded (Bun's and Node's fetch refuse them).
+  const forwardsBody =
+    request.method !== "GET" && request.method !== "HEAD" && declaresBody(request);
   const init: RequestInit = {
     method: request.method,
-    headers: forwardedHeaders(request),
+    headers: forwardedHeaders(request, forwardsBody),
     redirect: "manual",
     signal: AbortSignal.any([
       request.signal,
@@ -42,7 +45,7 @@ export function forwardProxyRequest(
   };
   let bodyEnded = true;
   // Re-stream decoded bytes: Bun 1.3.10's native chunked passthrough can produce empty 400s.
-  if (request.method !== "GET" && request.method !== "HEAD" && declaresBody(request)) {
+  if (forwardsBody) {
     bodyEnded = false;
     const progress = new TransformStream<Uint8Array, Uint8Array>({
       flush: () => {
@@ -93,12 +96,18 @@ export function drainResponse(): Response {
 }
 
 /** Copies end-to-end headers while preserving public authority. @param request - Native incoming request.
- * @returns Headers excluding connection-declared and standard hop-by-hop fields. */
-function forwardedHeaders(request: Request): Headers {
+ * @param forwardsBody - Whether the request's body is forwarded.
+ * @returns Headers excluding connection-declared and standard hop-by-hop fields, and without a
+ * `Content-Length` that declares a body that is not forwarded. */
+function forwardedHeaders(request: Request, forwardsBody: boolean): Headers {
   const headers = new Headers(request.headers);
   const connection = headers.get("connection");
   for (const name of connection?.split(",") ?? []) headers.delete(name.trim());
   for (const name of HOP_BY_HOP_HEADERS) headers.delete(name);
+  // A kept length with no body makes the worker take the next request on a pooled connection
+  // as this one's body (27.1); `Content-Length: 0` still declares no body and is kept.
+  if (!forwardsBody && Number(headers.get("content-length") ?? 0) !== 0)
+    headers.delete("content-length");
   // The worker derives its request URL from Host. Retain the public authority so origin
   // checks see the browser's URL rather than the private child port. Only Host carries it:
   // the worker trusts no client-supplied forwarding header for the authority.

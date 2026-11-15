@@ -92,6 +92,26 @@ test("keeps the RelKit control plane out of application telemetry but names each
   expect(lifecycle).toEqual(["request.started", "request.completed"]);
 });
 
+// 27.1 (e): an unmatched control-plane path's Problem names the request ID of its header.
+test("a control-plane Problem names the request ID of its header", async () => {
+  const { installUnmatchedRoute } = await import("../../src/runtime-hono/unmatched-route.js");
+  const { internalProblem } = await import("../../src/runtime-hono/internal-endpoints-utils.js");
+  const app = new Hono();
+  for (const middleware of createFrameworkMiddleware({ maxBodyBytes: 1_024 }))
+    app.use("*", middleware.handler);
+  app.get("/_relkit/v1/protected", (context) => internalProblem(context, 401, "denied", "No."));
+  installUnmatchedRoute(app);
+  for (const path of ["/_relkit/v1/nope", "/_relkit/v1/health/nope", "/_relkit/v1/protected"]) {
+    const response = await instrumentHttpRequest(
+      new Request(`http://localhost${path}`),
+      {},
+      (request) => app.fetch(request),
+    );
+    const body = (await response.json()) as { requestId?: string };
+    expect([path, body.requestId]).toEqual([path, response.headers.get("x-request-id")]);
+  }
+});
+
 test("the framework RPC endpoint stays application traffic under the reserved prefix", async () => {
   const { isRelkitControlPlanePath } = await import("../../src/runtime-hono/control-plane.js");
   expect(isRelkitControlPlanePath("/_relkit/v1/rpc")).toBe(false);

@@ -33,11 +33,19 @@ app.all("/body", async (context) => {
     text: bodyNull ? null : await request.text(),
   });
 });
+// Reports the URL and `Host` the handler received (27.1).
+app.get("/url", (context) =>
+  context.json({ url: context.req.raw.url, host: context.req.header("host") ?? null }),
+);
 installStaticFiles(app, { root: process.env.RELKIT_FIXTURE_ROOT, files: runtime.files });
 const server = await runtime.serve({
   hostname: "127.0.0.1",
   port: 0,
-  fetch: (request, bindings) => app.fetch(request, bindings),
+  // `/throw` fails outside the application's error mapping, as a framework defect would (27.1).
+  fetch: (request, bindings) => {
+    if (new URL(request.url).pathname === "/throw") throw new Error(`thrown at ${import.meta.url}`);
+    return app.fetch(request, bindings);
+  },
 });
 process.send?.({ port: server.port });
 process.once("SIGTERM", async () => {
