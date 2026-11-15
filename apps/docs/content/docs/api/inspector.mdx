@@ -141,6 +141,7 @@ declare const InspectionCollectionBatch: Schema.fromJsonString<
     readonly droppedBytes: Schema.optionalKey<Schema.Number>;
     readonly producerFailed: Schema.optionalKey<Schema.Number>;
     readonly producerDropped: Schema.optionalKey<Schema.Number>;
+    readonly droppedByKind: Schema.optionalKey<Schema.$Record<Schema.String, Schema.Number>>;
   }>
 >;
 ```
@@ -167,6 +168,18 @@ declare const collectionChange: (record: ObservabilityRecord) => ObservabilitySt
 
 Cumulative loss has an independent durable identity, outside the saturated application's buffer.
 
+### lostKinds
+
+Says what the lost records were.
+
+**Signature**
+
+```ts
+declare const lostKinds: (kinds: Readonly<Record<string, number>> | undefined) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L58)
+
 ### persistCollectionGap
 
 Records skipped sequences, such as records retired before this Inspector read them, as loss.
@@ -183,7 +196,7 @@ declare const persistCollectionGap: (
 ) => Effect.Effect<void, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L74)
 
 ### persistCollectionLoss
 
@@ -209,6 +222,7 @@ declare const persistCollectionLoss: (
     readonly droppedBytes?: number;
     readonly producerFailed?: number;
     readonly producerDropped?: number;
+    readonly droppedByKind?: { readonly [x: string]: number };
   },
   sessionId: string,
   previous?: string | undefined,
@@ -243,6 +257,7 @@ declare const collectInspectionBatch: (
     droppedRecords: number;
     incomplete: boolean;
     records: number;
+    backlog: boolean;
     lossKey: string | undefined;
     producerFailed: number;
     producerDropped: number;
