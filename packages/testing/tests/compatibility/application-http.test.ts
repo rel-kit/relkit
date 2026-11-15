@@ -84,6 +84,34 @@ test("maps HTTP data into function input without exposing the request", async ()
     await runtime.close();
   }
 });
+test("answers a denied access rule with 401 when the application has no auth service", async () => {
+  const target = defineFunction({
+    id: "orders.admin",
+    input: z.object({}),
+    output: z.object({ ok: z.boolean() }),
+    access: { roles: ["admin"] },
+    handler: async () => ({ ok: true }),
+  });
+  const route: TestRoute = {
+    method: "GET",
+    path: "/admin",
+    request: { kind: "input", fields: {} },
+    target,
+    responses: [{ kind: "success", status: 200 }],
+  };
+  const runtime = createTestRuntime();
+  try {
+    const response = await handleTestRequest(
+      [route],
+      runtime,
+      new Request("http://relkit.test/admin"),
+    );
+    expect(response.status).toBe(401);
+    expect(await response.json()).toMatchObject({ code: "unauthenticated" });
+  } finally {
+    await runtime.close();
+  }
+});
 test("returns validation 422 for invalid function input", async () => {
   const target = defineFunction({
     id: "orders.create",

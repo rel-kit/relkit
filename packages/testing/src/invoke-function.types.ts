@@ -1,5 +1,6 @@
 import type { MaybePromise } from "relkit/contracts";
 import type {
+  AccessPrincipalSource,
   DependencyClientSources,
   FunctionRegistry,
   InvocationContext,
@@ -61,4 +62,8 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
   readonly idSource?: InvocationIdSource;
   readonly context?: InvocationHooks<Context>["context"];
   readonly hooks?: InvocationHooks<Context>;
+  /** The caller that access rules see. Without it, the caller is read from the context's
+   * `auth.getSession()` session, which has no session (an anonymous caller) unless the
+   * context supplies one, and which carries no permissions. */
+  readonly principal?: AccessPrincipalSource;
 }

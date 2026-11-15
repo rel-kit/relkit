@@ -1,5 +1,5 @@
 /** Composes auth over a borrowed database without taking a second disposal authority. */
-import { generateBetterAuthOpenApi } from "@relkit/better-auth/drizzle";
+import { generateBetterAuthOpenApi, resolveBetterAuthAccess } from "@relkit/better-auth/drizzle";
 import { createHttpAuthRuntime } from "relkit/runtime-hono";
 import { Effect } from "effect";
 import type { TestRawRoute, TestRoute } from "./application-routes.js";
@@ -51,6 +51,8 @@ export const acquireApplicationAuth = Effect.fn("Testing.services.auth")(functio
     auth: createHttpAuthRuntime({
       getOpenApiDocument: () => generateBetterAuthOpenApi(active, instrumentation),
       getSession: async (headers) => (await active.api.getSession({ headers })) ?? null,
+      // Roles and permissions come from the organization plugin, as in the served application.
+      resolveAccess: (session) => resolveBetterAuthAccess(active, session),
     }),
     authHandler: (request) => active.handler(request),
     authBasePath: mountedPath,

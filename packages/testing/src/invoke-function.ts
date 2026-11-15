@@ -128,6 +128,7 @@ export function invokeFunctionWithRunner<
     ...(options?.signal === undefined ? {} : { signal: options.signal }),
     ...(options?.now === undefined ? {} : { now: options.now }),
     ...(options?.idSource === undefined ? {} : { idSource: options.idSource }),
+    ...(options?.principal === undefined ? {} : { principal: options.principal }),
     ...(hooks === undefined ? {} : { hooks }),
     ...(runner === undefined ? {} : { effectRunner: runner }),
   });

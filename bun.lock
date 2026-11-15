@@ -711,6 +711,7 @@
         "@relkit/better-auth": "workspace:*",
         "@relkit/drizzle": "workspace:*",
         "@relkit/langchain": "workspace:*",
+        "better-auth": "catalog:",
         "drizzle-orm": "catalog:",
         "vitest": "catalog:",
       },
