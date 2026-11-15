@@ -54,8 +54,20 @@ function failure(
     named,
     response.status,
     "http",
-    envelope ? payload : undefined,
+    envelope ? payload : problemDetails(payload),
   );
+}
+
+/**
+ * Keeps an application's own Problem Details answer, which is not an Inspector envelope, so a
+ * page can say why the application refused (for example its `origin-denied` code).
+ * @param payload - Parsed response body.
+ * @returns The body when it carries a string `code`; otherwise undefined.
+ */
+function problemDetails(payload: unknown): Record<string, unknown> | undefined {
+  if (typeof payload !== "object" || payload === null || Array.isArray(payload)) return undefined;
+  const body = payload as Record<string, unknown>;
+  return typeof body.code === "string" ? body : undefined;
 }
 
 export class InspectorApiTransport {
