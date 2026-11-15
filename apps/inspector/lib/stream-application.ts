@@ -7,8 +7,8 @@ import type { InspectorObject } from "./api-types";
 import type { StreamConnectionState } from "./stream-protocol";
 
 /**
- * `checking` until the Inspector has said; `waiting` when no session was found since this page
- * loaded; `unreachable` when a session this page saw stopped answering.
+ * `checking` until the Inspector has said; `waiting` when no session was ever found in this run
+ * of the Inspector; `unreachable` when a session it found stopped answering.
  */
 export type ApplicationLink = "checking" | "connected" | "waiting" | "unreachable" | "ambiguous";
 
@@ -35,9 +35,7 @@ export type InspectorStateAction =
   | { readonly type: "stream"; readonly state: StreamConnectionState }
   | { readonly type: "event"; readonly at: string; readonly data: unknown }
   | { readonly type: "status"; readonly at: string; readonly body: unknown }
-  | { readonly type: "status-failed" }
-  /** A session this tab saw connected before a reload. */
-  | { readonly type: "remembered"; readonly sessionId: string };
+  | { readonly type: "status-failed" };
 
 export const INITIAL_INSPECTOR_STATE: InspectorState = Object.freeze({
   stream: "connecting",
@@ -58,12 +56,6 @@ export function reduceInspectorState(
       return action.state === state.stream ? state : { ...state, stream: action.state };
     case "status-failed":
       return { ...state, statusFailed: true };
-    case "remembered":
-      return {
-        ...state,
-        everConnected: true,
-        application: { ...state.application, sessionId: action.sessionId },
-      };
     case "event": {
       const data = record(action.data);
       const raw = rawState(data?.state);
@@ -86,6 +78,15 @@ export function reduceInspectorState(
           : undefined,
         sinceKnown: text(application?.since) !== undefined,
         vouched: true,
+        // An older tool does not say; this tab then judges from what it saw itself.
+        ...(application !== undefined && "lastSessionId" in application
+          ? {
+              lastSession: {
+                sessionId: text(application.lastSessionId),
+                stoppedAt: text(application.lastConnectedUntil),
+              },
+            }
+          : {}),
       });
     }
   }
@@ -101,11 +102,21 @@ function applyRaw(
     readonly sessions?: readonly string[] | undefined;
     readonly sinceKnown?: boolean;
     readonly vouched?: boolean;
+    /** The tool's record of the last session of its run; absent from an older tool. */
+    readonly lastSession?: {
+      readonly sessionId: string | undefined;
+      readonly stoppedAt: string | undefined;
+    };
   },
 ): InspectorState {
+  // The tool records the last session of its run, so every tab tells a stopped session from
+  // one that never started. Without that record (an older tool) this tab goes by what it saw.
   // A new subscriber is replayed recent events, so only the status endpoint vouches that a
   // session was here; otherwise a replayed "connected" would turn "waiting" into "unreachable".
-  const everConnected = state.everConnected || (raw === "connected" && detail.vouched === true);
+  const everConnected =
+    detail.lastSession === undefined
+      ? state.everConnected || (raw === "connected" && detail.vouched === true)
+      : detail.lastSession.sessionId !== undefined;
   const link: ApplicationLink =
     raw === "connected"
       ? "connected"
@@ -116,9 +127,11 @@ function applyRaw(
           : "waiting";
   const previous = state.application;
   const same = previous.state === link;
-  const since = detail.sinceKnown || !same ? at : (previous.since ?? at);
+  const stoppedAt = link === "unreachable" ? detail.lastSession?.stoppedAt : undefined;
+  const since = stoppedAt ?? (detail.sinceKnown || !same ? at : (previous.since ?? at));
   const sessionId =
     detail.sessionId ??
+    (link === "unreachable" ? detail.lastSession?.sessionId : undefined) ??
     (link === "connected" || link === "unreachable" ? previous.sessionId : undefined);
   const generationId =
     detail.generationId ?? (link === "connected" ? previous.generationId : undefined);

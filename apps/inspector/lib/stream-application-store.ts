@@ -17,7 +17,6 @@ import {
 import { liveUpdates } from "./stream-application-text";
 
 const STATUS_INTERVAL_MS = 10_000;
-const SESSION_KEY = "relkit.inspector.application.session";
 
 let state: InspectorState = INITIAL_INSPECTOR_STATE;
 const listeners = new Set<() => void>();
@@ -30,20 +29,7 @@ function dispatch(action: InspectorStateAction): void {
   const next = reduceInspectorState(state, action);
   if (next === state) return;
   state = next;
-  const session = next.application;
-  if (session.state === "connected" && session.sessionId !== undefined)
-    try {
-      sessionStorage.setItem(SESSION_KEY, session.sessionId);
-    } catch {}
   for (const listener of [...listeners]) listener();
-}
-
-/** A reload of this tab still knows that a session was here, so it says "unreachable". */
-function remember(): void {
-  try {
-    const sessionId = sessionStorage.getItem(SESSION_KEY);
-    if (sessionId) dispatch({ type: "remembered", sessionId });
-  } catch {}
 }
 
 /** Re-reads the Inspector's status now; concurrent calls share one request. */
@@ -73,7 +59,6 @@ export function refreshInspectorStatus(): void {
 
 function start(): () => void {
   let connected = false;
-  if (!state.everConnected) remember();
   const stream = createInspectorBackendStream({
     onStateChange: (snapshot) => {
       dispatch({ type: "stream", state: snapshot.state });

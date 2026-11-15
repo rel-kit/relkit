@@ -166,7 +166,7 @@
 - [x] 16.3 IN-04: replace the headers and bodies panel with the invocation's captured input and result, and state that HTTP headers and bodies are not recorded (`app/signal-detail-sections.tsx:44-57`); verify with `tests/e2e/inspector-payload.spec.ts`.
 - [x] 16.4 IN-23, IN-35, IN-36: count unique spans, use one time formatter that shows the zone, and one request-label helper for live and loaded rows; verify with `lib/trace-view.test.ts`.
 - [x] 16.5 IN-37: focus the command palette's input when it opens and resolve request and trace identifiers; verify by keyboard in the browser.
-- [ ] 16.6 IN-21: show the server's message for a rejected filter at the field its `parameter` names, and as the list's message otherwise (`apps/inspector/app/use-request-history.ts`, `app/signals-client.tsx`); verify with a unit test of the mapping and the requests spec.
+- [x] 16.6 IN-21: show the server's message for a rejected filter at the field its `parameter` names, and as the list's message otherwise (`apps/inspector/app/use-request-history.ts`, `app/signals-client.tsx`); verify with a unit test of the mapping and the requests spec.
 
 ## 17. Inspector pages: actions and resources
 
@@ -190,8 +190,8 @@
 - [x] 18.4 IN-41, IN-42, IN-45: follow the system colour scheme until the user chooses one; add a not-found page without a hydration error; make graph cards legible at the default fit, theme the zoom control and give a bucket its node; verify in the page walk in both themes.
 - [x] 18.5 IN-35, IN-36: use the shared request label and time formatter on the remaining pages (`lib/overview-model.ts` `pathOf`, `components/neon/history-list.tsx`, `app/trace-waterfall.tsx`, `app/logs/**`), so live and loaded rows read the same and every time shows its zone; verify with unit tests.
 - [x] 18.6 Make the Inspector application's own `check` script type-check its sources (today its configuration lists no files, so it checks nothing) and fix the errors it then reports; verify `bun run check` in `apps/inspector` fails on an introduced type error and passes on the branch.
-- [ ] 18.7 IN-09: report from the Inspector's status endpoint whether a development session was ever connected in this run and the last session's identifier and end time (`packages/inspector/src/tool-backend.ts`, `tool-loop.ts`), and use it in the interface instead of the per-tab memory, so "stopped answering" and "waiting for a session" are told apart in every tab; verify with a tool test and the application-state unit tests.
-- [ ] 18.8 Run the whole Inspector end-to-end suite once on the merged pages and fix every failure that is not a screenshot baseline (known: the Routes heading now matches two headings in `tests/e2e/inspector.spec.ts`; the jobs status select in `tests/e2e/inspector-redesign.spec.ts`); list the screenshot baselines that must be regenerated in CI; verify the suite's non-screenshot tests all pass.
+- [x] 18.7 IN-09: report from the Inspector's status endpoint whether a development session was ever connected in this run and the last session's identifier and end time (`packages/inspector/src/tool-backend.ts`, `tool-loop.ts`), and use it in the interface instead of the per-tab memory, so "stopped answering" and "waiting for a session" are told apart in every tab; verify with a tool test and the application-state unit tests.
+- [x] 18.8 Run the whole Inspector end-to-end suite once on the merged pages and fix every failure that is not a screenshot baseline (known: the Routes heading now matches two headings in `tests/e2e/inspector.spec.ts`; the jobs status select in `tests/e2e/inspector-redesign.spec.ts`); list the screenshot baselines that must be regenerated in CI; verify the suite's non-screenshot tests all pass.
 
 ## 19. Node acceptance coverage
 

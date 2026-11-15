@@ -43,7 +43,11 @@ test("an idle overview reads history only on load", async ({ page }) => {
   await page.waitForTimeout(30_000);
   console.log(`idle overview, 30 s: ${history.length} history, ${status.length} status requests`);
   for (const entry of history) console.log(`  ${entry}`);
-  expect(history.length).toBeLessThanOrEqual(2);
+  // Polling would repeat the same read every few seconds. A tab that opens after other tests
+  // produced requests and logs is replayed those events, so it may recount the requests (two
+  // count reads, at most every 30 s) and reload generation history once; nothing is read twice.
+  expect(new Set(history).size).toBe(history.length);
+  expect(history.length).toBeLessThanOrEqual(3);
 });
 
 test("three tabs each keep their stream connected", async ({ context }) => {

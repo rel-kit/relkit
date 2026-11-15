@@ -24,7 +24,7 @@ test("loads the active graph and follows route/detail/composer flows", async ({ 
   await expect(page.getByText(graphHash).first()).toBeVisible();
 
   await page.getByRole("link", { name: "Routes", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Routes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Routes", exact: true })).toBeVisible();
   await page.goto("/routes/orders.create.http");
   await expect(page.getByRole("heading", { name: "Route detail" })).toBeVisible();
 

@@ -105,9 +105,9 @@ it.effect("several live sessions name the candidates and --connection-file once"
   }).pipe(Effect.scoped),
 );
 
-it.effect("the status endpoint reports the application session apart from the UI stream", () =>
+/** The `application` object the status endpoint answers for a tool state. */
+const application = (state: InspectorToolState) =>
   Effect.gen(function* () {
-    const { state } = yield* run([disconnected, connected("s1")], 3);
     const events = yield* acquireLiveEvents;
     const handler = inspectorBackend(yield* Ref.make(state), remote, "t", options, events);
     const request = new Request("http://localhost/_relkit/v1/storage", {
@@ -116,12 +116,59 @@ it.effect("the status endpoint reports the application session apart from the UI
     const body = yield* Effect.promise(() =>
       Effect.runPromise(handler(request)).then((response) => response.json()),
     );
-    expect(body.application).toEqual({
+    return body.application;
+  });
+
+it.effect("the status endpoint reports the application session apart from the UI stream", () =>
+  Effect.gen(function* () {
+    const { state } = yield* run([disconnected, connected("s1")], 3);
+    expect(yield* application(state)).toEqual({
       state: "connected",
       sessionId: "s1",
       generationId: "g1",
       sessions: [],
       since: new Date(state.selectionSince!).toISOString(),
+      lastSessionId: "s1",
+      lastConnectedUntil: null,
     });
+  }).pipe(Effect.scoped),
+);
+
+it.effect("after a session stops answering the status names it and when it stopped", () =>
+  Effect.gen(function* () {
+    const { state } = yield* run([disconnected, connected("s1"), disconnected], 5);
+    const stopped = new Date(state.selectionSince!).toISOString();
+    expect(yield* application(state)).toEqual({
+      state: "disconnected",
+      sessionId: null,
+      generationId: null,
+      sessions: [],
+      since: stopped,
+      lastSessionId: "s1",
+      lastConnectedUntil: stopped,
+    });
+  }).pipe(Effect.scoped),
+);
+
+it.effect("the status keeps the last session through several sessions and a longer wait", () =>
+  Effect.gen(function* () {
+    const script = [connected("s1"), disconnected, connected("s2"), disconnected];
+    const { state } = yield* run([...script, disconnected], 10);
+    const body = yield* application(state);
+    expect(body.lastSessionId).toBe("s2");
+    // The time s2 stopped; s1's earlier stop is forgotten.
+    expect(body.lastConnectedUntil).toBe(new Date(state.selectionSince!).toISOString());
+    expect(body.since).toBe(body.lastConnectedUntil);
+  }).pipe(Effect.scoped),
+);
+
+it.effect("with no session ever connected both last-session fields are null", () =>
+  Effect.gen(function* () {
+    const ambiguous: InspectorSelection = { state: "ambiguous", sessions: ["a", "b"], rejected: 0 };
+    const { state } = yield* run([disconnected, ambiguous, disconnected], 5);
+    const body = yield* application(state);
+    expect(body.state).toBe("disconnected");
+    expect(body.lastSessionId).toBeNull();
+    expect(body.lastConnectedUntil).toBeNull();
   }).pipe(Effect.scoped),
 );

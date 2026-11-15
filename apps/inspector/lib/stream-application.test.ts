@@ -57,13 +57,70 @@ describe("application state", () => {
     expect(state.application.sessionId).toBe("s1");
   });
 
-  test("a session this tab saw before a reload still reads as unreachable", () => {
+  test("a tab opened after the session stopped reads it as unreachable from the tool's record", () => {
     const state = run(
-      { type: "remembered", sessionId: "s0" },
-      status({ state: "disconnected", sessionId: null, sessions: [], since: at }),
+      status({
+        state: "disconnected",
+        sessionId: null,
+        sessions: [],
+        since: later,
+        lastSessionId: "s0",
+        lastConnectedUntil: at,
+      }),
     );
     expect(state.application.state).toBe("unreachable");
     expect(state.application.sessionId).toBe("s0");
+    // The time the session stopped answering, not when the tool last changed state.
+    expect(state.application.since).toBe(at);
+  });
+
+  test("the tool's record wins over this tab's own view of the session", () => {
+    const connected = status({
+      state: "connected",
+      sessionId: "s1",
+      sessions: [],
+      since: at,
+      lastSessionId: "s1",
+      lastConnectedUntil: null,
+    });
+    const restarted = status({
+      state: "disconnected",
+      sessionId: null,
+      sessions: [],
+      since: later,
+      lastSessionId: null,
+      lastConnectedUntil: null,
+    });
+    // A restarted tool has never seen a session: waiting, whatever this tab saw before.
+    expect(run(connected, restarted).application.state).toBe("waiting");
+  });
+
+  test("an older tool without the last-session fields still tells a stop from a wait in this tab", () => {
+    const older = run(
+      status({ state: "connected", sessionId: "s1", sessions: [], since: at }),
+      status({ state: "disconnected", sessionId: null, sessions: [], since: later }),
+    );
+    expect(older.application.state).toBe("unreachable");
+    expect(older.application.sessionId).toBe("s1");
+    expect(
+      run(status({ state: "disconnected", sessionId: null, sessions: [], since: at })).application
+        .state,
+    ).toBe("waiting");
+  });
+
+  test("with the tool's record, never connected reads as waiting in every tab", () => {
+    const state = run(
+      status({
+        state: "disconnected",
+        sessionId: null,
+        sessions: [],
+        since: at,
+        lastSessionId: null,
+        lastConnectedUntil: null,
+      }),
+    );
+    expect(state.application.state).toBe("waiting");
+    expect(state.application.sessionId).toBeUndefined();
   });
 
   test("with no session since start it is waiting, not unreachable", () => {
