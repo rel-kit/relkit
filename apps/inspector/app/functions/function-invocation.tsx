@@ -12,6 +12,7 @@ import { StatusBadge } from "../../components/neon/status-badge";
 import { Button } from "../../components/ui/button";
 import { cn } from "../../lib/utils";
 import { ActionAnswerView } from "../action-answer-view";
+import { SessionNote } from "../session-note";
 import type { ActionAnswer } from "../../lib/action-answer";
 import { actionAnswer } from "../../lib/action-answer";
 import { fieldControlClass, fieldTextareaClass, SchemaForm } from "../schema-form";
@@ -184,7 +185,9 @@ export function FunctionInvocation({
           </p>
         ) : null}
         {answer === undefined ? null : (
-          <ActionAnswerView ref={answerRef} id="function-invocation-answer" answer={answer} />
+          <ActionAnswerView ref={answerRef} id="function-invocation-answer" answer={answer}>
+            <SessionNote />
+          </ActionAnswerView>
         )}
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {status}
@@ -221,6 +224,7 @@ export function FunctionInvocation({
             ) : null}
           </div>
           <CodeBlock value={result.output} label="invocation output" maxHeight="24rem" />
+          <SessionNote />
         </div>
       )}
     </Section>

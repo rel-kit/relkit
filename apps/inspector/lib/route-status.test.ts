@@ -10,7 +10,7 @@ describe("the status line of a sent route request", () => {
     expect(routeOutcome({ status: 204, body: null }).text).toBe("Request completed (204).");
   });
 
-  test("a 401 says no session is attached and that this browser's session would be used", () => {
+  test("a 401 says no session is attached and does not promise this browser's cookies", () => {
     const outcome = routeOutcome({
       status: 401,
       body: { status: 401, code: "unauthenticated", detail: "Sign in" },
@@ -18,12 +18,21 @@ describe("the status line of a sent route request", () => {
     expect(outcome.tone).toBe("danger");
     expect(outcome.text).toContain("The application refused this request (401)");
     expect(outcome.text).toContain("no user session is attached");
-    expect(outcome.text).toContain("signed in to the application in this browser");
+    expect(outcome.text).not.toMatch(/cookie|signed in/i);
+  });
+
+  test("a 401 after a supplied Authorization value does not claim there was no credential", () => {
+    const text = routeOutcome({ status: 401, body: {} }, true).text;
+    expect(text).toContain("did not accept the Authorization value you supplied");
+    expect(text).not.toContain("no user session");
   });
 
   test("a 403 says the application denied the caller", () => {
     expect(routeOutcome({ status: 403, body: { code: "access-denied" } }).text).toContain(
       "The application refused this request (403)",
+    );
+    expect(routeOutcome({ status: 403, body: { code: "access-denied" } }).text).not.toMatch(
+      /cookie|signed in/i,
     );
   });
 

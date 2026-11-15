@@ -1,5 +1,29 @@
 import type { RouteField } from "../../lib/route-composer";
 import type { RouteStreamFrame } from "../../lib/route-request";
+import type { RouteOutcome } from "../../lib/route-status";
+import { SessionNote } from "../session-note";
+
+/** The sentence about the response, then, once, who the request acted as. */
+export function RouteResult({
+  outcome,
+  sessionNote,
+}: {
+  readonly outcome: RouteOutcome;
+  readonly sessionNote: string;
+}) {
+  return (
+    <>
+      <p
+        id="route-outcome"
+        data-tone={outcome.tone}
+        className="m-0 max-w-none text-xs leading-5 text-muted-foreground data-[tone=danger]:text-danger data-[tone=success]:text-success"
+      >
+        {outcome.text}
+      </p>
+      <SessionNote id="route-session-note" text={sessionNote} />
+    </>
+  );
+}
 
 /** Frames received from a streaming route, newest last. */
 export function StreamFrames({
@@ -37,7 +61,25 @@ export function StreamFrames({
   );
 }
 
-const SOURCE_ORDER = ["path", "query", "header", "cookie", "body", "whole-body", "multipart"];
+/** A read-only note for the cookies a route reads: the Inspector cannot send them. */
+export function CookieNote({ names }: { readonly names: readonly string[] }) {
+  if (names.length === 0) return null;
+  return (
+    <p id="route-cookie-note" className="m-0 max-w-none text-xs text-muted-foreground">
+      This route also reads {names.length === 1 ? "the cookie" : "the cookies"}{" "}
+      {names.map((name, index) => (
+        <span key={name}>
+          {index === 0 ? "" : ", "}
+          <code className="font-mono">{name}</code>
+        </span>
+      ))}
+      . A browser does not let a page set a <code className="font-mono">Cookie</code> header and the
+      Inspector does not forward cookies, so this request cannot send them.
+    </p>
+  );
+}
+
+const SOURCE_ORDER = ["path", "query", "header", "body", "whole-body", "multipart"];
 
 export function groupFields(
   fields: readonly RouteField[],
@@ -66,8 +108,6 @@ export function sourceLabel(source: string): string {
       return "Query";
     case "header":
       return "Headers";
-    case "cookie":
-      return "Cookies";
     case "body":
       return "Body";
     case "whole-body":
