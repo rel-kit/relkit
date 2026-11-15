@@ -28,12 +28,14 @@ async function eventActions(driver: BrowserAcceptanceDriver): Promise<void> {
   await confirm(driver, "Replay publication event-instance-1?", "Replay");
   if (published === "event-instance-1")
     throw new Error("Publish named the publication that already existed.");
-  // The fixture's replay delivers the stored publication again and answers with its id, so the
-  // sentence names event-instance-1 twice; it must still name a listed publication.
-  await publicationNamedBy(
+  // A replay delivers the stored publication again and publishes nothing new, so the sentence
+  // names the publication that was replayed; it must still be a listed publication.
+  const replayed = await publicationNamedBy(
     driver,
-    "Published the payload of event-instance-1 again as publication (event-instance-\\d+)\\.",
+    "Delivered publication (event-instance-\\d+) again to its reactions\\. Nothing new was published\\.",
   );
+  if (replayed !== "event-instance-1")
+    throw new Error(`Replay named ${replayed}, not the publication that was replayed.`);
   tree = await snapshot();
   await run("click", reference(tree, 'button "Cancel delivery delivery-3"'));
   await confirm(driver, "Cancel delivery delivery-3?", "Cancel delivery");
