@@ -6,6 +6,7 @@ import {
   createInspectorClient,
   INSPECTOR_BACKEND_CONNECTED_EVENT,
 } from "./client";
+import { GraphStore } from "./graph-store";
 import { normalizeGraphResponse, type GraphSnapshot } from "./graph-model";
 import type { InspectorGraph } from "./api-types";
 import type { StreamConnectionState } from "./stream";
@@ -47,30 +48,42 @@ export function graphLoaded(
   }
 }
 
+let store: GraphStore | undefined;
+
+/** The tab's graph: one read per generation, shared by every component that shows it. */
+export function sharedGraphStore(): GraphStore {
+  store ??= new GraphStore({
+    fetch: (fresh) => {
+      const api = createInspectorClient();
+      if (fresh) api.invalidate(["graph"]);
+      return api.graph();
+    },
+  });
+  return store;
+}
+
 export function useInspectorGraph(): InspectorGraphState {
   const [state, setState] = useState(initialState);
 
   useEffect(() => {
     let disposed = false;
-    const api = createInspectorClient();
-    const load = () => {
-      setState((current) => ({ ...current, loading: true, error: false }));
-      void api
-        .graph()
-        .then((payload) => {
-          if (disposed) return;
-          const loaded = graphLoaded(payload);
-          setState((current) => ({ ...current, ...loaded }));
-          if (!loaded.error) window.dispatchEvent(new Event(INSPECTOR_BACKEND_CONNECTED_EVENT));
-        })
-        .catch(() => {
-          if (!disposed) setState((current) => ({ ...current, loading: false, error: true }));
-        });
+    const graphs = sharedGraphStore();
+    const apply = (payload: InspectorGraph | undefined) => {
+      if (disposed) return;
+      if (payload === undefined) {
+        setState((current) => ({ ...current, loading: false, error: true }));
+        return;
+      }
+      setState((current) => ({ ...current, ...graphLoaded(payload) }));
     };
+    const unsubscribe = graphs.subscribe((payload) => {
+      apply(payload);
+      if (payload !== undefined) window.dispatchEvent(new Event(INSPECTOR_BACKEND_CONNECTED_EVENT));
+    });
     const stream = createInspectorBackendStream({
-      cache: { invalidate: (tags) => api.invalidate(tags) },
-      onInvalidate: (tags) => {
-        if (tags.includes("graph")) load();
+      cache: { invalidate: (tags) => createInspectorClient().invalidate(tags) },
+      onInvalidate: (_tags, event) => {
+        if (event?.type === "generation.changed") graphs.changed(event.data);
       },
       onStateChange: (snapshot) => {
         if (disposed) return;
@@ -81,10 +94,13 @@ export function useInspectorGraph(): InspectorGraphState {
         }));
       },
     });
-    load();
+    // A graph that is already loaded is shown at once; otherwise this is the read that loads it.
+    if (graphs.current !== undefined) apply(graphs.current);
+    else void graphs.load().catch(() => undefined);
     stream.start();
     return () => {
       disposed = true;
+      unsubscribe();
       stream.stop();
     };
   }, []);

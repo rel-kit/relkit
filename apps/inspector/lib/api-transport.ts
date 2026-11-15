@@ -83,6 +83,11 @@ export class InspectorApiTransport {
   private readonly cacheTtlMs: number;
   private readonly signal: AbortSignal | undefined;
   private readonly cache = new Map<string, CacheEntry>();
+  /** GETs under way, so components that ask for the same thing together share one request. */
+  private readonly inflight = new Map<
+    string,
+    { promise: Promise<unknown>; tags: readonly string[] }
+  >();
   private generation: string | undefined;
 
   constructor(options: InspectorFetchOptions = {}) {
@@ -100,15 +105,30 @@ export class InspectorApiTransport {
     path: string,
     options: InspectorRequestOptions = {},
   ): Promise<T> {
+    const { cacheTtlMs, ...sent } = options;
+    const { cacheTags } = sent;
+    const method = sent.method ?? "GET";
+    const url = resolveBackendUrl(this.baseUrl, path);
+    const key = `${method}:${url}`;
+    const ttl = this.cacheTtlMs === 0 ? 0 : Math.max(this.cacheTtlMs, cacheTtlMs ?? 0);
+    if (method !== "GET" || ttl === 0) return this.send<T>(path, sent, ttl);
+    const cached = this.cache.get(key);
+    if (cached !== undefined && cached.expiresAt > Date.now()) return cached.value as T;
+    this.cache.delete(key);
+    const pending = this.inflight.get(key);
+    if (pending !== undefined) return pending.promise as Promise<T>;
+    const promise = this.send<T>(path, sent, ttl).finally(() => {
+      if (this.inflight.get(key)?.promise === promise) this.inflight.delete(key);
+    });
+    this.inflight.set(key, { promise, tags: cacheTags ?? [] });
+    return promise;
+  }
+
+  private async send<T>(path: string, options: InspectorRequestOptions, ttl: number): Promise<T> {
     const { cacheTags, responseProtocols, ...init } = options;
     const method = init.method ?? "GET";
     const url = resolveBackendUrl(this.baseUrl, path);
     const key = `${method}:${url}`;
-    if (method === "GET" && this.cacheTtlMs > 0) {
-      const cached = this.cache.get(key);
-      if (cached !== undefined && cached.expiresAt > Date.now()) return cached.value as T;
-      this.cache.delete(key);
-    }
     let attempt = 0;
     while (true) {
       try {
@@ -122,10 +142,10 @@ export class InspectorApiTransport {
             observedGeneration(payload) ??
             response.headers.get("x-relkit-generation-id") ??
             this.generation;
-        if (method === "GET" && this.cacheTtlMs > 0)
+        if (method === "GET" && ttl > 0)
           this.cache.set(key, {
             value: payload,
-            expiresAt: Date.now() + this.cacheTtlMs,
+            expiresAt: Date.now() + ttl,
             tags: cacheTags ?? [],
           });
         return payload as T;
@@ -139,6 +159,7 @@ export class InspectorApiTransport {
 
   clearCache(): void {
     this.cache.clear();
+    this.inflight.clear();
   }
 
   invalidate(tags: readonly string[] = []): void {
@@ -146,6 +167,9 @@ export class InspectorApiTransport {
     const selected = new Set(tags);
     for (const [key, entry] of this.cache)
       if (entry.tags.some((tag) => selected.has(tag))) this.cache.delete(key);
+    // An answer that was asked for before the invalidation may be older than it.
+    for (const [key, entry] of this.inflight)
+      if (entry.tags.some((tag) => selected.has(tag))) this.inflight.delete(key);
   }
 
   invokeRouteStream(

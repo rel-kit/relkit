@@ -60,7 +60,8 @@ const invalidationTags: Record<StreamEventType, readonly string[]> = {
   "job.changed": ["jobs", "runtime"],
   "event.published": ["events", "runtime"],
   "event.delivery.changed": ["events", "jobs", "runtime"],
-  "generation.changed": ["graph", "runtime", "diagnostics", "env", "signals"],
+  // The graph is not dropped here: `GraphStore` reloads it when an event names another generation.
+  "generation.changed": ["runtime", "diagnostics", "env", "signals"],
   "diagnostic.changed": ["diagnostics"],
 };
 export function tagsForEvent(type: StreamEventType): readonly string[] {

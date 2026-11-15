@@ -33,12 +33,18 @@ import {
   observabilityQueryRequest,
 } from "./api-methods";
 export * from "./api-types";
+
+const GRAPH_CACHE_MS = 30_000;
 export class InspectorApiClient extends InspectorApiTransport {
   health(kind: "live" | "ready" = "ready"): Promise<InspectorObject> {
     return this.request(`${INSPECTOR_API_BASE}/health/${kind}`, { cacheTags: ["health"] });
   }
   graph(): Promise<InspectorGraph> {
-    return this.request(`${INSPECTOR_API_BASE}/graph`, { cacheTags: ["graph"] });
+    // Large, and fixed for a generation: reused until a generation change drops it.
+    return this.request(`${INSPECTOR_API_BASE}/graph`, {
+      cacheTags: ["graph"],
+      cacheTtlMs: GRAPH_CACHE_MS,
+    });
   }
   runtime(): Promise<InspectorObject> {
     return this.request(`${INSPECTOR_API_BASE}/runtime`, { cacheTags: ["runtime"] });
