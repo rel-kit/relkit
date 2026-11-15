@@ -47,8 +47,8 @@
 
 ## 7. Repository checks and archive
 
-- [ ] 7.1 Run `bun run prepush`; verify it passes.
-- [ ] 7.2 Run `bun run test:packages` to its end; verify every set of tests passes, the last Bun ones included.
-- [ ] 7.3 Run `bun run test:inspector`; verify it passes.
-- [ ] 7.4 Run `openspec validate --specs`; verify it passes, then archive the change with `openspec archive close-contract-gaps -y`.
-- [ ] 7.5 Stop every server and registry started for the proof, drop the throwaway database and delete the copy of the application; verify none is left.
+- [x] 7.1 Run `bun run prepush`; verify it passes.
+- [x] 7.2 Run `bun run test:packages` to its end; verify every set of tests passes, the last Bun ones included.
+- [x] 7.3 Run `bun run test:inspector`; verify it passes.
+- [x] 7.4 Run `openspec validate --specs`; verify it passes, then archive the change with `openspec archive close-contract-gaps -y`.
+- [x] 7.5 Stop every server and registry started for the proof, drop the throwaway database and delete the copy of the application; verify none is left.
