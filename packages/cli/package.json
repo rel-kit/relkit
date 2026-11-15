@@ -76,10 +76,12 @@
     "effect": "catalog:",
     "esbuild": "0.28.2",
     "hono": "catalog:",
-    "relkit": "workspace:*"
+    "relkit": "workspace:*",
+    "ws": "8.22.0"
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@types/ws": "8.18.1",
     "@modelcontextprotocol/client": "2.3.0",
     "@modelcontextprotocol/server": "2.3.0",
     "@relkit/local": "workspace:*",

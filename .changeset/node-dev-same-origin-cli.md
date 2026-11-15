@@ -7,3 +7,9 @@
 address, so the worker judged every browser `Origin` as foreign and answered 403 `origin-denied`.
 On Node the proxy now forwards over `node:http`, which keeps `Host`, as Bun's `fetch` already did.
 Cross-origin requests are still denied, and forwarding headers sent by the client are not trusted.
+
+`relkit dev` run by Node now accepts a same-origin WebSocket, so realtime channels and the RPC
+socket work from a browser. Node's `WebSocket` client also replaced `Host` on the proxy's upstream
+socket, so the worker refused every browser socket and the development server answered 502. On
+Node the proxy now opens that socket with `ws`, which keeps `Host` and forwards the browser's
+cookies and `Origin`; Bun keeps its own client. Cross-origin sockets are still refused.
