@@ -5,7 +5,14 @@
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { freePort, isListening, start, stop, waitForOk } from "./node-creation-process.js";
+import {
+  freePort,
+  isListening,
+  start,
+  stop,
+  stoppedByInterrupt,
+  waitForOk,
+} from "./node-creation-process.js";
 import { commands, fail, step, type Project, type StepResult } from "./node-creation-steps.js";
 
 /** Matches any coded RelKit error block. */
@@ -135,7 +142,7 @@ export async function devReadsDatabase(
       throw cause;
     }
     const finished = await stop(dev);
-    if (finished.code !== 130)
+    if (!stoppedByInterrupt(finished))
       fail(command.join(" "), finished, "Expected exit status 130 after SIGINT.");
     if (!finished.output.includes("Development server stopped"))
       fail(command.join(" "), finished, "The stop did not print `Development server stopped`.");

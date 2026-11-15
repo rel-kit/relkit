@@ -13,6 +13,19 @@ export interface Finished {
   readonly output: string;
 }
 
+/**
+ * Whether a script run by a package manager ended as a Ctrl+C stop does. The command itself
+ * exits with status 130; what the package manager reports depends on the shell that ran the
+ * script. macOS's `sh` passes the 130 on, while `dash` (Linux's `sh`) ends itself with SIGINT
+ * once its interrupted command has finished, and npm and pnpm then end the same way. A terminal
+ * shows status 130 for both.
+ * @param finished - How the package manager's process ended.
+ * @returns True for exit status 130 or termination by SIGINT.
+ */
+export function stoppedByInterrupt(finished: Finished): boolean {
+  return finished.code === 130 || (finished.code === null && finished.signal === "SIGINT");
+}
+
 /** A command that keeps running in its own process group. */
 export interface Running {
   readonly child: ChildProcess;
@@ -47,6 +60,9 @@ export function start(
   env: NodeJS.ProcessEnv,
   detached = false,
 ): Running {
+  // A maintainer's acceptance script: it runs the package manager it was asked for (`npm` or
+  // `pnpm`, checked where the option is read) and the commands of its own steps, without a shell.
+  // codeql[js/command-line-injection]
   const child = spawn(command[0]!, command.slice(1), {
     cwd,
     env,

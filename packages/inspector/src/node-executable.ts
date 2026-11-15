@@ -142,6 +142,9 @@ function unsupported(found: readonly string[]): NodeExecutableError {
 /** @param candidate - Executable to ask. @returns Its runtime versions, or undefined when it does not answer. */
 function probe(candidate: string): { bun: string | null; node: string } | undefined {
   try {
+    // The candidate is a `node` found on the developer's own PATH, run without a shell and with
+    // fixed arguments: the same program their terminal would start for `node`.
+    // codeql[js/command-line-injection]
     const output = execFileSync(candidate, ["-p", probeScript], {
       encoding: "utf8",
       timeout: 5000,

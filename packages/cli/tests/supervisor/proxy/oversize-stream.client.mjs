@@ -6,20 +6,37 @@
 // and how often a follow-up request was not answered 200.
 import { Agent, request } from "node:http";
 
-const [origin, mode, countText, limitText, path = "/echo", followUp = "/ok"] =
+const [originText, mode, countText, limitText, path = "/echo", followUp = "/ok"] =
   process.argv.slice(2);
 const count = Number(countText);
 const limit = Number(limitText);
+// The fixture passes a server it started on loopback; nothing else is ever requested.
+const target = new URL(originText);
+if (target.protocol !== "http:" || !["127.0.0.1", "localhost", "[::1]"].includes(target.hostname))
+  throw new Error("The oversize client only talks to a loopback HTTP server.");
+for (const route of [path, followUp])
+  if (!/^\/[\w./-]*$/.test(route) || route.startsWith("//"))
+    throw new Error("The oversize client only requests plain absolute paths.");
+if (!Number.isInteger(count) || count < 1 || count > 1_000)
+  throw new Error("The oversize client sends between 1 and 1,000 bodies of each size.");
+if (!Number.isInteger(limit) || limit < 0 || limit > 16 * 1_048_576)
+  throw new Error("The oversize client accepts a body limit of at most 16 MiB.");
+const origin = target.origin;
 const sizes = [limit + 1, 2 * 1_048_576, 5 * 1_048_576];
 const CHUNK = Buffer.alloc(65_536, 120);
 const agent = new Agent({ keepAlive: true, maxSockets: 1 });
 
 /** Sends one body with Node's fetch. */
 async function viaFetch(size, method) {
+  // The length is the checked body limit plus one, or a fixed size.
+  // codeql[js/resource-exhaustion]
+  const body = "x".repeat(size);
+  // A test client: the target is the loopback server its fixture started, checked above.
+  // codeql[js/request-forgery]
   const response = await fetch(origin + path, {
     method,
     headers: { "content-type": "application/json", origin },
-    body: "x".repeat(size),
+    body,
     signal: AbortSignal.timeout(10_000),
   });
   return {
@@ -33,6 +50,8 @@ async function viaFetch(size, method) {
 function viaHttp(size, method, declared) {
   return new Promise((resolve, reject) => {
     let answered = false;
+    // A test client: the target is the loopback server its fixture started, checked above.
+    // codeql[js/request-forgery]
     const outgoing = request(origin + path, {
       method,
       agent,
@@ -77,11 +96,15 @@ function viaHttp(size, method, declared) {
 /** Sends the follow-up GET on a kept-alive connection. */
 async function next() {
   if (mode === "fetch") {
+    // A test client: the target is the loopback server its fixture started, checked above.
+    // codeql[js/request-forgery]
     const response = await fetch(origin + followUp, { signal: AbortSignal.timeout(5_000) });
     await response.arrayBuffer();
     return response.status;
   }
   return new Promise((resolve, reject) => {
+    // A test client: the target is the loopback server its fixture started, checked above.
+    // codeql[js/request-forgery]
     const outgoing = request(origin + followUp, { agent, signal: AbortSignal.timeout(5_000) });
     outgoing.on("error", reject);
     outgoing.on("response", (incoming) => {

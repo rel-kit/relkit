@@ -9,6 +9,7 @@ import {
   isListening,
   start,
   stop,
+  stoppedByInterrupt,
   waitForOk,
   waitForOutput,
 } from "./node-creation-process.js";
@@ -51,7 +52,7 @@ export async function inspectorListens(
       throw cause;
     }
     const finished = await stop(inspector);
-    if (finished.code !== 130)
+    if (!stoppedByInterrupt(finished))
       fail(command.join(" "), finished, "Expected exit status 130 after SIGINT.");
     if (ERROR_BLOCK.test(finished.output))
       fail(command.join(" "), finished, "The stop printed an error block (RELKIT_INTERRUPTED).");
