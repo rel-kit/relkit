@@ -30,8 +30,8 @@ export const publishHistoryOwner = Effect.fn("Inspector.publishHistoryOwner")(fu
 ) {
   yield* Effect.promise(async () => {
     try {
-      const record: HistoryOwner = { pid: process.pid, url: listenOrigin(options) };
-      await writeFile(join(root, RECORD_FILE), JSON.stringify(record), { mode: 0o600 });
+      const owner: HistoryOwner = { pid: process.pid, url: listenOrigin(options) };
+      await writeFile(join(root, RECORD_FILE), JSON.stringify(owner), { mode: 0o600 });
     } catch {
       // The record only improves a message; the history works without it.
     }
