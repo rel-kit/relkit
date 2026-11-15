@@ -101,6 +101,14 @@ describe("storageHealth", () => {
     expect(storageHealth({ error: "history.writer-conflict" }).tone).toBe("danger");
     expect(storageHealth({ state: "degraded" }).label).toBe("degraded");
     expect(storageHealth({ state: "ready", incomplete: true }).tone).toBe("warning");
+    // No record was lost, so nothing is incomplete.
+    expect(
+      storageHealth({
+        state: "ready",
+        incomplete: true,
+        recordsLostBeforeHistory: { byApplicationProducer: 0, byInspectionBuffer: 0 },
+      }),
+    ).toEqual({ tone: "success", label: "ready" });
     expect(storageHealth({ state: "ready", connection: "connected" })).toEqual({
       tone: "success",
       label: "ready",
