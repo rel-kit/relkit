@@ -64,7 +64,7 @@ Severity: **high** = unsafe, data exposed, valid work fails, or a documented pat
 | RK-33 | low | Unknown command | "Unknown command", the list | `Command is not implemented … check that @relkit/cli is up to date`, exit 1 |
 | RK-34 | low | Help | Real examples, defaults, prerequisites | Examples repeat the bare command; `check --json` is one 420 KB line with generated files embedded |
 | RK-35 | low | Project created for npm | Only fields npm uses | `patchedDependencies` is written and silently ignored; nothing for npm's install-script approval |
-| RK-36 | medium | `@relkit/testing` in-process HTTP client | Evaluates function access rules like the served application | The application's test harness states it does not, and starts a real server for every test instead. Taken from the application's documented workaround; to be confirmed by the fix task's first test |
+| RK-36 | medium | `@relkit/testing` in-process HTTP client | Evaluates function access rules like the served application | Every call to a route with a permission rule answered 500 in process (anonymous, unpermitted and permitted alike): the harness built its auth runtime without the access resolver and mapped access failures to an internal error. The application's tests start a real server for every file to avoid it. Confirmed on 0.9.0 by the fix task's first test |
 
 ## List B: what the Inspector failed to deliver
 
