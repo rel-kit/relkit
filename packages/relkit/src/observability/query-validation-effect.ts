@@ -20,6 +20,8 @@ export class QueryValidationError extends Schema.TaggedError<QueryValidationErro
       "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
     ]),
     message: Schema.String,
+    /** The rejected query parameter, when one is to blame. */
+    parameter: Schema.optionalKey(Schema.String),
   },
 ) {}
 function observe<A, E>(operation: string, effect: Effect.Effect<A, E>): Effect.Effect<A, E> {
@@ -47,7 +49,13 @@ function expected<A>(run: () => A): Effect.Effect<A, QueryValidationError> {
   return Effect.try({ try: run, catch: (cause) => cause }).pipe(
     Effect.catch((cause) =>
       cause instanceof ObservabilityQueryError
-        ? Effect.fail(new QueryValidationError({ code: cause.code, message: cause.message }))
+        ? Effect.fail(
+            new QueryValidationError({
+              code: cause.code,
+              message: cause.message,
+              ...(cause.parameter === undefined ? {} : { parameter: cause.parameter }),
+            }),
+          )
         : Effect.die(cause),
     ),
   );

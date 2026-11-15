@@ -13,32 +13,38 @@ function validate(value: ObservabilityQueryRequest, maximum: number): Normalized
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Search must contain at most 512 characters",
+      "search",
     );
   if (value.source !== undefined && !["application", "relkit", "inspector"].includes(value.source))
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Log source is invalid",
+      "source",
     );
   if (value.order !== undefined && value.order !== "asc" && value.order !== "desc")
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Query order is invalid",
+      "order",
     );
   if (value.protocol !== undefined && value.protocol !== "relkit.observability.query")
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
       "Unsupported observability query protocol",
+      "protocol",
     );
   if (value.version !== undefined && value.version !== 1)
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
       "Unsupported observability query version",
+      "version",
     );
   const limit = value.limit ?? DEFAULT_OBSERVABILITY_QUERY_LIMIT;
   if (!Number.isSafeInteger(limit) || limit < 1)
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Observability query limit is invalid",
+      "limit",
     );
   const fromMs = value.from === undefined ? undefined : parseTime(value.from, "from");
   const toMs = value.to === undefined ? undefined : parseTime(value.to, "to");
@@ -46,11 +52,13 @@ function validate(value: ObservabilityQueryRequest, maximum: number): Normalized
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Observability query time range is invalid",
+      "from",
     );
   if (value.cursor !== undefined && (typeof value.cursor !== "string" || value.cursor.length === 0))
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Observability query cursor is invalid",
+      "cursor",
     );
   if (
     value.cursor !== undefined &&
@@ -61,6 +69,7 @@ function validate(value: ObservabilityQueryRequest, maximum: number): Normalized
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Observability query cursor is invalid",
+      "cursor",
     );
   if (
     value.severity !== undefined &&
@@ -69,6 +78,7 @@ function validate(value: ObservabilityQueryRequest, maximum: number): Normalized
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       "Observability query severity is invalid",
+      "severity",
     );
   for (const [name, item] of [
     ["routeId", value.routeId],
@@ -86,6 +96,7 @@ function validate(value: ObservabilityQueryRequest, maximum: number): Normalized
       throw new ObservabilityQueryError(
         "RELKIT_OBSERVABILITY_QUERY_INVALID",
         `Observability query ${name} is invalid`,
+        name,
       );
   }
   validateRequestFilters(value);
@@ -146,12 +157,14 @@ function parseTime(value: string, name: string): number {
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       `Observability query ${name} time is invalid`,
+      name,
     );
   const result = Date.parse(value);
   if (!Number.isFinite(result))
     throw new ObservabilityQueryError(
       "RELKIT_OBSERVABILITY_QUERY_INVALID",
       `Observability query ${name} time is invalid`,
+      name,
     );
   return result;
 }

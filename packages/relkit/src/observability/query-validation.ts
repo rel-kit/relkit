@@ -20,7 +20,7 @@ function run<A>(effect: Effect.Effect<A, QueryValidationError>): A {
     effect.pipe(
       Effect.catchTag("QueryValidationError", (error) =>
         Effect.sync(() => {
-          throw new ObservabilityQueryError(error.code, error.message);
+          throw new ObservabilityQueryError(error.code, error.message, error.parameter);
         }),
       ),
     ),

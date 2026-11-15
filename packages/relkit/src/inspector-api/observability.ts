@@ -16,12 +16,12 @@ import {
 } from "./native-edge.js";
 import { InspectorObservability, inspectorObservabilityLayer } from "./observability.service.js";
 import { inspectorLoggerLayer, registerInspectorOwner } from "./execution.js";
-import { readObservabilityQuery } from "./observability-utils.js";
+import { queryErrorDetail, readObservabilityQuery } from "./observability-utils.js";
 import { InspectorEndpointError, negotiateHeaders } from "./router-utils.js";
 import { EndpointError, ObservabilityEndpointConfigurationError } from "./observability-errors.js";
 export { ObservabilityEndpointConfigurationError } from "./observability-errors.js";
 
-export { readObservabilityQuery } from "./observability-utils.js";
+export { queryErrorDetail, readObservabilityQuery } from "./observability-utils.js";
 export const INSPECTOR_API_PROTOCOL = "relkit.inspector" as const;
 export const INSPECTOR_API_VERSION = API_VERSION;
 
@@ -214,15 +214,17 @@ function jsonResponse(
  * @param code - Existing public failure code.
  * @param status - Public HTTP status associated with the response.
  * @param headers - Optional native response headers merged into the public error envelope.
+ * @param detail - A rejected query's validation message and parameter; no other failure has one.
  * @returns A native response retaining the existing public status contract.
  */
 function errorResponse(
   code: string,
   status: number,
   headers: Record<string, string> = {},
+  detail: { readonly message?: string; readonly parameter?: string } = {},
 ): Response {
   return jsonResponse(
-    { protocol: INSPECTOR_API_PROTOCOL, version: INSPECTOR_API_VERSION, error: code },
+    { protocol: INSPECTOR_API_PROTOCOL, version: INSPECTOR_API_VERSION, error: code, ...detail },
     status,
     headers,
   );
@@ -237,7 +239,9 @@ function safeErrorResponse(error: unknown): Response {
   error = unwrapInspectorFailure(error);
   if (error instanceof EndpointError) return errorResponse(error.code, error.status);
   if (error instanceof InspectorEndpointError) return errorResponse(error.code, error.status);
-  if (error instanceof ObservabilityQueryError) return errorResponse(error.code, 400);
+  // The validator's message is framework text naming the parameter; other kinds stay code-only.
+  if (error instanceof ObservabilityQueryError)
+    return errorResponse(error.code, 400, {}, queryErrorDetail(error));
   if (error instanceof ObservabilityStreamError) return errorResponse(error.code, 400);
   return errorResponse("RELKIT_OBSERVABILITY_INTERNAL", 500);
 }

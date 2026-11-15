@@ -148,6 +148,37 @@ describe("inspector API client", () => {
     });
   });
 
+  test("a rejected history query carries the server's message and the parameter it names", async () => {
+    const message =
+      "Observability query status is invalid: expected an HTTP status from 100 to 599 or a class from 1xx to 5xx";
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () =>
+        envelope(
+          { error: "RELKIT_OBSERVABILITY_QUERY_INVALID", message, parameter: "status" },
+          400,
+        ),
+    });
+    const error = await client
+      .request("/_relkit/v1/requests?status=999")
+      .catch((cause: unknown) => cause);
+    expect(error).toBeInstanceOf(InspectorApiError);
+    expect(error).toMatchObject({
+      code: "RELKIT_OBSERVABILITY_QUERY_INVALID",
+      status: 400,
+      message,
+      parameter: "status",
+    });
+    const coded = await createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => envelope({ error: "RELKIT_OBSERVABILITY_QUERY_INVALID" }, 400),
+    })
+      .request("/_relkit/v1/requests")
+      .catch((cause: unknown) => cause);
+    expect(coded).toMatchObject({ message: "RELKIT_OBSERVABILITY_QUERY_INVALID" });
+    expect((coded as InspectorApiError).parameter).toBeUndefined();
+  });
+
   test("an application without jobs is told apart from a failing jobs service", async () => {
     expect(NO_JOBS_MESSAGE).toBe("This application declares no jobs.");
     expect(NO_JOBS_HINT).toContain("defineJob");

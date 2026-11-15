@@ -32,7 +32,11 @@ interface CacheEntry {
   readonly tags: readonly string[];
 }
 
-/** The error for a non-2xx response; the status is read before the envelope is checked. */
+/**
+ * The error for a non-2xx response; the status is read before the envelope is checked. The
+ * message is the server's own `message` when the envelope carries one (a rejected history query
+ * names the parameter and the accepted values), otherwise the code.
+ */
 function failure(
   response: Response,
   payload: unknown,
@@ -41,8 +45,12 @@ function failure(
   const envelope = isEnvelope(payload, ["relkit.inspector", ...(responseProtocols ?? [])]);
   const code = envelope ? errorCode(payload) : undefined;
   const named = code ?? `HTTP_${response.status}`;
+  const message =
+    envelope && typeof payload.message === "string" && payload.message !== ""
+      ? payload.message
+      : named;
   return new InspectorApiError(
-    named,
+    message,
     named,
     response.status,
     "http",
