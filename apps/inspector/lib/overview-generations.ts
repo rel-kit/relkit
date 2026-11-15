@@ -32,8 +32,6 @@ export interface GenerationGroup {
 /** What the Inspector reports about its session with the application. */
 export interface GenerationSession {
   readonly state: string;
-  /** When the Inspector began to report this session. */
-  readonly since?: string | undefined;
 }
 
 const PREFIX = "dev.generation.";
@@ -43,10 +41,13 @@ const CAUSE_LINES = 3;
  * @param items - `dev.generation.*` supervisor logs.
  * @param limit - How many of the newest events to keep.
  * @param session - The Inspector's session with the application. Only a connected session can be
- * current, and the newest run is it when it logged something since the Inspector began to report
- * that session (a run's id is not the session's id, so no stronger match exists). A connected
- * session with no such run is shown as an empty current group, whose start is not retained, and
- * no older run is called current. Without `session`, the newest run is current.
+ * current, and then the run of the newest generation event is it: a run that began before the
+ * Inspector connected (the normal order, `relkit dev` first) is still the running session, and a
+ * newer run would have logged a later start. A run's id is not the session's id (the log removes
+ * keys named after sessions, and the tool's status carries no run id), so the two cannot be
+ * joined exactly. A connected session while the list holds no generation event at all is shown as
+ * an empty current group, whose start is not retained. Without `session`, the newest run is
+ * current.
  */
 export function generationHistory(
   items: readonly InspectorObject[],
@@ -103,8 +104,6 @@ function currentRun(
   const key = text(record(newest.fields)?.runId) ?? "";
   if (session === undefined) return key;
   if (session.state !== "connected") return undefined;
-  const since = session.since === undefined ? undefined : Date.parse(session.since);
-  if (since !== undefined && Number.isFinite(since) && order(newest) < since) return undefined;
   return key;
 }
 

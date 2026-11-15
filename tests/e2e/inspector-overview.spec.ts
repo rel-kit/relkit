@@ -100,12 +100,15 @@ test("generation history names starts, reloads and failures by session", async (
   await expect(history).toContainText("Reload failed: Candidate validation failed.");
   await expect(history).toContainText("src/orders.ts(3,1): error TS1005");
   await expect(history.getByText("Development session started", { exact: true })).toHaveCount(2);
-  // The connected session has no retained record, so neither older run is called current.
-  await expect(history.getByRole("heading", { level: 3 })).toHaveCount(3);
+  // The newest run is the connected session, whether or not the Inspector started after it.
+  await expect(history.getByRole("heading", { level: 3 })).toHaveCount(2);
   await expect(
-    history.getByRole("heading", { name: "Current development session, start not retained" }),
+    history.getByRole("heading", { name: /^Current development session, started / }),
   ).toBeVisible();
-  await expect(history.getByText("current", { exact: true })).toHaveCount(0);
+  await expect(
+    history.getByRole("heading", { name: /^Development session started / }),
+  ).toBeVisible();
+  await expect(history.getByText("current", { exact: true })).toHaveCount(1);
   await expect(history).not.toContainText("Generation activated");
   // The reload after the failure succeeded, so no failure banner remains.
   await expect(page.getByRole("region", { name: "Development reload status" })).toHaveCount(0);
