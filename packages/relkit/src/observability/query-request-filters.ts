@@ -23,9 +23,7 @@ export const OBSERVABILITY_REQUEST_FILTER_PARAMETERS = Object.freeze([
  * @param status - Exact code such as `404`, or class such as `4xx`.
  * @returns The inclusive `[min, max]` range, or undefined when the filter is malformed.
  */
-export function statusRange(
-  status: string | number,
-): readonly [number, number] | undefined {
+export function statusRange(status: string | number): readonly [number, number] | undefined {
   const text = String(status).trim().toLowerCase();
   const exact = /^([1-5])\d\d$/.exec(text);
   if (exact !== null) return [Number(text), Number(text)];
@@ -96,7 +94,10 @@ export function matchesRequestFilters(
     return true;
   if (record.signal !== "request") return false;
   const range = query.status === undefined ? undefined : statusRange(query.status);
-  if (range !== undefined && !(record.status !== undefined && record.status >= range[0] && record.status <= range[1]))
+  if (
+    range !== undefined &&
+    !(record.status !== undefined && record.status >= range[0] && record.status <= range[1])
+  )
     return false;
   if (query.method !== undefined && record.method.toUpperCase() !== normalizedMethod(query.method))
     return false;
@@ -125,5 +126,6 @@ function invalid(name: string, expected: string): never {
   throw new ObservabilityQueryError(
     "RELKIT_OBSERVABILITY_QUERY_INVALID",
     `Observability query ${name} is invalid: expected ${expected}`,
+    name,
   );
 }

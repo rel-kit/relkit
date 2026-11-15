@@ -16,14 +16,17 @@ export class ObservabilityQueryError extends TypeError {
   /**
    * Creates a query validation error with a stable public code.
    * @param code - Invalid-input or protocol-mismatch code.
-   * @param message - Human-readable explanation.
+   * @param message - Human-readable explanation, written by the framework; it names the
+   * parameter and the accepted values, never a value the caller did not send.
+   * @param parameter - The query parameter that was rejected, when one is to blame.
    * @example
-   * throw new ObservabilityQueryError("RELKIT_OBSERVABILITY_QUERY_INVALID", "Invalid cursor");
+   * throw new ObservabilityQueryError("RELKIT_OBSERVABILITY_QUERY_INVALID", "Invalid cursor", "cursor");
    */
   constructor(
     readonly code:
       "RELKIT_OBSERVABILITY_QUERY_INVALID" | "RELKIT_OBSERVABILITY_QUERY_PROTOCOL_MISMATCH",
     message: string,
+    readonly parameter?: string,
   ) {
     super(message);
     this.name = "ObservabilityQueryError";

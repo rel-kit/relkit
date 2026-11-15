@@ -10,7 +10,7 @@ export { QueryDetailError, makeObservabilityQueryEffect } from "./query-effect.j
 function legacy(error: QueryDetailError | QueryReadError | QueryValidationError): unknown {
   if (error._tag === "QueryReadError") return error.cause;
   if (error._tag === "QueryValidationError")
-    return new ObservabilityQueryError(error.code, error.message);
+    return new ObservabilityQueryError(error.code, error.message, error.parameter);
   return new TypeError(error.message);
 }
 /**

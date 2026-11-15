@@ -42,7 +42,7 @@ export function readObservabilityQuery(request: Request): ObservabilityQueryRequ
   ]) {
     const item = params.get(name);
     if (item !== null) {
-      if (item.length === 0) throw queryError(`${name} is invalid`);
+      if (item.length === 0) throw queryError(name);
       value[name] = item;
     }
   }
@@ -107,20 +107,37 @@ export { streamResponse } from "./observability-stream.js";
  * @returns A finite accepted integer or the existing parameter error.
  */
 function integer(value: string, name: string): number {
-  if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value)))
-    throw queryError(`${name} is invalid`);
+  if (!/^\d+$/.test(value) || !Number.isSafeInteger(Number(value))) throw queryError(name);
   return Number(value);
 }
 
 /**
- * Creates the existing invalid observation-query failure.
- * @param message - Public diagnostic message, preserving the compatibility constructor.
- * @returns A public observation query error.
+ * Projects a rejected query into the fields of its error body: the validation message, which the
+ * framework writes and which names the parameter and the accepted values, and the parameter when
+ * the validator knows it. The Inspector shows the message at that parameter's field.
+ * @param error - Query validation failure.
+ * @returns The `message` and optional `parameter` body fields.
  */
-function queryError(message: string): ObservabilityQueryError {
+export function queryErrorDetail(error: ObservabilityQueryError): {
+  readonly message: string;
+  readonly parameter?: string;
+} {
+  return {
+    message: error.message,
+    ...(error.parameter === undefined ? {} : { parameter: error.parameter }),
+  };
+}
+
+/**
+ * Creates the existing invalid observation-query failure for one parameter.
+ * @param name - The rejected query parameter, named in the message.
+ * @returns A public observation query error carrying the parameter.
+ */
+function queryError(name: string): ObservabilityQueryError {
   return new ObservabilityQueryError(
     "RELKIT_OBSERVABILITY_QUERY_INVALID",
-    `Observability query ${message}`,
+    `Observability query ${name} is invalid`,
+    name,
   );
 }
 

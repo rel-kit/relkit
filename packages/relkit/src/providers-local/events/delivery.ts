@@ -15,7 +15,9 @@ import { createJobQueue } from "../jobs/queue.js";
 import { createJobStore } from "../jobs/store.js";
 import { normalizeEnvelope } from "./router-records.js";
 import {
+  administer,
   admitDelivery,
+  cancelDelivery,
   ledger,
   normalizeRetry,
   positive,
@@ -144,16 +146,16 @@ export const makeEventDelivery = Effect.fn("EventDelivery.open")(
     /**
      * Deduplicates and persists acceptance under the trigger admission permit.
      * @param input - Caller operation input.
+     * @param replayId - Identity of a replay delivery of the same publication.
      * @returns The lazy accepted delivery receipt after durable acknowledgement.
      */
     const accept = Effect.fn("EventDelivery.accept")(
-      function* (input: UnknownEventEnvelope) {
+      function* (input: UnknownEventEnvelope, replayId?: string) {
         yield* ensureOpen();
         const envelope = yield* localSync(() => normalizeEnvelope(input));
+        const profile = binding.profile ?? "default";
         const accepted = yield* admission.withPermits(1)(
-          localPromise(() =>
-            admitDelivery(queue, envelope, triggerId, binding.profile ?? "default"),
-          ),
+          localPromise(() => admitDelivery(queue, envelope, triggerId, profile, replayId)),
         );
         const status =
           accepted.entry.state === "completed"
@@ -198,12 +200,12 @@ export const makeEventDelivery = Effect.fn("EventDelivery.open")(
         (effect) => localOperation("EventDelivery.deliver", effect),
       ),
       retry: (id) =>
-        localOperation(
-          "EventDelivery.retry",
-          Effect.andThen(
-            ensureOpen(),
-            localPromise(() => retryDelivery(queue, triggerId, id, clock)),
-          ),
+        administer("EventDelivery.retry", ensureOpen, () =>
+          retryDelivery(queue, triggerId, id, clock),
+        ),
+      cancel: (id) =>
+        administer("EventDelivery.cancel", ensureOpen, () =>
+          cancelDelivery(queue, triggerId, id, clock),
         ),
       recover: (time) =>
         localOperation(

@@ -46,6 +46,9 @@ export interface EvaluatorModuleResult extends Schema.Schema.Type<
   typeof Wire.EvaluatorModuleResult
 > {}
 
+/** A located parse error of a module that failed to build. */
+export interface EvaluatorBuildError extends Schema.Schema.Type<typeof Wire.EvaluatorBuildError> {}
+
 /** Structured evaluator failure evidence. */
 export interface EvaluatorFailure extends Schema.Schema.Type<typeof Wire.EvaluatorFailure> {}
 

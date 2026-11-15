@@ -59,11 +59,15 @@ async function queryEventRuntime(query) {
     cursor = query.cursor.slice(separator + 1) || undefined;
   }
   const limit = query.limit ?? 50;
+  // Total and per-state counts cover every profile, whichever page this is.
+  const totals = new Map();
   for (let index = start; index < profiles.length; index++) {
     const value = provider(providerRegistry, "event", profiles[index]);
     if (typeof value?.query !== "function") continue;
     const page = await value.query({ ...query, cursor: index === start ? cursor : undefined,
       limit: limit - result.deliveries.length });
+    if (index === start && cursor !== undefined) totals.set(index, undefined);
+    else totals.set(index, page);
     for (const field of Object.keys(result)) result[field].push(...(page[field] ?? []));
     if (page.nextCursor !== undefined || result.deliveries.length >= limit) {
       const next = page.nextCursor !== undefined ? index : index + 1;
@@ -71,7 +75,22 @@ async function queryEventRuntime(query) {
       break;
     }
   }
-  return result;
+  return { ...result, ...(await eventTotals(providerRegistry, profiles, query, totals)) };
+}
+// Sums the providers' totals and per-state counts for the filter; a profile not read for this page
+// (or read from a cursor) is asked once with limit 1. Absent when no provider reports a total.
+async function eventTotals(providerRegistry, profiles, query, pages) {
+  let total, counts;
+  for (let index = 0; index < profiles.length; index++) {
+    const value = provider(providerRegistry, "event", profiles[index]);
+    if (typeof value?.query !== "function") continue;
+    const page = pages.get(index) ?? await value.query({ ...query, cursor: undefined, limit: 1 });
+    if (Number.isSafeInteger(page?.total)) total = (total ?? 0) + page.total;
+    if (page?.counts !== null && typeof page?.counts === "object")
+      for (const [state, count] of Object.entries(page.counts))
+        if (Number.isSafeInteger(count)) (counts ??= {})[state] = (counts[state] ?? 0) + count;
+  }
+  return { ...(total === undefined ? {} : { total }), ...(counts === undefined ? {} : { counts }) };
 }
 async function supportsInspector(capability, nodes, id, ...operations) {
   try {

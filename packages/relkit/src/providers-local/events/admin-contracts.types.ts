@@ -129,6 +129,10 @@ export interface EventQueryContract extends EventAdminVersion {
   readonly deliveries: readonly EventDeliveryContract[];
   readonly deadLetters: readonly EventDeadLetterContract[];
   readonly nextCursor?: string;
+  /** Deliveries that match the filters across all pages. */
+  readonly total?: number;
+  /** Deliveries that match the filters, by state; a state with none is absent. */
+  readonly counts?: Readonly<Partial<Record<EventDeliveryContract["state"], number>>>;
 }
 
 /** Event mutation request carrying delivery identity and optional audit reason. */

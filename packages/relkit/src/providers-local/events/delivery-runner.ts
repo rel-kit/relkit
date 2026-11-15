@@ -2,7 +2,7 @@ import type { DeliveryRunnerOptions } from "./delivery.service.types.js";
 import { Effect, Option } from "effect";
 import { localOperation, localPromise } from "../local-effect.js";
 import { applyRetry, safeFailureMetadata } from "../jobs/retry.js";
-import { normalizeEnvelope } from "./router-records.js";
+import { isReplayDeliveryId, normalizeEnvelope } from "./router-records.js";
 import { promoteDue, records, resultFrom } from "./delivery-utils.js";
 import type { EventDeliveryEffects } from "./delivery.service.types.js";
 
@@ -41,12 +41,16 @@ export function makeDeliveryRunner(owner: DeliveryRunnerOptions): EventDeliveryE
               localPromise(() =>
                 binding.invoke(normalizeEnvelope(leased.input), {
                   attempt: leased.attempt,
-                  replayed: store
-                    .snapshot()
-                    .records.some(
-                      (record) =>
-                        record.instanceId === leased.instanceId && record.kind === "dead-lettered",
-                    ),
+                  // A replay's own delivery, or a dead letter run again, is a re-delivery.
+                  replayed:
+                    isReplayDeliveryId(leased.instanceId) ||
+                    store
+                      .snapshot()
+                      .records.some(
+                        (record) =>
+                          record.instanceId === leased.instanceId &&
+                          record.kind === "dead-lettered",
+                      ),
                   ...(binding.timeoutMs === undefined ? {} : { timeoutMs: binding.timeoutMs }),
                 }),
               ),

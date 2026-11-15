@@ -96,6 +96,11 @@ export class InspectorApiError extends Error {
     ].includes(this.code);
   }
 
+  /** The query parameter the server rejected, when the error body names one. */
+  get parameter(): string | undefined {
+    return typeof this.body?.parameter === "string" ? this.body.parameter : undefined;
+  }
+
   get isCursorExpired(): boolean {
     return this.code === "RELKIT_OBSERVABILITY_STREAM_CURSOR_EXPIRED";
   }

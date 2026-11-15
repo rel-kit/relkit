@@ -7,6 +7,7 @@ import { acquireEvaluatorDetectors } from "./evaluator-detectors.js";
 import { acquireDiagnosticsReporter } from "./evaluator-diagnostics-reporter.js";
 import { sideEffectFailureEffect, snapshotModuleEffect } from "./evaluator-child-utils.js";
 import { EvaluatorChildBoundaryError } from "./evaluator-child-errors.js";
+import { discardUnparsedModules } from "./evaluator-unparsed-modules.js";
 import {
   candidateUrl,
   evaluatorResponse,
@@ -161,6 +162,8 @@ export const evaluateCandidate = Effect.fn("Discovery.evaluateCandidate")(
           });
         }
         if (Result.isFailure(imported)) {
+          // Bun keeps a module that did not parse in its loader; a later import of it would hang.
+          discardUnparsedModules(imported.failure.cause, normalized.success, request.projectRoot);
           return CandidateResultSchema.make({
             module: undefined,
             failure: yield* importFailure(imported.failure.cause, candidate.file, request),
