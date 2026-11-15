@@ -14,7 +14,7 @@ export const CONFORMANCE_POLICY: Readonly<Required<BucketPolicy>> = Object.freez
 });
 
 const encoder = new TextEncoder();
-const bytes = (size: number): Uint8Array => encoder.encode("x".repeat(size));
+const bytes = (size: number): Uint8Array<ArrayBuffer> => encoder.encode("x".repeat(size));
 
 /**
  * Rejects with a policy error: a TypeError carrying `RELKIT_BUCKET_POLICY_INVALID`.
