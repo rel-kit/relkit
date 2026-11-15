@@ -1,20 +1,20 @@
 /** Declares the database service boundary without acquiring native clients. */
-import { Database } from "bun:sqlite";
+import { sql } from "drizzle-orm";
 import { defineDrizzleService } from "@relkit/drizzle";
-import { drizzle } from "drizzle-orm/bun-sqlite";
+import { openSqliteDatabase } from "@relkit/drizzle/sqlite";
 import * as schema from "./schema/index.js";
 
 export default defineDrizzleService({
   schema,
-  client: ({ env }) => {
-    const sqlite = new Database(env.DATABASE_PATH, { create: true });
-    sqlite.exec(
-      "create table if not exists users (id integer primary key autoincrement, email text not null unique)",
+  client: async ({ env }) => {
+    const database = await openSqliteDatabase(env.DATABASE_PATH);
+    await database.run(
+      sql`create table if not exists users (id integer primary key autoincrement, email text not null unique)`,
     );
-    sqlite.exec(
-      "create table if not exists announcements (id integer primary key autoincrement, message text not null, created_at text not null)",
+    await database.run(
+      sql`create table if not exists announcements (id integer primary key autoincrement, message text not null, created_at text not null)`,
     );
-    return drizzle({ client: sqlite });
+    return database;
   },
   dispose: (database) => database.$client.close(),
 });

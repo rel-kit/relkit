@@ -24,8 +24,9 @@ test("runs CRUD, custom methods, composite selectors, schemas, and rollback", ()
           ),
           (owner) => Effect.promise(() => owner.close()),
         );
+        // The tests run on Bun, so the runtime-selecting client is a `bun:sqlite` database.
         expect(
-          migrate(active.client, {
+          migrate(active.client as unknown as Parameters<typeof migrate>[0], {
             migrationsFolder: resolve(import.meta.dir, "../src/services/database/migrations"),
           }),
         ).toBeUndefined();

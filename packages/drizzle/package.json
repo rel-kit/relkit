@@ -103,13 +103,25 @@
         {
           "package": "mysql2",
           "supportedRange": ">=2.0.0",
-          "installSection": "devDependencies",
+          "installSection": "dependencies",
           "capabilities": [
             "mysql"
           ],
           "phases": [
             "check",
-            "build"
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "pg",
+          "supportedRange": ">=8.0.0",
+          "installSection": "dependencies",
+          "capabilities": [
+            "pg"
+          ],
+          "phases": [
+            "runtime"
           ]
         }
       ]

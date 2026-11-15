@@ -16,21 +16,30 @@ export default defineEnv({
 ```
 
 ```ts
-import { Database } from "bun:sqlite";
 import { defineDrizzleService } from "@relkit/drizzle";
-import { drizzle } from "drizzle-orm/bun-sqlite";
+import { openSqliteDatabase } from "@relkit/drizzle/sqlite";
 import * as schema from "./schema/index.js";
 
 export default defineDrizzleService({
   schema,
-  client: ({ env }) => drizzle({ client: new Database(env.DATABASE_PATH, { create: true }) }),
+  client: ({ env }) => openSqliteDatabase(env.DATABASE_PATH),
   dispose: (database) => database.$client.close(),
 });
 ```
 
-Open the native connection in the `client({ env })` factory and close it with `dispose` when needed. Discovery does not run the factory. Generate and review migrations with the installed Drizzle tooling; service creation does not create tables or apply migrations. After `bun run check`, generated context declarations provide typed `context.database`.
+Open the connection in the `client({ env })` factory and close it with `dispose` when needed. The factory may return a promise: `openSqliteDatabase` is async, and RelKit awaits it. Discovery does not run the factory. Generate and review migrations with the installed Drizzle tooling; service creation does not create tables or apply migrations. After `npm run check` (or `bun run check`), generated context declarations provide typed `context.database`.
 
-For a model callback that uses the native database, import `defineModel` from the selected dialect leaf: `@relkit/drizzle/sqlite`, `/pg` or `/mysql`. This keeps other drivers outside the declaration closure. A MySQL development/typecheck installation also supplies `mysql2` for the upstream native database declarations.
+Open the database with the runtime-selecting client of its dialect, so the service runs on Node and on Bun. Do not import `bun:sqlite`, `node:sqlite` or `drizzle-orm/bun-*` in a service.
+
+| Dialect    | Client                                             | Driver                                                         | Close                      |
+| ---------- | -------------------------------------------------- | -------------------------------------------------------------- | -------------------------- |
+| SQLite     | `openSqliteDatabase` from `@relkit/drizzle/sqlite` | `bun:sqlite` on Bun, `node:sqlite` on Node; nothing to install | `database.$client.close()` |
+| PostgreSQL | `openPostgresDatabase` from `@relkit/drizzle/pg`   | Bun's built-in SQL on Bun, `pg` on Node                        | `database.$client.end()`   |
+| MySQL      | `openMysqlDatabase` from `@relkit/drizzle/mysql`   | `mysql2`                                                       | `database.$client.end()`   |
+
+A PostgreSQL or MySQL service passes the connection URL from `env.DATABASE_URL` to its client. A Node application installs `pg` or `mysql2` itself; `relkit add database` adds it.
+
+For a model callback that uses the native database, import `defineModel` from the selected dialect leaf: `@relkit/drizzle/sqlite`, `/pg` or `/mysql`. This keeps other drivers outside the declaration closure. A MySQL project installs `mysql2`, which is both the driver of `openMysqlDatabase` and the source of the upstream native database declarations.
 
 ## Version and apply migration source
 
@@ -39,14 +48,16 @@ New grouped scaffolds configure `src/services/database/migrations` beside the da
 Set the required environment in the application root's `.env` or shell, then run:
 
 ```sh
-bun run db:generate
+npm run db:generate
 # Review the generated SQL and metadata before applying them.
-bun run db:migrate
+npm run db:migrate
 ```
 
-`db:generate` uses the installed Drizzle Kit. `db:migrate` invokes installed RelKit tooling, `relkit db migrate`, without copying a runner into the app. Root `drizzle.config.ts` explicitly owns dialect, schema, migration output, connection and supported log options. To select another config, use `bun run relkit db migrate --config configs/database.ts`; relative output/database paths still use the application root. Keep delegated PostgreSQL/MySQL config deterministic because Kit loads it again. Existing shell variables take precedence over Bun's normal dotenv loading; `.env.example` is documentation only.
+With Bun, run `bun run db:generate` and `bun run db:migrate`.
 
-Migration applies pending SQL only when explicitly invoked; scaffolding and service startup do not apply it, generate secrets or open the database. SQLite uses the Bun-native driver. PostgreSQL/MySQL delegate to the app's installed Kit under Bun. Missing/empty/incompatible history requires generation or a compatible ORM/Kit pair, not a reset or fallback directory. Review failures before another manual run: SQL is not automatically retried, and dialect-specific partial DDL is not guaranteed to roll back. Keep the generated dependency patch and registration while required by the installed release.
+`db:generate` runs `drizzle-kit generate`. `db:migrate` invokes installed RelKit tooling, `relkit db migrate`, without copying a runner into the app. Root `drizzle.config.ts` explicitly owns dialect, schema, migration output, connection and supported log options. To select another config, run `npx relkit db migrate --config configs/database.ts` (`bun run relkit db migrate --config configs/database.ts` with Bun); relative output/database paths still use the application root. Keep delegated PostgreSQL/MySQL config deterministic because Kit loads it again. Existing shell variables take precedence over the environment files, which `relkit` commands read on Node and on Bun and `drizzle-kit` reads through the generated config; `.env.example` is documentation only.
+
+Migration applies pending SQL only when explicitly invoked; scaffolding and service startup do not apply it, generate secrets or open the database. SQLite uses the native driver of the runtime that runs the command, `bun:sqlite` on Bun and `node:sqlite` on Node. PostgreSQL/MySQL run the app's installed Kit. Missing/empty/incompatible history requires generation or a compatible ORM/Kit pair, not a reset or fallback directory. Review failures before another manual run: SQL is not automatically retried, and dialect-specific partial DDL is not guaranteed to roll back. Keep the generated dependency patch and registration while required by the installed release: Bun reads it from `package.json`, pnpm from `pnpm-workspace.yaml`, and npm applies no patches (the repair changes only type declarations, so skipping it is safe).
 
 ## `defineBetterAuthService`
 
@@ -91,4 +102,4 @@ export default defineBucket({
 });
 ```
 
-Configure compatible profiles in `relkit.config.ts` and declare each resource in a function's `dependencies` before using its checked context client. A profile selects a provider; the descriptor does not create Redis, S3, or credentials. Use `bun run relkit local status` to inspect Docker-backed resources.
+Configure compatible profiles in `relkit.config.ts` and declare each resource in a function's `dependencies` before using its checked context client. A profile selects a provider; the descriptor does not create Redis, S3, or credentials. Use `npx relkit local status` (`bun run relkit local status` with Bun) to inspect Docker-backed resources.
