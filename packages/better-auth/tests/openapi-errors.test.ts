@@ -16,7 +16,7 @@ const BASE = "http://127.0.0.1:3000";
 const ERROR_REFERENCE = { $ref: "#/components/schemas/BetterAuthError" };
 const METHODS = ["get", "post", "put", "patch", "delete"];
 
-/** A real instance; `session` and `plugins` vary by test. */
+/** A real instance; the session setting and the organization plugin vary by test. */
 function instance(options: { organizations?: boolean; sessionByPost?: boolean } = {}) {
   return betterAuth({
     baseURL: BASE,
