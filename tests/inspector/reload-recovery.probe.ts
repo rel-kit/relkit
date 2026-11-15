@@ -11,6 +11,7 @@ import {
   hasPath,
   pinnedRequest,
   referenceSnapshot,
+  settledSnapshot,
   sourceRecovery,
   withRecoveryTraffic,
 } from "./reload-recovery-checks.js";
@@ -24,6 +25,9 @@ const environment = {
   NODE_OPTIONS: "--max-old-space-size=1024",
   NEXT_TELEMETRY_DISABLED: "1",
   AGENT_BROWSER_DEFAULT_TIMEOUT: "15000",
+  // The parallel type-check watch is not what this probe measures, and its launcher keeps
+  // `relkit dev` from exiting on a lone SIGTERM (the pipes stay open past the joined stop).
+  RELKIT_DEV_TYPECHECK: "0",
 };
 
 /** Runs a finite owned browser/CLI command and joins its output streams. */
@@ -70,23 +74,13 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
     const baseUrl = `http://127.0.0.1:${backendPort}`;
     const cli = join(repository, "packages/cli/src/bin.ts");
     await recoveryFixture(root, repository, backendPort);
-    if (mode === "prepared")
-      await writeFile(
-        join(output, "prepare.txt"),
-        await run(
-          [
-            process.execPath,
-            cli,
-            "dev",
-            "--prepare",
-            "--verbose",
-            "--json",
-            "--project-root",
-            root,
-          ],
-          root,
-        ),
-      );
+    // `dev --prepare` is a finite check now (no prepared session); dev then starts on its output.
+    if (mode === "prepared") {
+      const args = [process.execPath, cli, "dev", "--prepare", "--json", "--project-root", root];
+      const prepared = await run(args, root);
+      await writeFile(join(output, "prepare.txt"), prepared);
+      assert.equal(JSON.parse(prepared).ok, true);
+    }
     const startedAt = performance.now();
     dev = recoveryProcess(root, mode, backendPort, {
       path: "/hello/probe",
@@ -98,9 +92,10 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
       async () => (await dev?.read()) === '{"message":"number:7"}',
     );
     const backendReadyMs = Math.round(performance.now() - startedAt);
-    assert.equal(dev.logs().includes(".relkit/dev/sessions/"), mode === "prepared");
     tool = await launchGeneratedTool(root);
     await toolReply(tool, "/_relkit/v1/runtime", "generationId");
+    // The separate Inspector reads the whole graph through the bridge (D8, RK-43).
+    await toolReply(tool, "/_relkit/v1/graph", '"nodes"');
     const inspectorUrl = `http://127.0.0.1:${tool.port}`;
     const toolPid = tool.child.pid;
     const inspectorReadyMs = Math.round(performance.now() - startedAt);
@@ -114,7 +109,7 @@ async function replay(mode: "ordinary" | "prepared"): Promise<void> {
       );
       await browser("wait", "--fn", "!document.body.innerText.includes('Latest reload failed')");
       const before = dev.logs().length;
-      const active = await referenceSnapshot(inspectorUrl);
+      const active = await settledSnapshot(inspectorUrl);
       await writeFile(join(root, ".env"), "DAYS=invalid\n");
       await mkdir(join(root, "src/routes/recovered/[name]"), { recursive: true });
       await writeFile(

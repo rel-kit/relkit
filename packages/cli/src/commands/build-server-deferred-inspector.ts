@@ -7,6 +7,25 @@ import { inspectorEndpointsSource } from "./build-server-http-inspector.js";
 import type { ServerSourceConfiguration } from "./build-server.types.js";
 
 /**
+ * Emits the inspection authority of the eager graph probe: the development bridge's session
+ * reads the whole graph projection at `/_relkit/v1/graph`, every other caller its identity only.
+ * @param configuration - Accepted inspector configuration; production builds emit nothing.
+ * @returns An `internalEndpoints` spread fragment that imports the projection only when asked.
+ */
+export function inspectionGraphSource(configuration: ServerSourceConfiguration): string {
+  if (!configuration.inspectorEnabled) return "";
+  return `
+    ...(environment !== "production" && process.env.RELKIT_INSPECTOR_SESSION_TOKEN !== undefined
+      ? {
+          inspection: {
+            authorize: (request) => request.headers.get("x-relkit-inspector-session-token") === process.env.RELKIT_INSPECTOR_SESSION_TOKEN,
+            graph: async () => (await import("relkit/inspector-api")).graphSnapshot({ generationId, graphHash, activationFingerprint, graph, observedEdges: [...observedEdges.values()], integrations: runtimeIntegrationsPlan }),
+          },
+        }
+      : {}),`;
+}
+
+/**
  * Reuses canonical inspector options with a lazy framework import.
  * @param configuration - Accepted document/preview and endpoint configuration.
  * @returns Native initializer source; it contains no acquisition before invocation.
