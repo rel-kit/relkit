@@ -7,7 +7,9 @@ import {
   deliveryTime,
   deliveryTraceId,
   payloadPreview,
+  publicationRequestId,
   publicationTime,
+  publicationTraceId,
 } from "../../lib/event-rows";
 import { formatTimestamp, utcTimestamp } from "../../lib/format";
 import { StatusBadge, statusTone } from "../../components/neon/status-badge";
@@ -31,14 +33,20 @@ export function PublicationRow({
   const id = text(publication.instanceId) || text(publication.publicationId);
   if (id === "") return null;
   const preview = payloadPreview(publication);
-  const traceId = text(publication.traceId);
+  const traceId = publicationTraceId(publication);
+  const requestId = publicationRequestId(publication);
   return (
     <li id={`publication-${id}`} className="grid min-w-0 gap-1.5 scroll-mt-20 text-xs">
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <span className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <code className="font-mono break-all">{id}</code>
           <Time value={publicationTime(publication)} />
-          {traceId === "" ? null : <TraceLink traceId={traceId} />}
+          {traceId === undefined ? null : <TraceLink traceId={traceId} />}
+          {requestId === undefined ? null : (
+            <Link className="text-link" href={`/requests/${encodeURIComponent(requestId)}`}>
+              Open request
+            </Link>
+          )}
         </span>
         <Button
           type="button"
