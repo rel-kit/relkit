@@ -10,4 +10,6 @@
 export interface RemoteObservabilityOptions {
   readonly url: string;
   readonly token: string;
+  /** Sends the framework's success logs to the inspection stream too (decision D15: off by default). */
+  readonly frameworkSuccessLogs?: boolean;
 }

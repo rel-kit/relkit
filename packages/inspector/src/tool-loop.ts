@@ -35,6 +35,8 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
   let nextHistoryRetry = 0;
   /** Lock conflicts in the current episode; an opened history starts a new one. */
   let lockNotices = 0;
+  // A full batch leaves records behind it; the next pull follows at once instead of after 100 ms.
+  let backlog = false;
   while (true) {
     const now = yield* Clock.currentTimeMillis;
     const cycle = Effect.gen(function* () {
@@ -46,7 +48,12 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
         yield* acquireHistory(state, files, options);
         if ((yield* Ref.get(state)).history) lockNotices = 0;
       }
-      if (yield* collectCurrent(state, remote, options, stream)) historyFailures = 0;
+      backlog = false;
+      const collected = yield* collectCurrent(state, remote, options, stream);
+      if (collected !== false) {
+        historyFailures = 0;
+        backlog = collected.backlog;
+      }
     });
     yield* cycle.pipe(
       Effect.catchCause((cause) => {
@@ -74,7 +81,7 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
         );
       }),
     );
-    yield* Effect.sleep(100);
+    if (!backlog) yield* Effect.sleep(100);
   }
 });
 
@@ -174,5 +181,5 @@ const collectCurrent = Effect.fn("Inspector.collectCurrent")(function* (
     producerFailed: batch.producerFailed,
     producerDropped: batch.producerDropped,
   }));
-  return true;
+  return { backlog: batch.backlog };
 });

@@ -19,12 +19,12 @@ function sized(sequence: number, bytes: number) {
   return record("x".repeat(bytes - overhead));
 }
 
-test("default count accepts 2,048, then evicts exactly one without hitting the byte bound", async () => {
+test("default count accepts 8,192, then evicts exactly one without hitting the byte bound", async () => {
   await Effect.runPromise(
     Effect.gen(function* () {
       const buffer = yield* EarlyRetention.make();
-      for (let i = 1; i <= 2048; i++) yield* buffer.admit(record(String(i)));
-      expect(yield* buffer.status()).toMatchObject({ bufferedRecords: 2048, droppedRecords: 0 });
+      for (let i = 1; i <= 8192; i++) yield* buffer.admit(record(String(i)));
+      expect(yield* buffer.status()).toMatchObject({ bufferedRecords: 8192, droppedRecords: 0 });
       yield* buffer.admit(record("one over"));
       const entries = yield* buffer.snapshot();
       expect(entries[0]!.sequence).toBe(2);
@@ -34,9 +34,9 @@ test("default count accepts 2,048, then evicts exactly one without hitting the b
           Buffer.byteLength(JSON.stringify({ sequence: entry.sequence, record: entry.record })),
         0,
       );
-      expect(bytes).toBeLessThan(2_097_152);
+      expect(bytes).toBeLessThan(8_388_608);
       expect(yield* buffer.status()).toMatchObject({
-        bufferedRecords: 2048,
+        bufferedRecords: 8192,
         bufferedBytes: bytes,
         droppedRecords: 1,
       });
@@ -45,19 +45,18 @@ test("default count accepts 2,048, then evicts exactly one without hitting the b
 });
 
 test.each([0, 1])(
-  "default two MiB plus %s byte enforces bytes independently of count",
+  "default eight MiB plus %s byte enforces bytes independently of count",
   async (over) => {
     await Effect.runPromise(
       Effect.gen(function* () {
         const buffer = yield* EarlyRetention.make();
-        yield* buffer.admit(sized(1, 700_000));
-        yield* buffer.admit(sized(2, 700_000));
-        yield* buffer.admit(sized(3, 697_152 + over));
+        for (let i = 1; i <= 8; i++) yield* buffer.admit(sized(i, 1_000_000));
+        yield* buffer.admit(sized(9, 388_608 + over));
         expect(yield* buffer.status()).toMatchObject({
-          bufferedRecords: over === 0 ? 3 : 2,
-          bufferedBytes: 2_097_152 + over - (over === 0 ? 0 : 700_000),
+          bufferedRecords: over === 0 ? 9 : 8,
+          bufferedBytes: 8_388_608 + over - (over === 0 ? 0 : 1_000_000),
           droppedRecords: over,
-          droppedBytes: over === 0 ? 0 : 700_000,
+          droppedBytes: over === 0 ? 0 : 1_000_000,
         });
       }),
     );

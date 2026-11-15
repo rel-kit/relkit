@@ -33,7 +33,7 @@ test("records an error status returned without a thrown failure as a failed outc
     );
 
   expect(response.status).toBe(404);
-  expect(record).toMatchObject({ status: 404, outcome: "declared-error" });
+  expect(record).toMatchObject({ status: 404, outcome: "refused" });
   expect(span?.events?.map((event) => event.name)).toContain("http.declared-error");
   expect(span?.events?.map((event) => event.name)).not.toContain("http.success");
 });

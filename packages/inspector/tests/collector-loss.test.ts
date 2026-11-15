@@ -1,7 +1,7 @@
 /** Overflow diagnostics survive saturation, coalesce changed totals and retain stable durable receipt keys. */
 import { expect, test } from "vitest";
 import { Effect } from "effect";
-import { persistCollectionLoss } from "../src/collector-loss.js";
+import { lostKinds, persistCollectionLoss } from "../src/collector-loss.js";
 import type { InspectorHistoryOperations } from "../src/history.types.js";
 
 test("loss is persisted outside the application queue and only changed totals produce another diagnostic", async () => {
@@ -38,4 +38,30 @@ test("loss is persisted outside the application queue and only changed totals pr
     persistCollectionLoss(history, { ...batch, droppedRecords: 3 }, "session", key),
   );
   expect(writes[2]?.key).not.toBe(key);
+});
+
+test("the loss diagnostic names what the buffer gave up", async () => {
+  const messages: string[] = [];
+  const history: InspectorHistoryOperations = {
+    call: (command) =>
+      Effect.sync(() => {
+        if (command.type === "append")
+          for (const entry of command.records)
+            if (entry.record.signal === "diagnostic") messages.push(entry.record.message);
+        return [];
+      }),
+  };
+  const batch = {
+    records: [],
+    gap: false,
+    droppedRecords: 5,
+    droppedBytes: 900,
+    droppedByKind: { frameworkLogs: 4, logs: 1, spans: 0, requestEnds: 0 },
+    incomplete: true,
+  };
+  await Effect.runPromise(persistCollectionLoss(history, batch, "session"));
+  expect(messages[0]).toContain(
+    "5 retained records lost (900 bytes: 4 framework success logs, 1 other logs)",
+  );
+  expect(lostKinds(undefined)).toBe("");
 });

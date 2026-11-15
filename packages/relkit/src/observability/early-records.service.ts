@@ -32,7 +32,7 @@ export class EarlyRetention extends Context.Service<EarlyRetention, EarlyRetenti
 
 /**
  * Supplies fresh early retention state for one runtime or deterministic test.
- * @param options - Bounded count/byte policy; default 2,048 records and 2 MiB.
+ * @param options - Bounded count/byte policy; default 8,192 records and 8 MiB.
  * @returns Lazy Layer; policy errors remain acquisition failures.
  */
 export function earlyRetentionLive(options: EarlyRetentionOptions = {}) {

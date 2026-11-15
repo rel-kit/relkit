@@ -75,6 +75,10 @@ The JSON printed by `relkit check --json` embedded the text of every generated f
 
 `relkit <unknown>` now fails with `RELKIT_UNKNOWN_COMMAND` and exit status 2, like other usage errors, instead of `RELKIT_COMMAND_UNAVAILABLE` and status 1. `RELKIT_COMMAND_UNAVAILABLE` keeps its meaning for a command that parses but is not implemented.
 
+### D15. The framework's success logs stay out of the inspection stream
+
+Measured on a generated API: before this change a request left 15 to 74 records in the development inspection buffer, of which 11 to 58 were span revisions (every attribute and event re-sends the whole span) and 1 to 9 were `Execution operation completed` success logs; at about 30 sequential requests per second the buffer gave up 31,000 to 42,000 records in 1,260 requests, and 1 request in 4 (Bun) to 8 (Node) lost its record or its end. The application now sends one revision per finished span, and its framework success logs are not sent to the Inspector: the span of the same operation already carries its outcome and duration. Failure and interruption logs, the request line and the application's own logs are sent as before; the local store, exporters and JSON sink still receive success logs, and production is unchanged. `remote.frameworkSuccessLogs: true` sends them again (no command-line switch yet). Alternatives rejected: sampling them, which shows the steps of some requests and not others; and turning `ExecutionSuccessLogs` off for request scopes, which would also empty the JSON and exporter streams that consumers rely on.
+
 ## Risks / Trade-offs
 
 - The application's database layer is Bun-only, so some Node failures belong to the application. Triage separates them; the Node path of RelKit is still exercised up to the point where application code fails.

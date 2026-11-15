@@ -69,6 +69,7 @@ export function earlyRetentionOperations(
               bufferedBytes: value.bytes,
               droppedRecords: value.droppedRecords,
               droppedBytes: value.droppedBytes,
+              droppedByKind: value.droppedByKind,
               incomplete: value.droppedRecords > 0,
             }),
           ),

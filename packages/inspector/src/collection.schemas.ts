@@ -39,5 +39,12 @@ export const InspectionCollectionBatch = Schema.fromJsonString(
     producerDropped: Schema.optionalKey(
       Schema.Number.check(Schema.isInt(), Schema.isGreaterThanOrEqualTo(0)),
     ),
+    /** Records the buffer gave up, by kind (`EarlyLossKind`); older applications omit it. */
+    droppedByKind: Schema.optionalKey(
+      Schema.Record(
+        Schema.String,
+        Schema.Number.check(Schema.isInt(), Schema.isGreaterThanOrEqualTo(0)),
+      ),
+    ),
   }),
 );

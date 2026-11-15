@@ -10,4 +10,7 @@ export const REQUEST_OUTCOMES = [
   "timeout",
   "cancelled",
   "defect",
+  // The framework answered before any handler ran: no route (404), a method the path does not
+  // accept (405) or a body over the limit (413).
+  "refused",
 ] as const;

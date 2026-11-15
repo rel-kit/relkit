@@ -38,6 +38,7 @@ test("records every request outcome and preserves declared error identity", () =
     ["timeout", 504],
     ["cancelled", 499],
     ["defect", 500],
+    ["refused", 413],
   ] as const;
   const records = cases.map(([outcome, status], index) => {
     const builder = createRequestRecordBuilder({
