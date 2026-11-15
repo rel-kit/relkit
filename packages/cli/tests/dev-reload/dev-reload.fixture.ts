@@ -117,21 +117,35 @@ export default defineApp({ env, server: { port: 3000, maxBodyBytes: ${maxBodyByt
  * @param root - Application root.
  * @param verbose - Whether dev runs with `--verbose`.
  * @param flags - Further `relkit dev` flags, such as `--json`.
+ * @param host - Runtime that runs the built CLI; `node` disables the Bun hand-off as an npm user would.
  * @returns The running process with output and request helpers.
  */
 export async function startDev(
   root: string,
   verbose = true,
   flags: readonly string[] = [],
+  host: "bun" | "node" = "bun",
 ): Promise<DevProcess> {
   const probe = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: () => new Response() });
   const port = probe.port ?? 0;
   await probe.stop(true);
+  const nodeEnvironment = { RELKIT_BUN_HANDOFF: "0", npm_config_user_agent: undefined };
   const child = Bun.spawn(
-    [process.execPath, cli, "dev", ...(verbose ? ["--verbose"] : []), ...flags],
+    [
+      host === "node" ? "node" : process.execPath,
+      cli,
+      "dev",
+      ...(verbose ? ["--verbose"] : []),
+      ...flags,
+    ],
     {
       cwd: root,
-      env: { ...process.env, PORT: String(port), NO_COLOR: "1" },
+      env: {
+        ...process.env,
+        ...(host === "node" ? nodeEnvironment : {}),
+        PORT: String(port),
+        NO_COLOR: "1",
+      },
       stdin: "ignore",
       stdout: "pipe",
       stderr: "pipe",
@@ -173,9 +187,9 @@ export async function startDev(
       // Already gone.
     }
   };
-  const request = (path: string) =>
-    fetch(`http://127.0.0.1:${port}${path}`, { signal: AbortSignal.timeout(5_000) });
-  return { get, request, waitFor, output: () => output, stop };
+  const request = (path: string, init: RequestInit = {}) =>
+    fetch(`http://127.0.0.1:${port}${path}`, { signal: AbortSignal.timeout(5_000), ...init });
+  return { origin: `http://127.0.0.1:${port}`, get, request, waitFor, output: () => output, stop };
 }
 
 const TSCONFIG = `${JSON.stringify(

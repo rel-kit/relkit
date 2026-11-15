@@ -1,6 +1,6 @@
 import { Context, Effect, Layer, Ref, Result, Scope } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
-import { drainResponse } from "./proxy-forward.js";
+import { drainResponse, forwardingFetch } from "./proxy-forward.js";
 import { proxyRequest } from "./proxy-request.js";
 import { normalizeTarget, sameToken } from "./proxy-validation.js";
 import type { ProxyState, SupervisorProxyOptions, SupervisorProxyService } from "./proxy.types.js";
@@ -76,7 +76,7 @@ export function createProxyLayer(options: SupervisorProxyOptions, defaultHostnam
             );
           const selected = yield* admit;
           if (selected !== undefined)
-            return yield* proxyRequest(request, selected, options.fetch ?? fetch);
+            return yield* proxyRequest(request, selected, options.fetch ?? forwardingFetch);
           if (Ref.getUnsafe(state).target !== undefined) return drainResponse();
           return new Response(JSON.stringify({ error: "No active RelKit generation." }), {
             status: 503,

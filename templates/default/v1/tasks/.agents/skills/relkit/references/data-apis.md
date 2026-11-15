@@ -72,7 +72,7 @@ export default defineBetterAuthService({
 
 The root descriptor and session types remain available from `@relkit/better-auth`; native activation is owned by `@relkit/better-auth/drizzle` and selected by the server producer. Better Auth uses the same Drizzle connection and needs its tables in that schema. Mount `auth.handler` directly with `export const ALL = defineRoute({ handler: auth.handler })` under the auth base path. Supply a stable server-side `BETTER_AUTH_SECRET` and correct public `BETTER_AUTH_URL`; the scaffold only adds environment examples. Protect application routes and enforce ownership separately from signing in.
 
-The selected auth scaffold keeps Better Auth 1.7.1 and the existing migration contract. It emits an override to the official `@better-fetch/fetch` 1.3.2 typing fix for Bun/npm and pnpm, and installs `@cloudflare/workers-types` 4.20250121.0 as a development-only requirement of the upstream D1 declarations. Preserve these fields and the separate Drizzle patch when extending the project; none applies SQL.
+The selected auth scaffold installs Better Auth 1.7.7, whose generated `account` table has no `issuer` column, and keeps the existing migration contract. It emits an override to the official `@better-fetch/fetch` 1.3.2 typing fix for Bun/npm and pnpm, and installs `@cloudflare/workers-types` 4.20250121.0 as a development-only requirement of the upstream D1 declarations. Preserve these fields and the separate Drizzle patch when extending the project; none applies SQL.
 
 ## `defineCache` and `defineBucket`
 

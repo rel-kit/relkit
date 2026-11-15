@@ -8,6 +8,7 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { assertCandidateInstalled } from "../../scripts/node-creation-candidate.ts";
+import { postsAreOriginChecked } from "../../scripts/node-creation-dev.ts";
 import {
   commands,
   expectOutput,
@@ -111,4 +112,31 @@ test("the lockfile must resolve the package from the candidate registry", async 
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test("the dev step requires a served same-origin POST and a 403 origin-denied cross-origin one", async () => {
+  const origin = "http://127.0.0.1:4100";
+  const seen: string[] = [];
+  /** Answers like a development server whose origin check is `verdict`. */
+  const server = (verdict: (from: string) => Response): typeof fetch =>
+    (async (input: string | URL | Request, init?: RequestInit) => {
+      const from = new Headers(init?.headers).get("origin")!;
+      seen.push(`${init?.method} ${String(input)} ${from}`);
+      return verdict(from);
+    }) as typeof fetch;
+  const denied = () => Response.json({ code: "origin-denied" }, { status: 403 });
+  const correct = server((from) => (from === origin ? Response.json({ id: 1 }) : denied()));
+  expect(await postsAreOriginChecked(origin, correct)).toBe('{"id":1}');
+  expect(seen).toEqual([
+    `POST ${origin}/items ${origin}`,
+    `POST ${origin}/items http://attacker.example`,
+  ]);
+  // RK-39: the same-origin request denied as if it came from elsewhere.
+  await expect(postsAreOriginChecked(origin, server(denied))).rejects.toThrow(
+    /same-origin POST \/items answered 403/,
+  );
+  const open = server(() => Response.json({ id: 1 }));
+  await expect(postsAreOriginChecked(origin, open)).rejects.toThrow(
+    /cross-origin POST \/items answered 200, not 403 origin-denied/,
+  );
 });
