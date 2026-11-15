@@ -31,6 +31,15 @@ export function currentHttpContext(): Context.Context<never> {
   return context.mapUnsafe.has(Logger.CurrentLoggers.key) ? context : Context.merge(app, context);
 }
 
+/** Captures the current request's asynchronous context (the application handle, its logger and
+ * Effect configuration) for work that a runtime starts outside it, such as WebSocket messages.
+ * @returns A function that runs its callback in the captured context.
+ * @example const inRequest = captureRequestContext(); socket.onmessage = () => inRequest(handle);
+ */
+export function captureRequestContext(): <R>(run: () => R) => R {
+  return AsyncLocalStorage.snapshot();
+}
+
 /** Captures caller configuration for independently owned generation scopes.
  * @returns A layer retaining the current fiber's logger, clock and operation observers.
  */
