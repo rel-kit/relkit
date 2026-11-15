@@ -6,6 +6,7 @@ export const REQUEST_OUTCOME_OPTIONS = [
   { value: "success", label: "Success" },
   { value: "declared-error", label: "Declared error" },
   { value: "validation-error", label: "Validation error" },
+  { value: "refused", label: "Refused by the framework" },
   { value: "timeout", label: "Timeout" },
   { value: "cancelled", label: "Cancelled" },
   { value: "defect", label: "Unexpected failure" },

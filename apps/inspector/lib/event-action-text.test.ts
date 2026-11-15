@@ -124,6 +124,7 @@ describe("a payload that fails the schema in the page", () => {
       text: "The payload does not satisfy the event's schema. Nothing was sent.",
       issues: [{ path: "orderId", code: "missing" }],
       noSession: false,
+      sent: false,
     });
   });
 });

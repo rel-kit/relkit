@@ -185,9 +185,10 @@ export function FunctionInvocation({
           </p>
         ) : null}
         {answer === undefined ? null : (
-          <ActionAnswerView ref={answerRef} id="function-invocation-answer" answer={answer}>
-            <SessionNote />
-          </ActionAnswerView>
+          <>
+            <ActionAnswerView ref={answerRef} id="function-invocation-answer" answer={answer} />
+            {answer.sent ? <SessionNote /> : null}
+          </>
         )}
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {status}

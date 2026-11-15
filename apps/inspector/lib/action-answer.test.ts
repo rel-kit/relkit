@@ -165,3 +165,23 @@ describe("the application's answer to a refused action", () => {
     );
   });
 });
+
+describe("whether the application answered", () => {
+  test("an answer from the application counts as sent", () => {
+    const answer = actionAnswer(
+      refused("RELKIT_INSPECTOR_ACTION_FAILED", 409, {
+        cause: { status: 401, code: "unauthenticated" },
+      }),
+      "function",
+    );
+    expect(answer.sent).toBe(true);
+  });
+
+  test("an action the provider cannot run was never sent", () => {
+    const answer = actionAnswer(refused("RELKIT_INSPECTOR_ACTION_UNSUPPORTED", 501), "event", {
+      unsupported: "This provider cannot retry a delivery.",
+    });
+    expect(answer.text).toBe("This provider cannot retry a delivery.");
+    expect(answer.sent).toBe(false);
+  });
+});

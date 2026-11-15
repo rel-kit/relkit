@@ -25,9 +25,10 @@ export function ActionOutcome({
   if (outcome === undefined) return null;
   if (outcome.kind === "failure")
     return (
-      <ActionAnswerView answer={outcome.answer}>
-        <SessionNote />
-      </ActionAnswerView>
+      <div className="grid min-w-0 gap-1">
+        <ActionAnswerView answer={outcome.answer} />
+        {outcome.answer.sent ? <SessionNote /> : null}
+      </div>
     );
   const created = publications.find((item) => item.instanceId === outcome.publicationId);
   const traceId = typeof created?.traceId === "string" ? created.traceId : "";

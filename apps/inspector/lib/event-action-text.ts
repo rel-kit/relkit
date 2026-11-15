@@ -119,7 +119,11 @@ export function checkPayload(
   if (!parsed.ok)
     return {
       ok: false,
-      answer: { text: "The payload is not valid JSON. Nothing was sent.", noSession: false },
+      answer: {
+        text: "The payload is not valid JSON. Nothing was sent.",
+        noSession: false,
+        sent: false,
+      },
     };
   const issues = validateAgainstSchema(schema, parsed.value);
   return issues.length === 0
@@ -133,5 +137,6 @@ export function payloadAnswer(issues: readonly ValidationIssue[]): ActionAnswer 
     text: "The payload does not satisfy the event's schema. Nothing was sent.",
     issues,
     noSession: false,
+    sent: false,
   };
 }

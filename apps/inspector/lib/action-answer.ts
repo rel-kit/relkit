@@ -21,6 +21,8 @@ export interface ActionAnswer {
   readonly issues?: readonly ValidationIssue[];
   /** Whether the refusal is explained by the Inspector running without a user session. */
   readonly noSession: boolean;
+  /** Whether the application answered: false when the action never reached it. */
+  readonly sent: boolean;
 }
 
 export type ActionSubject = "function" | "event";
@@ -84,10 +86,10 @@ export function actionAnswer(
   if (cause !== undefined) return fromCause(cause, subject);
   // The application's own problem answer, such as its origin check, is not an Inspector envelope.
   if (error instanceof InspectorApiError && error.body?.code === ORIGIN_DENIED)
-    return { text: ORIGIN_DENIED_TEXT, noSession: false };
+    return { text: ORIGIN_DENIED_TEXT, noSession: false, sent: true };
   if (error instanceof InspectorApiError && error.code === "HTTP_403" && error.body === undefined)
-    return { text: BARE_FORBIDDEN_TEXT, noSession: false };
-  return { text: inspectorReason(error, options), noSession: false };
+    return { text: BARE_FORBIDDEN_TEXT, noSession: false, sent: true };
+  return { text: inspectorReason(error, options), noSession: false, sent: false };
 }
 
 function fromCause(cause: ActionCause, subject: ActionSubject): ActionAnswer {
@@ -95,6 +97,7 @@ function fromCause(cause: ActionCause, subject: ActionSubject): ActionAnswer {
   const answer = (text: string, rest: Partial<ActionAnswer> = {}): ActionAnswer => ({
     text,
     noSession: false,
+    sent: true,
     ...rest,
   });
   switch (cause.code) {

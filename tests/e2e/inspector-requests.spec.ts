@@ -188,13 +188,17 @@ test("offers the recorded outcomes and shows a rejected filter at its field", as
     "Success",
     "Declared error",
     "Validation error",
+    "Refused by the framework",
     "Timeout",
     "Cancelled",
     "Unexpected failure",
   ]);
-  await outcome.selectOption("validation-error");
-  await page.getByRole("button", { name: "Apply filters" }).click();
-  await expect(page).toHaveURL(/outcome=validation-error/);
+  // The development server may reload the page once while it compiles; a reload clears the draft.
+  await expect(async () => {
+    await outcome.selectOption("validation-error");
+    await page.getByRole("button", { name: "Apply filters" }).click();
+    await expect(page).toHaveURL(/outcome=validation-error/, { timeout: 2_000 });
+  }).toPass({ timeout: 15_000 });
 
   await page.goto("/requests");
   await page.getByLabel("Status", { exact: true }).fill("700");

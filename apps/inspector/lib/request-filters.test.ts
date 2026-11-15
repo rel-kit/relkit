@@ -55,6 +55,7 @@ describe("request filter validation", () => {
       "success",
       "declared-error",
       "validation-error",
+      "refused",
       "timeout",
       "cancelled",
       "defect",
