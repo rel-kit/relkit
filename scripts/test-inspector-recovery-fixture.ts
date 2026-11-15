@@ -21,7 +21,7 @@ export async function recoveryFixture(
     const path = join(root, file);
     await writeFile(
       path,
-      (await readFile(path, "utf8")).replace('"relkit"', `"@relkit/app/${entrypoint}"`),
+      (await readFile(path, "utf8")).replace('"relkit"', `"relkit/${entrypoint}"`),
     );
   }
   const route = join(root, "src/routes/hello/[name]/route.ts");
