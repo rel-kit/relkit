@@ -242,6 +242,22 @@ defaults.bucket: "wrong"       3 errors on line 17, one per property:
 access.permissions: [""]       no suggestion (`vehicleModel:create`, `vehicle:read` are missing)
 ```
 
+## The two known defects on the logistics application, after
+
+The packages built from this change, packed and installed from a local registry into a plain folder copy of the application's committed files (14,017 files of 11 packages compared with the archives, 0 differ). `relkit check` added two lines to the copy's `.relkit/generated/context-registry.d.ts`: the alias `RelkitApplicationAccess` and `interface ApplicationAccess`. The application's own `tsc --noEmit` passes without a change to its source.
+
+```text
+defaults.bucket, empty value   5,074 suggestions; "local" is the first
+defaults.bucket, inside quotes 1 suggestion: local
+defaults.bucket: "wrong"       1 error, on that entry (line 17, column 31):
+                                 Type '"wrong"' is not assignable to type '"local"'.
+access.permissions: [""]       33 suggestions: organization:update, …, vehicleModel:create, vehicleModel:read, …
+"vehicleModel:creat"           1 error, on that entry:
+                                 Type '"vehicleModel:creat"' is not assignable to type '"organization:update" | …
+                                 | "vehicleModel:create" | … 23 more … | "team:delete"'.
+                                 Did you mean '"vehicleModel:create"'?
+```
+
 ## After this change
 
 Measured again on the change's last commit, with the same probes.

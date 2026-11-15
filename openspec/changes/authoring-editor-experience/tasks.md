@@ -47,4 +47,4 @@
 - [ ] 7.2 Run `bun run test:types`; verify it passes.
 - [ ] 7.3 Run `bun run test:packages` to its end; verify every set of tests passes.
 - [ ] 7.4 Run `openspec validate --specs`; verify it passes, then archive the change with `openspec archive authoring-editor-experience -y`.
-- [ ] 7.5 Install the built packages into a plain folder copy of the logistics application and run the kept survey there; record before and after for the two known defects; delete the copy.
+- [x] 7.5 Install the built packages into a plain folder copy of the logistics application and run the kept survey there; record before and after for the two known defects; delete the copy.
