@@ -126,7 +126,10 @@ export function foreignHandshake(origin: string): Promise<{ status: number; raw:
     let raw = "";
     const settle = (): void => {
       socket.destroy();
-      resolve({ status: Number(/^HTTP\/1\.1 (\d{3})/u.exec(raw)?.[1] ?? 0), raw: raw.toLowerCase() });
+      resolve({
+        status: Number(/^HTTP\/1\.1 (\d{3})/u.exec(raw)?.[1] ?? 0),
+        raw: raw.toLowerCase(),
+      });
     };
     socket.setTimeout(1_000, settle);
     socket.on("error", reject);

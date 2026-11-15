@@ -60,7 +60,9 @@ export async function cancelWhileWaiting(): Promise<CancelledWait> {
   const logger = Logger.make((event) =>
     logs.push({ level: event.logLevel, message: String(event.message) }),
   );
-  const logged = Effect.runSync(Effect.context<never>().pipe(Effect.provide(Logger.layer([logger]))));
+  const logged = Effect.runSync(
+    Effect.context<never>().pipe(Effect.provide(Logger.layer([logger]))),
+  );
   const caller = new AbortController();
   let ended: CancelledWait["ended"] = "done";
   try {

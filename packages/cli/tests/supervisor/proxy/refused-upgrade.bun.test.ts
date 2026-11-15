@@ -17,7 +17,13 @@ afterAll(async () => {
 });
 
 for (const [name, path, origin, status, code] of [
-  ["a foreign Origin is refused with 403", "/socket", "http://attacker.example", 403, "origin-denied"],
+  [
+    "a foreign Origin is refused with 403",
+    "/socket",
+    "http://attacker.example",
+    403,
+    "origin-denied",
+  ],
   ["an opaque Origin is refused with 403", "/socket", "null", 403, "origin-denied"],
   ["another refusal is a 502 Problem", "/socket?locked", undefined, 502, "upstream-unavailable"],
 ] as const)

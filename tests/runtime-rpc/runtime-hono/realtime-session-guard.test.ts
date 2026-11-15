@@ -1,7 +1,11 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
 import { nodeRuntime } from "relkit/runtime/node";
 import { burst, closeAfter, MALFORMED_FRAMES } from "./rpc-websocket-hygiene.case.ts";
-import { firstFrame, foreignHandshake, startSessionGuardServer } from "./realtime-session-guard.case.ts";
+import {
+  firstFrame,
+  foreignHandshake,
+  startSessionGuardServer,
+} from "./realtime-session-guard.case.ts";
 
 let server: Awaited<ReturnType<typeof startSessionGuardServer>>;
 beforeAll(async () => {

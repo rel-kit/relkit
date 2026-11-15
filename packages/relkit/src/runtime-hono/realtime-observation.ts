@@ -134,7 +134,9 @@ function observe(
             ).pipe(
               Effect.as(true),
               // The caller went away during the wait: the stream ends, nothing failed.
-              Effect.catch((error) => (signal?.aborted ? Effect.succeed(false) : Effect.fail(error))),
+              Effect.catch((error) =>
+                signal?.aborted ? Effect.succeed(false) : Effect.fail(error),
+              ),
             );
             if (!waited) return [[], Option.none<typeof state>()] as const;
           }
