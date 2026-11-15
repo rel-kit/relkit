@@ -1,4 +1,5 @@
 import type { BucketPutOptions } from "../../buckets/index.js";
+import { bucketPolicyViolation } from "../../buckets/bucket-policy.js";
 import {
   LocalBucketPolicyError,
   type LocalBucketPolicy,
@@ -43,16 +44,11 @@ export function validatePut(
   policy: Readonly<LocalBucketPolicy>,
 ): { readonly contentType?: string; readonly metadata: Readonly<Record<string, string>> } {
   const contentType = normalizeContentType(options?.contentType);
-  if (policy.maxObjectBytes !== undefined && bytes.byteLength > policy.maxObjectBytes) {
-    throw new LocalBucketPolicyError("Bucket object exceeds maxObjectBytes");
-  }
-  if (
-    policy.allowedContentTypes !== undefined &&
-    (contentType === undefined ||
-      !policy.allowedContentTypes.some((allowed) => matchesContentType(contentType, allowed)))
-  ) {
-    throw new LocalBucketPolicyError("Bucket content type is not allowed");
-  }
+  const violation = bucketPolicyViolation(policy, {
+    size: bytes.byteLength,
+    ...(contentType === undefined ? {} : { contentType }),
+  });
+  if (violation !== undefined) throw new LocalBucketPolicyError(violation);
   return {
     ...(contentType === undefined ? {} : { contentType }),
     metadata: normalizeMetadata(options?.metadata),
@@ -110,18 +106,4 @@ function normalizeMetadata(value: BucketPutOptions["metadata"]): Readonly<Record
     return [key, entry] as const;
   });
   return Object.freeze(Object.fromEntries(entries.sort(([a], [b]) => a.localeCompare(b))));
-}
-
-/**
- * Checks a content type against exact and wildcard MIME policies.
- * @param value - Candidate value to validate, normalize or encode.
- * @param allowed - Configured exact or wildcard MIME patterns.
- * @returns Whether an allowed pattern matches.
- */
-function matchesContentType(value: string, allowed: string): boolean {
-  return (
-    allowed === "*/*" ||
-    allowed === value ||
-    (allowed.endsWith("/*") && value.startsWith(`${allowed.slice(0, -1)}`))
-  );
 }

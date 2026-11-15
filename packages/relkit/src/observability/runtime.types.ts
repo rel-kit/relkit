@@ -18,7 +18,10 @@ export interface TelemetryPipelineCounters {
   readonly exportSelected: number;
   readonly sampledOut: number;
   readonly severityFiltered: number;
+  /** Records a configured exporter failed to export. Zero when no exporter is configured. */
   readonly exportFailures: number;
+  /** Records the full or closed export queue rejected before any exporter saw them. */
+  readonly exportCapacityRejections?: number;
 }
 
 /**

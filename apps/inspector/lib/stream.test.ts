@@ -46,13 +46,13 @@ async function waitFor(predicate: () => boolean): Promise<void> {
 describe("inspector SSE client", () => {
   test("persists cursors, counts gaps, and invalidates affected caches", async () => {
     const saved = storage();
-    const invalidations: readonly string[][] = [];
+    const invalidations: string[][] = [];
     const client = createInspectorStream({
       storage: saved,
       reconnectDelayMs: 0,
       maxReconnectAttempts: 0,
       fetch: async () => response(`${event(1, "span.updated")}${event(3)}`),
-      onInvalidate: (tags) => invalidations.push(tags),
+      onInvalidate: (tags) => invalidations.push([...tags]),
     });
     client.start();
     await waitFor(() => client.snapshot.cursor === "3");
@@ -61,6 +61,30 @@ describe("inspector SSE client", () => {
     expect(saved.getItem("relkit.inspector.stream.cursor")).toBe("3");
     expect(invalidations).toContainEqual(["traces", "requests", "signals"]);
     expect(invalidations).toContainEqual(["logs", "signals"]);
+  });
+
+  test("a fresh load is not told it missed the events that came before it", async () => {
+    const fresh = createInspectorStream({
+      storage: storage(),
+      reconnectDelayMs: 0,
+      maxReconnectAttempts: 0,
+      fetch: async () => response(`${event(2229)}${event(2230)}`),
+    });
+    fresh.start();
+    await waitFor(() => fresh.snapshot.cursor === "2230");
+    fresh.stop();
+    expect(fresh.snapshot.droppedEvents).toBe(0);
+
+    const resumed = createInspectorStream({
+      storage: storage("10"),
+      reconnectDelayMs: 0,
+      maxReconnectAttempts: 0,
+      fetch: async () => response(event(13)),
+    });
+    resumed.start();
+    await waitFor(() => resumed.snapshot.cursor === "13");
+    resumed.stop();
+    expect(resumed.snapshot.droppedEvents).toBe(2);
   });
 
   test("clears expired and future cursors before replay", async () => {

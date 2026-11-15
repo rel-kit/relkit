@@ -33,6 +33,19 @@ export function collectRouteFields(mapping: unknown, inputSchema?: unknown): rea
   return collect(mapping, [], true, undefined, schemaRecord(inputSchema));
 }
 
+/**
+ * The fields the composer lets you fill. A browser never sends a `Cookie` header set from page
+ * code and the Inspector does not forward cookies, so cookie fields cannot be sent.
+ */
+export function editableRouteFields(fields: readonly RouteField[]): readonly RouteField[] {
+  return fields.filter((field) => field.source !== "cookie");
+}
+
+/** Names of the cookies the route reads, shown as a note because they cannot be sent. */
+export function cookieFieldNames(fields: readonly RouteField[]): readonly string[] {
+  return fields.flatMap((field) => (field.source === "cookie" ? [field.name ?? field.key] : []));
+}
+
 export function composeRouteRequest(
   route: RouteRequestDefinition,
   values: Readonly<Record<string, unknown>>,
@@ -46,7 +59,7 @@ export function composeRouteRequest(
   let rawBody: unknown;
   let multipart: FormData | undefined;
 
-  for (const field of fields) {
+  for (const field of editableRouteFields(fields)) {
     const value = valueFor(field, values, errors);
     if (value === undefined) continue;
     const converted = convertValue(value, field, errors);
@@ -56,7 +69,6 @@ export function composeRouteRequest(
       path = path.replace(`*${field.name ?? ""}`, encodeURIComponent(String(converted)));
     } else if (field.source === "query") query.set(field.name ?? field.key, String(converted));
     else if (field.source === "header") headers.set(field.name ?? field.key, String(converted));
-    else if (field.source === "cookie") headers.set("cookie", `${field.name}=${String(converted)}`);
     else if (field.source === "whole-body") rawBody = converted;
     else if (field.source === "multipart") {
       multipart ??= new FormData();

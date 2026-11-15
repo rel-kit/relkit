@@ -1,5 +1,6 @@
 import type { GraphCollection, GraphData } from "./graph.types.js";
 import { GRAPH_VERSION, type JsonValue } from "relkit/contracts";
+import { systemRouteNodes } from "relkit/observability";
 import { isRecord, pick, safeJson } from "./shared.js";
 import { projectNode } from "./graph-utils.js";
 
@@ -51,6 +52,12 @@ export function graphItems(
   const data = graphData(value);
   if (data === undefined) return undefined;
   if (collection === "descriptors") return data.nodes;
+  // Mounted and system routes have no trigger node; they are listed so their requests have a home.
+  if (collection === "routes")
+    return [
+      ...data.nodes.filter((node) => belongs(node, collection)),
+      ...(systemRouteNodes(data) as unknown as JsonValue[]),
+    ];
   return data.nodes.filter((node) => belongs(node, collection));
 }
 

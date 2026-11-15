@@ -2,12 +2,19 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { consumerModule, consumerPath, usage } from "./migration-config.js";
+import { consumerModule, consumerPackageDirectory, usage } from "./migration-config.js";
 import { MigrationFailure, type MigrationConfig } from "./migration.schemas.js";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
+import type { MigrationSqlite } from "./migration-sqlite.types.js";
 import { runtime } from "../runtime/index.js";
 
-/** Verifies readable history with the application's exact ORM version, without a connection. */
-export async function preflightHistory(root: string, history: string): Promise<void> {
+/**
+ * Verifies readable history with the application's exact ORM version, without a connection.
+ * @param root - Application root.
+ * @param history - Migration folder.
+ * @returns How many migrations the history holds.
+ */
+export async function preflightHistory(root: string, history: string): Promise<number> {
   const module = await consumerModule(root, "drizzle-orm/migrator");
   try {
     if (typeof module.readMigrationFiles !== "function") throw new Error("Unsupported reader");
@@ -29,22 +36,28 @@ export async function preflightHistory(root: string, history: string): Promise<v
       )
     )
       throw new Error("Empty or invalid history");
+    return files.length;
   } catch {
     throw new MigrationFailure({
       code: "RELKIT_DB_HISTORY",
       exitCode: 2,
-      message:
-        "Migration history is missing, empty or incompatible. Run bun run db:generate and review history for the installed ORM/Kit versions.",
+      message: `Migration history is missing, empty or incompatible. Run ${packageManagerCommands(projectPackageManager(root)).run("db:generate")} and review history for the installed ORM/Kit versions.`,
     });
   }
 }
 
-/** Applies SQLite with the runtime's native driver and the consumer's matching migrator. */
+/**
+ * Applies SQLite with the runtime's native driver and the consumer's matching migrator.
+ * @param root - Application root.
+ * @param config - Validated configuration.
+ * @param history - Migration folder.
+ * @returns How many migrations this run applied, from the migration log before and after.
+ */
 export async function migrateSqlite(
   root: string,
   config: MigrationConfig,
   history: string,
-): Promise<void> {
+): Promise<number> {
   const url = config.dbCredentials.url;
   if (typeof url !== "string" || !url.trim() || /:memory:|[?&]mode=memory/i.test(url))
     throw usage("Set the selected config's SQLite target to a persistent file.");
@@ -71,6 +84,8 @@ export async function migrateSqlite(
       : (await import("./node/sqlite-client.js")).openNodeSqlite(path);
   try {
     sqlite.exec("PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;");
+    const table = config.migrations?.table ?? "__drizzle_migrations";
+    const before = sqliteLogCount(sqlite, table);
     const db: unknown = Reflect.apply(driver.drizzle, undefined, [{ client: sqlite.client }]);
     const result: unknown = Reflect.apply(migrator.migrate, undefined, [
       db,
@@ -82,6 +97,7 @@ export async function migrateSqlite(
       },
     ]);
     if (result !== undefined) throw new Error("Native migration failed");
+    return sqliteLogCount(sqlite, table) - before;
   } finally {
     sqlite.close();
   }
@@ -89,8 +105,7 @@ export async function migrateSqlite(
 
 /** Delegates SQL server dialects to declared consumer tooling; the parent owns the entire group. */
 export async function migrateServer(root: string, configPath: string): Promise<void> {
-  const manifest = await consumerPath(root, "drizzle-kit/package.json");
-  const executable = resolve(dirname(manifest), "bin.cjs");
+  const executable = resolve(await consumerPackageDirectory(root, "drizzle-kit"), "bin.cjs");
   const command =
     runtime.name === "bun"
       ? [process.execPath, "--bun", executable, "migrate", "--config", configPath]
@@ -102,4 +117,19 @@ export async function migrateServer(root: string, configPath: string): Promise<v
     stderr: "ignore",
   });
   if ((await child.exited) !== 0) throw new Error("Installed Drizzle migration failed");
+}
+
+/**
+ * Counts the rows of the migration log, which has one row per applied migration.
+ * @param sqlite - Open connection.
+ * @param table - Log table name.
+ * @returns Row count, 0 when the table does not exist yet.
+ */
+function sqliteLogCount(sqlite: MigrationSqlite, table: string): number {
+  const exists = sqlite.scalar(
+    "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = ?",
+    table,
+  );
+  if (Number(exists) === 0) return 0;
+  return Number(sqlite.scalar(`SELECT count(*) FROM "${table.replaceAll('"', '""')}"`));
 }

@@ -1,5 +1,23 @@
 import { expect, test, vi } from "vitest";
 import { createObservabilityRuntime } from "../../src/observability/index.ts";
+import type { TelemetryExporterStatus } from "../../src/observability/telemetry-exporter.types.js";
+
+const testLane: TelemetryExporterStatus = {
+  name: "test",
+  integrationId: "test",
+  adapterId: "test",
+  healthy: true,
+  received: 0,
+  selected: 0,
+  exported: 0,
+  sampledOut: 0,
+  severityFiltered: 0,
+  failures: 0,
+  queuedRecords: 0,
+  queuedUnits: 0,
+  droppedRecords: 0,
+  droppedUnits: 0,
+};
 test("remote runtime persists a record and releases resources after flush failure", async () => {
   const fetchMock = vi.fn(async () => ({ ok: true, json: async () => ({}) }));
   vi.stubGlobal("fetch", fetchMock);
@@ -60,7 +78,8 @@ test("remote runtime retains an asynchronous export failure until flush", async 
         close: async () => {
           closes++;
         },
-        stats: () => [],
+        // One lane: a fan-out with no lanes is "no exporter configured" and gets no queue.
+        stats: () => [testLane],
         setFailureHandler: () => undefined,
       },
     });

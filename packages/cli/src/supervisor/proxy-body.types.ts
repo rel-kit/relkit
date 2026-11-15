@@ -8,4 +8,6 @@ export interface ProxyBodyOptions {
   /** Joins the request worker after body termination. @returns Its complete outcome without claiming caller cancellation. */
   readonly join: () => Effect.Effect<unknown>;
   readonly signal: AbortSignal;
+  /** Aborts when the client went away; its body then ends without an error nobody can read. */
+  readonly client?: AbortSignal;
 }

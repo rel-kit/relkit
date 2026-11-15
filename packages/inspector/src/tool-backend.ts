@@ -12,7 +12,41 @@ import type { InspectorToolState, InspectorToolStateRef } from "./tool-state.typ
 import type { InspectorOptions } from "./options.types.js";
 import { historyResponse, backendError } from "./backend-history.js";
 import { forwardBackend } from "./backend-forward.js";
+import { makeApplicationIdentityJar, type ApplicationIdentityJar } from "./application-identity.js";
 import { ExecutionSuccessLogs } from "relkit/contracts/operation";
+import { publishSelectionState } from "./live-events.js";
+import { crossSiteRefusal } from "./browser-boundary.js";
+import { collectionState, historyError, historyFailure, historyReadable } from "./history-state.js";
+
+/**
+ * The Inspector's session with the application, apart from the UI's own stream to the Inspector.
+ * @param current - Tool state.
+ * @returns `state`: `connected` (one live `relkit dev` session), `disconnected` (none found or it
+ * stopped answering) or `ambiguous` (several; pass `--connection-file`); `sessionId` and
+ * `generationId` of the connected session or null; `sessions`: the candidates when ambiguous;
+ * `since`: ISO time the state began, or null before the first discovery; `lastSessionId`: the
+ * last session this run of the tool connected to, or null when none ever did; and
+ * `lastConnectedUntil`: ISO time that session stopped answering, or null while it is connected
+ * or when none ever connected. Both survive the tool's own UI connections, so every tab tells a
+ * stopped session from one that never started.
+ */
+function applicationStatus(current: InspectorToolState) {
+  const selection = current.selection;
+  const handshake = selection.state === "connected" ? selection.handshake : undefined;
+  return {
+    state: selection.state,
+    sessionId: handshake?.sessionId ?? null,
+    generationId: handshake?.generationId ?? null,
+    sessions: selection.state === "ambiguous" ? [...selection.sessions] : [],
+    since:
+      current.selectionSince === undefined ? null : new Date(current.selectionSince).toISOString(),
+    lastSessionId: current.lastSession?.sessionId ?? null,
+    lastConnectedUntil:
+      current.lastSession?.stoppedAt === undefined
+        ? null
+        : new Date(current.lastSession.stoppedAt).toISOString(),
+  };
+}
 
 /** The packaged Next server alone receives credentials for this local hop. */
 export function inspectorBackend(
@@ -22,8 +56,10 @@ export function inspectorBackend(
   options: InspectorOptions,
   stream: ObservabilityStream,
 ) {
+  // One anonymous identity with the application for every page of this Inspector.
+  const jar = makeApplicationIdentityJar();
   return (request: Request) => {
-    const served = serveBackend(state, remote, token, options, stream, request).pipe(
+    const served = serveBackend(state, remote, token, options, stream, request, jar).pipe(
       Effect.catchTag("InspectionConnectionError", (error) =>
         Effect.succeed(
           backendError(
@@ -57,6 +93,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
   options: InspectorOptions,
   stream: ObservabilityStream,
   request: Request,
+  jar: ApplicationIdentityJar,
 ) {
   const expected = Buffer.from(token);
   const received = Buffer.from(request.headers.get("x-relkit-inspector-token") ?? "");
@@ -66,6 +103,8 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
     !timingSafeEqual(expected, received)
   )
     return backendError("Unauthorized", 401);
+  const crossSite = crossSiteRefusal(request);
+  if (crossSite) return crossSite;
   const current = yield* Ref.get(state);
   const url = new URL(request.url);
   if (url.pathname === "/health/live") return Response.json({ state: "listening" });
@@ -75,12 +114,15 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
     current.history.projectId !== current.selection.connection.descriptor.projectId
   )
     return backendError("history.foreign-project", 503);
-  const status = backendStatus(current, url.pathname);
+  const status = backendStatus(current, url.pathname, stream);
   if (status) return status;
   const history = /^\/_relkit\/v1\/(logs|requests|traces)(?:\/([^/]+))?$/.exec(url.pathname);
   if (history && request.method === "GET") return yield* historyResponse(current, request, history);
-  if (url.pathname === "/_relkit/v1/stream" && request.method === "GET")
+  if (url.pathname === "/_relkit/v1/stream" && request.method === "GET") {
+    // The subscriber replays it as its newest event, even when the session never changed.
+    publishSelectionState(stream, current.selection);
     return yield* localStreamResponse(stream, request);
+  }
   if (current.selection.state !== "connected")
     return backendError(
       current.selection.state === "ambiguous"
@@ -88,7 +130,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
         : "Inspector disconnected",
       503,
     );
-  return yield* forwardBackend(remote, current.selection.connection, request, options.target);
+  return yield* forwardBackend(remote, current.selection.connection, request, options.target, jar);
 });
 
 /**
@@ -110,18 +152,43 @@ const localStreamResponse = Effect.fn("Inspector.streamResponse")(
 );
 
 /** Projects history readiness without leaking private connection descriptors or credentials. */
-function backendStatus(current: InspectorToolState, path: string): Response | undefined {
+function backendStatus(
+  current: InspectorToolState,
+  path: string,
+  stream: ObservabilityStream,
+): Response | undefined {
   if (path === "/_relkit/v1/storage")
     return Response.json(
       {
         protocol: "relkit.observability.query",
         version: 1,
-        state: current.history && current.error === undefined ? "ready" : "degraded",
+        // `degraded` only when history itself is unavailable; an application outage keeps
+        // retained history readable and is said by `collection`.
+        state: historyReadable(current) ? "ready" : "degraded",
+        collection: collectionState(current),
         connection: current.selection.state,
-        error: current.error,
-        incomplete: current.incomplete,
+        application: applicationStatus(current),
+        // Pages read any `error` as a history failure, so an application's failure is apart.
+        error: historyError(current),
+        applicationError:
+          current.error && !historyFailure(current.error) ? current.error : undefined,
+        // A record this run of the tool could not store keeps history incomplete for the run.
+        incomplete: current.incomplete || (current.historyLost ?? 0) > 0,
+        recordsLostBeforeHistory: {
+          // Records the application's producer could not hand to its inspection buffer.
+          byApplicationProducer: current.producerDropped ?? 0,
+          // Records the application's inspection buffer evicted before the Inspector stored them.
+          byInspectionBuffer: current.droppedRecords,
+          // Records the Inspector collected that its history did not store: refused by the
+          // store, or still unstored when their session ended. Counted over the tool's run.
+          byHistoryStore: current.historyLost ?? 0,
+        },
+        // Invalidations the tool's stream dropped for a slow interface; no record is lost.
+        missedLiveUpdates: stream.counters().subscriberDropped,
+        /** @deprecated Same as `recordsLostBeforeHistory.byInspectionBuffer`. */
         dropped: current.droppedRecords,
         producerFailed: current.producerFailed ?? 0,
+        /** @deprecated Same as `recordsLostBeforeHistory.byApplicationProducer`. */
         producerDropped: current.producerDropped ?? 0,
       },
       { headers: { "x-relkit-api-version": "1" } },
@@ -131,7 +198,9 @@ function backendStatus(current: InspectorToolState, path: string): Response | un
       { state: current.selection.state },
       {
         status:
-          current.selection.state === "connected" && current.history && current.error === undefined
+          current.selection.state === "connected" &&
+          historyReadable(current) &&
+          current.error === undefined
             ? 200
             : 503,
       },

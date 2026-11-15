@@ -32,6 +32,8 @@ const OWNERS = {
   "@langchain/langgraph": "integrations/packages/langchain/package.json",
   langchain: "integrations/packages/langchain/package.json",
   langsmith: "integrations/packages/langchain/package.json",
+  mysql2: "packages/drizzle/package.json",
+  pg: "packages/drizzle/package.json",
 } as const;
 
 test("keeps scaffold dependency versions aligned with owning manifests", async () => {

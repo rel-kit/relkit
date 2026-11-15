@@ -321,6 +321,48 @@ A model given as a string stays a model profile name. RelKit tools stay in `tool
 
 Every HTTP error response is now [RFC 9457 Problem Details](/docs/modules/http/responses) with the error's ID in `code`. Code that reads the old `error` field cannot be told apart from other objects, so `relkit migrate` changes nothing here and lists the usual places: comparisons such as `body.error === "not-found"` and expectations such as `toEqual({ error: "not-found" })`. Read `body.code` instead, with `status`, `detail` and `data`.
 
+## Remove the account issuer column [#better-auth-account-issuer]
+
+RelKit now installs Better Auth 1.7.7, which never writes the `issuer` column that Better Auth 1.7.1 required on the `account` table and refuses to start while the Drizzle schema declares it required. `relkit migrate` removes `issuer` from the `sqliteTable`, `pgTable` or `mysqlTable` call for `"account"`, removes the index entries that read `table.issuer` and the imports only they used, and lists the table so you generate and apply the database migration:
+
+```ts title="src/services/database/schema/auth.ts — before"
+export const account = pgTable(
+  "account",
+  {
+    id: text().primaryKey(),
+    accountId: text().notNull(),
+    issuer: text().notNull(),
+    providerId: text().notNull(),
+    // …
+  },
+  (table) => [uniqueIndex("account_issuer_account_id").on(table.issuer, table.accountId)],
+);
+```
+
+```ts title="src/services/database/schema/auth.ts — after"
+export const account = pgTable("account", {
+  id: text().primaryKey(),
+  accountId: text().notNull(),
+  providerId: text().notNull(),
+  // …
+});
+```
+
+Before you migrate, check that no two accounts share a provider and account ID, which Better Auth 1.7.3 and later reject. On PostgreSQL:
+
+```sql
+SELECT "providerId", "accountId", count(*) FROM account GROUP BY 1, 2 HAVING count(*) > 1;
+```
+
+Then run `db:generate` and `db:migrate`. The generated migration drops the index before the column:
+
+```sql title="migration.sql"
+DROP INDEX "account_issuer_account_id";--> statement-breakpoint
+ALTER TABLE "account" DROP COLUMN "issuer";
+```
+
+An index callback that is not a plain list of entries is listed instead of changed. [Remove the account issuer column](/docs/modules/auth/better-auth#remove-the-account-issuer-column) has the hand-written steps.
+
 ## Related tasks
 
 - [Runtime handle](/docs/learn/concepts/runtime-handle) for calls outside handlers.

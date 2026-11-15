@@ -56,6 +56,176 @@ Since v0.1.0
 
 <include>/_snippets/generated/exports/buckets.mdx</include>
 
+## `bucket-policy.ts`
+
+The bucket policy every provider applies the same way: object size, allowed content types and
+the content type and length a signed upload URL is issued for.
+
+### BucketPolicyError (class)
+
+An object, a signed upload request or a bucket setting breaks the bucket policy.
+
+**Example**
+
+```ts
+throw new BucketPolicyError("Bucket content type is not allowed");
+```
+
+**Signature**
+
+```ts
+declare class BucketPolicyError {
+  constructor(message: string);
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L13)
+
+### code (property)
+
+**Signature**
+
+```ts
+readonly code: "RELKIT_BUCKET_POLICY_INVALID"
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L14)
+
+### assertWriteUrlAllowed
+
+Checks a signed upload request against the bucket policy before any URL is signed.
+
+**Throws**
+
+BucketPolicyError when the declaration is malformed or not allowed.
+
+**Example**
+
+```ts
+assertWriteUrlAllowed({ allowedContentTypes: ["image/*"] }, { contentType: "image/png" });
+```
+
+**Signature**
+
+```ts
+declare const assertWriteUrlAllowed: (
+  policy: Readonly<BucketPolicy>,
+  options: BucketWriteUrlOptions | undefined,
+) => BucketWriteUrlOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L117)
+
+### bucketPolicyViolation
+
+Finds the rule an object breaks.
+
+**Example**
+
+```ts
+bucketPolicyViolation({ maxObjectBytes: 1 }, { size: 2 }); // "Bucket object exceeds maxObjectBytes"
+```
+
+**Signature**
+
+```ts
+declare const bucketPolicyViolation: (
+  policy: Readonly<BucketPolicy>,
+  object: {
+    readonly size?: number;
+    readonly contentType?: string;
+    readonly typeOptional?: boolean;
+  },
+) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L86)
+
+### matchesContentType
+
+Checks a content type against an exact or wildcard MIME pattern.
+
+**Example**
+
+```ts
+matchesContentType("image/png", "image/*"); // true
+```
+
+**Signature**
+
+```ts
+declare const matchesContentType: (value: string, allowed: string) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L154)
+
+### normalizeBucketPolicy
+
+Validates a bucket's limits and normalizes its content types.
+
+**Throws**
+
+BucketPolicyError when a limit is malformed.
+
+**Example**
+
+```ts
+const policy = normalizeBucketPolicy({ maxObjectBytes: 5_000_000 });
+```
+
+**Signature**
+
+```ts
+declare const normalizeBucketPolicy: (policy: BucketPolicy) => Readonly<BucketPolicy>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L28)
+
+### normalizeWriteUrlOptions
+
+Validates the content type and length a signed upload URL is requested for.
+
+**Throws**
+
+BucketPolicyError when a field is malformed.
+
+**Example**
+
+```ts
+normalizeWriteUrlOptions({ contentType: "image/png", contentLength: 1024 });
+```
+
+**Signature**
+
+```ts
+declare const normalizeWriteUrlOptions: (
+  options: BucketWriteUrlOptions | undefined,
+) => BucketWriteUrlOptions;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L58)
+
+### signedUploadHeaders
+
+The headers a signed upload URL binds for a declaration: the exact `content-type` and, when
+a length is declared, the exact `content-length` (a presigned PUT cannot bind a range).
+
+**Example**
+
+```ts
+signedUploadHeaders({ contentType: "image/png" }); // { "content-type": "image/png" }
+```
+
+**Signature**
+
+```ts
+declare const signedUploadHeaders: (
+  options: BucketWriteUrlOptions,
+) => Readonly<Record<string, string>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/bucket-policy.ts#L137)
+
 ## `bucket-validation-error.ts`
 
 ### BucketValidationError (class)
@@ -130,7 +300,7 @@ declare const createBucketReadUrlEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L150)
 
 ### createBucketWriteUrlEffect
 
@@ -139,7 +309,7 @@ Creates a signed write URL when supported.
 **Example**
 
 ```ts
-Effect.provide(createBucketWriteUrlEffect("a"), layer);
+Effect.provide(createBucketWriteUrlEffect("a.png", { contentType: "image/png" }), layer);
 ```
 
 **Signature**
@@ -147,6 +317,7 @@ Effect.provide(createBucketWriteUrlEffect("a"), layer);
 ```ts
 declare const createBucketWriteUrlEffect: (
   key: string,
+  options?: BucketWriteUrlOptions | undefined,
 ) => Effect.Effect<
   string,
   | BucketOperationCancelledError
@@ -155,12 +326,13 @@ declare const createBucketWriteUrlEffect: (
   | BucketDependencyError
   | BucketCapabilityError
   | BucketProviderError
-  | BucketProviderFailureError,
+  | BucketProviderFailureError
+  | BucketPolicyError,
   BucketRuntime
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L173)
 
 ### deleteBucketEffect
 
@@ -190,7 +362,7 @@ declare const deleteBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L93)
 
 ### existsBucketEffect
 
@@ -220,7 +392,7 @@ declare const existsBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L112)
 
 ### getBucketEffect
 
@@ -250,7 +422,7 @@ declare const getBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L55)
 
 ### headBucketEffect
 
@@ -280,7 +452,7 @@ declare const headBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L74)
 
 ### listBucketEffect
 
@@ -310,7 +482,7 @@ declare const listBucketEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L122)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L131)
 
 ### putBucketEffect
 
@@ -337,12 +509,13 @@ declare const putBucketEffect: (
   | BucketDependencyError
   | BucketCapabilityError
   | BucketProviderError
-  | BucketProviderFailureError,
+  | BucketProviderFailureError
+  | BucketPolicyError,
   BucketRuntime
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-effects.ts#L28)
 
 ## `client-errors.ts`
 
@@ -794,6 +967,49 @@ export interface BucketInvocation<A> {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-operation.types.ts#L8)
 
+## `client-policy.ts`
+
+### checkPutPolicyEffect
+
+Refuses an object the client's declared bucket policy does not allow, before the provider.
+
+**Example**
+
+```ts
+Effect.provide(checkPutPolicyEffect({ size: 3, contentType: "text/plain" }), layer);
+```
+
+**Signature**
+
+```ts
+declare const checkPutPolicyEffect: (object: {
+  readonly size: number;
+  readonly contentType?: string;
+}) => Effect.Effect<undefined, BucketPolicyError, BucketRuntime>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-policy.ts#L21)
+
+### writeUrlOptionsEffect
+
+Validates a signed upload declaration and checks it against the declared policy.
+
+**Example**
+
+```ts
+Effect.provide(writeUrlOptionsEffect({ contentType: "image/png" }), layer);
+```
+
+**Signature**
+
+```ts
+declare const writeUrlOptionsEffect: (
+  options: BucketWriteUrlOptions | undefined,
+) => Effect.Effect<BucketWriteUrlOptions, BucketPolicyError, BucketRuntime>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-policy.ts#L40)
+
 ## `client-provider.types.ts`
 
 ### BucketCapabilities (interface)
@@ -901,6 +1117,27 @@ export interface BucketOperationContext {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L25)
 
+### BucketPolicy (interface)
+
+A bucket's object limits, as declared with `defineBucket`.
+
+**Example**
+
+```ts
+const policy: BucketPolicy = { maxObjectBytes: 5_000_000, allowedContentTypes: ["image/*"] };
+```
+
+**Signature**
+
+```ts
+export interface BucketPolicy {
+  readonly maxObjectBytes?: number;
+  readonly allowedContentTypes?: readonly string[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L54)
+
 ### BucketProvider (interface)
 
 Provider implementation; omitted operations fail with BucketProviderError.
@@ -984,14 +1221,19 @@ export interface BucketProvider {
   /** Create a signed write URL.
    * @param key - Portable object key.
    * @param context - Cancellation and deadline context.
+   * @param options - Content type and length to check against the policy and bind to the URL.
    * @returns URL text or a provider rejection.
-   * @example await provider.createWriteUrl?.("a");
+   * @example await provider.createWriteUrl?.("a", undefined, { contentType: "image/png" });
    */
-  readonly createWriteUrl?: (key: string, context?: BucketOperationContext) => MaybePromise<string>;
+  readonly createWriteUrl?: (
+    key: string,
+    context?: BucketOperationContext,
+    options?: BucketWriteUrlOptions,
+  ) => MaybePromise<string>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L73)
 
 ### BucketPutOptions (interface)
 
@@ -1013,6 +1255,30 @@ export interface BucketPutOptions extends Readonly<Record<string, unknown>> {
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L46)
+
+### BucketWriteUrlOptions (interface)
+
+The upload a signed write URL is issued for. A declared type is checked against the bucket's
+allowed types and signed, so storage rejects an upload with another type; a declared length is
+checked against `maxObjectBytes` and signed as the exact `content-length`. Without them the URL
+binds neither, and the bucket's limits are not enforced on the upload.
+
+**Example**
+
+```ts
+const options: BucketWriteUrlOptions = { contentType: "image/png", contentLength: 1024 };
+```
+
+**Signature**
+
+```ts
+export interface BucketWriteUrlOptions {
+  readonly contentType?: string;
+  readonly contentLength?: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client-provider.types.ts#L65)
 
 ## `client-results.ts`
 
@@ -1345,7 +1611,7 @@ Re-exports all named exports from the "./client.types.js" module.
 export * from "./client.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L36)
 
 ### BucketCapabilityError
 
@@ -1355,7 +1621,7 @@ export * from "./client.types.js";
 declare const BucketCapabilityError: typeof BucketCapabilityError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L29)
 
 ### BucketDependencyError
 
@@ -1365,7 +1631,7 @@ declare const BucketCapabilityError: typeof BucketCapabilityError;
 declare const BucketDependencyError: typeof BucketDependencyError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L30)
 
 ### BucketOperationCancelledError
 
@@ -1375,7 +1641,7 @@ declare const BucketDependencyError: typeof BucketDependencyError;
 declare const BucketOperationCancelledError: typeof BucketOperationCancelledError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L31)
 
 ### BucketOperationTimeoutError
 
@@ -1385,7 +1651,7 @@ declare const BucketOperationCancelledError: typeof BucketOperationCancelledErro
 declare const BucketOperationTimeoutError: typeof BucketOperationTimeoutError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L32)
 
 ### BucketProviderError
 
@@ -1395,7 +1661,7 @@ declare const BucketOperationTimeoutError: typeof BucketOperationTimeoutError;
 declare const BucketProviderError: typeof BucketProviderError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L33)
 
 ### BucketProviderFailureError
 
@@ -1405,7 +1671,7 @@ declare const BucketProviderError: typeof BucketProviderError;
 declare const BucketProviderFailureError: typeof BucketProviderFailureError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L34)
 
 ### createBucketClient
 
@@ -1427,7 +1693,7 @@ createBucketClient({ ownerId: "job", bucketId: "assets", source: provider }).get
 declare const createBucketClient: (options: BucketClientOptions) => BucketClient;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L44)
 
 ### createBucketClientEffect
 
@@ -1447,7 +1713,7 @@ declare const createBucketClientEffect: (
 ) => Effect.Effect<BucketClient, BucketValidationError | BucketProviderError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.ts#L57)
 
 ## `client.types.ts`
 
@@ -1461,7 +1727,7 @@ Re-exports all named exports from the "./client-provider.types.js" module.
 export * from "./client-provider.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L10)
 
 ### BucketBridgeOptions (interface)
 
@@ -1484,7 +1750,7 @@ export interface BucketBridgeOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L75)
 
 ### BucketClient (interface)
 
@@ -1546,14 +1812,16 @@ export interface BucketClient {
   createReadUrl(key: string): Promise<string>;
   /** Request a signed upload URL.
    * @param key - Portable key.
+   * @param options - Content type and length the upload must carry; a type or length the bucket
+   * does not allow rejects before a URL is signed.
    * @returns URL or a rejected Promise.
-   * @example await client.createWriteUrl("a");
+   * @example await client.createWriteUrl("a.png", { contentType: "image/png", contentLength: 1024 });
    */
-  createWriteUrl(key: string): Promise<string>;
+  createWriteUrl(key: string, options?: BucketWriteUrlOptions): Promise<string>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L18)
 
 ### BucketClientOptions (interface)
 
@@ -1572,6 +1840,9 @@ export interface BucketClientOptions {
   readonly ownerId: string;
   readonly bucketId: string;
   readonly source: unknown;
+  /** The bucket's declared limits; `put` and `createWriteUrl` refuse objects they do not allow
+   * before the provider is called. */
+  readonly policy?: BucketPolicy;
   readonly bridge?: BucketInvocationBridge;
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;
@@ -1581,7 +1852,7 @@ export interface BucketClientOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L114)
 
 ### BucketInvocationBridge (interface)
 
@@ -1607,7 +1878,7 @@ export interface BucketInvocationBridge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L84)
 
 ### BucketObservedEdge (interface)
 
@@ -1629,7 +1900,7 @@ export interface BucketObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L96)
 
 ### BucketOperationObservation (interface)
 
@@ -1653,7 +1924,7 @@ export interface BucketOperationObservation {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L104)
 
 ### BucketOperationOutcome (type alias)
 
@@ -1666,7 +1937,7 @@ type BucketOperationOutcome =
   "success" | "provider-failure" | "cancelled" | "timeout" | "unsupported";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/client.types.ts#L13)
 
 ## `define-bucket.ts`
 
@@ -1877,6 +2148,18 @@ export interface DefineBucketOptions<Id extends string> extends DescriptorMetada
 
 ## `index.ts`
 
+### "./bucket-policy.js" (namespace export)
+
+Re-exports all named exports from the "./bucket-policy.js" module.
+
+**Signature**
+
+```ts
+export * from "./bucket-policy.js";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L3)
+
 ### "./bucket-validation-error.js" (namespace export)
 
 Re-exports all named exports from the "./bucket-validation-error.js" module.
@@ -1899,7 +2182,7 @@ Re-exports all named exports from the "./client-effects.js" module.
 export * from "./client-effects.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L5)
 
 ### "./client-observability.js" (namespace export)
 
@@ -1911,7 +2194,7 @@ Re-exports all named exports from the "./client-observability.js" module.
 export * from "./client-observability.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L7)
 
 ### "./client-runtime.js" (namespace export)
 
@@ -1923,7 +2206,7 @@ Re-exports all named exports from the "./client-runtime.js" module.
 export * from "./client-runtime.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L6)
 
 ### "./client.js" (namespace export)
 
@@ -1935,7 +2218,7 @@ Re-exports all named exports from the "./client.js" module.
 export * from "./client.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/index.ts#L4)
 
 ### "./define-bucket.js" (namespace export)
 

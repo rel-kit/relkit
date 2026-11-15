@@ -30,6 +30,16 @@ function forwardedRequest(request) {
 `;
 
 /**
+ * Development request-log severity: server failures are errors; client errors are ordinary
+ * traffic at info, except rejected credentials, denied access and rate limits at warn.
+ */
+export const HTTP_LOG_LEVEL_SOURCE = `function httpLogLevel(event) {
+  if (event.status >= 500) return "error";
+  if (event.status === 401 || event.status === 403 || event.status === 429) return "warn";
+  return event.type === "request.cancelled" ? "debug" : "info";
+}`;
+
+/**
  * Emits HTTP transport callbacks while the typed lifecycle host owns readiness and work.
  * @param configuration - Validated HTTP configuration.
  * @returns Source with the existing health, status, admission, and client contracts.
@@ -47,15 +57,17 @@ ${serverJobsAdministrationSource(configuration)}
   const dispatchSource =
     "runWithRelkit(await relkitHandle(), () => preparedApplication.fetch(request, bindings))";
   return `const internalEndpointsEnabled = environment !== "production";
+${HTTP_LOG_LEVEL_SOURCE}
 const httpMiddlewareOptions = {
   generationId, graphHash, observability: telemetry, spanRuntime, maxBodyBytes: ${configuration.maxBodyBytes},
   ...(environment === "production" || process.env.RELKIT_DEV_LOGS !== "1" ? {} : { onLifecycleEvent(event) {
     if (event.type === "request.started") return;
-    const level = event.status >= 500 ? "error" : event.status >= 400 ? "warn" : event.type === "request.cancelled" ? "debug" : "info";
+    const level = httpLogLevel(event);
     writeRuntimeLog(telemetry.collect({ version: 2, signal: "log", timestamp: event.completedAt,
       level, component: "runtime.http", message: event.type,
       requestId: event.requestId, originRequestId: event.requestId, traceId: event.traceId, generationId, graphHash,
       fields: { method: event.method, path: event.path, status: event.status, durationMs: event.durationMs } }));
+    releaseHttpLogs(event.requestId);
   } }),
 };
 ${serverHttpOptionsSource(configuration)}${applicationSource}${FORWARDED_REQUEST_SOURCE}
@@ -81,7 +93,8 @@ const relkitFetch = (request, bindings) => instrumentHttpRequest(forwardedReques
       return problemResponse(500, "Internal Server Error", "internal-error", "The request failed unexpectedly.");
     }
   });
+// The development supervisor names its loopback host; built servers and containers keep all interfaces.
 if (relkitMode.functionHost !== true)
-  server = await relkitRuntime.serve({ hostname: "0.0.0.0", port: Number(process.env.PORT ?? 3000), fetch: relkitFetch });
+  server = await relkitRuntime.serve({ hostname: process.env.RELKIT_HOSTNAME || "0.0.0.0", port: Number(process.env.PORT ?? 3000), fetch: relkitFetch });
 runtimeOwner.setReady("server", true);`;
 }

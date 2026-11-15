@@ -26,7 +26,10 @@ export function OverlayDialog({
   onOpenChange,
 }: OverlayDialogProps) {
   return (
-    <DialogTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
+    <DialogTrigger
+      {...(isOpen === undefined ? {} : { isOpen })}
+      {...(onOpenChange === undefined ? {} : { onOpenChange })}
+    >
       {trigger}
       <ModalOverlay className="overlay-dialog-backdrop fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-[2px]">
         <Modal

@@ -88,13 +88,25 @@ export const graph = {
     { kind: "bucket", id: "orders.bucket", source: source("src/buckets.ts") },
     { kind: "cache", id: "orders.cache", source: source("src/cache.ts") },
     { kind: "tool", id: "orders.tool", source: source("src/tools.ts") },
-    { kind: "agent", id: "orders.agent", source: source("src/agents.ts") },
+    {
+      kind: "agent",
+      id: "orders.agent",
+      source: source("src/agents.ts"),
+      modelSource: "native",
+      instructions: "Answer order questions.",
+    },
     {
       kind: "channel",
       id: "orders.updates",
       source: source("src/channels.ts"),
       client: { exposure: "protected" },
       events: { "status.changed": { type: "object" } },
+      params: {
+        type: "object",
+        properties: { companyId: { type: "string" } },
+        required: ["companyId"],
+      },
+      replay: { retentionMs: 300_000, maxEvents: 500 },
       presence: { kind: "count" },
     },
     {

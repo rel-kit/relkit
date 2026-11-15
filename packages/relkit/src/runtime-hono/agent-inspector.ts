@@ -14,6 +14,15 @@ import {
   inspectorTransitions,
 } from "./agent-inspector-projection.js";
 
+/**
+ * Key under which a development server sets, on the router these routes are installed on, the
+ * check of its inspection session (the `x-relkit-inspector-session-token` the development bridge
+ * adds). With it, the routes answer only inspection sessions; without it, only callers presenting
+ * explicitly configured internal credentials, and otherwise they do not exist (404). The open
+ * default of the other internal endpoints does not apply: agent executions are rich inspection.
+ */
+export const INSPECTION_AUTHORIZE = Symbol.for("relkit.inspection.authorize");
+
 /** Registers internal agent inspection endpoints under the configured access policy.
  * @param app - Hono application receiving the configured endpoints or middleware.
  * @param options - Application dependencies and configuration for this domain.
@@ -28,7 +37,8 @@ export function installAgentInspectorEndpoints(
   const mode = internal.environment ?? internal.mode ?? "development";
   if (!(internal.enabled ?? mode !== "production")) return;
   app.get(`${API_BASE_PATH}/agents/:agentId/workflow`, async (context) => {
-    if (!(await isAuthorized(context.req.raw, internal))) return unauthorized();
+    const access = await inspectionAccess(app, context.req.raw, internal);
+    if (access !== "allowed") return access === "absent" ? context.notFound() : unauthorized();
     const node = options.plan.agents.find((agent) => agent.id === context.req.param("agentId"));
     if (node === undefined) return jsonResponse({ error: "RELKIT_INSPECTOR_NOT_FOUND" }, 404);
     return jsonResponse({
@@ -41,7 +51,8 @@ export function installAgentInspectorEndpoints(
     } as unknown as JsonValue);
   });
   app.get(`${API_BASE_PATH}/runtime/agents/:agentId/executions`, async (context) => {
-    if (!(await isAuthorized(context.req.raw, internal))) return unauthorized();
+    const access = await inspectionAccess(app, context.req.raw, internal);
+    if (access !== "allowed") return access === "absent" ? context.notFound() : unauthorized();
     try {
       return await executionResponse(context, options);
     } catch (error) {
@@ -50,6 +61,31 @@ export function installAgentInspectorEndpoints(
       return jsonResponse({ error: "RELKIT_INSPECTOR_RUNTIME_UNAVAILABLE" }, 503);
     }
   });
+}
+
+/**
+ * Decides whether a request may read agent inspection data.
+ * @param app - Router carrying the development server's inspection session check, if any.
+ * @param request - Incoming request.
+ * @param internal - Internal endpoint credentials explicitly configured for the application.
+ * @returns `allowed`, `unauthorized` when a check exists and fails, or `absent` when none exists.
+ */
+async function inspectionAccess(
+  app: Hono,
+  request: Request,
+  internal: InternalEndpointOptions,
+): Promise<"allowed" | "unauthorized" | "absent"> {
+  const session = (app as unknown as Record<symbol, unknown>)[INSPECTION_AUTHORIZE];
+  if (typeof session === "function") {
+    try {
+      if ((await session(request)) === true) return "allowed";
+    } catch {
+      return "unauthorized";
+    }
+  }
+  const explicit = internal.bearerToken !== undefined || internal.authorize !== undefined;
+  if (explicit && (await isAuthorized(request, internal))) return "allowed";
+  return typeof session === "function" || explicit ? "unauthorized" : "absent";
 }
 
 /** Builds the authorized structural execution inspection response.

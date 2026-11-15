@@ -31,7 +31,9 @@ export function ServiceNode({ data }: NodeProps<ExplorerNode>) {
   return (
     <article
       {...cardProps(data, "service")}
-      aria-label={`${NODE_CATEGORIES[view.category].label} ${view.title}`}
+      aria-label={`${NODE_CATEGORIES[view.category].label} ${view.title}${
+        view.resources === undefined ? "" : `, uses ${view.resources.join(", ")}`
+      }`}
     >
       <Ports />
       <header className="explorer-card__head">
@@ -43,7 +45,11 @@ export function ServiceNode({ data }: NodeProps<ExplorerNode>) {
         <AccessMark view={view} />
       </header>
       {view.counts && view.counts.length > 0 && (
-        <ul className="explorer-card__counts" aria-label="Contents">
+        <ul
+          className="explorer-card__counts"
+          aria-label="Contents"
+          {...(view.resources === undefined ? {} : { title: `Uses ${view.resources.join(", ")}` })}
+        >
           {view.counts.map((count) => (
             <li key={count.label}>
               <b>{count.value}</b> {count.label}

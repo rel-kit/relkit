@@ -13,6 +13,7 @@ import type { InspectorHistoryOperations } from "./history.types.js";
 import { InspectionCollectionBatch } from "./collection.schemas.js";
 import { collectionChange } from "./collector-changes.js";
 import { persistCollectionGap, persistCollectionLoss } from "./collector-loss.js";
+import { appendCollected } from "./collector-refusal.js";
 import { observeExecution } from "relkit/contracts/operation";
 
 // Names this Inspector to the bridge, so another Inspector collecting the same session cannot
@@ -29,6 +30,7 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
     target?: string,
     previousLossKey?: string,
     previousDropped: number = 0,
+    pulled: (records: number, through: number) => Effect.Effect<void> = () => Effect.void,
   ) {
     const response = yield* remote.request(
       connection,
@@ -54,13 +56,17 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
       through = entry.sequence;
     }
     const records = yield* admitBatch(connection.descriptor.sessionId, batch.records);
-    if (Buffer.byteLength(JSON.stringify(records)) > 1_048_576)
+    const bytes = Buffer.byteLength(JSON.stringify(records));
+    if (bytes > 1_048_576)
       return yield* new InspectionConnectionError({
         operation: "collection.oversized",
         cause: new Error("Persistence batch exceeds one MiB"),
       });
+    let refused = 0;
     if (records.length > 0) {
-      yield* history.call({ type: "append", records });
+      // Pulled but not stored until the append below succeeds; nothing is acknowledged before.
+      yield* pulled(records.length, through);
+      refused = yield* appendCollected(history, records, connection.descriptor.sessionId);
     }
     const next = batch.records[0]?.sequence;
     // Records the buffer evicted are already reported as loss below; only the rest is a gap.
@@ -78,8 +84,12 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
       through,
       gap: batch.gap,
       droppedRecords: batch.droppedRecords,
-      incomplete: batch.incomplete,
+      incomplete: batch.incomplete || refused > 0,
       records: batch.records.length,
+      /** Records the history store refused; named in history by a diagnostic and acknowledged. */
+      refused,
+      // A batch that reached its count or byte bound leaves records behind it; pull again at once.
+      backlog: batch.records.length === 256 || bytes > 786_432,
       lossKey,
       producerFailed: batch.producerFailed ?? 0,
       producerDropped: batch.producerDropped ?? 0,

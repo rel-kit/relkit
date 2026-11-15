@@ -375,7 +375,7 @@ jobs:
         with:
           name: node-creation-candidate
           path: node-smoke
-      - name: Create with npx or pnpm dlx and run dev on Node, with no Bun installed
+      - name: Create, add a database and the Inspector, migrate, check, start and run dev on Node, with no Bun installed
         run: node node-smoke/smoke.mjs --package-manager "${{ matrix.manager }}" --require-no-bun
 
   inspector-container:

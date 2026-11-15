@@ -63,6 +63,43 @@ export async function migrate(root: string, args: string[] = []) {
   return { code, stdout, stderr, result: JSON.parse(stdout[0] ?? "null") };
 }
 
+/** Built CLI executable; tests that run the CLI on Node need `turbo run build --filter=@relkit/cli`. */
+export const builtCli = join(repository, "packages/cli/dist/bin.js");
+
+/**
+ * Runs the built CLI on Node from the app directory, with the Bun hand-off disabled.
+ * @param root - Application root and working directory.
+ * @param args - CLI arguments after the executable.
+ * @param environment - Values set (or, when undefined, removed) on top of the test's environment.
+ * @returns Exit status and captured output.
+ */
+export async function nodeCli(
+  root: string,
+  args: readonly string[],
+  environment: Record<string, string | undefined> = {},
+) {
+  const env: Record<string, string | undefined> = {
+    ...process.env,
+    RELKIT_BUN_HANDOFF: "0",
+    npm_config_user_agent: undefined,
+    // `bun test` sets NODE_ENV=test; a user's shell normally leaves it unset.
+    NODE_ENV: undefined,
+    ...environment,
+  };
+  const child = Bun.spawn(["node", builtCli, ...args], {
+    cwd: root,
+    env,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const [code, stdout, stderr] = await Promise.all([
+    child.exited,
+    new Response(child.stdout).text(),
+    new Response(child.stderr).text(),
+  ]);
+  return { code, stdout, stderr };
+}
+
 /** Runs the actual executable from the app cwd so Bun's dotenv behavior is observable. */
 export async function nativeMigrate(
   root: string,

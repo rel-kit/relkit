@@ -6,8 +6,16 @@ import { type Context, Effect } from "effect";
 import type { ScaffoldProcess } from "./scaffold-process.js";
 import type { BrowserAcceptanceDriver } from "./test-inspector-agent-browser.js";
 
+/** Navigation and sub-resources stay on the fixture's loopback host. Chrome's built-in PDF
+ * viewer cannot run under that allowlist: when the PDF preview mounts its `<object>`, the
+ * viewer's own frames are outside the allowlist's reach (a `blob:http://127.0.0.1` entry lets
+ * the object load but about half the runs still end on about:blank), and agent-browser closes
+ * the tab. Plugins are therefore off, so the object stays in the page as markup and the
+ * script asserts that markup, not the viewer.
+ */
 export const browserEnvironment = {
   AGENT_BROWSER_ALLOWED_DOMAINS: "127.0.0.1",
+  AGENT_BROWSER_ARGS: "--blink-settings=pluginsEnabled=false",
   AGENT_BROWSER_CONTENT_BOUNDARIES: "1",
   AGENT_BROWSER_DEFAULT_TIMEOUT: "60000",
   AGENT_BROWSER_MAX_OUTPUT: "50000",

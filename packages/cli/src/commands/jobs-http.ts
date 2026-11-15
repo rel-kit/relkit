@@ -1,4 +1,6 @@
+import { resolve } from "node:path";
 import { Effect, Schema } from "effect";
+import { oneShotEnvironment } from "../runtime/one-shot-environment.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliHttp } from "../services/http.service.js";
 import { cliAdapterError } from "../cli-errors.js";
@@ -50,8 +52,12 @@ export const fetchJobsJsonEffect = Effect.fn("Jobs.request")(
     const query = jobsQuery(parsed);
     const url = `${baseUrl}/_relkit/v1${path}${query.size === 0 ? "" : `?${query}`}`;
     const headers: Record<string, string> = { accept: "application/json" };
-    if (process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN !== undefined)
-      headers.authorization = `Bearer ${process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN}`;
+    // On Node, a token set only in the application's environment files is sent as under Bun.
+    const environment = yield* oneShotEnvironment(
+      resolve(parsed.options["project-root"] ?? process.cwd()),
+    );
+    const token = environment.RELKIT_INTERNAL_ENDPOINT_TOKEN;
+    if (token !== undefined) headers.authorization = `Bearer ${token}`;
     if (path.startsWith("/jobs/runs") || path.startsWith("/jobs/schedules"))
       Object.assign(headers, yield* jobsIdentityHeadersEffect(baseUrl));
     if (method !== "GET" || options.body !== undefined) {

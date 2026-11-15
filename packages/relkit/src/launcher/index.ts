@@ -1,12 +1,13 @@
 /** Lightweight launcher: create directly, or execute the compatible project-owned CLI. */
 
-import { readFileSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import manifest from "../../package.json" with { type: "json" };
 import type { CliManifest } from "./index.types.js";
 import { launchBun } from "./launch-bun.js";
+import { installCommands } from "./package-manager.js";
 import { diagnosticCode, diagnosticDocsUrl } from "../diagnostics/codes/index.js";
 
 /** Resolves only the installed CLI declared by the nearest project manifest.
@@ -15,10 +16,13 @@ import { diagnosticCode, diagnosticDocsUrl } from "../diagnostics/codes/index.js
  */
 export function resolveProjectCli(cwd: string): string {
   const root = projectRoot(cwd);
-  const declared = declaresProjectCli(JSON.parse(readFileSync(join(root, "package.json"), "utf8")));
-  if (!declared)
+  const project: unknown = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+  const commands = () => installCommands(project, (name) => existsSync(join(root, name)));
+  if (!declaresProjectCli(project))
     throw new Error(
-      "RELKIT_PROJECT_CLI_REQUIRED: This project does not declare @relkit/cli. Add it with `bun add -d @relkit/cli@" +
+      "RELKIT_PROJECT_CLI_REQUIRED: This project does not declare @relkit/cli. Add it with `" +
+        commands().addDev +
+        " @relkit/cli@" +
         manifest.version +
         "`.",
     );
@@ -37,7 +41,9 @@ export function resolveProjectCli(cwd: string): string {
     return validateCliEntry(candidate, cli);
   }
   throw new Error(
-    "RELKIT_PROJECT_CLI_REQUIRED: This project declares @relkit/cli, but it is not installed. Run `bun install`.",
+    "RELKIT_PROJECT_CLI_REQUIRED: This project declares @relkit/cli, but it is not installed. Run `" +
+      commands().install +
+      "`.",
   );
 }
 

@@ -109,6 +109,42 @@ test("rejects missing and duplicate scalar sources with structured issues", asyn
     ]);
 });
 
+test.each([
+  ["POST", "null", null],
+  ["POST", "an array", []],
+  ["POST", "a string", "x"],
+  ["PATCH", "null", null],
+  ["PATCH", "an array", []],
+  ["PATCH", "a string", "x"],
+] as const)(
+  "rejects a %s JSON body that is %s when fields are mapped",
+  async (method, _name, body) => {
+    const field = { kind: "body", name: "plate" };
+    const result = await mapRequest(
+      request(
+        new Request("http://localhost/vehicles/v1", {
+          method,
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(body),
+        }),
+      ),
+      {
+        kind: "input",
+        fields: {
+          id: { kind: "path", name: "id" },
+          plate: method === "PATCH" ? { kind: "optional", value: field } : field,
+        },
+      },
+    );
+
+    expect(result.ok).toBe(false);
+    if (!result.ok)
+      expect(result.issues.map(({ code, path }) => [code, path])).toEqual([
+        ["body-not-object", []],
+      ]);
+  },
+);
+
 test("rejects wrong content type, malformed JSON, and oversized bodies", async () => {
   const mapping = { kind: "input", fields: { body: { kind: "whole-body" } } };
   const wrongType = await mapRequest(
@@ -232,9 +268,18 @@ test("applies a route body limit before invoking its target", async () => {
     body: "12345",
   });
 
-  expect(response.status).toBe(422);
+  // D6: an oversize body is 413 everywhere, with the server limit's code and wording.
+  expect(response.status).toBe(413);
   expect(calls).toBe(0);
-  expect(await response.json()).toMatchObject({ issues: [{ code: "body-too-large" }] });
+  const body = await response.json();
+  expect(body).toMatchObject({
+    type: "/errors/payload-too-large",
+    status: 413,
+    code: "payload-too-large",
+    detail: "The request body exceeds the 3-byte limit.",
+    requestId: response.headers.get("x-request-id"),
+  });
+  expect(body).not.toHaveProperty("issues");
 });
 
 function routePlan(): RegistrationPlan {

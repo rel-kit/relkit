@@ -28,7 +28,13 @@ describe("deterministic inspector fixture backend", () => {
         chat: { input: "message", output: "answer" },
       },
     );
-    expect((await routes.json()).items).toHaveLength(2);
+    // Two declared routes, plus the health probe and RPC listed as system routes.
+    const routeItems = (await routes.json()).items as { id: string; system?: boolean }[];
+    expect(routeItems.filter((item) => item.system !== true)).toHaveLength(2);
+    expect(routeItems.filter((item) => item.system === true).map((item) => item.id)).toEqual([
+      "relkit.system.health",
+      "relkit.rpc",
+    ]);
     expect((await route.json()).node.id).toBe(FIXTURE_IDS.route);
     expect((await source.json()).source.file).toBe("src/routes/create-order.route.ts");
   });

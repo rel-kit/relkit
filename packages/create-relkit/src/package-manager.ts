@@ -17,8 +17,14 @@ export const PACKAGE_MANAGERS: readonly PackageManagerName[] = ["bun", "npm", "p
 /** Command spellings of one package manager. */
 export interface PackageManagerCommands {
   readonly name: PackageManagerName;
-  /** Installs a project's dependencies. */
+  /**
+   * Installs a project's dependencies, and may change the lockfile: the install that follows a
+   * manifest change (creation, `relkit add`) must not fail because `CI` is set. An install that
+   * must be reproducible elsewhere uses {@link PackageManagerCommands.frozenCheck}.
+   */
   readonly install: readonly string[];
+  /** The install, for display (`npm install`). */
+  readonly installText: string;
   /** Checks that the lockfile matches the manifest without changing `node_modules`. */
   readonly frozenCheck: readonly string[];
   /**
@@ -33,6 +39,8 @@ export interface PackageManagerCommands {
    * @returns Shell text such as `npx --no-install relkit dev --prepare`.
    */
   readonly exec: (command: string) => string;
+  /** Adds a dependency, for display (`bun add`). */
+  readonly add: string;
   /** Adds development dependencies, for display (`bun add -d`). */
   readonly addDev: string;
 }
@@ -40,26 +48,35 @@ export interface PackageManagerCommands {
 const COMMANDS: Readonly<Record<PackageManagerName, PackageManagerCommands>> = {
   bun: {
     name: "bun",
+    // Bun does not freeze the lockfile under `CI`; `bun ci` and `--frozen-lockfile` do.
     install: ["install"],
+    installText: "bun install",
     frozenCheck: ["install", "--frozen-lockfile", "--dry-run"],
     run: (script) => `bun run ${script}`,
     exec: (command) => `bunx --no-install ${command}`,
+    add: "bun add",
     addDev: "bun add -d",
   },
   npm: {
     name: "npm",
+    // `npm install` updates the lockfile under `CI`; `npm ci` is the frozen install.
     install: ["install", "--no-audit", "--no-fund"],
+    installText: "npm install",
     frozenCheck: ["ci", "--dry-run", "--ignore-scripts", "--no-audit", "--no-fund"],
     run: (script) => `npm run ${script}`,
     exec: (command) => `npx --no-install ${command}`,
+    add: "npm install",
     addDev: "npm install -D",
   },
   pnpm: {
     name: "pnpm",
-    install: ["install"],
+    // pnpm freezes the lockfile when `CI` is set, so a manifest change fails without the flag.
+    install: ["install", "--no-frozen-lockfile"],
+    installText: "pnpm install",
     frozenCheck: ["install", "--frozen-lockfile", "--lockfile-only", "--ignore-scripts"],
     run: (script) => `pnpm run ${script}`,
     exec: (command) => `pnpm exec ${command}`,
+    add: "pnpm add",
     addDev: "pnpm add -D",
   },
 };
@@ -142,4 +159,20 @@ export function projectPackageManager(
   if (existsSync(join(root, "pnpm-lock.yaml"))) return "pnpm";
   if (existsSync(join(root, "package-lock.json"))) return "npm";
   return creationPackageManager(undefined, agent);
+}
+
+/**
+ * Approves one package's install script for npm 11, which lists unapproved install scripts on
+ * every install (and later releases block them): the `allowScripts` field `npm approve-scripts`
+ * writes. An entry the author already wrote, allowing or denying the script, stays as it is.
+ * @param content - `package.json` text.
+ * @param name - Package whose install script runs, for any version.
+ * @returns The manifest text with `allowScripts[name]` set unless it already has a value.
+ */
+export function withAllowedInstallScript(content: string, name: string): string {
+  const manifest = JSON.parse(content) as Record<string, unknown>;
+  const allowed = manifest["allowScripts"];
+  const current = typeof allowed === "object" && allowed !== null ? allowed : {};
+  manifest["allowScripts"] = name in current ? current : { ...current, [name]: true };
+  return `${JSON.stringify(manifest, null, 2)}\n`;
 }

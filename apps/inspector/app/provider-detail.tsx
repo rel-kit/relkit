@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { FailedState, LoadingRows } from "../components/blocks/block-state";
 import { DetailList } from "../components/blocks/details";
 import { Section } from "../components/blocks/section";
-import { StatusBadge, statusTone } from "../components/neon/status-badge";
+import { StatusBadge } from "../components/neon/status-badge";
+import { provenance } from "../lib/provider-provenance";
 import type { InspectorObject } from "../lib/api-types";
 import { createInspectorClient } from "../lib/client";
 import { normalizeGraphResponse } from "../lib/graph-model";
@@ -27,8 +28,9 @@ export function ProviderDetail() {
   useEffect(() => {
     if (id === "") return;
     const client = createInspectorClient();
-    void Promise.all([client.detail<InspectorObject>("providers", id), client.graph()]).then(
-      ([detail, graph]) => {
+    // One handler for both: a graph without data shows the failed state, not an endless load.
+    void Promise.all([client.detail<InspectorObject>("providers", id), client.graph()])
+      .then(([detail, graph]) => {
         const node = record(detail.node) ?? record(detail.descriptor);
         if (node === undefined) throw new Error("Provider unavailable");
         const adapter = record(node.adapter);
@@ -44,9 +46,8 @@ export function ProviderDetail() {
             ? {}
             : { packageLabel: `${integration.packageName}@${integration.packageVersion}` }),
         });
-      },
-      () => setFailed(true),
-    );
+      })
+      .catch(() => setFailed(true));
   }, [id]);
   if (state === undefined)
     return failed ? (
@@ -63,12 +64,11 @@ export function ProviderDetail() {
     );
   const { node } = state;
   const adapter = record(node.adapter);
-  const providerSource = record(node.providerSource);
   const local = record(node.local);
   const features = strings(adapter?.features);
   const namedValues = records(node.namedValues);
   const deploymentRoles = records(node.deploymentRoles);
-  const sourceKind = label(providerSource?.kind);
+  const source = provenance(text(record(node.providerSource)?.kind));
   return (
     <DetailLayout
       header={{
@@ -77,7 +77,7 @@ export function ProviderDetail() {
         icon: <Plug />,
         badges: (
           <>
-            <StatusBadge tone={statusTone(sourceKind)} label={sourceKind} />
+            <StatusBadge tone="neutral" label={source.label} title={source.text} />
             <StatusBadge tone="neutral" label={label(node.profile)} />
           </>
         ),
@@ -153,7 +153,7 @@ export function ProviderDetail() {
               { label: "Package", value: state.packageLabel ?? "Unavailable", mono: true },
               {
                 label: "Binding source",
-                value: <StatusBadge tone={statusTone(sourceKind)} label={sourceKind} />,
+                value: <StatusBadge tone="neutral" label={source.label} title={source.text} />,
               },
               { label: "Definition", value: <SourceLink source={record(node.source)} /> },
             ]}

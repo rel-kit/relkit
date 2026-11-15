@@ -67,6 +67,18 @@ export async function referenceSnapshot(inspectorUrl: string) {
   return { generation, specification: await response.json() };
 }
 
+/** Waits until the active generation stops changing: one edit can activate twice in a row. */
+export async function settledSnapshot(inspectorUrl: string) {
+  let previous = await referenceSnapshot(inspectorUrl);
+  for (let attempt = 0; attempt < 20; attempt++) {
+    await Bun.sleep(750);
+    const current = await referenceSnapshot(inspectorUrl);
+    if (current.generation === previous.generation) return current;
+    previous = current;
+  }
+  throw new Error("The active generation did not settle");
+}
+
 /** Verifies active and stale browser requests without weakening the generation fence. */
 export async function pinnedRequest(inspectorUrl: string, generation: string, marker?: number) {
   const response = await fetch(`${inspectorUrl}/_relkit/backend/hello/probe`, {
@@ -101,7 +113,7 @@ export async function sourceRecovery(
   ] as const) {
     const file = join(root, path);
     const original = await readFile(file, "utf8");
-    const active = await referenceSnapshot(inspectorUrl);
+    const active = await settledSnapshot(inspectorUrl);
     const before = dev.logs().length;
     await writeFile(file, invalid);
     await dev.wait("Rejected source candidate", () =>

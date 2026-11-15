@@ -7,6 +7,10 @@ export const MigrationSuccess = Schema.Struct({
   dialect: Schema.Literals(["sqlite", "postgresql", "mysql"]),
   configPath: Schema.String,
   migrationPath: Schema.String,
+  /** Migrations in the history folder. */
+  history: Schema.Number,
+  /** Migrations this run applied; absent when the CLI could not read the database's log. */
+  applied: Schema.optionalKey(Schema.Number),
 });
 export const MigrationError = Schema.Struct({
   ok: Schema.Literal(false),

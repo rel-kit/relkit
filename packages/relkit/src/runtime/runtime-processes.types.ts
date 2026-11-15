@@ -28,6 +28,13 @@ export interface RuntimeSpawnOptions {
   readonly ipc?: (message: unknown) => void;
   /** Kills the child when aborted. */
   readonly signal?: AbortSignal;
+  /**
+   * Starts the child as the leader of a new process group (and session) on POSIX, so a signal
+   * to the negative of its pid (`process.kill(-pid, signal)`) reaches the child and everything
+   * it started, which a child that is a launcher for a native program needs. Ignored on
+   * Windows, which has no process groups; the terminal's Ctrl+C no longer reaches such a child.
+   */
+  readonly processGroup?: boolean;
 }
 
 /** Writable standard input of a child started with `stdin: "pipe"`. */

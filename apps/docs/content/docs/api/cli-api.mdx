@@ -27,7 +27,7 @@ Re-exports all named exports from the "./cli-help-model.types.js" module.
 export * from "./cli-help-model.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L16)
 
 ### findCliHelp
 
@@ -39,7 +39,7 @@ Resolves a command path in the static tree without executing the command.
 declare const findCliHelp: (path: readonly string[]) => CliHelpCommand | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L196)
 
 ### getCliHelpModel
 
@@ -51,7 +51,7 @@ Returns a frozen static help tree without acquiring command services.
 declare const getCliHelpModel: (version: string) => CliHelpModel;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L123)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/cli-help-model.ts#L188)
 
 ## `cli-help-model.types.ts`
 
@@ -1898,7 +1898,7 @@ Formats an existing terminal diagnostic without changing Error identity.
 declare const errorMessage: (error: unknown) => string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L171)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L176)
 
 ### fail
 
@@ -1976,7 +1976,7 @@ declare const installSignals: (controller: AbortController) => () => void;
 declare const isGeneratorApi: (value: unknown) => value is CreateRelkitGeneratorApi;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L194)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L199)
 
 ### loadCreateRelkit
 
@@ -1986,7 +1986,7 @@ declare const isGeneratorApi: (value: unknown) => value is CreateRelkitGenerator
 declare const loadCreateRelkit: () => Promise<CreateRelkitGeneratorApi>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L194)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L199)
 
 ### loadCreateRelkitEffect
 
@@ -1996,7 +1996,7 @@ declare const loadCreateRelkit: () => Promise<CreateRelkitGeneratorApi>;
 declare const loadCreateRelkitEffect: Effect<CreateRelkitGeneratorApi, CliAdapterError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L194)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main-support.ts#L199)
 
 ### toFailure
 
@@ -2024,7 +2024,7 @@ Re-exports all named exports from the "./cli-help-model.js" module.
 export * from "./cli-help-model.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L18)
 
 ### "./main-support.js" (namespace export)
 
@@ -2036,7 +2036,7 @@ Re-exports all named exports from the "./main-support.js" module.
 export * from "./main-support.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L19)
 
 ### main
 
@@ -2048,7 +2048,7 @@ Runs the native process entry point using the same invocation owner.
 declare const main: (argv?: readonly string[]) => Promise<number>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L91)
 
 ### runCli
 
@@ -2060,7 +2060,7 @@ Executes one invocation with one service graph and scoped resources.
 declare const runCli: (argv?: readonly string[], runtime?: CliRuntime) => Promise<number>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/main.ts#L27)
 
 ## `add-name.ts`
 
@@ -3090,7 +3090,7 @@ declare const renderDatabase: (
 ) => Promise<RenderedDatabase>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L89)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L95)
 
 ### renderDatabaseEffect
 
@@ -3110,7 +3110,7 @@ declare const renderDatabaseEffect: (
 ) => Effect.Effect<RenderedDatabase, GeneratorDomainError | GeneratorIoError, GeneratorFileSystem>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L39)
 
 ## `render-database.types.ts`
 

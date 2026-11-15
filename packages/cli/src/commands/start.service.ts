@@ -3,7 +3,8 @@ import { Context, Effect, Layer } from "effect";
 import { DEFAULT_CANDIDATE_HEALTH_TIMEOUT_MS } from "../supervisor/index.js";
 import { cliTry } from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
-import { fileSystemLayer } from "../services/filesystem.service.js";
+import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
+import { oneShotEnvironment } from "../runtime/one-shot-environment.js";
 import { cleanupLayer } from "../services/cleanup.service.js";
 import { resolveApplicationPort } from "./ports.js";
 import { CliBuiltProject, builtProjectLive } from "./start-built.js";
@@ -34,6 +35,7 @@ function makeStartLive(defaults: StartOptions) {
       const built = yield* CliBuiltProject;
       const native = yield* CliStartNative;
       const processes = yield* CliStartProcess;
+      const files = yield* CliFileSystem;
       return CliStart.of({
         start: Effect.fn("Start.start")(
           function* (overrides) {
@@ -54,9 +56,14 @@ function makeStartLive(defaults: StartOptions) {
               if (options.signal?.aborted)
                 throw options.signal.reason ?? new Error("Start was aborted.");
             });
+            // A built server on Node reads no environment file itself; the files fill what the
+            // process environment lacks, as Bun's loader does.
+            const inherited = yield* oneShotEnvironment(projectRoot).pipe(
+              Effect.provideService(CliFileSystem, files),
+            );
             const source = {
               ...Object.fromEntries(
-                Object.entries(process.env).filter(
+                Object.entries(inherited).filter(
                   (entry): entry is [string, string] => entry[1] !== undefined,
                 ),
               ),
@@ -85,6 +92,8 @@ function makeStartLive(defaults: StartOptions) {
               cwd: projectRoot,
               environment: {
                 ...source,
+                // A started build is production unless the operator chose the RelKit environment.
+                RELKIT_ENV: source.RELKIT_ENV ?? "production",
                 PORT: String(port),
                 RELKIT_GRAPH_HASH: artifacts.graphHash,
               },
@@ -126,6 +135,7 @@ export function startLiveLayer(options: StartOptions = {}): Layer.Layer<CliStart
     Layer.provide(
       Layer.mergeAll(
         builtProjectLive.pipe(Layer.provide(fileSystemLayer)),
+        fileSystemLayer,
         startNativeLive(options.fetch).pipe(Layer.provide(cleanupLayer)),
         processes,
       ),

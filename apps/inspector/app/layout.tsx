@@ -3,17 +3,13 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { InspectorShell } from "./inspector-shell";
-import { INSPECTOR_THEME_KEY } from "./theme-storage";
+import { THEME_BOOT_SCRIPT } from "./theme-storage";
 
 export const metadata = {
   title: "RelKit Inspector",
   description: "A read-only view of the active RelKit development generation.",
   icons: { icon: "/logo.svg" },
 };
-
-// Dark is rendered on the server; this runs before first paint so a stored light preference
-// never flashes dark (and the default never flashes light).
-const applyStoredTheme = `try{var t=localStorage.getItem(${JSON.stringify(INSPECTOR_THEME_KEY)});if(t==="light"){var d=document.documentElement;d.dataset.theme="light";d.classList.remove("dark")}}catch(e){}`;
 
 export default function RootLayout({ children }: { readonly children: ReactNode }) {
   return (
@@ -24,7 +20,9 @@ export default function RootLayout({ children }: { readonly children: ReactNode 
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: applyStoredTheme }} />
+        {/* Dark is rendered on the server; this corrects it before first paint to the stored
+            choice or the system's colour scheme. `suppressHydrationWarning` on <html> keeps it. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body>
         <InspectorShell>{children}</InspectorShell>

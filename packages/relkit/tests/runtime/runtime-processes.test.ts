@@ -14,6 +14,7 @@ describe.each(["bun", "node"] as const)("%s processes and modules", (runtime) =>
       reply: { echo: { value: 1 } },
       killed: { exited: 143, signalCode: "SIGTERM" },
       missing: "ENOENT",
+      group: { plainLeads: false, groupLeads: true, grandchildGone: true },
       which: true,
       whichMissing: null,
       resolved: true,

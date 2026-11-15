@@ -452,7 +452,7 @@ export const inspectorCodes = [
     code: "RELKIT_TRIGGER_SDK_UNAVAILABLE",
     title: "Trigger.dev SDK is not installed",
     happened: "RelKit could not load the `@trigger.dev/sdk` package.",
-    fix: "Install `@trigger.dev/sdk` in your app with `bun add @trigger.dev/sdk`, then restart.",
+    fix: "Add `@trigger.dev/sdk` to your app's dependencies, then restart.",
   },
   {
     code: "RELKIT_TRIGGER_SUBSCRIPTION_CURSOR_UNSUPPORTED",

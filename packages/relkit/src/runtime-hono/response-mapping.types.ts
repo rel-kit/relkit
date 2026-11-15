@@ -11,4 +11,6 @@ export interface ResponseMappingOptions {
   readonly responseId?: string;
   /** Trace ID added to Problem Details bodies. */
   readonly traceId?: string;
+  /** Request ID added to Problem Details bodies; equals the response's `x-request-id`. */
+  readonly requestId?: string;
 }

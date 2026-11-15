@@ -149,7 +149,7 @@ export const configureTutorial = Effect.fn("Tutorial.dependencies")(function* (
   devDependencies["drizzle-kit"] = "1.0.0-rc.5-ab785fc";
   if (auth) {
     dependencies["@relkit/better-auth"] = version;
-    dependencies["better-auth"] = "1.7.1";
+    dependencies["better-auth"] = "1.7.7";
   }
   yield* Effect.tryPromise({
     try: () =>

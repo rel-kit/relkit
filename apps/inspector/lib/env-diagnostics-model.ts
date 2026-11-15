@@ -1,3 +1,4 @@
+import { optional } from "./optional";
 import type {
   InspectorDiagnosticsPage,
   InspectorEnvironmentPage,
@@ -105,11 +106,9 @@ function generation(
     role,
     generationId,
     graphHash,
-    ...(integer(value.sourceVersion) === undefined
-      ? {}
-      : { sourceVersion: integer(value.sourceVersion) }),
-    ...(text(value.state) === undefined ? {} : { state: text(value.state) }),
-    ...(text(value.status) === undefined ? {} : { status: text(value.status) }),
+    ...optional("sourceVersion", integer(value.sourceVersion)),
+    ...optional("state", text(value.state)),
+    ...optional("status", text(value.status)),
   };
 }
 
@@ -127,8 +126,8 @@ function fields(items: readonly unknown[]): readonly EnvironmentFieldView[] {
         hasDefault: item.hasDefault === true,
         optional: item.optional === true,
         sensitive: item.sensitive === true,
-        ...(text(item.description) === undefined ? {} : { description: text(item.description) }),
-        ...(source(item.source) === undefined ? {} : { source: source(item.source) }),
+        ...optional("description", text(item.description)),
+        ...optional("source", source(item.source)),
       },
     ];
   });
@@ -152,12 +151,10 @@ function diagnostics(items: readonly unknown[]): readonly DiagnosticView[] {
         code,
         message,
         severity,
-        ...(source(item) === undefined ? {} : { source: source(item) }),
-        ...(text(item.descriptorId) === undefined ? {} : { descriptorId: text(item.descriptorId) }),
-        ...(text(item.suggestion) === undefined ? {} : { suggestion: text(item.suggestion) }),
-        ...(text(item.documentationPath) === undefined
-          ? {}
-          : { documentationPath: text(item.documentationPath) }),
+        ...optional("source", source(item)),
+        ...optional("descriptorId", text(item.descriptorId)),
+        ...optional("suggestion", text(item.suggestion)),
+        ...optional("documentationPath", text(item.documentationPath)),
       },
     ];
   });

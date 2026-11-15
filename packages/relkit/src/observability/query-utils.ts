@@ -36,7 +36,7 @@ function run<A>(
       Effect.mapError((error) =>
         error._tag === "QueryReadError"
           ? error.cause
-          : new ObservabilityQueryError(error.code, error.message),
+          : new ObservabilityQueryError(error.code, error.message, error.parameter),
       ),
     ),
   );

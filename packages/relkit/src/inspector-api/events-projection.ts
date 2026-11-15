@@ -77,6 +77,8 @@ export function projectPublication(value: unknown): JsonValue[] {
         "correlationId",
         "causationInvocationId",
         "traceId",
+        "producerTraceId",
+        "originRequestId",
         "attributes",
       ]),
     ),

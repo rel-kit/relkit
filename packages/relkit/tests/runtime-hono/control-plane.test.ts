@@ -17,7 +17,7 @@ const controlPlanePaths = [
   "/_relkit/v1/stream",
 ] as const;
 
-test("keeps the RelKit control plane out of application telemetry", async () => {
+test("keeps the RelKit control plane out of application telemetry but names each response", async () => {
   const collector = createObservabilityCollector();
   const lifecycle: string[] = [];
   const options = {
@@ -40,7 +40,7 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
       ...(action ? { body: "x", headers: { "content-length": "1" } } : {}),
     });
     expect(await response.text()).toBe("ok");
-    expect(response.headers.has("x-request-id")).toBe(false);
+    expect(response.headers.get("x-request-id")).toMatch(/^request-/);
   }
 
   const oversized = await app.request(
@@ -48,6 +48,7 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
     { method: "POST", body: "{}", headers: { "content-length": "2" } },
   );
   expect(oversized.status).toBe(413);
+  expect(oversized.headers.get("x-request-id")).toMatch(/^request-/);
   expect(await oversized.json()).toMatchObject({
     type: "/errors/payload-too-large",
     status: 413,
@@ -59,6 +60,13 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
     app.fetch(request),
   );
   expect(await nested.text()).toBe("ok");
+  expect(nested.headers.get("x-request-id")).toMatch(/^request-/);
+  const direct = await instrumentHttpRequest(
+    new Request("http://localhost/_relkit/v1/health/live"),
+    options,
+    () => new Response("live"),
+  );
+  expect(direct.headers.get("x-request-id")).toMatch(/^request-/);
   expect(collector.read()).toEqual([]);
   expect(lifecycle).toEqual([]);
 
@@ -82,6 +90,26 @@ test("keeps the RelKit control plane out of application telemetry", async () => 
       ),
   ).toHaveLength(1);
   expect(lifecycle).toEqual(["request.started", "request.completed"]);
+});
+
+// 27.1 (e): an unmatched control-plane path's Problem names the request ID of its header.
+test("a control-plane Problem names the request ID of its header", async () => {
+  const { installUnmatchedRoute } = await import("../../src/runtime-hono/unmatched-route.js");
+  const { internalProblem } = await import("../../src/runtime-hono/internal-endpoints-utils.js");
+  const app = new Hono();
+  for (const middleware of createFrameworkMiddleware({ maxBodyBytes: 1_024 }))
+    app.use("*", middleware.handler);
+  app.get("/_relkit/v1/protected", (context) => internalProblem(context, 401, "denied", "No."));
+  installUnmatchedRoute(app);
+  for (const path of ["/_relkit/v1/nope", "/_relkit/v1/health/nope", "/_relkit/v1/protected"]) {
+    const response = await instrumentHttpRequest(
+      new Request(`http://localhost${path}`),
+      {},
+      (request) => app.fetch(request),
+    );
+    const body = (await response.json()) as { requestId?: string };
+    expect([path, body.requestId]).toEqual([path, response.headers.get("x-request-id")]);
+  }
 });
 
 test("the framework RPC endpoint stays application traffic under the reserved prefix", async () => {

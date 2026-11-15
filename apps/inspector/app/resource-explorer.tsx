@@ -27,6 +27,7 @@ import { Button } from "../components/ui/button";
 import { FailedState, LoadingRows } from "../components/blocks/block-state";
 import { EmptyState } from "../components/neon/empty-state";
 import { cn } from "../lib/utils";
+import { BucketObjectMeta } from "./resource-object-meta";
 import { BucketPreview, CachePreview } from "./resource-preview";
 
 type Kind = "bucket" | "cache";
@@ -288,10 +289,12 @@ function ResourceRows({
                           </code>
                         </span>
                       </td>
-                      <td className="h-8 py-0 pr-3 text-right font-mono text-[11px] whitespace-nowrap text-muted-foreground tabular-nums group-hover/row:bg-muted/50">
-                        {kind === "cache"
-                          ? cacheMeta(item as InspectorCacheKey)
-                          : bucketMeta(item as InspectorBucketObject)}
+                      <td className="h-8 py-0 pr-3 text-right font-mono text-[11px] text-muted-foreground tabular-nums group-hover/row:bg-muted/50">
+                        {kind === "cache" ? (
+                          cacheMeta(item as InspectorCacheKey)
+                        ) : (
+                          <BucketObjectMeta item={item as InspectorBucketObject} />
+                        )}
                       </td>
                       <td className="h-8 w-0 rounded-r-md py-0 pr-1 text-right group-hover/row:bg-muted/50">
                         {kind === "bucket" ? (
@@ -332,14 +335,4 @@ function groupItems(kind: Kind, items: readonly Item[]): readonly Group[] {
 
 function cacheMeta(item: InspectorCacheKey): string {
   return `${item.type} · ${item.bytes.toLocaleString("en-US")} B · ${item.ttlMs === null ? "no TTL" : `${item.ttlMs} ms TTL`}`;
-}
-
-function bucketMeta(item: InspectorBucketObject): string {
-  const size =
-    typeof item.size === "number"
-      ? item.size
-      : typeof item.metadata?.size === "number"
-        ? item.metadata.size
-        : undefined;
-  return size === undefined ? "Metadata available" : `${size.toLocaleString("en-US")} B`;
 }

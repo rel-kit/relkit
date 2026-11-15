@@ -3,10 +3,11 @@ import type { HttpTriggerRegistration } from "../graph/index.js";
 import type { InvocationFailure } from "../runtime-effect/index.js";
 import { Effect } from "effect";
 import { problemBody, problemResponse, type ProblemInput } from "./problem-details.js";
-import { developmentFailureMessage } from "./response-mapping-provider.js";
+import { recordInternalFailure } from "./response-mapping-provider.js";
 import {
   findResponse,
   internalErrorResponse,
+  problemIds,
   jsonResponse,
   responseStatus,
 } from "./response-mapping-utils.js";
@@ -19,19 +20,20 @@ import type { ResponseMappingOptions } from "./response-mapping.types.js";
  */
 export const encodeProblem = Effect.fn("ResponseMapping.encodeProblem")((input: ProblemInput) =>
   Effect.try({ try: () => problemResponse(input), catch: (cause) => cause }).pipe(
-    Effect.catch(() => Effect.succeed(internalErrorResponse(input.traceId))),
+    Effect.catch(() => Effect.succeed(internalErrorResponse(input))),
   ),
 );
 
 /** Converts a serializable application value; invalid JSON values become safe HTTP failures.
  * @param value - Value inspected, validated or projected by this operation.
  * @param status - HTTP status associated with the observed response or lifecycle event.
+ * @param ids - The request's trace and request IDs for the fallback problem.
  * @returns An effect yielding serialized JSON or a safe HTTP 500 response when serialization fails.
  */
 export const encodeJson = Effect.fn("ResponseMapping.encodeJson")(
-  (value: unknown, status: number, traceId?: string) =>
+  (value: unknown, status: number, ids: Pick<ProblemInput, "traceId" | "requestId"> = {}) =>
     Effect.try({ try: () => jsonResponse(value, status), catch: (cause) => cause }).pipe(
-      Effect.catch(() => Effect.succeed(internalErrorResponse(traceId))),
+      Effect.catch(() => Effect.succeed(internalErrorResponse(ids))),
     ),
 );
 
@@ -39,7 +41,8 @@ export const encodeJson = Effect.fn("ResponseMapping.encodeJson")(
  * @param trigger - Route declarations used to select an outcome-specific response.
  * @param failure - Normalized provider, cancellation, timeout or defect failure.
  * @param options - Runtime exposure mode and optional response schemas.
- * @returns An effect yielding a validated public failure response without native cause details.
+ * @returns An effect yielding a validated public failure response without native cause details
+ *   in any mode.
  */
 export const genericFailureResponse = Effect.fn("ResponseMapping.genericFailure")(function* (
   trigger: HttpTriggerRegistration,
@@ -73,15 +76,16 @@ export const genericFailureResponse = Effect.fn("ResponseMapping.genericFailure"
       code: "internal-error",
       detail: "The request failed unexpectedly.",
     };
-  const message = developmentFailureMessage(failure, options.mode);
+  // The cause goes to the log and the trace; the response names only the failure class.
+  yield* recordInternalFailure(failure, options.mode);
   const status = responseStatus(declaration, selected.status);
   const problem = problemBody({
     status,
     code: selected.code,
-    detail: message ?? selected.detail,
-    ...(options.traceId === undefined ? {} : { traceId: options.traceId }),
+    detail: selected.detail,
+    ...problemIds(options),
   });
   return (yield* responseIsValid(trigger, declaration, problem, options))
     ? yield* encodeProblem({ ...problem, status })
-    : internalErrorResponse(options.traceId);
+    : internalErrorResponse(options);
 });

@@ -4,6 +4,13 @@ const source = async (path: string): Promise<string> =>
   Bun.file(`${import.meta.dir}/../app/${path}`).text();
 
 describe("inspector accessibility contract", () => {
+  test("a failed invocation's status sentence is printed once", async () => {
+    const invocation = await source("functions/function-invocation.tsx");
+    // One live region that is also the visible text: a second copy reads twice on the page.
+    expect(invocation.match(/\{status\}/g)).toHaveLength(1);
+    expect(invocation).toContain('role="status"');
+  });
+
   test("critical forms expose names, descriptions, errors, and live status", async () => {
     const [route, field, invocation, filters] = await Promise.all([
       source("routes/route-composer.tsx"),
@@ -25,7 +32,7 @@ describe("inspector accessibility contract", () => {
     expect(invocation).toContain("resultHeadingRef");
     expect(invocation).toContain("Invoke locally");
     expect(filters).toContain('aria-describedby="signal-filter-description"');
-    expect(filters).toContain('id="signal-filter-severity"');
+    expect(filters).toContain('id="signal-filter-limit"');
     expect(filters).toContain("Apply filters");
     expect(filters).toContain("Reset");
   });

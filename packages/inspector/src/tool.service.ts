@@ -77,7 +77,8 @@ const runTool = Effect.fn("Inspector.run")(function* (
       sessionId: undefined,
       through: 0,
       error: undefined,
-      incomplete: true,
+      // Nothing is known to be missing until a batch reports a gap or a loss.
+      incomplete: false,
       droppedRecords: 0,
     });
     const token = randomBytes(32).toString("base64url");
@@ -111,7 +112,10 @@ const runTool = Effect.fn("Inspector.run")(function* (
         ),
       ),
     );
-    const exited = yield* ui.start(options, backend, token);
+    // Starting the interface succeeds quietly; the "listening" line says the rest, and a failure still logs.
+    const exited = yield* ui
+      .start(options, backend, token)
+      .pipe(Effect.provideService(ExecutionSuccessLogs, false));
     yield* exited;
   }).pipe(Scope.use(scope));
 });

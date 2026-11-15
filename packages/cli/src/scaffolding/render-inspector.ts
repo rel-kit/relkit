@@ -11,6 +11,7 @@ import { Effect } from "effect";
 import { observeExecution } from "relkit/contracts/operation";
 import { runGeneratorPromise } from "create-relkit/generator-runtime";
 import { scaffoldErrors } from "create-relkit/generator-errors";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
 import type { AddRequest } from "create-relkit/add-types";
 import { PlanBuilder } from "./plan-builder.js";
 import { addFactoryObjectMember } from "./source-edit.js";
@@ -40,8 +41,9 @@ export const renderInspectorEffect = Effect.fn("Scaffold.renderInspector")(
     );
     yield* builder.dependencyEffect("@relkit/inspector");
     yield* builder.scriptEffect("inspector", INSPECTOR_SCRIPT);
-    yield* builder.nextStepEffect("bun run dev");
-    yield* builder.nextStepEffect("bun run inspector");
+    const commands = packageManagerCommands(projectPackageManager(builder.discovery.projectRoot));
+    yield* builder.nextStepEffect(commands.run("dev"));
+    yield* builder.nextStepEffect(commands.run("inspector"));
   },
   (effect) => observeExecution("generator", "planning.renderInspector", scaffoldErrors(effect)),
 );

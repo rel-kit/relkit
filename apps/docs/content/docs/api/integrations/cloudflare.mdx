@@ -537,7 +537,7 @@ type R2RequestInit = Omit<RequestInit, "body"> & {
 declare const assertR2Response: (response: Response, operation: string) => Promise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/cloudflare/src/runtime/r2-signing.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/cloudflare/src/runtime/r2-signing.ts#L64)
 
 ### presignR2Url
 
@@ -549,6 +549,7 @@ declare const presignR2Url: (
   method: "GET" | "PUT",
   credentials: R2Credentials,
   expiresSeconds: number,
+  headers?: Readonly<Record<string, string>>,
 ) => Promise<string>;
 ```
 
@@ -576,7 +577,7 @@ declare const signedR2Request: (
 **Signature**
 
 ```ts
-export interface CloudflareR2BucketOptions extends R2Credentials {
+export interface CloudflareR2BucketOptions extends R2Credentials, BucketPolicy {
   readonly accountId: string;
   readonly bucketName: string;
   readonly signedUrlTtlSeconds?: number;
@@ -584,7 +585,7 @@ export interface CloudflareR2BucketOptions extends R2Credentials {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/cloudflare/src/runtime/r2.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/cloudflare/src/runtime/r2.ts#L22)
 
 ### createCloudflareR2BucketProvider
 
@@ -596,7 +597,7 @@ declare const createCloudflareR2BucketProvider: (
 ) => BucketProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/cloudflare/src/runtime/r2.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/cloudflare/src/runtime/r2.ts#L30)
 
 ## `realtime-durable-object.ts`
 

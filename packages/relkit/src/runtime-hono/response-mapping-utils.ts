@@ -3,7 +3,7 @@ import type { StandardIssue, StandardSchemaV1 } from "../schema/index.js";
 import type { RequestMappingIssue } from "./request-mapping.js";
 import type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 import { canCarryStandardSchema } from "../contracts/index.js";
-import { problemResponse } from "./problem-details.js";
+import { PROBLEM_CONTENT_TYPE, problemResponse, type ProblemInput } from "./problem-details.js";
 export type { ResponseDeclaration, ResponseSchemaEntries } from "./response-mapping-utils.types.js";
 
 /** Select an explicit response ID or the route's default success declaration.
@@ -106,6 +106,23 @@ export function jsonResponse(value: unknown, status: number): Response {
     headers: { "content-type": "application/json" },
   });
 }
+/** Completes a route's JSON or Problem Details response: an explicit `Content-Length`, so a
+ * `HEAD` reports the `GET` length, `X-Content-Type-Options: nosniff`, and `Cache-Control:
+ * no-store` unless the route set its own. Other responses, such as streams, are unchanged.
+ * @param response - Final route response, after the route's own `response` option.
+ * @returns The response with the default headers; its body is buffered once to measure it.
+ */
+export async function withDefaultHeaders(response: Response): Promise<Response> {
+  const type = response.headers.get("content-type")?.split(";")[0]?.trim();
+  if (type !== "application/json" && type !== PROBLEM_CONTENT_TYPE) return response;
+  const headers = new Headers(response.headers);
+  headers.set("x-content-type-options", "nosniff");
+  if (!headers.has("cache-control")) headers.set("cache-control", "no-store");
+  const body = response.body === null ? null : await response.arrayBuffer();
+  if (body !== null && !headers.has("content-length"))
+    headers.set("content-length", String(body.byteLength));
+  return new Response(body, { status: response.status, statusText: response.statusText, headers });
+}
 /** JSON replacer for REST bodies: a bigint becomes its exact decimal string.
  * @param _key - Property name.
  * @param value - Property value.
@@ -115,16 +132,41 @@ export function jsonWireValue(_key: string, value: unknown): unknown {
   return typeof value === "bigint" ? value.toString() : value;
 }
 /** The 500 problem returned when a response cannot be produced safely.
- * @param traceId - The request's trace ID, when known.
+ * @param ids - The request's trace ID, or its trace and request IDs, when known.
  * @returns A Problem Details response without internal detail.
  */
-export function internalErrorResponse(traceId?: string): Response {
+export function internalErrorResponse(ids?: string | ProblemIds): Response {
   return problemResponse({
     status: 500,
     code: "internal-error",
     detail: "The request failed unexpectedly.",
-    ...(traceId === undefined ? {} : { traceId }),
+    ...problemIds(typeof ids === "string" ? { traceId: ids } : (ids ?? {})),
   });
+}
+/** The 413 problem for a request body over its byte limit, worded as the server limit's (D6).
+ * @param limit - The byte limit the body exceeded.
+ * @param ids - The request's trace and request IDs.
+ * @returns A `payload-too-large` Problem Details response.
+ */
+export function payloadTooLargeResponse(limit: number, ids: ProblemIds): Response {
+  return problemResponse({
+    status: 413,
+    code: "payload-too-large",
+    detail: `The request body exceeds the ${limit}-byte limit.`,
+    ...problemIds(ids),
+  });
+}
+/** The identity fields a Problem Details body carries. */
+type ProblemIds = Pick<ProblemInput, "traceId" | "requestId">;
+/** Picks the trace and request IDs that are set, for a Problem Details body.
+ * @param source - Response options or problem input carrying the request's IDs.
+ * @returns Only the defined `traceId` and `requestId`.
+ */
+export function problemIds(source: ProblemIds): ProblemIds {
+  return {
+    ...(source.traceId === undefined ? {} : { traceId: source.traceId }),
+    ...(source.requestId === undefined ? {} : { requestId: source.requestId }),
+  };
 }
 /** Bound issue messages and normalize field paths for public validation errors.
  * @param issue - Validation or mapping issue to sanitize.
@@ -145,6 +187,26 @@ export function safeIssue(issue: StandardIssue | RequestMappingIssue): {
       }),
     ),
   };
+}
+/** Most validation issues named on a span event; the count attribute keeps the total. */
+const MAX_TRACED_ISSUES = 10;
+/** Span event attributes naming each validation issue's code and path, never its message or
+ * the rejected value.
+ * @param issues - Validation or mapping issues.
+ * @returns The issue count and, for the first ten issues, code and dotted path.
+ */
+export function validationIssueAttributes(
+  issues: readonly (StandardIssue | RequestMappingIssue)[],
+): Record<string, string | number> {
+  const attributes: Record<string, string | number> = {
+    "relkit.validation.issue_count": issues.length,
+  };
+  issues.slice(0, MAX_TRACED_ISSUES).forEach((issue, index) => {
+    const safe = safeIssue(issue);
+    attributes[`relkit.validation.issues.${index}.code`] = safe.code;
+    attributes[`relkit.validation.issues.${index}.path`] = safe.path.join(".");
+  });
+  return attributes;
 }
 /** Read object response declarations from route configuration.
  * @param trigger - Compiled HTTP trigger registration.

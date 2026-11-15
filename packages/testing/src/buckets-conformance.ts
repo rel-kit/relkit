@@ -11,6 +11,7 @@ import type {
 } from "./buckets-conformance.types.js";
 import type { ConformanceHarness } from "./conformance.types.js";
 import { abortedSignal, check, conformanceHarness, rejects, same, SKIPPED } from "./conformance.js";
+import { CONFORMANCE_POLICY, policyCase, signedUploadCase } from "./buckets-conformance-policy.js";
 
 export type * from "./buckets-conformance.types.js";
 
@@ -25,6 +26,11 @@ export const BUCKETS_CONFORMANCE_CASES: readonly BucketsConformanceCase[] = Obje
   { id: "cancellation", description: "an aborted operation rejects" },
   { id: "closed", description: "operations reject after close" },
   { id: "backend-failure", description: "a failing backend rejects instead of reporting a miss" },
+  { id: "policy", description: "put refuses sizes and content types the bucket does not allow" },
+  {
+    id: "signed-upload-limits",
+    description: "a signed upload binds its declared type and length; storage rejects others",
+  },
 ]);
 
 const encoder = new TextEncoder();
@@ -60,6 +66,22 @@ export function createBucketsConformanceHarness(
       await provider.ready?.();
       try {
         return await body(complete(provider), prefix);
+      } finally {
+        await provider.close?.();
+      }
+    };
+  const limited =
+    (
+      caseId: string,
+      body: (provider: BucketsConformanceProvider, prefix: string) => Promise<void | "skipped">,
+    ): (() => Promise<void | "skipped">) =>
+    async () => {
+      if (options.limited === undefined) return SKIPPED;
+      const prefix = `${run}/${caseId}`;
+      const provider = options.limited(prefix, CONFORMANCE_POLICY);
+      await provider.ready?.();
+      try {
+        return await body(provider, prefix);
       } finally {
         await provider.close?.();
       }
@@ -134,6 +156,10 @@ export function createBucketsConformanceHarness(
       await provider.close();
       await rejects(async () => provider.get?.(`${run}/closed/a`), "get after close");
     },
+    policy: limited("policy", policyCase),
+    "signed-upload-limits": limited("signed-upload-limits", (provider, prefix) =>
+      signedUploadCase(provider, prefix, options.upload),
+    ),
     "backend-failure": async () => {
       if (options.failing === undefined) return SKIPPED;
       const provider = options.failing();

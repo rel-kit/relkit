@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import type { InspectorObject } from "../lib/api-types";
 import { createInspectorBackendStream, createInspectorClient } from "../lib/client";
+import { useHistoryFailed, useLiveUpdates } from "../lib/stream-application-store";
+import { HISTORY_UNAVAILABLE_TEXT, isHistoryUnavailable } from "../lib/history-status";
 import { requestDetail, traceDetail } from "../lib/observability-api";
 import { eventRecord, records, text } from "../lib/observability-model";
 import { SignalDetailView } from "./signal-detail-view";
@@ -28,8 +30,10 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
   const params = useParams<{ requestId?: string; traceId?: string }>();
   const id = kind === "requests" ? text(params?.requestId) : text(params?.traceId);
   const [data, setData] = useState<SignalDetailData>();
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const [state, setState] = useState<"loading" | "ready" | "error" | "history">("loading");
+  const historyFailed = useHistoryFailed();
   const [liveState, setLiveState] = useState("connecting");
+  const live = useLiveUpdates(liveState);
   const [paging, setPaging] = useState("ready");
   const loadMore = async () => {
     if (!data?.nextCursor) return;
@@ -71,8 +75,9 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
           setData(next);
           setState("ready");
         }
-      } catch {
-        if (mounted && current === requestNumber) setState("error");
+      } catch (error) {
+        if (mounted && current === requestNumber)
+          setState(isHistoryUnavailable(error) ? "history" : "error");
       }
     };
     void load(true);
@@ -104,6 +109,17 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
   }, [id, kind]);
 
   const title = kind === "requests" ? "Request detail" : "Trace detail";
+  // A page that waits for history that cannot be read would show its skeleton for good.
+  if ((historyFailed || state === "history") && data === undefined)
+    return (
+      <div className="route-page">
+        <PageHeader title={title} />
+        <FailedState
+          title={HISTORY_UNAVAILABLE_TEXT}
+          description="Requests, traces and logs are read from history. The application keeps running."
+        />
+      </div>
+    );
   if (state === "loading" && data === undefined)
     return (
       <div className="route-page">
@@ -126,7 +142,7 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
       kind={kind}
       id={id}
       {...data}
-      liveState={liveState}
+      liveState={live}
       notice={
         data.nextCursor ? (
           <div

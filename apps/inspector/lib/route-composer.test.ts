@@ -1,5 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import { collectRouteFields, composeRouteRequest } from "./route-composer";
+import {
+  collectRouteFields,
+  composeRouteRequest,
+  cookieFieldNames,
+  editableRouteFields,
+} from "./route-composer";
 import { openApiOperation } from "./route-openapi";
 
 const mapping = {
@@ -66,5 +71,24 @@ describe("route composer contract", () => {
         { name: "orderId", in: "path", required: true, schema: { type: "string" } },
       ]),
     );
+  });
+
+  test("cookie fields are listed apart and never sent", () => {
+    const withCookie = {
+      kind: "input",
+      fields: { ...mapping.fields, session: { kind: "cookie", name: "session" } },
+    };
+    const route = { method: "GET", path: "/orders/:orderId", request: withCookie };
+    const fields = collectRouteFields(withCookie);
+    expect(cookieFieldNames(fields)).toEqual(["session"]);
+    expect(editableRouteFields(fields).map((field) => field.source)).toEqual([
+      "path",
+      "query",
+      "body",
+    ]);
+    const sent = composeRouteRequest(route, { orderId: "1", quantity: "2", session: "abc" });
+    expect(sent.ok).toBe(true);
+    expect(new Headers(sent.init?.headers).get("cookie")).toBeNull();
+    expect(composeRouteRequest(route, { orderId: "1", quantity: "2" }).errors).toEqual([]);
   });
 });

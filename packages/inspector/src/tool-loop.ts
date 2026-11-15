@@ -2,14 +2,25 @@
 import { Cause, Clock, Effect, Ref } from "effect";
 import { InspectionConnectionError } from "relkit/inspector-api/connection";
 import type { InspectionFilesOperations } from "relkit/inspector-api/connection";
-import type { InspectorDiscoveryOperations } from "./discovery.types.js";
+import type { InspectorDiscoveryOperations, InspectorSelection } from "./discovery.types.js";
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorOptions } from "./options.types.js";
 import type { InspectorToolStateRef } from "./tool-state.types.js";
-import { collectInspectionBatch } from "./collector.js";
+import { collectCurrent } from "./tool-collect.js";
 import type { ObservabilityStream } from "relkit/observability";
-import { publishSelection, publishCollection } from "./live-events.js";
-import { acquireHistory, historyFailureHint, recoverInspection } from "./tool-history.js";
+import {
+  publishSelection,
+  publishSelectionState,
+  selectionKey,
+  selectionNotices,
+} from "./live-events.js";
+import {
+  acquireHistory,
+  historyFailureHint,
+  historyRoot,
+  recoverInspection,
+} from "./tool-history.js";
+import { readHistoryOwner } from "./history-owner.js";
 
 /** Fast history retries before backing off; a released lock is still picked up later. */
 const HISTORY_FAST_RETRIES = 3;
@@ -29,6 +40,8 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
   let nextHistoryRetry = 0;
   /** Lock conflicts in the current episode; an opened history starts a new one. */
   let lockNotices = 0;
+  // A full batch leaves records behind it; the next pull follows at once instead of after 100 ms.
+  let backlog = false;
   while (true) {
     const now = yield* Clock.currentTimeMillis;
     const cycle = Effect.gen(function* () {
@@ -40,7 +53,12 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
         yield* acquireHistory(state, files, options);
         if ((yield* Ref.get(state)).history) lockNotices = 0;
       }
-      if (yield* collectCurrent(state, remote, options, stream)) historyFailures = 0;
+      backlog = false;
+      const collected = yield* collectCurrent(state, remote, options, stream);
+      if (collected !== false) {
+        historyFailures = 0;
+        backlog = collected.backlog;
+      }
     });
     yield* cycle.pipe(
       Effect.catchCause((cause) => {
@@ -52,15 +70,20 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
           historyFailures++;
           if (historyFailures >= HISTORY_FAST_RETRIES)
             nextHistoryRetry = now + HISTORY_SLOW_RETRY_MS;
-          const hint = historyFailureHint(error);
           // Counted per episode, not per historyFailures: that only resets once collection
           // succeeds, so a later conflict while disconnected would otherwise never be named.
-          if (hint && ++lockNotices === 1)
-            notice = Effect.logWarning(
-              historyFailures >= HISTORY_FAST_RETRIES ? `${hint}; retrying every 30s` : hint,
-            );
-          else if (hint && historyFailures === HISTORY_FAST_RETRIES)
-            notice = Effect.logWarning(`${hint}; retrying every 30s`);
+          const first = ++lockNotices === 1;
+          if (first || historyFailures === HISTORY_FAST_RETRIES) {
+            const retrying = historyFailures >= HISTORY_FAST_RETRIES;
+            notice = Effect.gen(function* () {
+              const owner =
+                error.operation === "history.writer-conflict"
+                  ? yield* readHistoryOwner(historyRoot(options))
+                  : undefined;
+              const hint = historyFailureHint(error, owner);
+              yield* Effect.logWarning(retrying ? `${hint}; retrying every 30s` : hint);
+            });
+          }
         }
         return notice.pipe(
           Effect.andThen(recoverInspection(state, error)),
@@ -68,7 +91,7 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
         );
       }),
     );
-    yield* Effect.sleep(100);
+    if (!backlog) yield* Effect.sleep(100);
   }
 });
 
@@ -79,14 +102,13 @@ const selectConnection = Effect.fn("Inspector.selectConnection")(function* (
   options: InspectorOptions,
   stream: ObservabilityStream,
 ) {
-  const selection = yield* discovery.select(options).pipe(
-    Effect.tapError(() =>
-      Ref.update(state, (value) => ({
-        ...value,
-        selection: { state: "disconnected" as const, rejected: 1 },
-      })),
-    ),
-  );
+  const selection = yield* discovery
+    .select(options)
+    .pipe(
+      Effect.tapError(() =>
+        applySelection(state, options, stream, { state: "disconnected", rejected: 1 }),
+      ),
+    );
   const previous = yield* Ref.get(state);
   if (
     previous.history &&
@@ -97,41 +119,40 @@ const selectConnection = Effect.fn("Inspector.selectConnection")(function* (
       operation: "history.foreign-project",
       cause: new Error("Choose a project-specific history directory"),
     });
-  publishSelection(stream, previous.selection, selection);
-  yield* Ref.update(state, (value) => ({ ...value, selection }));
+  yield* applySelection(state, options, stream, selection);
 });
 
-/** A durable receipt advances state only after collection and acknowledgement complete. */
-const collectCurrent = Effect.fn("Inspector.collectCurrent")(function* (
+/** Records a discovery result, invalidates the UI and tells the terminal what changed, once. */
+const applySelection = Effect.fn("Inspector.applySelection")(function* (
   state: InspectorToolStateRef,
-  remote: InspectorRemoteOperations,
   options: InspectorOptions,
   stream: ObservabilityStream,
+  selection: InspectorSelection,
 ) {
-  const current = yield* Ref.get(state);
-  if (current.selection.state !== "connected" || !current.history) return false;
-  const sessionId = current.selection.connection.descriptor.sessionId;
-  const after = sessionId === current.sessionId ? current.through : 0;
-  const batch = yield* collectInspectionBatch(
-    remote,
-    current.history.operations,
-    current.selection.connection,
-    after,
-    options.target,
-    current.lossKey,
-    sessionId === current.sessionId ? current.droppedRecords : 0,
-  );
-  publishCollection(stream, batch.changes);
+  const previous = yield* Ref.get(state);
+  const first = previous.selectionSince === undefined;
+  if (first) publishSelectionState(stream, selection);
+  else publishSelection(stream, previous.selection, selection);
+  const project = options.projectRoot ?? options.connectionFile ?? process.cwd();
+  for (const notice of selectionNotices(first ? undefined : previous.selection, selection, project))
+    yield* notice.level === "warn"
+      ? Effect.logWarning(notice.message)
+      : Effect.logInfo(notice.message);
+  const changed = first || selectionKey(previous.selection) !== selectionKey(selection);
+  const now = yield* Clock.currentTimeMillis;
+  const stopped =
+    previous.selection.state === "connected" && selection.state !== "connected"
+      ? previous.selection.handshake.sessionId
+      : undefined;
   yield* Ref.update(state, (value) => ({
     ...value,
-    sessionId,
-    through: batch.through,
-    error: undefined,
-    incomplete: batch.incomplete || batch.gap,
-    droppedRecords: batch.droppedRecords,
-    lossKey: batch.lossKey,
-    producerFailed: batch.producerFailed,
-    producerDropped: batch.producerDropped,
+    selection,
+    selectionSince: changed ? now : value.selectionSince,
+    lastSession:
+      selection.state === "connected"
+        ? { sessionId: selection.handshake.sessionId }
+        : stopped === undefined
+          ? value.lastSession
+          : { sessionId: stopped, stoppedAt: now },
   }));
-  return true;
 });

@@ -9,7 +9,7 @@ import { CircleAlert, CircleCheck, CircleDashed, CircleX, Loader } from "lucide-
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { durationShare, formatDuration, relativeTime } from "@/lib/format";
+import { durationShare, formatDuration, relativeTime, utcTimestamp } from "@/lib/format";
 import type { StatusTone } from "./status-badge";
 
 export interface HistoryEntry {
@@ -107,7 +107,11 @@ export function HistoryList({
                 </span>
               ) : null}
               {entry.at ? (
-                <time className="text-muted-foreground/70" dateTime={entry.at} title={entry.at}>
+                <time
+                  className="text-muted-foreground/70"
+                  dateTime={entry.at}
+                  title={utcTimestamp(entry.at)}
+                >
                   {relativeTime(entry.at)}
                 </time>
               ) : null}

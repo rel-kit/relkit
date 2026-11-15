@@ -6,7 +6,7 @@ import { Button } from "../components/ui/button";
 import { EmptyState } from "../components/neon/empty-state";
 import { StatusBadge, statusTone } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
-import { clockTime, formatDuration } from "../lib/format";
+import { formatDuration, formatTimestamp, utcTimestamp } from "../lib/format";
 import { waterfall } from "../lib/observability-model";
 import {
   lifecyclePhases,
@@ -131,7 +131,11 @@ export function TraceWaterfall({
               <span>{summary.root.status}</span>
             ) : null}
             <span>{summary.running ? "in progress" : formatDuration(summary.totalMs)}</span>
-            {summary.startedAt ? <span>started {clockTime(summary.startedAt)}</span> : null}
+            {summary.startedAt ? (
+              <span title={utcTimestamp(summary.startedAt)}>
+                started {formatTimestamp(summary.startedAt, { date: false })}
+              </span>
+            ) : null}
             <span>
               {summary.spans} span{summary.spans === 1 ? "" : "s"}
             </span>

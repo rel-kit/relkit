@@ -11,7 +11,12 @@ import {
   validateMetadataEffect,
   validateUrlEffect,
 } from "./client-results.js";
-import type { BucketObjectMetadata, BucketPutOptions } from "./client.types.js";
+import { checkPutPolicyEffect, writeUrlOptionsEffect } from "./client-policy.js";
+import type {
+  BucketObjectMetadata,
+  BucketPutOptions,
+  BucketWriteUrlOptions,
+} from "./client.types.js";
 
 /** Stores bytes under a portable key.
  * @param key - Object key.
@@ -28,6 +33,10 @@ export const putBucketEffect = Effect.fn("bucket.put")(
         yield* validateKeyEffect(key);
         if (!(bytes instanceof Uint8Array))
           return yield* new BucketValidationError({ message: "Bucket bytes must be a Uint8Array" });
+        yield* checkPutPolicyEffect({
+          size: bytes.byteLength,
+          ...(options?.contentType === undefined ? {} : { contentType: options.contentType }),
+        });
         return yield* runBucketOperation<void>({
           operation: "put",
           input: { key, bytes, options },
@@ -156,21 +165,28 @@ export const createBucketReadUrlEffect = Effect.fn("bucket.createReadUrl")((key:
 
 /** Creates a signed write URL when supported.
  * @param key - Object key.
+ * @param options - Content type and length the upload must carry; checked against the declared
+ * policy before the provider signs, then bound into the URL by the provider.
  * @returns Effect of a URL or a typed bucket error.
- * @example Effect.provide(createBucketWriteUrlEffect("a"), layer);
+ * @example Effect.provide(createBucketWriteUrlEffect("a.png", { contentType: "image/png" }), layer);
  */
-export const createBucketWriteUrlEffect = Effect.fn("bucket.createWriteUrl")((key: string) =>
-  observeBucket(
-    "createWriteUrl",
-    Effect.flatMap(validateKeyEffect(key), () =>
-      runBucketOperation<string>({
-        operation: "createWriteUrl",
-        input: { key },
-        capability: "signedWriteUrl",
-        work: (provider, context) =>
-          required(provider.createWriteUrl, "createWriteUrl")(key, context),
-        validate: (value) => validateUrlEffect(value, "createWriteUrl"),
+export const createBucketWriteUrlEffect = Effect.fn("bucket.createWriteUrl")(
+  (key: string, options?: BucketWriteUrlOptions) =>
+    observeBucket(
+      "createWriteUrl",
+      Effect.gen(function* () {
+        yield* validateKeyEffect(key);
+        const declared = yield* writeUrlOptionsEffect(options);
+        return yield* runBucketOperation<string>({
+          operation: "createWriteUrl",
+          input: options === undefined ? { key } : { key, options: declared },
+          capability: "signedWriteUrl",
+          work: (provider, context) =>
+            options === undefined
+              ? required(provider.createWriteUrl, "createWriteUrl")(key, context)
+              : required(provider.createWriteUrl, "createWriteUrl")(key, context, declared),
+          validate: (value) => validateUrlEffect(value, "createWriteUrl"),
+        });
       }),
     ),
-  ),
 );

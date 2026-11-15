@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { WaterfallEvent, WaterfallSpan } from "./observability-trace-model";
+import { waterfall, type WaterfallEvent, type WaterfallSpan } from "./observability-trace-model";
+import { uniqueSpanCount } from "./trace-lifecycle";
 import {
   barGeometry,
   lifecyclePhases,
@@ -128,7 +129,7 @@ describe("trace view", () => {
   });
 
   test("a handler recorded as a sibling of the transport span still joins the lifecycle", () => {
-    const sibling = { ...handler, parentId: undefined };
+    const { parentId: _parent, ...sibling } = handler;
     expect(lifecyclePhases([route, sibling]).map((phase) => phase.label)).toContain(
       "orders.create",
     );
@@ -159,5 +160,32 @@ describe("trace view", () => {
     expect(rulerTicks(2.4)).toEqual([0, 1, 2]);
     expect(rulerTicks(0)).toEqual([0]);
     expect(shortEventName("http.request.received")).toBe("request received");
+  });
+});
+
+describe("span count", () => {
+  test("counts each span once, however many records it has", () => {
+    // One span reported three times (started, updated, completed) is one span.
+    const records = [
+      { signal: "span", spanId: "a", revision: 0, status: "started" },
+      { signal: "span", spanId: "a", revision: 1, status: "updated" },
+      { signal: "span", spanId: "a", revision: 2, status: "completed" },
+      { signal: "span", spanId: "b", parentSpanId: "a", revision: 1, status: "completed" },
+    ];
+    expect(records).toHaveLength(4);
+    expect(uniqueSpanCount(records)).toBe(2);
+    expect(traceSummary(waterfall(records)).spans).toBe(uniqueSpanCount(records));
+  });
+
+  test("ignores records that are not spans and records without a span id", () => {
+    expect(
+      uniqueSpanCount([
+        { signal: "request", requestId: "r" },
+        { signal: "log", message: "x" },
+        { signal: "span" },
+        { signal: "span", spanId: "a" },
+      ]),
+    ).toBe(1);
+    expect(uniqueSpanCount([])).toBe(0);
   });
 });

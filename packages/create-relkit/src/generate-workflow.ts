@@ -48,11 +48,17 @@ export const generateEffect = Effect.fn("ProjectGeneration.execute")(
         }
         context.onProgress?.(`Creating a new RelKit app in ${validated.destination}.`);
         const owned = yield* acquireGenerationStage(validated.destination, context);
-        yield* materializeGenerationStage(owned.stage, options, context);
+        const notice = yield* materializeGenerationStage(owned.stage, options, context);
         const gitInitialized = yield* installGenerationStage(owned.stage, options, context);
         yield* verifyGenerationStage(owned.stage, options, context);
         yield* publishGenerationStage(owned, validated.destination, context);
-        return yield* generationResult(options, validated.destination, gitInitialized, context);
+        return yield* generationResult(
+          options,
+          validated.destination,
+          gitInitialized,
+          context,
+          notice,
+        );
       }),
     ),
   (effect) => observeExecution("generator", "generation.execute", effect),

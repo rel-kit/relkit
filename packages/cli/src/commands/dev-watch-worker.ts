@@ -23,7 +23,8 @@ const consumeWatchBatch = Effect.fn("Dev.consumeWatchBatch")(function* (
   const state = owner.state,
     first = yield* Queue.take(state.events);
   yield* Effect.sleep(75);
-  const batch = yield* Queue.takeBetween(state.events, 0, 256);
+  // `Queue.takeBetween` with a minimum of zero returns nothing, so the quiet window drains the queue.
+  const batch = yield* Queue.clear(state.events);
   if (Ref.getUnsafe(state.nativeFailures).length) return;
   const files = Object.freeze([...new Set([...first, ...batch.flat()])].sort().slice(-256));
   while (yield* cliTry("dev.watch.scaffold", () => activeScaffoldWatchFence(session.projectRoot))) {
@@ -31,9 +32,12 @@ const consumeWatchBatch = Effect.fn("Dev.consumeWatchBatch")(function* (
     yield* Effect.sleep(75);
   }
   if (!Ref.getUnsafe(state.open)) return;
+  // The system reports reads and copies too; only files whose content differs rebuild.
+  const changed = yield* cliTry("dev.watch.content", () => state.content.changed(files));
+  if (changed.length === 0) return;
   yield* syncWatchConfigurations(session.projectRoot, native, owner);
-  if (session.options.sourceChangedEffect) yield* session.options.sourceChangedEffect(files);
-  yield* session.nativeEngine.activate(undefined, files);
+  if (session.options.sourceChangedEffect) yield* session.options.sourceChangedEffect(changed);
+  yield* session.nativeEngine.activate(undefined, changed);
 });
 
 /**

@@ -17,6 +17,8 @@ it.effect(
       let initialized = false;
       const descriptor = defineBetterAuthService({
         baseURL: "http://localhost",
+        // The fake Drizzle schema declares no Better Auth tables; these tests exercise acquisition only.
+        advanced: { database: { validateSchema: false } },
         plugins: [
           {
             id: "portable-hook",
@@ -99,6 +101,8 @@ it.effect(
       yield* Deferred.await(entered);
       const descriptor = defineBetterAuthService({
         baseURL: "http://localhost",
+        // The fake Drizzle schema declares no Better Auth tables; these tests exercise acquisition only.
+        advanced: { database: { validateSchema: false } },
         plugins: [
           {
             id: "native-query",
@@ -131,6 +135,8 @@ it.effect(
       const failure = new Error("eager initialization failed");
       const descriptor = defineBetterAuthService({
         baseURL: "http://localhost",
+        // The fake Drizzle schema declares no Better Auth tables; these tests exercise acquisition only.
+        advanced: { database: { validateSchema: false } },
         plugins: [
           {
             id: "failing-hook",

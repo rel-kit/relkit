@@ -1,4 +1,4 @@
-import { abortable } from "./native/iterate.js";
+import { abortable, abortableIterator } from "./native/iterate.js";
 import { createWorkOwner } from "./native/owner.js";
 import type {
   ClientTransportService,
@@ -35,7 +35,9 @@ export function createClientTransport(select: TransportSelection): ClientTranspo
       owner.run(async (signal) => {
         const link = await abortable(selected(), signal);
         signal.throwIfAborted();
-        return link.call(path, input, { ...options, signal });
+        const output = await link.call(path, input, { ...options, signal });
+        // A channel stream outlives this call; its reads must still end when the call aborts.
+        return isAsyncIterator(output) ? abortableIterator(output, signal) : output;
       }, options.signal),
     close: () => owner.close(),
   };
@@ -78,4 +80,18 @@ export function selectAutoTransport(options: CreateAutoClientOptions): Transport
       return Promise.resolve(connected);
     });
   };
+}
+
+/**
+ * Recognizes an event iterator returned by a link.
+ * @param value - A link call's output.
+ * @returns Whether the output is an async iterator that can be iterated and returned.
+ */
+function isAsyncIterator(value: unknown): value is AsyncIterableIterator<unknown> {
+  return (
+    value !== null &&
+    typeof value === "object" &&
+    typeof (value as { readonly next?: unknown }).next === "function" &&
+    Symbol.asyncIterator in value
+  );
 }

@@ -54,12 +54,22 @@ bun run relkit env example
 describes one declaration, and `example` renders a safe template. Run `bun run check` after changing the contract
 so generated types and graph metadata stay current.
 
-Generated commands run under Bun, which loads its normal dotenv files for the process.
-For one-shot and production commands, an existing process environment value takes precedence. `.env.example` is an informational
-template; RelKit does not load it as runtime configuration. Keep its placeholder values
-separate from real credentials. Moving services leaves the root dotenv files in place.
+## Know which value wins
 
-During `bun dev`, RelKit reloads active dotenv files for each candidate, including after a
+The two kinds of command read the dotenv files with opposite precedence, on Bun and on Node.js:
+
+| Command                                                        | A value in the process environment and in a dotenv file |
+| -------------------------------------------------------------- | ------------------------------------------------------- |
+| `relkit dev`                                                   | The dotenv file wins over the exported variable         |
+| `relkit db migrate`, `env`, `start`, `jobs`, `local`, `doctor` | The process value wins; the files fill the gaps         |
+
+With `DATABASE_PATH=./a.sqlite` exported in your shell and `DATABASE_PATH=./b.sqlite` in `.env`,
+`relkit dev` serves `./b.sqlite` and `relkit db migrate` migrates `./a.sqlite`. Keep one source for
+a value to avoid migrating a different database than the one you serve. `.env.example` is an
+informational template; RelKit does not load it as runtime configuration. Keep its placeholder
+values separate from real credentials. Moving services leaves the root dotenv files in place.
+
+During `relkit dev`, RelKit reloads active dotenv files for each candidate, including after a
 failed reload. Keys declared in those files are managed by the files: additions and edits
 replace startup values, and deleting a key removes its previous file-managed value. Other
 inherited environment values and explicit RelKit runtime settings remain in effect.
@@ -74,6 +84,24 @@ neither ordinary nor prepared startup requires restarting the CLI after a dotenv
 The CLI's `--environment` selects the command's provider environment. It does not turn a
 custom application field named `RELKIT_ENV` into business configuration. RelKit owns that
 reserved runtime selector; the application contract continues to describe its own values.
+
+## Run a build in production mode
+
+`relkit start` runs the built server in production mode: it sets `RELKIT_ENV=production` unless
+you set `RELKIT_ENV` yourself, so a started build never depends on `NODE_ENV` to hide the
+development-only endpoints. Set `RELKIT_ENV=development` to start a build in development mode. A
+server started directly with `bun` or `node` reads `RELKIT_ENV` first and falls back to production
+only when `NODE_ENV=production`; the container, Vercel and Workers targets already set production.
+
+Production mode turns off:
+
+- the API reference and the OpenAPI document served at `/_relkit/v1/openapi.json`, unless you enable
+  them in production behind authentication;
+- the other `/_relkit/v1/*` endpoints, including the graph probe, unless you enable them with a
+  bearer token. When they are on, `health/live` and `health/ready` answer status and readiness
+  only, without the generation identity;
+- the recorded cause of an internal failure: the log record names only the failure's class. No mode
+  puts the cause in a response; see [HTTP responses](/docs/modules/http/responses#see-what-the-framework-sends-by-itself).
 
 <Callout type="warning" title="Framework-owned variables">
   `PORT` and `RELKIT_ENV` are reserved. Configure the listener through `server.port` and select a

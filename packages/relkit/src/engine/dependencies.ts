@@ -30,6 +30,7 @@ export type {
 } from "./dependencies.types.js";
 
 export { DependencyAccessError, DependencyNotConfiguredError } from "./dependency-clients.js";
+export { bindBucketPolicy, type PolicyBoundBucketSource } from "./bucket-dependency.js";
 
 /** Client families exposed by guarded invocation contexts. */
 export const DEPENDENCY_CATEGORIES = [

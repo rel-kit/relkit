@@ -103,8 +103,8 @@ async function readStream(
         const frame = sseFrame(block);
         if (frame === undefined) continue;
         onFrame(frame);
-        if (frame.event === "relkit-complete") terminal = "complete";
-        if (frame.event === "relkit-error") terminal = "error";
+        if (frame.kind === "sse" && frame.event === "relkit-complete") terminal = "complete";
+        if (frame.kind === "sse" && frame.event === "relkit-error") terminal = "error";
       }
     }
   }

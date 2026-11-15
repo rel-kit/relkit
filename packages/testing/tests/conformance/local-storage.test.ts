@@ -33,9 +33,11 @@ describe("local storage providers", () => {
     const report = await runConformance(
       createBucketsConformanceHarness({
         create: () => createLocalBucketProvider({ root: join(root, "bucket") }),
+        limited: (_prefix, policy) =>
+          createLocalBucketProvider({ root: join(root, "limited-bucket"), ...policy }),
       }),
     );
-    expectOutcomes(report, ["signed-urls", "backend-failure"]);
+    expectOutcomes(report, ["signed-urls", "backend-failure", "signed-upload-limits"]);
   });
 
   test("realtime", async () => {

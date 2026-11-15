@@ -31,6 +31,23 @@ Check for `undefined` before using a file. For text or JSON, decode the returned
 
 With an S3-compatible provider, `await context.buckets.assets.createReadUrl(key)` creates a temporary download URL. `createWriteUrl(key)` creates a temporary upload URL. Local storage does not support these methods.
 
+Pass the file's media type and size when you create an upload URL:
+
+```ts
+const url = await context.buckets.assets.createWriteUrl(key, {
+  contentType: "image/png",
+  contentLength: 48_213,
+});
+```
+
+A type outside the bucket's `allowedContentTypes`, or a size above its `maxObjectBytes`, is refused before a URL is created, with `RELKIT_BUCKET_POLICY_INVALID`, whichever provider backs the bucket; `put` checks the same limits. The URL binds both values: the uploader must send exactly that `Content-Type` and `Content-Length`, and the storage service rejects any other type or length with `403`.
+
+```ts
+await fetch(url, { method: "PUT", headers: { "content-type": "image/png" }, body: png });
+```
+
+`png` must be 48,213 bytes long here; the browser or runtime sets `Content-Length` from the body. Both options are optional. Without them the URL binds neither, so it accepts any type and size and the bucket's limits are not enforced on that upload: declare both whenever the bucket has limits.
+
 Check the current user's permission before issuing either URL. Anyone holding the URL can use it until it expires, so do not log it. Configure expiry through your storage provider, not as an argument to these methods.
 
 ## Delete a file

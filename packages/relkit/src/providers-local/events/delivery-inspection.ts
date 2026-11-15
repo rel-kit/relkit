@@ -1,8 +1,16 @@
+/**
+ * Builds the inspection snapshot of one durable event delivery owner: the journal records of its
+ * deliveries, their ledger and the queue counts. Router inspection and the provider's `query`
+ * call it for every durable trigger. It reads the journal once and the queue twice (entries and
+ * counts) per call, whatever the number of stored deliveries, and records no success log:
+ * inspection is housekeeping, not application work, while failures still log.
+ */
 import { Effect } from "effect";
+import { ExecutionSuccessLogs } from "../../contracts/operation.js";
 import { localOperation, type LocalOperationError } from "../local-effect.js";
 import type { JobStore } from "../jobs/store.js";
 import type { JobQueue } from "../jobs/queue-utils.js";
-import { ledger, records } from "./delivery-utils.js";
+import { ledgerFrom, records } from "./delivery-projection.js";
 import { EVENT_DELIVERY_CAPABILITIES } from "./delivery-types.js";
 
 /**
@@ -22,13 +30,18 @@ export const deliverySnapshot = Effect.fn("EventDelivery.snapshot")(
   ) {
     yield* ensureOpen();
     const current = store.snapshot();
+    // One queue read serves both projections; the ledger used to read the queue per record.
+    const entries = queue.snapshot();
     return Object.freeze({
       cursor: current.checkpoint.sequence,
-      records: Object.freeze(records(current.records, triggerId, queue)),
-      ledger: ledger(store, triggerId, queue),
+      records: Object.freeze(records(current.records, triggerId, entries)),
+      ledger: ledgerFrom(current.records, triggerId, entries),
       counts: queue.counts(),
       capabilities: EVENT_DELIVERY_CAPABILITIES,
     });
   },
-  (effect) => localOperation("EventDelivery.snapshot", effect),
+  (effect) =>
+    localOperation("EventDelivery.snapshot", effect).pipe(
+      Effect.provideService(ExecutionSuccessLogs, false),
+    ),
 );

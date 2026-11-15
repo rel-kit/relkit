@@ -16,10 +16,10 @@ import {
   readPayload,
   shouldRetry,
 } from "./api-request-utils";
-import { assertEnvelope } from "./api-validation";
+import { assertEnvelope, isEnvelope } from "./api-validation";
 import { resolveBackendUrl } from "./backend-url";
 import { invokeInspectorRouteStream } from "./api-methods";
-import { mutationGeneration, observedGeneration } from "./api-generation";
+import { mutationGeneration, observedGeneration, STALE_GENERATION } from "./api-generation";
 import type {
   RouteInvocationInput,
   RouteInvocationResult,
@@ -32,6 +32,50 @@ interface CacheEntry {
   readonly tags: readonly string[];
 }
 
+/**
+ * The error for a non-2xx response; the status is read before the envelope is checked. The
+ * message is the server's own `message` when the envelope carries one (a rejected history query
+ * names the parameter and the accepted values), otherwise the code.
+ */
+function failure(
+  response: Response,
+  payload: unknown,
+  responseProtocols: InspectorRequestOptions["responseProtocols"],
+): InspectorApiError {
+  const envelope = isEnvelope(payload, ["relkit.inspector", ...(responseProtocols ?? [])]);
+  // The tool refuses a mutation for an older generation before it reaches the application, in a
+  // body that is not an envelope; the page needs the code to tell it from any other 409.
+  const code = envelope ? errorCode(payload) : staleCode(payload);
+  const named = code ?? `HTTP_${response.status}`;
+  const message =
+    envelope && typeof payload.message === "string" && payload.message !== ""
+      ? payload.message
+      : named;
+  return new InspectorApiError(
+    message,
+    named,
+    response.status,
+    "http",
+    envelope ? payload : problemDetails(payload),
+  );
+}
+
+function staleCode(payload: unknown): string | undefined {
+  return errorCode(payload) === STALE_GENERATION ? STALE_GENERATION : undefined;
+}
+
+/**
+ * Keeps an application's own Problem Details answer, which is not an Inspector envelope, so a
+ * page can say why the application refused (for example its `origin-denied` code).
+ * @param payload - Parsed response body.
+ * @returns The body when it carries a string `code`; otherwise undefined.
+ */
+function problemDetails(payload: unknown): Record<string, unknown> | undefined {
+  if (typeof payload !== "object" || payload === null || Array.isArray(payload)) return undefined;
+  const body = payload as Record<string, unknown>;
+  return typeof body.code === "string" ? body : undefined;
+}
+
 export class InspectorApiTransport {
   readonly baseUrl: string;
   protected readonly fetcher: InspectorFetch;
@@ -39,6 +83,11 @@ export class InspectorApiTransport {
   private readonly cacheTtlMs: number;
   private readonly signal: AbortSignal | undefined;
   private readonly cache = new Map<string, CacheEntry>();
+  /** GETs under way, so components that ask for the same thing together share one request. */
+  private readonly inflight = new Map<
+    string,
+    { promise: Promise<unknown>; tags: readonly string[] }
+  >();
   private generation: string | undefined;
 
   constructor(options: InspectorFetchOptions = {}) {
@@ -56,43 +105,50 @@ export class InspectorApiTransport {
     path: string,
     options: InspectorRequestOptions = {},
   ): Promise<T> {
+    const { cacheTtlMs, ...sent } = options;
+    const { cacheTags } = sent;
+    const method = sent.method ?? "GET";
+    const url = resolveBackendUrl(this.baseUrl, path);
+    const key = `${method}:${url}`;
+    const ttl = this.cacheTtlMs === 0 ? 0 : Math.max(this.cacheTtlMs, cacheTtlMs ?? 0);
+    if (method !== "GET" || ttl === 0) return this.send<T>(path, sent, ttl);
+    // A read that asks for the current state (the status behind the application banner) is
+    // neither answered from the tab's cache nor joined to a request already under way.
+    if (sent.cache === "no-store") return this.send<T>(path, sent, 0);
+    const cached = this.cache.get(key);
+    if (cached !== undefined && cached.expiresAt > Date.now()) return cached.value as T;
+    this.cache.delete(key);
+    const pending = this.inflight.get(key);
+    if (pending !== undefined) return pending.promise as Promise<T>;
+    const promise = this.send<T>(path, sent, ttl).finally(() => {
+      if (this.inflight.get(key)?.promise === promise) this.inflight.delete(key);
+    });
+    this.inflight.set(key, { promise, tags: cacheTags ?? [] });
+    return promise;
+  }
+
+  private async send<T>(path: string, options: InspectorRequestOptions, ttl: number): Promise<T> {
     const { cacheTags, responseProtocols, ...init } = options;
     const method = init.method ?? "GET";
     const url = resolveBackendUrl(this.baseUrl, path);
     const key = `${method}:${url}`;
-    if (method === "GET" && this.cacheTtlMs > 0) {
-      const cached = this.cache.get(key);
-      if (cached !== undefined && cached.expiresAt > Date.now()) return cached.value as T;
-      this.cache.delete(key);
-    }
     let attempt = 0;
     while (true) {
       try {
         const requestInit = this.prepareRequest(init);
         const response = await this.fetch(url, requestInit);
         const payload = await readPayload(response);
-        assertEnvelope(
-          payload,
-          response.headers,
-          response.ok ? responseProtocols : ["relkit.inspector", ...(responseProtocols ?? [])],
-        );
-        if (!response.ok) {
-          const code = errorCode(payload);
-          throw new InspectorApiError(
-            typeof code === "string" ? code : `HTTP_${response.status}`,
-            typeof code === "string" ? code : `HTTP_${response.status}`,
-            response.status,
-          );
-        }
+        if (!response.ok) throw failure(response, payload, responseProtocols);
+        assertEnvelope(payload, response.headers, responseProtocols);
         if (method === "GET")
           this.generation =
             observedGeneration(payload) ??
             response.headers.get("x-relkit-generation-id") ??
             this.generation;
-        if (method === "GET" && this.cacheTtlMs > 0)
+        if (method === "GET" && ttl > 0)
           this.cache.set(key, {
             value: payload,
-            expiresAt: Date.now() + this.cacheTtlMs,
+            expiresAt: Date.now() + ttl,
             tags: cacheTags ?? [],
           });
         return payload as T;
@@ -106,6 +162,7 @@ export class InspectorApiTransport {
 
   clearCache(): void {
     this.cache.clear();
+    this.inflight.clear();
   }
 
   invalidate(tags: readonly string[] = []): void {
@@ -113,6 +170,9 @@ export class InspectorApiTransport {
     const selected = new Set(tags);
     for (const [key, entry] of this.cache)
       if (entry.tags.some((tag) => selected.has(tag))) this.cache.delete(key);
+    // An answer that was asked for before the invalidation may be older than it.
+    for (const [key, entry] of this.inflight)
+      if (entry.tags.some((tag) => selected.has(tag))) this.inflight.delete(key);
   }
 
   invokeRouteStream(

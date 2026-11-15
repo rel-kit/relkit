@@ -8,7 +8,11 @@ import type { GeneratorDomainError, GeneratorIoError } from "./generator-errors.
 import { runGeneratorPromise } from "./generator-runtime.js";
 import type { CreateOptions } from "./options.js";
 import { customizeDeploymentEffect } from "./generate-deployment.js";
-import { creationPackageManager, packageManagerFromUserAgent } from "./package-manager.js";
+import {
+  creationPackageManager,
+  packageManagerFromUserAgent,
+  withAllowedInstallScript,
+} from "./package-manager.js";
 import {
   compareNames,
   projectId,
@@ -126,7 +130,10 @@ const customizePackageManagerEffect = Effect.fn("ProjectFiles.packageManager")(f
   const agent = packageManagerFromUserAgent();
   const version = agent?.name === manager ? agent.version : undefined;
   const field = version === undefined ? "" : `$1"packageManager": "${manager}@${version}",\n`;
-  yield* fs.write(path, content.replace(/^(\s*)"packageManager": "bun@[^"]*",\n/m, field));
+  const next = content.replace(/^(\s*)"packageManager": "bun@[^"]*",\n/m, field);
+  // Like pnpm's settings above, npm's approval names esbuild only, for any version: `@relkit/cli`
+  // and drizzle-kit depend on different esbuild versions.
+  yield* fs.write(path, manager === "npm" ? withAllowedInstallScript(next, "esbuild") : next);
 });
 
 /**

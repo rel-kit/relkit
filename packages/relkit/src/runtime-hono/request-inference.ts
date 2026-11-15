@@ -4,10 +4,15 @@ import { canCarryStandardSchema } from "../contracts/index.js";
 const schemaCache = new WeakMap<object, JsonSchema | null>();
 const JSON_NUMBER = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
 
+/** Request sources whose values arrive as text and may be decoded to numbers and booleans. */
+const TEXT_SOURCES: readonly string[] = ["path", "path-segments", "query", "header", "cookie"];
+
 /** Decode inferred request strings using the target input's JSON Schema.
  * @param value - Value to validate or project.
  * @param route - Route descriptor controlling request mapping.
  * @param target - Target descriptor or validated request source.
+ * @param mapping - The route's request mapping; when given, only values read from the path,
+ *   query, headers and cookies are decoded, and JSON body values are kept as sent.
  * @returns Converted numbers/booleans, while explicit request mappings remain unchanged.
  * @example
  * import { z } from "relkit/schema";
@@ -15,11 +20,43 @@ const JSON_NUMBER = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?$/;
  * const input = decodeInferredInput({ page: "2", active: "true" }, {}, target);
  * // input is { page: 2, active: true }.
  */
-export function decodeInferredInput(value: unknown, route: unknown, target: unknown): unknown {
+export function decodeInferredInput(
+  value: unknown,
+  route: unknown,
+  target: unknown,
+  mapping?: unknown,
+): unknown {
   if (!isRecord(route) || route.request !== undefined) return value;
   if (!isRecord(target) || !isSchema(target.input)) return value;
   const schema = projectedSchema(target.input);
-  return schema === undefined ? value : decodeValue(value, schema);
+  if (schema === undefined) return value;
+  return mapping === undefined ? decodeValue(value, schema) : decodeMapped(value, schema, mapping);
+}
+
+/** Follows the request mapping and decodes only values its text sources produced.
+ * @param value - Mapped value at this node.
+ * @param schema - JSON Schema of the value at this node.
+ * @param node - Serialized mapping node that produced the value.
+ * @returns The value with text-sourced scalars decoded and body values unchanged.
+ */
+function decodeMapped(value: unknown, schema: unknown, node: unknown): unknown {
+  if (!isRecord(node) || typeof node.kind !== "string") return value;
+  if (TEXT_SOURCES.includes(node.kind)) return decodeValue(value, schema);
+  if (node.kind === "optional" || node.kind === "default" || node.kind === "transform")
+    return decodeMapped(value, schema, node.value);
+  if ((node.kind !== "input" && node.kind !== "nested") || !isRecord(node.fields)) return value;
+  if (!isRecord(value) || !isRecord(schema)) return value;
+  const fields = node.fields;
+  // An optional or nullable object projects as a union; its object variant names the fields.
+  const variants = [schema, ...[schema.anyOf, schema.oneOf].filter(Array.isArray).flat()];
+  const object = variants.find((variant) => isRecord(variant) && isRecord(variant.properties));
+  const properties = isRecord(object) && isRecord(object.properties) ? object.properties : {};
+  return Object.fromEntries(
+    Object.entries(value).map(([key, entry]) => [
+      key,
+      Object.hasOwn(fields, key) ? decodeMapped(entry, properties[key], fields[key]) : entry,
+    ]),
+  );
 }
 
 /** Cache a schema's JSON Schema projection by schema identity.

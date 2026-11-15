@@ -14,7 +14,7 @@ describe("inspector redesign contracts", () => {
     expect(shell).toContain("CommandPalette");
     // Dark-first: rendered dark on the server, a stored "light" preference applied before paint.
     expect(layout).toContain('data-theme="dark"');
-    expect(layout).toContain("INSPECTOR_THEME_KEY");
+    expect(layout).toContain("THEME_BOOT_SCRIPT");
     expect(layout).toContain("suppressHydrationWarning");
     expect(shell).toContain("applyInspectorTheme");
     expect(shell).toContain("SidebarProvider");
@@ -23,7 +23,7 @@ describe("inspector redesign contracts", () => {
     expect(table).toContain("Pagination");
     expect(table).toContain("OverlayDialog");
     expect(table).toContain("PageHeader");
-    expect(filters).toContain("Filters are applied by the versioned backend");
+    expect(filters).toContain("Filters run on every retained request");
     expect(packageJson).toContain('"react-aria-components"');
     expect(packageJson).toContain('"tailwindcss"');
   });
@@ -107,7 +107,8 @@ describe("inspector redesign contracts", () => {
     expect(provider).not.toContain("node.configuration");
     expect(runtime).toContain("APPLICATION EXPORT STATUS");
     expect(runtime).toContain("LiveHistoryStatus");
-    expect(runtime).toContain("Accepted by app capture");
+    // Counter labels live in lib/overview-export.ts, shown only with an exporter (IN-18).
+    expect(runtime).toContain("exportCounters(value)");
     expect(runtime).toContain("External exporters");
     expect(cohort).toContain('role="alert"');
     expect(signals).toContain("Capture and history are bounded");

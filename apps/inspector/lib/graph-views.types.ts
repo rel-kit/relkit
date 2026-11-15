@@ -14,6 +14,8 @@ export interface ViewNode {
   readonly subtitle?: string;
   readonly badges?: readonly string[];
   readonly counts?: readonly { readonly label: string; readonly value: number }[];
+  /** Resources a domain card stands for, such as "bucket photos", named for its tooltip. */
+  readonly resources?: readonly string[];
   readonly node?: GraphNode;
   /** Compound parent (view node id) for ELK hierarchical layout. */
   readonly parentId?: string;

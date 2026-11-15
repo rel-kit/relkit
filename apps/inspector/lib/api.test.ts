@@ -5,7 +5,7 @@ import {
   InspectorApiError,
   createInspectorApiClient,
 } from "./api";
-import { jobsNotMounted } from "./api-request-utils";
+import { jobsNotMounted, NO_JOBS_HINT, NO_JOBS_MESSAGE } from "./api-request-utils";
 
 const envelope = (value: Record<string, unknown>, status = 200) =>
   new Response(
@@ -51,6 +51,29 @@ describe("inspector API client", () => {
     expect(requests).toHaveLength(2);
   });
 
+  test("a read that asks for the current state is never answered from the cache", async () => {
+    let state = "connected";
+    let requests = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 10_000,
+      fetch: async () => {
+        requests += 1;
+        return envelope({ application: { state } });
+      },
+    });
+    const read = (cache?: RequestCache) =>
+      client.request<{ application: { state: string } }>("/_relkit/v1/storage", {
+        ...(cache === undefined ? {} : { cache }),
+      });
+
+    expect((await read()).application.state).toBe("connected");
+    state = "disconnected";
+    // The tab's cache still holds the first answer for an ordinary read.
+    expect((await read()).application.state).toBe("connected");
+    expect((await read("no-store")).application.state).toBe("disconnected");
+    expect(requests).toBe(2);
+  });
+
   test("retries transient GET failures during backend startup", async () => {
     let attempts = 0;
     const client = createInspectorApiClient({
@@ -87,6 +110,109 @@ describe("inspector API client", () => {
     expect(
       jobsNotMounted(new InspectorApiError("x", "RELKIT_INSPECTOR_JOBS_UNAVAILABLE", 503)),
     ).toBe(false);
+  });
+
+  test("reads the status before the envelope: a Problem Details 404 is HTTP_404", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return new Response(
+          JSON.stringify({ type: "about:blank", title: "Not Found", status: 404 }),
+          { status: 404, headers: { "content-type": "application/problem+json" } },
+        );
+      },
+    });
+
+    const error = await client.jobDefinitions().catch((cause: unknown) => cause);
+    expect(error).toMatchObject({ code: "HTTP_404", status: 404, kind: "http" });
+    expect(jobsNotMounted(error)).toBe(true);
+    expect(attempts).toBe(1);
+  });
+
+  test("a 5xx without an envelope keeps its status and is retried", async () => {
+    let attempts = 0;
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => {
+        attempts += 1;
+        return attempts === 1
+          ? new Response(JSON.stringify({ message: "bad gateway" }), {
+              status: 502,
+              headers: { "content-type": "application/json" },
+            })
+          : envelope({ items: [] });
+      },
+    });
+    await expect(client.list("routes")).resolves.toMatchObject({ items: [] });
+    expect(attempts).toBe(2);
+  });
+
+  test("a rejected action keeps its body so the page can read the application's answer", async () => {
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () =>
+        envelope(
+          {
+            error: "RELKIT_INSPECTOR_ACTION_FAILED",
+            cause: { status: 401, code: "unauthenticated" },
+          },
+          409,
+        ),
+    });
+    const error = await client
+      .request("/_relkit/v1/actions/functions/a/invoke", { method: "POST", body: "{}" })
+      .catch((cause: unknown) => cause);
+    expect(error).toMatchObject({
+      code: "RELKIT_INSPECTOR_ACTION_FAILED",
+      status: 409,
+      body: { cause: { status: 401, code: "unauthenticated" } },
+    });
+  });
+
+  test("a rejected history query carries the server's message and the parameter it names", async () => {
+    const message =
+      "Observability query status is invalid: expected an HTTP status from 100 to 599 or a class from 1xx to 5xx";
+    const client = createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () =>
+        envelope(
+          { error: "RELKIT_OBSERVABILITY_QUERY_INVALID", message, parameter: "status" },
+          400,
+        ),
+    });
+    const error = await client
+      .request("/_relkit/v1/requests?status=999")
+      .catch((cause: unknown) => cause);
+    expect(error).toBeInstanceOf(InspectorApiError);
+    expect(error).toMatchObject({
+      code: "RELKIT_OBSERVABILITY_QUERY_INVALID",
+      status: 400,
+      message,
+      parameter: "status",
+    });
+    const coded = await createInspectorApiClient({
+      cacheTtlMs: 0,
+      fetch: async () => envelope({ error: "RELKIT_OBSERVABILITY_QUERY_INVALID" }, 400),
+    })
+      .request("/_relkit/v1/requests")
+      .catch((cause: unknown) => cause);
+    expect(coded).toMatchObject({ message: "RELKIT_OBSERVABILITY_QUERY_INVALID" });
+    expect((coded as InspectorApiError).parameter).toBeUndefined();
+  });
+
+  test("an application without jobs is told apart from a failing jobs service", async () => {
+    expect(NO_JOBS_MESSAGE).toBe("This application declares no jobs.");
+    expect(NO_JOBS_HINT).toContain("defineJob");
+    // A 5xx or a network failure is an outage, never "none declared".
+    expect(jobsNotMounted(new InspectorApiError("x", "HTTP_500", 500))).toBe(false);
+    expect(
+      jobsNotMounted(
+        new InspectorApiError("x", "RELKIT_INSPECTOR_DISCONNECTED", undefined, "network"),
+      ),
+    ).toBe(false);
+    expect(jobsNotMounted(new InspectorApiError("x", "HTTP_404", 404))).toBe(true);
   });
 
   test("falls back immediately when task-first job APIs are unavailable", async () => {
@@ -150,7 +276,7 @@ describe("inspector API client", () => {
     const second = await client.query("logs", {
       functionId: "sum",
       limit: 1,
-      cursor: first.nextCursor,
+      ...(first.nextCursor === undefined ? {} : { cursor: first.nextCursor }),
     });
 
     expect(first.items).toEqual([{ functionId: "sum", signal: "log", id: "first" }]);

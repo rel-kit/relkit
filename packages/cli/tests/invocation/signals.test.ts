@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { installInvocationSignals } from "../../src/invocation-signals.js";
 import { failSignal, installSignals, toFailure } from "../../src/main-support.js";
+import { runCli } from "../../src/main.js";
 
 for (const [signal, exitCode] of [
   ["SIGINT", 130],
@@ -104,4 +105,72 @@ test("unsupported signal metadata does not acquire a trusted failure contract", 
     message: "Operation interrupted.",
     exitCode: 130,
   });
+});
+
+/** Runs `relkit create` and stops it with the given failure, as the signal handlers do. */
+async function stopped(
+  reason: ReturnType<typeof failSignal>,
+  argv: readonly string[] = ["create", "demo"],
+  closingLine?: string,
+) {
+  const stdout: string[] = [];
+  const stderr: string[] = [];
+  const controller = new AbortController();
+  const exitCode = await runCli(argv, {
+    io: { stdout: (line) => stdout.push(line), stderr: (line) => stderr.push(line) },
+    signal: controller.signal,
+    installSignalHandlers: false,
+    loadCreateRelkit: async () => ({
+      normalizeCreateOptions: () => ({ name: "demo" }),
+      generateProject: async (_options, context) => {
+        if (closingLine !== undefined) context.io?.stderr(closingLine);
+        controller.abort(reason);
+        throw context.signal.reason;
+      },
+    }),
+  });
+  return { exitCode, stdout, stderr };
+}
+
+for (const [signal, exitCode] of [
+  ["SIGINT", 130],
+  ["SIGTERM", 143],
+] as const) {
+  test(`${signal} prints one neutral line and no error block in human output`, async () => {
+    expect(await stopped(failSignal(signal))).toEqual({
+      exitCode,
+      stdout: [],
+      stderr: ["Stopped."],
+    });
+  });
+
+  test(`${signal} keeps the structured failure in JSON output`, async () => {
+    const result = await stopped(failSignal(signal), ["--json", "create", "demo"]);
+    expect(result.exitCode).toBe(exitCode);
+    expect(result.stderr).toEqual([]);
+    expect(JSON.parse(result.stdout[0]!)).toEqual({
+      ok: false,
+      error: { code: "RELKIT_INTERRUPTED", message: `Received ${signal}.` },
+    });
+  });
+}
+
+test("a command that printed its own closing line gets no second line", async () => {
+  const closing = "12:00:00.000 INFO  relkit            Development server stopped";
+  const result = await stopped(failSignal("SIGINT"), ["create", "demo"], closing);
+  expect(result).toEqual({ exitCode: 130, stdout: [], stderr: [closing] });
+});
+
+test("SIGHUP keeps the interruption message", async () => {
+  const result = await stopped(failSignal("SIGHUP"));
+  expect(result.exitCode).toBe(129);
+  expect(result.stderr[0]).toBe("RELKIT_INTERRUPTED: Received SIGHUP.");
+  expect(result.stderr).toHaveLength(3);
+});
+
+test("an interruption that carries no signal keeps the interruption message", async () => {
+  const result = await stopped(
+    Object.assign(failSignal("SIGINT"), { signal: undefined }) as ReturnType<typeof failSignal>,
+  );
+  expect(result.stderr[0]).toStartWith("RELKIT_INTERRUPTED:");
 });

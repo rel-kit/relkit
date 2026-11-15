@@ -946,6 +946,139 @@ declare const update: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mutations.ts#L44)
 
+## `index.ts`
+
+MySQL on Bun: Bun's built-in SQL client through Drizzle's `bun-sql` driver.
+
+### openBunMysql
+
+Connects to a MySQL URL with Bun's SQL client; it connects on the first query.
+
+**Signature**
+
+```ts
+declare const openBunMysql: OpenMysql;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/bun/index.ts#L6)
+
+## `index.ts`
+
+Connects to MySQL with the driver of the runtime the application runs on.
+
+### openMysqlDatabase
+
+Connects to a MySQL database with Bun's built-in SQL client on Bun and `mysql2` on Node, so
+one Drizzle service runs on both. Only the current runtime's driver is loaded: a Node
+application needs `mysql2` installed, a Bun application needs nothing more.
+
+**Example**
+
+```ts
+import { openMysqlDatabase } from "@relkit/drizzle/mysql";
+
+// Nothing connects until the first query runs, such as `database.execute(sql\`select 1\`)`.
+const database = await openMysqlDatabase("mysql://app@localhost:3306/app");
+console.assert(typeof database.execute === "function");
+await database.$client.end();
+```
+
+**Signature**
+
+```ts
+declare const openMysqlDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  url: string,
+  config?: MysqlDatabaseConfig<Relations>,
+) => Promise<MysqlDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/index.ts#L25)
+
+Since v0.9.1
+
+### MysqlDatabase
+
+**Signature**
+
+```ts
+declare const MysqlDatabase: MysqlDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/index.ts#L4)
+
+### MysqlDatabaseConfig
+
+**Signature**
+
+```ts
+declare const MysqlDatabaseConfig: MysqlDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/index.ts#L4)
+
+## `mysql-client.types.ts`
+
+The Drizzle MySQL database `openMysqlDatabase` returns on either runtime.
+
+### MysqlDatabase (type alias)
+
+An asynchronous Drizzle MySQL database whose connection pool can be ended.
+
+**Signature**
+
+```ts
+type MysqlDatabase<Relations extends AnyRelations = EmptyRelations> = MySqlAsyncDatabase<
+  MySqlQueryResultHKT,
+  Relations
+> & { readonly $client: { end(): Promise<void> } };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/mysql-client.types.ts#L8)
+
+### MysqlDatabaseConfig (type alias)
+
+Drizzle settings passed through to the runtime's driver.
+
+**Signature**
+
+```ts
+type MysqlDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzleMySqlConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/mysql-client.types.ts#L14)
+
+### OpenMysql (type alias)
+
+Connects to one MySQL URL with a runtime's driver.
+
+**Signature**
+
+```ts
+type OpenMysql = <Relations extends AnyRelations = EmptyRelations>(
+  url: string,
+  config?: MysqlDatabaseConfig<Relations>,
+) => MysqlDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/mysql-client.types.ts#L18)
+
+## `index.ts`
+
+MySQL on Node: a `mysql2` connection pool through Drizzle's `mysql2` driver.
+
+### openNodeMysql
+
+Connects to a MySQL URL with a `mysql2` pool; it connects on the first query.
+
+**Signature**
+
+```ts
+declare const openNodeMysql: OpenMysql;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/node/index.ts#L6)
+
 ## `mysql.ts`
 
 mysql native model typing; imports only this selected dialect's upstream declarations.
@@ -972,7 +1105,27 @@ Native database injected into model extensions for the selected dialect.
 type DialectDatabase = Omit<MySqlAsyncDatabase<any, any>, "query">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L10)
+
+### MysqlDatabase
+
+**Signature**
+
+```ts
+declare const MysqlDatabase: MysqlDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L7)
+
+### MysqlDatabaseConfig
+
+**Signature**
+
+```ts
+declare const MysqlDatabaseConfig: MysqlDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L7)
 
 ### defineModel
 
@@ -984,7 +1137,20 @@ Declares lazy native extensions with this dialect's real transaction client type
 declare const defineModel: DefineModel<DialectDatabase>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L13)
+
+### openMysqlDatabase
+
+**Signature**
+
+```ts
+declare const openMysqlDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  url: string,
+  config?: MysqlDatabaseConfig<Relations>,
+) => Promise<MysqlDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L6)
 
 ## `native-leases.ts`
 
@@ -1769,6 +1935,139 @@ export interface OwnerBinding {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/owner.types.ts#L43)
 
+## `index.ts`
+
+PostgreSQL on Bun: Bun's built-in SQL client through Drizzle's `bun-sql` driver.
+
+### openBunPostgres
+
+Connects to a PostgreSQL URL with Bun's SQL client; it connects on the first query.
+
+**Signature**
+
+```ts
+declare const openBunPostgres: OpenPostgres;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/bun/index.ts#L6)
+
+## `index.ts`
+
+Connects to PostgreSQL with the driver of the runtime the application runs on.
+
+### openPostgresDatabase
+
+Connects to a PostgreSQL database with Bun's built-in SQL client on Bun and `pg` on Node, so
+one Drizzle service runs on both. Only the current runtime's driver is loaded: a Node
+application needs `pg` installed, a Bun application needs nothing more.
+
+**Example**
+
+```ts
+import { openPostgresDatabase } from "@relkit/drizzle/pg";
+
+// Nothing connects until the first query runs, such as `database.execute(sql\`select 1\`)`.
+const database = await openPostgresDatabase("postgres://app@localhost:5432/app");
+console.assert(typeof database.execute === "function");
+await database.$client.end();
+```
+
+**Signature**
+
+```ts
+declare const openPostgresDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  url: string,
+  config?: PostgresDatabaseConfig<Relations>,
+) => Promise<PostgresDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/index.ts#L25)
+
+Since v0.9.1
+
+### PostgresDatabase
+
+**Signature**
+
+```ts
+declare const PostgresDatabase: PostgresDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/index.ts#L4)
+
+### PostgresDatabaseConfig
+
+**Signature**
+
+```ts
+declare const PostgresDatabaseConfig: PostgresDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/index.ts#L4)
+
+## `index.ts`
+
+PostgreSQL on Node: a `pg` connection pool through Drizzle's `node-postgres` driver.
+
+### openNodePostgres
+
+Connects to a PostgreSQL URL with a `pg` pool; it connects on the first query.
+
+**Signature**
+
+```ts
+declare const openNodePostgres: OpenPostgres;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/node/index.ts#L6)
+
+## `pg-client.types.ts`
+
+The Drizzle PostgreSQL database `openPostgresDatabase` returns on either runtime.
+
+### OpenPostgres (type alias)
+
+Connects to one PostgreSQL URL with a runtime's driver.
+
+**Signature**
+
+```ts
+type OpenPostgres = <Relations extends AnyRelations = EmptyRelations>(
+  url: string,
+  config?: PostgresDatabaseConfig<Relations>,
+) => PostgresDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/pg-client.types.ts#L18)
+
+### PostgresDatabase (type alias)
+
+An asynchronous Drizzle PostgreSQL database whose connection pool can be ended.
+
+**Signature**
+
+```ts
+type PostgresDatabase<Relations extends AnyRelations = EmptyRelations> = PgAsyncDatabase<
+  PgQueryResultHKT,
+  Relations
+> & { readonly $client: { end(): Promise<void> } };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/pg-client.types.ts#L8)
+
+### PostgresDatabaseConfig (type alias)
+
+Drizzle settings passed through to the runtime's driver.
+
+**Signature**
+
+```ts
+type PostgresDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzlePgConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/pg-client.types.ts#L14)
+
 ## `pg.ts`
 
 pg native model typing; imports only this selected dialect's upstream declarations.
@@ -1795,7 +2094,27 @@ Native database injected into model extensions for the selected dialect.
 type DialectDatabase = Omit<PgAsyncDatabase<any, any>, "query">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L10)
+
+### PostgresDatabase
+
+**Signature**
+
+```ts
+declare const PostgresDatabase: PostgresDatabase<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L7)
+
+### PostgresDatabaseConfig
+
+**Signature**
+
+```ts
+declare const PostgresDatabaseConfig: PostgresDatabaseConfig<Relations>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L7)
 
 ### defineModel
 
@@ -1807,7 +2126,20 @@ Declares lazy native extensions with this dialect's real transaction client type
 declare const defineModel: DefineModel<DialectDatabase>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L13)
+
+### openPostgresDatabase
+
+**Signature**
+
+```ts
+declare const openPostgresDatabase: <Relations extends AnyRelations = EmptyRelations>(
+  url: string,
+  config?: PostgresDatabaseConfig<Relations>,
+) => Promise<PostgresDatabase<Relations>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L6)
 
 ## `queries.ts`
 

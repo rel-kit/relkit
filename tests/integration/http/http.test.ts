@@ -348,11 +348,6 @@ describe("HTTP integration", () => {
       { headers: { "content-type": "text/plain" }, body: "{}" },
       "content-type",
     ],
-    [
-      "body too large",
-      { headers: { "content-type": "application/json" }, body: "12345" },
-      "body-too-large",
-    ],
   ] as const) {
     test(`rejects ${name} before engine invocation`, async () => {
       const harness = createHarness({
@@ -380,6 +375,35 @@ describe("HTTP integration", () => {
       }
     });
   }
+
+  test("rejects a body over the request mapping limit with 413 before engine invocation", async () => {
+    const harness = createHarness({
+      plan: planFor([
+        route("payload", {
+          method: "POST",
+          path: "/payload",
+          request: { kind: "input", fields: { body: { kind: "whole-body" } } },
+          responses: [validation()],
+        }),
+      ]),
+      requestMapping: { maxBodyBytes: 3 },
+      handlers: { payload: () => ({ ok: true }) },
+    });
+    try {
+      const response = await harness.client.post("/payload", {
+        headers: { "content-type": "application/json" },
+        body: "12345",
+      });
+      expect(response.status).toBe(413);
+      expect(await response.json()).toMatchObject({
+        code: "payload-too-large",
+        detail: "The request body exceeds the 3-byte limit.",
+      });
+      expect(harness.calls).toHaveLength(0);
+    } finally {
+      await harness.close();
+    }
+  });
 
   test("rejects target schema failures before the handler runs", async () => {
     let handlerCalled = false;

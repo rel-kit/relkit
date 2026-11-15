@@ -13,13 +13,73 @@ For configuration and examples, read [inspector](/docs/modules/operations/inspec
 
 <include>/_snippets/generated/exports/inspector.mdx</include>
 
+## `application-identity.ts`
+
+Path of the application's client identity document; `CLIENT_IDENTITY_PATH` of
+`relkit/runtime-hono`, repeated here so the tool does not load the HTTP runtime.
+
+### ApplicationIdentityJar (interface)
+
+The tool's cookies for the applications it calls.
+
+**Signature**
+
+```ts
+export interface ApplicationIdentityJar {
+  /**
+   * @param projectId - Project of the application called.
+   * @returns The `Cookie` header for a call to it, or undefined when the jar holds none.
+   */
+  readonly cookie: (projectId: string) => string | undefined;
+  /**
+   * Keeps the cookies an identity response set: a new value replaces the old one, and an
+   * expired cookie (`Max-Age=0` or a past `Expires`) is removed.
+   * @param projectId - Project of the application that answered.
+   * @param setCookies - The response's `Set-Cookie` values.
+   */
+  readonly keep: (projectId: string, setCookies: readonly string[]) => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/application-identity.ts#L28)
+
+### CLIENT_IDENTITY_PATH
+
+Path of the application's client identity document; `CLIENT_IDENTITY_PATH` of
+`relkit/runtime-hono`, repeated here so the tool does not load the HTTP runtime.
+
+**Signature**
+
+```ts
+declare const CLIENT_IDENTITY_PATH: "/_relkit/v1/client/identity";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/application-identity.ts#L18)
+
+### makeApplicationIdentityJar
+
+Creates an empty jar for one tool process.
+
+**Signature**
+
+```ts
+declare const makeApplicationIdentityJar: () => ApplicationIdentityJar;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/application-identity.ts#L47)
+
 ## `backend-forward.ts`
 
 Live operations are forwarded once; bridge rejections retain their HTTP status in the UI protocol.
 
 ### forwardBackend
 
-Preserves native cookies, authorization, operation IDs and streaming bodies.
+Sends an accepted page request to the application as the Inspector's own call, authenticated
+by the session's bridge token. Inspection actions (`/_relkit/v1/...`) and route requests from
+the composer are both sent without the browser's `Origin`, `Referer`, `Sec-Fetch-*` and
+cookies, so they run without a user session; `Authorization` a developer typed, operation IDs
+and streaming bodies are kept. With a jar, the call carries the tool's own anonymous identity
+cookies, and the cookies the identity endpoint sets go to the jar instead of the browser.
 
 **Signature**
 
@@ -29,10 +89,11 @@ declare const forwardBackend: (
   connection: InspectionConnectionFile,
   request: Request,
   target?: string | undefined,
+  jar?: ApplicationIdentityJar | undefined,
 ) => Effect.Effect<Response, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L17)
 
 ## `backend-history.ts`
 
@@ -45,10 +106,14 @@ Credential-free failures retain the UI's established error protocol.
 **Signature**
 
 ```ts
-declare const backendError: (error: string, status: number) => Response;
+declare const backendError: (
+  error: string,
+  status: number,
+  detail?: { readonly message?: string; readonly parameter?: string },
+) => Response;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L78)
 
 ### historyResponse
 
@@ -64,11 +129,43 @@ declare const historyResponse: (
 ) => Effect.Effect<Response, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L15)
 
 ## `bin.ts`
 
 Native standalone entry; signals interrupt and join the tool's complete resource Scope.
+
+## `browser-boundary.ts`
+
+The Inspector is the boundary between a browser and the application's inspection bridge: it
+refuses a change a page of another site asked for, and forwards what it accepts as its own
+call, without the browser's provenance or the developer's application cookies.
+
+### crossSiteRefusal
+
+Refuses a state-changing request that a browser marked as sent from another origin. The
+Inspector's UI server has already required the page's `Origin` (or `Referer`) to be its own;
+this check holds even where an `Origin` is absent or was rewritten on the way.
+
+**Signature**
+
+```ts
+declare const crossSiteRefusal: (request: Request) => Response | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/browser-boundary.ts#L21)
+
+### inspectorCallHeaders
+
+Copies a browser request's headers for the Inspector's own call to the application.
+
+**Signature**
+
+```ts
+declare const inspectorCallHeaders: (incoming: Headers) => Headers;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/browser-boundary.ts#L51)
 
 ## `collection.schemas.ts`
 
@@ -101,6 +198,7 @@ declare const InspectionCollectionBatch: Schema.fromJsonString<
     readonly droppedBytes: Schema.optionalKey<Schema.Number>;
     readonly producerFailed: Schema.optionalKey<Schema.Number>;
     readonly producerDropped: Schema.optionalKey<Schema.Number>;
+    readonly droppedByKind: Schema.optionalKey<Schema.$Record<Schema.String, Schema.Number>>;
   }>
 >;
 ```
@@ -127,6 +225,18 @@ declare const collectionChange: (record: ObservabilityRecord) => ObservabilitySt
 
 Cumulative loss has an independent durable identity, outside the saturated application's buffer.
 
+### lostKinds
+
+Says what the lost records were.
+
+**Signature**
+
+```ts
+declare const lostKinds: (kinds: Readonly<Record<string, number>> | undefined) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L58)
+
 ### persistCollectionGap
 
 Records skipped sequences, such as records retired before this Inspector read them, as loss.
@@ -143,7 +253,7 @@ declare const persistCollectionGap: (
 ) => Effect.Effect<void, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L74)
 
 ### persistCollectionLoss
 
@@ -169,6 +279,7 @@ declare const persistCollectionLoss: (
     readonly droppedBytes?: number;
     readonly producerFailed?: number;
     readonly producerDropped?: number;
+    readonly droppedByKind?: { readonly [x: string]: number };
   },
   sessionId: string,
   previous?: string | undefined,
@@ -176,6 +287,41 @@ declare const persistCollectionLoss: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L8)
+
+## `collector-refusal.ts`
+
+Keeps one record the history store refuses from stopping collection. The store refuses a batch
+as a whole, so a batch it refuses is stored again one record at a time; only the records it
+still refuses are given up, and only after the store has proved that it stores by keeping a
+diagnostic that names them. A failure of the store itself gives up nothing.
+
+### appendCollected
+
+Appends a batch; when the store refuses it, appends its records one by one.
+
+**Signature**
+
+```ts
+declare const appendCollected: (
+  history: InspectorHistoryOperations,
+  records: ReadonlyArray<LocalRecord>,
+  sessionId: string,
+) => Effect.Effect<number, InspectionConnectionError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-refusal.ts#L34)
+
+### refusedByStore
+
+Whether the worker answered that it refused the records, as opposed to failing itself.
+
+**Signature**
+
+```ts
+declare const refusedByStore: (error: InspectionConnectionError) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-refusal.ts#L18)
 
 ## `collector.ts`
 
@@ -196,6 +342,7 @@ declare const collectInspectionBatch: (
   target?: string | undefined,
   previousLossKey?: string | undefined,
   previousDropped?: number | undefined,
+  pulled?: ((records: number, through: number) => Effect.Effect<void>) | undefined,
 ) => Effect.Effect<
   {
     through: number;
@@ -203,6 +350,8 @@ declare const collectInspectionBatch: (
     droppedRecords: number;
     incomplete: boolean;
     records: number;
+    refused: number;
+    backlog: boolean;
     lossKey: string | undefined;
     producerFailed: number;
     producerDropped: number;
@@ -225,7 +374,7 @@ declare const collectInspectionBatch: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector.ts#L24)
 
 ## `container-bin.ts`
 
@@ -406,7 +555,7 @@ declare const historyNativeFailure: <Cause extends Error>(
 ) => InspectionConnectionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-native.service.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-native.service.ts#L53)
 
 ## `history-native.types.ts`
 
@@ -420,14 +569,83 @@ Owns project binding, worker open and joined physical shutdown as one acquisitio
 
 ```ts
 export interface InspectorHistoryNativeOperations {
+  /**
+   * @param root - History directory.
+   * @param projectId - Project the directory must belong to.
+   * @param onFailure - Told once when the worker stops or fails without being closed.
+   */
   readonly acquire: (
     root: string,
     projectId: string,
+    onFailure?: (error: Error) => void,
   ) => Effect.Effect<LocalWorkerEffects, InspectionConnectionError, Scope.Scope>;
 }
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-native.types.ts#L7)
+
+## `history-owner.ts`
+
+Records which Inspector holds a project's history and where it listens, so a second Inspector
+that cannot open the history can say who has it. The record sits beside the history, is private
+to the user, and names an address only while the process that wrote it is alive.
+
+### HistoryOwner (interface)
+
+The Inspector that holds a history directory.
+
+**Signature**
+
+```ts
+export interface HistoryOwner {
+  readonly pid: number;
+  /** Origin of its interface, for example `http://127.0.0.1:3210`. */
+  readonly url: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L15)
+
+### publishHistoryOwner
+
+Writes this process as the history's owner; a failure leaves no record and nothing else changes.
+
+**Signature**
+
+```ts
+declare const publishHistoryOwner: (
+  root: string,
+  options: InspectorOptions,
+) => Effect.Effect<void, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L27)
+
+### readHistoryOwner
+
+Reads the record of another live Inspector.
+
+**Signature**
+
+```ts
+declare const readHistoryOwner: (
+  root: string,
+) => Effect.Effect<HistoryOwner | undefined, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L64)
+
+### removeHistoryOwner
+
+Removes the record when this process wrote it.
+
+**Signature**
+
+```ts
+declare const removeHistoryOwner: (root: string) => Effect.Effect<void, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L46)
 
 ## `history-reply.ts`
 
@@ -447,6 +665,77 @@ declare const validateHistoryReply: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-reply.ts#L17)
+
+## `history-state.ts`
+
+What the tool says about history and its collection. An application that stopped answering
+loses no stored record, so it is told apart from history that cannot be written or read.
+
+### CollectionState (type alias)
+
+Where collection into history stands; see `collectionState`.
+
+**Signature**
+
+```ts
+type CollectionState =
+  | "collecting"
+  | "waiting-for-application"
+  | "application-unreachable"
+  | "application-invalid"
+  | "history-unavailable";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L39)
+
+### collectionState
+
+Names where collection stands, for the `/_relkit/v1/storage` answer.
+
+**Signature**
+
+```ts
+declare const collectionState: (current: InspectorToolState) => CollectionState;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L55)
+
+### historyError
+
+Names what is wrong with history itself.
+
+**Signature**
+
+```ts
+declare const historyError: (current: InspectorToolState) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L32)
+
+### historyFailure
+
+Tells a failure of the tool's own history (its database, or the collection loop) from one of
+the application it collects from.
+
+**Signature**
+
+```ts
+declare const historyFailure: (error: string) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L13)
+
+### historyReadable
+
+Whether retained history is open and readable.
+
+**Signature**
+
+```ts
+declare const historyReadable: (current: InspectorToolState) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L22)
 
 ## `history.service.ts`
 
@@ -477,7 +766,7 @@ declare const inspectorHistoryLayer: (
 ) => Layer.Layer<InspectorHistory, InspectionConnectionError, InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history.service.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history.service.ts#L50)
 
 ## `history.types.ts`
 
@@ -640,6 +929,21 @@ declare const parseInspectorOptions: (args: readonly string[]) => InspectorOptio
 
 UI invalidations borrow the existing bounded stream, while full records stay in history.
 
+### SelectionNotice (interface)
+
+One terminal line about the application session.
+
+**Signature**
+
+```ts
+export interface SelectionNotice {
+  readonly level: "info" | "warn";
+  readonly message: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L56)
+
 ### acquireLiveEvents
 
 The tool Scope closes every subscriber before releasing its listener.
@@ -665,7 +969,7 @@ declare const publishCollection: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L110)
 
 ### publishSelection
 
@@ -682,6 +986,151 @@ declare const publishSelection: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L21)
+
+### publishSelectionState
+
+Publishes the application session state whether or not it changed: a new subscriber needs it
+before the next change, and a repeated one only invalidates metadata again.
+
+**Signature**
+
+```ts
+declare const publishSelectionState: (
+  stream: ObservabilityStream,
+  selection: InspectorSelection,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L43)
+
+### selectionKey
+
+**Signature**
+
+```ts
+declare const selectionKey: (selection: InspectorSelection) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L102)
+
+### selectionNotices
+
+Says what changed in the application session, so the terminal never repeats a line per poll.
+
+**Signature**
+
+```ts
+declare const selectionNotices: (
+  previous: InspectorSelection | undefined,
+  next: InspectorSelection,
+  project: string,
+) => SelectionNotice[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L68)
+
+## `node-executable.ts`
+
+Finds the real Node executable the interface (a Next.js standalone server) and the DuckDB
+history worker need. On Node that is the running executable. On Bun it is the first `node` on
+`PATH` that is not Bun itself: `bun --bun` puts a directory whose `node` is Bun first on `PATH`,
+as a symlink on macOS and possibly a copy or hard link elsewhere, so a candidate that does not
+resolve to Bun's own file is asked for `process.versions.bun`.
+
+### MINIMUM_NODE_VERSION
+
+Lowest Node release the package declares in its engines.
+
+**Signature**
+
+```ts
+declare const MINIMUM_NODE_VERSION: "20.9.0";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L15)
+
+### NodeExecutable (interface)
+
+Node executable for the Inspector's children.
+
+**Signature**
+
+```ts
+export interface NodeExecutable {
+  /** Absolute path of the executable. */
+  readonly executable: string;
+  /** Its `process.versions.node`. */
+  readonly version: string;
+  /** `PATH` for the children, without the directories whose `node` is Bun. */
+  readonly path: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L18)
+
+### NodeExecutableError (class)
+
+No usable Node was found; the message names Node, the version needed and the Bun alias.
+
+**Signature**
+
+```ts
+declare class NodeExecutableError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L39)
+
+### NodeExecutableHost (interface)
+
+The process the resolution runs in.
+
+**Signature**
+
+```ts
+export interface NodeExecutableHost {
+  readonly runtime: "bun" | "node";
+  /** The running runtime's executable. */
+  readonly execPath: string;
+  /** The running runtime's `process.versions.node`. */
+  readonly nodeVersion: string;
+  /** Search path. */
+  readonly path: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L28)
+
+### findNodeExecutable
+
+Resolves Node for this process, once per runtime and search path.
+
+**Throws**
+
+When no Node of a supported release is found.
+
+**Signature**
+
+```ts
+declare const findNodeExecutable: (host?: NodeExecutableHost) => NodeExecutable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L53)
+
+### resolveNodeExecutable
+
+Resolves Node for the interface child.
+
+**Signature**
+
+```ts
+declare const resolveNodeExecutable: () => Effect.Effect<
+  NodeExecutable,
+  InspectionConnectionError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L66)
 
 ## `index.ts`
 
@@ -821,7 +1270,7 @@ declare const prepareDuckdbBatch: (
 ) => Effect.Effect<Map<string, PreparedDuckdbRecord>, DuckdbError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-prepare.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-prepare.ts#L14)
 
 ## `duckdb-batch-receipts.ts`
 
@@ -992,6 +1441,7 @@ declare const openDuckdbDatabaseEffect: (
           log: StoredLocalRecord;
           items: ReadonlyArray<never>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -1009,6 +1459,7 @@ declare const openDuckdbDatabaseEffect: (
           incomplete: readonly string[];
           items: ReadonlyArray<never>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -1018,6 +1469,7 @@ declare const openDuckdbDatabaseEffect: (
           records: ReadonlyArray<StoredLocalRecord>;
           items: ReadonlyArray<StoredLocalRecord>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -1101,6 +1553,7 @@ declare const openDuckdbDatabase: (
             log: StoredLocalRecord;
             items: ReadonlyArray<never>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -1118,6 +1571,7 @@ declare const openDuckdbDatabase: (
             incomplete: readonly string[];
             items: ReadonlyArray<never>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -1127,6 +1581,7 @@ declare const openDuckdbDatabase: (
             records: ReadonlyArray<StoredLocalRecord>;
             items: ReadonlyArray<StoredLocalRecord>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -1141,6 +1596,7 @@ declare const openDuckdbDatabase: (
         log: StoredLocalRecord;
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1158,6 +1614,7 @@ declare const openDuckdbDatabase: (
         incomplete: readonly string[];
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1167,6 +1624,7 @@ declare const openDuckdbDatabase: (
         records: ReadonlyArray<StoredLocalRecord>;
         items: ReadonlyArray<StoredLocalRecord>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1480,6 +1938,7 @@ declare const makeDuckdbDetail: (
       log: StoredLocalRecord;
       items: ReadonlyArray<never>;
       nextCursor?: string;
+      total?: number;
       protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
       version: typeof OBSERVABILITY_QUERY_VERSION;
     }
@@ -1493,6 +1952,7 @@ declare const makeDuckdbDetail: (
       incomplete: readonly string[];
       items: ReadonlyArray<never>;
       nextCursor?: string;
+      total?: number;
       protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
       version: typeof OBSERVABILITY_QUERY_VERSION;
     }
@@ -1502,6 +1962,7 @@ declare const makeDuckdbDetail: (
       records: ReadonlyArray<StoredLocalRecord>;
       items: ReadonlyArray<StoredLocalRecord>;
       nextCursor?: string;
+      total?: number;
       protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
       version: typeof OBSERVABILITY_QUERY_VERSION;
     }
@@ -1538,6 +1999,7 @@ declare const makeDuckdbQueryEffect: (
         log: StoredLocalRecord;
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1555,6 +2017,7 @@ declare const makeDuckdbQueryEffect: (
         incomplete: readonly string[];
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1564,6 +2027,7 @@ declare const makeDuckdbQueryEffect: (
         records: ReadonlyArray<StoredLocalRecord>;
         items: ReadonlyArray<StoredLocalRecord>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1636,11 +2100,13 @@ declare const duckdbQueryFilters: (
 ) => { clauses: Array<string>; values: Array<DuckDBValue> };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-filters.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-filters.ts#L10)
 
 ## `duckdb-query-list.ts`
 
-Executes a validated list plan and emits versioned cursor pages over committed history.
+Executes a validated list plan and emits versioned cursor pages over committed history. A query
+that asks for `count` also gets `total`, the matching records across all pages, from a second
+count query compiled with the same filters.
 
 ### makeDuckdbList
 
@@ -1649,6 +2115,7 @@ Executes a validated list plan and emits versioned cursor pages over committed h
 ```ts
 declare const makeDuckdbList: (
   rows: DuckdbReadRows,
+  count: DuckdbReadCount,
 ) => (
   kind: "logs" | "requests" | "traces",
   input?: ObservabilityQueryRequest | undefined,
@@ -1659,11 +2126,26 @@ declare const makeDuckdbList: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-list.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-list.ts#L16)
 
 ## `duckdb-query-plan.ts`
 
 Builds history paging SQL with stable request/trace revision selection and bound parameters.
+
+### duckdbCountPlan
+
+Builds the SQL counting every record a list query selects, across all pages.
+
+**Signature**
+
+```ts
+declare const duckdbCountPlan: (
+  kind: "logs" | "requests" | "traces",
+  query: NormalizedQuery,
+) => { sql: string; values: Array<DuckDBValue> };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-plan.ts#L48)
 
 ### duckdbQueryPlan
 
@@ -1681,6 +2163,22 @@ declare const duckdbQueryPlan: (
 ## `duckdb-query-rows.ts`
 
 Decodes native JSON rows into validated diagnostic records under the shared database permit.
+
+### makeDuckdbCount
+
+**Signature**
+
+```ts
+declare const makeDuckdbCount: (
+  connection: DuckdbConnectionPort,
+  permit: Semaphore.Semaphore,
+) => (
+  sql: string,
+  values?: Array<DuckDBValue> | undefined,
+) => Effect.Effect<number, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-rows.ts#L29)
 
 ### makeDuckdbRows
 
@@ -1701,6 +2199,18 @@ declare const makeDuckdbRows: (
 ## `duckdb-query-rows.types.ts`
 
 SQL row reader shared by native list/detail query operations.
+
+### DuckdbReadCount (type alias)
+
+Reads the single `total` of a native count query.
+
+**Signature**
+
+```ts
+type DuckdbReadCount = (sql: string, values?: DuckDBValue[]) => Effect.Effect<number, DuckdbError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-rows.types.ts#L12)
 
 ### DuckdbReadRows (type alias)
 
@@ -1750,6 +2260,7 @@ declare const createDuckdbQuery: (connection: DuckdbConnectionPort) => {
         log: StoredLocalRecord;
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1767,6 +2278,7 @@ declare const createDuckdbQuery: (connection: DuckdbConnectionPort) => {
         incomplete: readonly string[];
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1776,6 +2288,7 @@ declare const createDuckdbQuery: (connection: DuckdbConnectionPort) => {
         records: ReadonlyArray<StoredLocalRecord>;
         items: ReadonlyArray<StoredLocalRecord>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -2483,6 +2996,24 @@ export interface LegacyImportSummary {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history.types.ts#L16)
 
+## `well-formed.ts`
+
+Makes record text storable. A JavaScript string can hold an unpaired UTF-16 surrogate (a JSON
+body may escape `\ud800`, and `JSON.parse` keeps it), but DuckDB's JSON column refuses such text
+and with it the whole batch. Each unpaired surrogate becomes U+FFFD, as a UTF-8 encoder writes it.
+
+### wellFormedValue
+
+Replaces unpaired surrogates in every string of a JSON-like value, object keys included.
+
+**Signature**
+
+```ts
+declare const wellFormedValue: <Value>(value: Value) => Value;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/well-formed.ts#L15)
+
 ## `worker-client-effect.ts`
 
 Acquires the optional isolated Node worker and exposes shared structural effects.
@@ -2500,7 +3031,7 @@ declare const startLocalWorkerEffect: (
 ) => Effect.Effect<LocalWorkerEffects, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L24)
 
 ## `worker-client-send.ts`
 
@@ -2925,7 +3456,32 @@ declare const inspectorBackend: (
 ) => (request: Request) => Effect.Effect<Response, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L52)
+
+## `tool-collect.ts`
+
+Collects one batch from the connected application session into history. A batch is
+acknowledged to the application only once history holds it, so a batch history could not store
+stays in the application's buffer and the next pull stores it. What still goes missing is
+counted and named: records the store refuses, and a pulled batch whose session ended before
+history could store it.
+
+### collectCurrent
+
+Pulls, stores and acknowledges one batch of the connected session.
+
+**Signature**
+
+```ts
+declare const collectCurrent: (
+  state: InspectorToolStateRef,
+  remote: InspectorRemoteOperations,
+  options: InspectorOptions,
+  stream: ObservabilityStream,
+) => Effect.Effect<false | { backlog: boolean }, InspectionConnectionError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-collect.ts#L26)
 
 ## `tool-history.ts`
 
@@ -2945,20 +3501,62 @@ declare const acquireHistory: (
 ) => Effect.Effect<undefined, InspectionConnectionError, Scope.Scope | InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L13)
 
 ### historyFailureHint
 
-Names the remedy for a locked history database. DuckDB reports the holder's
-PID; only that number is echoed, never the file path or the rest of the message.
+Says what is wrong with the history and what to do. A lock conflict names the other holder:
+DuckDB reports its PID, and only that number is echoed, never the file path or the rest of the
+message. Any other failure is named by its code alone.
 
 **Signature**
 
 ```ts
-declare const historyFailureHint: (error: InspectionConnectionError) => string | undefined;
+declare const historyFailureHint: (
+  error: InspectionConnectionError,
+  owner?: HistoryOwner,
+) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L117)
+
+### historyRoot
+
+The directory that holds a project's history.
+
+**Signature**
+
+```ts
+declare const historyRoot: (options: InspectorOptions) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L91)
+
+### quiet
+
+Runs an operation without log records; its failure is reported once by the collection loop.
+
+**Signature**
+
+```ts
+declare const quiet: <A, E, R>(
+  self: Effect.Effect<A, E, R>,
+) => Effect.Effect<A, E, Exclude<R, never>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L98)
+
+### quietHistory
+
+Wraps history operations so their failures leave no log records of their own.
+
+**Signature**
+
+```ts
+declare const quietHistory: (operations: InspectorHistoryOperations) => InspectorHistoryOperations;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L105)
 
 ### recoverInspection
 
@@ -2973,7 +3571,7 @@ declare const recoverInspection: (
 ) => Effect.Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L66)
 
 ## `tool-loop.ts`
 
@@ -2996,7 +3594,7 @@ declare const inspectionLoop: (
 ) => Effect.Effect<never, InspectionConnectionError, Scope | InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L30)
 
 ## `tool-main.ts`
 
@@ -3010,7 +3608,7 @@ Shares the native signal owner between package and restricted container entries.
 declare const runInspectorMain: (container: boolean) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-main.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-main.ts#L37)
 
 ## `tool-state.types.ts`
 
@@ -3027,6 +3625,11 @@ export interface InspectorHistoryOwner {
   readonly projectId: string;
   readonly scope: Scope.Closeable;
   readonly operations: InspectorHistoryOperations;
+  /**
+   * Why the worker stopped on its own, such as `history.worker-exited`, or undefined while it
+   * runs. Read on every status request, so a lost worker is reported before the next command.
+   */
+  readonly failure?: () => string | undefined;
 }
 ```
 
@@ -3041,6 +3644,13 @@ Collection state contains only one finite batch at a time; no pending write queu
 ```ts
 export interface InspectorToolState {
   readonly selection: InspectorSelection;
+  /** When the application session entered its current state (ms); undefined before discovery. */
+  readonly selectionSince?: number | undefined;
+  /**
+   * The last application session this run of the tool connected to, kept after it stops
+   * answering. `stoppedAt` (ms) is undefined while that session is still connected.
+   */
+  readonly lastSession?: { readonly sessionId: string; readonly stoppedAt?: number } | undefined;
   readonly history: InspectorHistoryOwner | undefined;
   readonly sessionId: string | undefined;
   readonly through: number;
@@ -3050,10 +3660,21 @@ export interface InspectorToolState {
   readonly lossKey?: string | undefined;
   readonly producerFailed?: number | undefined;
   readonly producerDropped?: number | undefined;
+  /**
+   * The last batch pulled from an application session and not stored yet, because history
+   * failed. The application keeps it until acknowledged, so a later pull stores it; when the
+   * session ends first, it is lost.
+   */
+  readonly unstored?: InspectorUnstoredBatch | undefined;
+  /**
+   * Records this run of the tool pulled from the application that history does not hold: refused
+   * by the store, or still unstored when their session ended. Counted over the whole run.
+   */
+  readonly historyLost?: number | undefined;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L19)
 
 ### InspectorToolStateRef (type alias)
 
@@ -3065,7 +3686,26 @@ Shared projection is owned by the acquired tool, never module global.
 type InspectorToolStateRef = Ref.Ref<InspectorToolState>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L61)
+
+### InspectorUnstoredBatch (interface)
+
+A pulled batch that history has not stored.
+
+**Signature**
+
+```ts
+export interface InspectorUnstoredBatch {
+  readonly sessionId: string;
+  /** Last sequence stored before it. */
+  readonly after: number;
+  /** Its last sequence. */
+  readonly through: number;
+  readonly records: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L51)
 
 ## `tool.service.ts`
 
@@ -3109,7 +3749,7 @@ Native UI acquisition is separate from all application/session ownership.
 declare class InspectorUiNative
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L14)
 
 ### InspectorUiNativeLive
 
@@ -3121,7 +3761,7 @@ Live child adapter, acquired only by an explicit standalone launch.
 declare const InspectorUiNativeLive: Layer.Layer<InspectorUiNative, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L30)
 
 ### acquireInspectorUi
 
@@ -3142,7 +3782,7 @@ declare const acquireInspectorUi: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L33)
 
 ## `ui-readiness.ts`
 

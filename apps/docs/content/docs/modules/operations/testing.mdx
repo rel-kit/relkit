@@ -72,7 +72,9 @@ The body type is a declaration, not a check: assert the shape with `expect`. Wit
 requests return.
 
 The harness runs in process and exposes `application.http`. It maps invalid function input to a
-validation `422`, but it does not implement the entire production HTTP pipeline. It does not prove
+validation `422` and decides function `access` rules as the served application does: see
+[Test a protected route in process](/docs/modules/auth/testing#test-a-protected-route-in-process).
+It does not implement the entire production HTTP pipeline. It does not prove
 all middleware, rate limits, OpenAPI behavior, or RPC transport. Close it in `afterAll` so runtime
 state and handles do not leak into another test, then send representative requests to the running
 backend as the Start journey does.

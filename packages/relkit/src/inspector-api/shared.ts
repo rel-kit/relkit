@@ -76,7 +76,8 @@ export async function resolveService(source: unknown): Promise<unknown> {
  * @typeParam T - Successful public or native value retained by this boundary.
  * @param items - Ordered public records to filter and paginate.
  * @param request - HTTP request carrying bounded filters, negotiated headers and a native cancellation signal.
- * @returns An ordered page and continuation cursor when required.
+ * @returns An ordered page, the number of records matching the filters, and a continuation
+ * cursor when more remain.
  */
 export function page<T extends JsonValue>(items: readonly T[], request: Request): Page<T> {
   const params = new URL(request.url).searchParams;
@@ -98,8 +99,8 @@ export function page<T extends JsonValue>(items: readonly T[], request: Request)
   const selected = filtered.slice(cursor, cursor + limit);
   const next = cursor + selected.length;
   return next < filtered.length
-    ? { items: selected, nextCursor: String(next) }
-    : { items: selected };
+    ? { items: selected, nextCursor: String(next), total: filtered.length }
+    : { items: selected, total: filtered.length };
 }
 
 /**

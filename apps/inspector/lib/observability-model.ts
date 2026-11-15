@@ -1,4 +1,5 @@
 import type { InspectorObject, InspectorQuery } from "./api-types";
+import { matchesRequestFilters } from "./request-filters";
 import type { StreamEvent } from "./stream-protocol";
 
 export type SignalKind = "requests" | "logs" | "traces";
@@ -13,6 +14,14 @@ export interface SignalFilters {
   readonly requestId: string;
   readonly traceId: string;
   readonly serviceId: string;
+  /** Requests: an exact HTTP status or a class such as `5xx`. */
+  readonly status: string;
+  readonly method: string;
+  /** Requests: prefix of the raw path. */
+  readonly path: string;
+  readonly search: string;
+  /** Requests: a declared error identifier. */
+  readonly errorId: string;
 }
 
 export const EMPTY_SIGNAL_FILTERS: SignalFilters = Object.freeze({
@@ -25,6 +34,11 @@ export const EMPTY_SIGNAL_FILTERS: SignalFilters = Object.freeze({
   requestId: "",
   traceId: "",
   serviceId: "",
+  status: "",
+  method: "",
+  path: "",
+  search: "",
+  errorId: "",
 });
 
 export function record(value: unknown): InspectorObject | undefined {
@@ -55,6 +69,8 @@ export function queryFromFilters(
   const pageSize = Number.isFinite(limit) ? Math.trunc(limit) : 50;
   return {
     limit: Math.min(Math.max(1, pageSize), 100),
+    // History defaults to oldest first; every list here says "newest first".
+    order: "desc",
     ...(cursor === undefined ? {} : { cursor }),
     ...(from === undefined ? {} : { from }),
     ...(to === undefined ? {} : { to }),
@@ -65,6 +81,35 @@ export function queryFromFilters(
     ...(filters.requestId === "" ? {} : { requestId: filters.requestId }),
     ...(filters.traceId === "" ? {} : { traceId: filters.traceId }),
     ...(filters.serviceId === "" ? {} : { serviceId: filters.serviceId }),
+    ...(filters.status === "" ? {} : { status: filters.status.trim() }),
+    ...(filters.method === "" ? {} : { method: filters.method.trim() }),
+    ...(filters.path === "" ? {} : { path: filters.path }),
+    ...(filters.search.trim() === "" ? {} : { search: filters.search.trim() }),
+    ...(filters.errorId === "" ? {} : { errorId: filters.errorId }),
+  };
+}
+
+export interface RequestLabel {
+  readonly method: string;
+  /** What to show first: the raw path, else the route pattern, else the route id; may be empty. */
+  readonly title: string;
+  /** The route id when the title is a path; empty when it would repeat the title. */
+  readonly secondary: string;
+}
+
+/**
+ * The one way a request is named in a list, loaded or pushed live: method and raw path first,
+ * the route id as secondary text. A request without a path falls back to its route id.
+ * "unknown" is not a name.
+ */
+export function requestLabel(item: InspectorObject): RequestLabel {
+  const known = (value: unknown): string => (text(value) === "unknown" ? "" : text(value));
+  const path = text(item.rawPath) || known(item.normalizedRoute);
+  const routeId = known(item.routeId);
+  return {
+    method: text(item.method) || "HTTP",
+    title: path || routeId,
+    secondary: path !== "" && routeId !== path ? routeId : "",
   };
 }
 
@@ -83,7 +128,11 @@ export function mergeLiveItems(
   const next = eventRecord(event);
   if (next === undefined) return items;
   const key = signalKey(next);
-  return [next, ...items.filter((item) => signalKey(item) !== key)];
+  // A record that is already listed (a request that completed) keeps its place; a new one is
+  // the newest and goes on top.
+  const index = items.findIndex((item) => signalKey(item) === key);
+  if (index < 0) return [next, ...items];
+  return items.map((item, position) => (position === index ? next : item));
 }
 
 export function matchesQuery(value: InspectorObject, query: InspectorQuery): boolean {
@@ -95,6 +144,7 @@ export function matchesQuery(value: InspectorObject, query: InspectorQuery): boo
     matches(value, query.outcome, "outcome") &&
     matches(value, query.traceId, "traceId") &&
     matches(value, query.serviceId, "serviceId") &&
+    matchesRequestFilters(value, query) &&
     (query.requestId === undefined ||
       value.requestId === query.requestId ||
       value.correlationId === query.requestId) &&

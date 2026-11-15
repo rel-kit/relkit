@@ -34,6 +34,8 @@ export interface InspectorFetchOptions {
 
 export interface InspectorRequestOptions extends RequestInit {
   readonly cacheTags?: readonly string[];
+  /** How long a GET answer is reused, when longer than the client's default (never when caching is off). */
+  readonly cacheTtlMs?: number;
   readonly responseProtocols?: readonly InspectorResponseProtocol[];
 }
 
@@ -47,6 +49,14 @@ export interface InspectorQuery {
   readonly order?: "asc" | "desc";
   readonly kind?: string;
   readonly status?: string;
+  /** Requests only: HTTP method, any case. */
+  readonly method?: string;
+  /** Requests only: prefix of the raw path; starts with `/`. */
+  readonly path?: string;
+  /** Requests only: a declared error identifier. */
+  readonly errorId?: string;
+  /** Asks the page to carry `total`, the number of matches; scans every match. */
+  readonly count?: boolean;
   readonly from?: string;
   readonly to?: string;
   readonly severity?: string;
@@ -73,6 +83,8 @@ export class InspectorApiError extends Error {
     readonly code: string,
     readonly status?: number,
     readonly kind: "network" | "http" | "protocol" = "http",
+    /** The error response's JSON body: an Inspector envelope, or an application's Problem Details. */
+    readonly body?: { readonly [key: string]: unknown },
   ) {
     super(message);
     this.name = "InspectorApiError";
@@ -84,6 +96,11 @@ export class InspectorApiError extends Error {
       "RELKIT_INSPECTOR_PROTOCOL_UNSUPPORTED",
       "RELKIT_INSPECTOR_API_VERSION_UNSUPPORTED",
     ].includes(this.code);
+  }
+
+  /** The query parameter the server rejected, when the error body names one. */
+  get parameter(): string | undefined {
+    return typeof this.body?.parameter === "string" ? this.body.parameter : undefined;
   }
 
   get isCursorExpired(): boolean {

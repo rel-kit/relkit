@@ -42,6 +42,7 @@ function buildArchitecture(hierarchy: AppHierarchy, options: ViewOptions): Graph
   nodes.push(...hierarchy.domains.map((domain) => domainCard(domain)));
   // Detail cards, owned by a domain, shown on the map unless folded.
   const detail = new Set<string>();
+  const buckets = new Set<string>();
   for (const domain of hierarchy.domains) {
     const add = (list: readonly GraphNode[], filter: FilterId) => {
       if (!show(filter)) return;
@@ -54,6 +55,11 @@ function buildArchitecture(hierarchy: AppHierarchy, options: ViewOptions): Graph
     add(domain.channels, "channels");
     add(domain.agents, "agents");
     add(domain.tools, "tools");
+    // A bucket is a place data lives: it gets a card of its own, whatever the filters say.
+    for (const node of domain.members.filter((member) => member.kind === "bucket")) {
+      nodes.push({ ...itemNode(node, hierarchy), domainId: domain.id });
+      buckets.add(node.id);
+    }
   }
   const { database, auth } = hierarchy.platform;
   if (auth !== undefined) {
@@ -180,6 +186,16 @@ function buildArchitecture(hierarchy: AppHierarchy, options: ViewOptions): Graph
     const linked = [...aggregate.keys()].some((key) => key.split("\u0000").includes(id));
     const owner = hierarchy.ownerOf.get(id);
     if (!linked && owner !== undefined && owner !== PLATFORM_OWNER)
+      push(owner, id, { relationship: "declared", kind: "declares", from: owner, to: id });
+  }
+  // A bucket always hangs off its domain, even when no function reaches it.
+  for (const id of buckets) {
+    const owner = hierarchy.ownerOf.get(id);
+    if (owner === undefined || owner === PLATFORM_OWNER) continue;
+    const linked = [...aggregate.keys()].some(
+      (key) => key === `${owner}\u0000${id}` || key === `${id}\u0000${owner}`,
+    );
+    if (!linked)
       push(owner, id, { relationship: "declared", kind: "declares", from: owner, to: id });
   }
   const edges: ViewEdge[] = [...aggregate.entries()]

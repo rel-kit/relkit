@@ -106,7 +106,7 @@ Generate a second migration and inspect its SQL before applying it. This keeps t
 Orders table and adds auth tables; do not regenerate the initial migration.
 
 ```sh title="Terminal — relkit-orders"
-bun --bun drizzle-kit generate --name=auth
+bun x drizzle-kit generate --name=auth
 bun run relkit db migrate
 bun run check
 ```

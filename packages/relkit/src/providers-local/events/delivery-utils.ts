@@ -1,15 +1,18 @@
 import { normalizeRetry, positive, json, validateStoredData } from "./delivery-validation.js";
 import { normalizeId } from "../../contracts/index.js";
-import type { JobStore, JobRecord } from "../jobs/store.js";
-import { readEntry } from "../jobs/queue-entry.js";
 import type { JobQueue, JobQueueEntry } from "../jobs/queue-utils.js";
 import type { UnknownEventEnvelope } from "../../events/index.js";
-import { makeDeliveryId, normalizeEnvelope, type EventDeliveryRecord } from "./router-records.js";
-import type { EventDeliveryLedgerRecord, EventDeliveryResult } from "./delivery-types.js";
+import { makeDeliveryId, normalizeEnvelope } from "./router-records.js";
+import type { EventDeliveryResult } from "./delivery-types.js";
+import { EventAdminError } from "./admin-errors.js";
+import { Effect } from "effect";
+import { localOperation, localPromise, type LocalOperationError } from "../local-effect.js";
 
 export { validateStoredData, normalizeRetry, positive, json } from "./delivery-validation.js";
 
 export { DEFAULT_RETRY } from "./delivery-validation.js";
+
+export { ledger, ledgerFrom, records } from "./delivery-projection.js";
 
 /** Projects a durable queue entry into the public delivery outcome.
  * @param entry - Current queue or storage entry.
@@ -65,6 +68,56 @@ export async function retryDelivery(
   return resultFrom(entry, triggerId, false, "queued");
 }
 
+/** Runs one administrative delivery transition once the owner is known to be open.
+ * @param name - Observed operation name.
+ * @param ensureOpen - Lifecycle admission check of the delivery owner.
+ * @param work - The durable transition.
+ * @returns A lazy observed operation yielding the transition's outcome.
+ */
+export function administer(
+  name: string,
+  ensureOpen: () => Effect.Effect<void, LocalOperationError>,
+  work: () => Promise<EventDeliveryResult>,
+): Effect.Effect<EventDeliveryResult, LocalOperationError> {
+  return localOperation(name, Effect.andThen(ensureOpen(), localPromise(work)));
+}
+
+/** Safe failure recorded on a delivery cancelled from the Inspector (the jobs' cancellation code). */
+const CANCELLED = Object.freeze({
+  kind: "cancellation",
+  outcome: "cancelled",
+  code: "RELKIT_JOB_ADMIN_CANCELLED",
+  message: "Event delivery cancelled by local development action",
+  retry: "never",
+} as const);
+
+/** Cancels a pending or scheduled delivery: it becomes a dead letter whose failure says cancelled.
+ * @param queue - Owning durable queue operations.
+ * @param triggerId - Registered trigger identity.
+ * @param deliveryId - Stable delivery identity.
+ * @param now - Current clock time in milliseconds.
+ * @returns The cancelled delivery outcome after durable transition.
+ * @remarks A delivery whose handler runs (leased) is refused like a terminal one: dead-lettering
+ * it would make the handler's own acknowledgement fail.
+ */
+export async function cancelDelivery(
+  queue: JobQueue,
+  triggerId: string,
+  deliveryId: string,
+  now: () => number,
+): Promise<EventDeliveryResult> {
+  const normalized = normalizeId(deliveryId);
+  await queue.recover(now());
+  const state = queue.get(normalized)?.state;
+  if (state === "leased" || state === "completed" || state === "dead-lettered")
+    throw new EventAdminError(
+      "RELKIT_EVENT_ADMIN_STATE_INELIGIBLE",
+      "Only pending or scheduled event deliveries can be cancelled",
+    );
+  const entry = await queue.adminDeadLetter(normalized, CANCELLED);
+  return resultFrom(entry, triggerId, false, "failed", undefined, entry.failure);
+}
+
 /** Promotes due delayed deliveries before selecting worker work.
  * @param queue - Owning durable queue operations.
  * @param now - Current clock time in milliseconds.
@@ -82,77 +135,12 @@ export async function promoteDue(queue: JobQueue, now: () => number): Promise<vo
   }
 }
 
-/** Selects validated event-delivery records from the journal snapshot.
- * @param raw - Untrusted input before validation.
- * @param triggerId - Registered trigger identity.
- * @param queue - Owning durable queue operations.
- * @returns Validated delivery records from the journal.
- */
-export function records(
-  raw: readonly JobRecord[],
-  triggerId: string,
-  queue: JobQueue,
-): EventDeliveryRecord[] {
-  return queue.snapshot().map((entry) => {
-    const record = [...raw].reverse().find((item) => item.instanceId === entry.instanceId);
-    const envelope = normalizeEnvelope(entry.input);
-    return Object.freeze({
-      version: 1 as const,
-      sequence: record?.sequence ?? entry.order,
-      timestamp: record?.timestamp ?? entry.acceptedAt,
-      deliveryId: entry.instanceId,
-      eventInstanceId: envelope.instanceId,
-      triggerId,
-      envelope,
-    });
-  });
-}
-
-/** Projects durable queue state and envelopes into inspection ledger records.
- * @param store - Owning persisted-state or journal operations.
- * @param triggerId - Registered trigger identity.
- * @param queue - Owning durable queue operations.
- * @returns The delivery inspection ledger.
- */
-export function ledger(
-  store: Pick<JobStore, "snapshot">,
-  triggerId: string,
-  queue: JobQueue,
-): readonly EventDeliveryLedgerRecord[] {
-  return Object.freeze(
-    store
-      .snapshot()
-      .records.filter((record) => queue.get(record.instanceId) !== undefined)
-      .filter((record) => record.kind !== "event-delivery-accepted")
-      .map((record) => {
-        const entry = readEntry(record);
-        if (entry === undefined) throw new Error("Event delivery ledger state is invalid");
-        const envelope = normalizeEnvelope(entry.input);
-        return Object.freeze({
-          version: 1 as const,
-          sequence: record.sequence,
-          timestamp: record.timestamp,
-          cursor: record.sequence,
-          deliveryId: entry.instanceId,
-          eventInstanceId: envelope.instanceId,
-          triggerId,
-          envelope,
-          state: entry.state as EventDeliveryResult["state"],
-          attempt: entry.attempt,
-          duplicate: entry.attempt > 1,
-          ...(entry.leaseOwner === undefined ? {} : { leaseOwner: entry.leaseOwner }),
-          ...(entry.leaseExpiresAt === undefined ? {} : { leaseExpiresAt: entry.leaseExpiresAt }),
-          ...(entry.failure === undefined ? {} : { failure: entry.failure }),
-        });
-      }),
-  );
-}
-
 /** Applies configured backlog overflow admission before durable acceptance.
  * @param queue - Owning durable queue operations.
  * @param envelope - Validated event envelope.
  * @param triggerId - Registered trigger identity.
  * @param profile - Local provider profile partition.
+ * @param replayId - Identity of a replay delivery; a publication's own delivery derives its id.
  * @returns The admission decision after enforcing backlog policy.
  */
 export async function admitDelivery(
@@ -160,8 +148,9 @@ export async function admitDelivery(
   envelope: UnknownEventEnvelope,
   triggerId: string,
   profile: string,
+  replayId?: string,
 ): Promise<{ readonly entry: JobQueueEntry; readonly duplicate: boolean }> {
-  const deliveryId = makeDeliveryId(envelope.instanceId, triggerId);
+  const deliveryId = replayId ?? makeDeliveryId(envelope.instanceId, triggerId);
   const existing = queue.get(deliveryId);
   if (existing !== undefined) return { entry: existing, duplicate: true };
   const accepted = await queue.enqueue({

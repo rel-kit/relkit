@@ -20,4 +20,8 @@ export interface DependencyPatch extends DependencyPatchDescriptor {
 export interface DependencyPatchPlan {
   readonly content: string;
   readonly operation?: ScaffoldFileOperation;
+  /** The `pnpm-workspace.yaml` change that registers the patch for pnpm, which ignores `package.json`. */
+  readonly workspace?: ScaffoldFileOperation;
+  /** Present when the project's package manager applies no patches and the repair was skipped. */
+  readonly notice?: string;
 }

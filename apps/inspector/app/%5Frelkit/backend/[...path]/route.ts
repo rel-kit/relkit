@@ -34,14 +34,16 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
   let response: Response;
   try {
-    response = await fetch(target, {
+    // `duplex` streams a request body in Node's fetch; the DOM's RequestInit does not list it.
+    const init: RequestInit & { readonly duplex: "half" } = {
       method: request.method,
       headers,
-      body: hasBody ? await readInspectorProxyBody(request) : undefined,
+      body: hasBody ? ((await readInspectorProxyBody(request)) ?? null) : null,
       duplex: "half",
       redirect: "manual",
       signal: request.signal,
-    });
+    };
+    response = await fetch(target, init);
   } catch (error) {
     if (error instanceof InspectorProxyBodyError)
       return Response.json({ error: "Request body exceeds one MiB" }, { status: 413 });

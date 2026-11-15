@@ -85,13 +85,15 @@ it.effect("uses the byte bound independently of its count bound", () =>
   }).pipe(Effect.provide(earlyRetentionLive({ maxRecords: 100, maxBytes: 400 }))),
 );
 
-it.effect("enforces the default two MiB byte bound before the count bound", () =>
+it.effect("enforces the default eight MiB byte bound before the count bound", () =>
   Effect.gen(function* () {
     const buffer = yield* EarlyRetention;
-    yield* Effect.forEach([0, 1, 2], () => buffer.admit(record("x".repeat(900_000))));
+    yield* Effect.forEach([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], () =>
+      buffer.admit(record("x".repeat(900_000))),
+    );
     const status = yield* buffer.status();
-    expect(status.bufferedRecords).toBe(2);
-    expect(status.bufferedBytes).toBeLessThanOrEqual(2_097_152);
+    expect(status.bufferedRecords).toBe(9);
+    expect(status.bufferedBytes).toBeLessThanOrEqual(8_388_608);
     expect(status.droppedRecords).toBe(1);
     expect(status.droppedBytes).toBeGreaterThan(900_000);
   }).pipe(Effect.provide(earlyRetentionLive())),

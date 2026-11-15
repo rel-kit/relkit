@@ -1,5 +1,5 @@
 /** The options form of `defineBetterAuthService` still works and warns once, naming the replacement. */
-import { afterEach, expect, spyOn, test } from "bun:test";
+import { afterEach, beforeEach, expect, spyOn, test } from "bun:test";
 import { betterAuth } from "better-auth";
 import { resetDeprecationWarnings } from "relkit/diagnostics";
 import { defineBetterAuthService } from "../src/index.ts";
@@ -26,6 +26,8 @@ function consoleLines(run: () => void): string[] {
   return lines.filter((line) => line.includes("RELKIT_DEPRECATED_"));
 }
 
+// Another test file in the same process may already have used the options form.
+beforeEach(resetDeprecationWarnings);
 afterEach(resetDeprecationWarnings);
 
 test("the options form warns once with the replacement and a docs link", () => {

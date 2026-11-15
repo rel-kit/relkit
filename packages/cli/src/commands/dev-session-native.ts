@@ -6,6 +6,7 @@ import {
   createSupervisorStateMachine,
 } from "../supervisor/index.js";
 import { createContractPublisher } from "../supervisor/contract-publish.js";
+import { blockInspectionPath } from "../supervisor/proxy-inspection.js";
 import type { DevSessionState } from "./dev-session.types.js";
 import type { DevOptions, DevLog } from "./dev.types.js";
 
@@ -45,11 +46,8 @@ export function createDevNativeSession(
     },
   });
   const proxy = createSupervisorProxy({
-    intercept: (request) => {
-      if (isPrivateInspectionPath(new URL(request.url).pathname))
-        return Promise.resolve(new Response("Not found", { status: 404 }));
-      return contracts.intercept(request) ?? options.intercept?.(request);
-    },
+    intercept: (request) =>
+      blockInspectionPath(request) ?? contracts.intercept(request) ?? options.intercept?.(request),
     ...(options.hostname === undefined ? {} : { hostname: options.hostname }),
     ...(options.stablePort === undefined ? {} : { port: options.stablePort }),
     track: (token) =>
@@ -58,17 +56,4 @@ export function createDevNativeSession(
         ?.track(token),
   });
   return { observability, stateMachine, proxy, contracts };
-}
-
-/** Keeps core readiness, identity, jobs RPC and selected public transports independent. */
-function isPrivateInspectionPath(path: string): boolean {
-  if (path === "/_relkit/v1/graph") return false;
-  if (/^\/_relkit\/v1\/jobs(?:\/|$)/.test(path)) return false;
-  if (/^\/_relkit\/v1\/agents\/[^/]+\/ag-ui$/.test(path)) return false;
-  return (
-    path === "/_relkit/v1" ||
-    /^\/_relkit\/v1\/(?:runtime|graph|source|env|diagnostics|requests|logs|traces|stream|storage|actions|jobs|descriptors|routes|middlewares|functions|events|buckets|cache|tools|agents|channels|errors|services|providers)(?:\/|$)/.test(
-      path,
-    )
-  );
 }

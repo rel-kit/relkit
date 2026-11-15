@@ -4,16 +4,16 @@ import type { ReactNode } from "react";
 import { PageHeader } from "../components/blocks/page-header";
 import { StatusBadge, type StatusTone } from "../components/neon/status-badge";
 import type { InspectorObject } from "../lib/api-types";
+import { missedLiveUpdatesNote } from "../lib/history-status";
+import type { RequestCounts } from "../lib/overview-counts";
 import type { GraphSummary } from "../lib/graph-model";
+import { INITIAL_INSPECTOR_STATE, type ApplicationSession } from "../lib/stream-application";
+import { applicationLabel } from "../lib/stream-application-text";
 import type { ActivationFingerprint } from "../lib/graph-topology-model";
 import { ActivationCohort } from "./activation-cohort";
-import {
-  GenerationHistory,
-  HealthStrip,
-  KpiRow,
-  linkButtonClass,
-  RecentRequests,
-} from "./overview/overview-panels";
+import { APPLICATION_TONES, HealthStrip } from "./overview/overview-health";
+import { GenerationHistory } from "./overview/overview-generations";
+import { KpiRow, linkButtonClass, RecentRequests } from "./overview/overview-panels";
 import type { SampleState } from "./overview/use-overview-signals";
 
 export type ConnectionState = "connecting" | "connected" | "reconnecting" | "offline";
@@ -21,7 +21,10 @@ export type ConnectionState = "connecting" | "connected" | "reconnecting" | "off
 export interface OverviewSnapshot {
   readonly generationId?: string;
   readonly graphHash?: string;
+  /** The browser's stream to the Inspector process. */
   readonly connection?: ConnectionState;
+  /** The Inspector's session with the application. */
+  readonly application?: ApplicationSession;
   readonly droppedEvents?: number;
   readonly graphSummary?: GraphSummary;
   readonly activationFingerprint?: ActivationFingerprint;
@@ -33,6 +36,8 @@ export interface OverviewSignalsSnapshot {
   readonly requests: SampleState;
   readonly generations: SampleState;
   readonly storage: InspectorObject | undefined;
+  /** Counts over every retained request; undefined until counted. */
+  readonly requestCounts?: RequestCounts | undefined;
 }
 
 const EMPTY_SNAPSHOT: OverviewSnapshot = Object.freeze({ connection: "connecting" });
@@ -63,13 +68,10 @@ function boundedLabel(value: string | undefined): string | undefined {
   return label.length <= 96 ? label : `${label.slice(0, 48)}…${label.slice(-24)}`;
 }
 
-function droppedEventLabel(value: number | undefined): string {
-  if (value === undefined || !Number.isSafeInteger(value) || value < 1)
-    return "No dropped events reported";
-  return `${Math.min(value, 999_999)} dropped event${value === 1 ? "" : "s"}`;
-}
-
-/** Live stream state as a status badge plus the dropped-event count. */
+/**
+ * Live stream state as a status badge. Gaps in the stream are missed live updates, not lost
+ * records (IN-17): they get a quiet note, never a count.
+ */
 export function ConnectionStatus({
   state = "connecting",
   droppedEvents,
@@ -85,9 +87,11 @@ export function ConnectionStatus({
       aria-live="polite"
     >
       <StatusBadge tone={connectionTones[state]} label={connectionLabels[state]} />
-      <span className="truncate text-[11px] text-muted-foreground">
-        {droppedEventLabel(droppedEvents)}
-      </span>
+      {missedLiveUpdatesNote(droppedEvents) === undefined ? null : (
+        <span className="truncate text-[11px] text-muted-foreground">
+          {missedLiveUpdatesNote(droppedEvents)}
+        </span>
+      )}
     </span>
   );
 }
@@ -104,6 +108,7 @@ export function OverviewShell({
   const generationId = boundedLabel(snapshot.generationId);
   const graphHash = boundedLabel(snapshot.graphHash);
   const appId = snapshot.graphSummary?.appId;
+  const application = snapshot.application ?? INITIAL_INSPECTOR_STATE.application;
 
   return (
     <div className="overview-shell route-page">
@@ -115,7 +120,12 @@ export function OverviewShell({
             : `The active generation of ${appId}, its capabilities and recent traffic.`
         }
         badges={
-          <ConnectionStatus state={snapshot.connection} droppedEvents={snapshot.droppedEvents} />
+          <span role="status" aria-live="polite" className="inline-flex">
+            <StatusBadge
+              tone={APPLICATION_TONES[application.state]}
+              label={`Application ${applicationLabel(application.state)}`}
+            />
+          </span>
         }
         actions={
           <Link href="/graph" className={linkButtonClass}>
@@ -125,7 +135,8 @@ export function OverviewShell({
       />
 
       <HealthStrip
-        {...(snapshot.connection === undefined ? {} : { connection: snapshot.connection })}
+        {...(snapshot.connection === undefined ? {} : { stream: snapshot.connection })}
+        application={application}
         {...(generationId === undefined ? {} : { generationId })}
         {...(graphHash === undefined ? {} : { graphHash })}
         {...(snapshot.droppedEvents === undefined ? {} : { droppedEvents: snapshot.droppedEvents })}
@@ -136,12 +147,14 @@ export function OverviewShell({
         counts={snapshot.counts}
         summary={snapshot.graphSummary}
         requests={signals.requests}
+        requestCounts={signals.requestCounts}
       />
 
       <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <RecentRequests requests={signals.requests} />
         <GenerationHistory
           generations={signals.generations}
+          application={application}
           {...(generationId === undefined ? {} : { generationId })}
         />
       </div>

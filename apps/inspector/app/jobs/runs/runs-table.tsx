@@ -5,7 +5,7 @@ import { EmptyState } from "../../../components/neon/empty-state";
 import { HistoryList, type HistoryEntry } from "../../../components/neon/history-list";
 import { statusTone } from "../../../components/neon/status-badge";
 import type { InspectorObject } from "../../../lib/api-types";
-import { NO_JOBS_MESSAGE } from "../../../lib/api-request-utils";
+import { JobsNoneDeclared } from "../jobs-none-declared";
 import { middleTruncate } from "../../../lib/format";
 import { elapsed, text } from "../job-format";
 
@@ -17,14 +17,7 @@ export function RunsTable({
   readonly items: readonly InspectorObject[];
   readonly state: "loading" | "ready" | "error" | "absent";
 }) {
-  if (state === "absent")
-    return (
-      <EmptyState
-        icon={<Briefcase />}
-        title={<span role="status">{NO_JOBS_MESSAGE}</span>}
-        description="Declare a job in the application and its runs appear here as they are accepted."
-      />
-    );
+  if (state === "absent") return <JobsNoneDeclared icon={<Briefcase />} />;
   if (state === "error")
     return (
       <FailedState

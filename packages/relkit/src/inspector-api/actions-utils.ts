@@ -6,6 +6,7 @@ import { inspectorExecution } from "./execution.js";
 import { API_VERSION, PROTOCOL_VERSION, canonicalJson } from "relkit/contracts";
 import { isRecord, safeJson, type ResolvedActiveGeneration } from "./shared.js";
 import { InspectorActionError } from "./actions-errors.js";
+import { applicationCause } from "./actions-cause.js";
 import { ACTION_REDACTION } from "./actions-projection.js";
 import type { InspectorActionRequest, InspectorAuditRecord } from "./actions.js";
 import type { InspectorMode } from "./shared.js";
@@ -217,9 +218,17 @@ export function toActionError(error: unknown): InspectorActionError {
       ? 403
       : code.includes("PROTOCOL") || code.includes("REQUEST")
         ? 400
-        : 409;
+        : code.includes("UNSUPPORTED")
+          ? 501
+          : code.includes("VALIDATION")
+            ? 422
+            : 409;
+  // The application's own status and safe code travel under `cause`, so a refusal such as a
+  // missing session reads as the application's answer rather than an Inspector failure.
+  const cause = applicationCause(error);
   return new InspectorActionError(
     code.startsWith("RELKIT_") ? code : "RELKIT_INSPECTOR_ACTION_FAILED",
     status,
+    cause === undefined ? undefined : { cause },
   );
 }

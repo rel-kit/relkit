@@ -97,7 +97,9 @@ export interface OpenApiDocument {
   readonly tags?: readonly OpenApiTag[];
   readonly paths: Readonly<Record<string, OpenApiPathItem>>;
   readonly components?: {
-    readonly securitySchemes: Readonly<Record<string, OpenApiSecurityScheme>>;
+    /** The shared Problem Details schema that generated error responses refer to. */
+    readonly schemas?: Readonly<Record<string, OpenApiSchema>>;
+    readonly securitySchemes?: Readonly<Record<string, OpenApiSecurityScheme>>;
   };
   readonly "x-relkit": {
     readonly version: number;

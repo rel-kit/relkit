@@ -7,6 +7,7 @@ import { upgradeWebSocket, websocket } from "hono/bun";
 import type { BunWebSocketData } from "hono/bun";
 import { processEnvironment } from "../process-environment.js";
 import { bunModules, bunProcesses } from "./processes.js";
+import { acceptedRequest, internalErrorResponse } from "./request-target.js";
 import type {
   RuntimeAdapter,
   RuntimeServeOptions,
@@ -26,7 +27,16 @@ async function serve(options: RuntimeServeOptions): Promise<RuntimeServer> {
     ...(options.maxRequestBodySize === undefined
       ? {}
       : { maxRequestBodySize: options.maxRequestBodySize }),
-    fetch: (request, bunServer) => options.fetch(request, bunServer),
+    // Never Bun's development error page, whatever NODE_ENV says: it shows source and paths.
+    development: false,
+    error: (error) => {
+      console.error(error);
+      return internalErrorResponse();
+    },
+    fetch: (request, bunServer) => {
+      const accepted = acceptedRequest(request, bunServer.url.host);
+      return accepted instanceof Response ? accepted : options.fetch(accepted, bunServer);
+    },
   });
   return Object.freeze({
     port: server.port ?? options.port,

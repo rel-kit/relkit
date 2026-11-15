@@ -25,3 +25,20 @@ export function makeDuckdbRows(connection: DuckdbConnectionPort, permit: Semapho
     });
   });
 }
+/** @param connection - Scoped native connection. @param permit - Database serialization. @returns A reader of one `total` count row. */
+export function makeDuckdbCount(connection: DuckdbConnectionPort, permit: Semaphore.Semaphore) {
+  return Effect.fn("ObservabilityDuckdb.count")(function* (
+    sql: string,
+    values: DuckDBValue[] = [],
+  ) {
+    const result = yield* permit.withPermit(readDuckdbSql(connection, "query", sql, values));
+    return yield* Effect.try({
+      try: (): number => {
+        const total = Number(result.getRowObjectsJson()[0]?.total);
+        if (!Number.isSafeInteger(total) || total < 0) throw new TypeError("Invalid count row");
+        return total;
+      },
+      catch: (cause) => duckdbError("decode", cause),
+    });
+  });
+}

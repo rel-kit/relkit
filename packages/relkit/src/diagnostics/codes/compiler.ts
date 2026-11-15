@@ -173,6 +173,13 @@ export const compilerCodes = [
     fix: "Rename one of them, or give it an explicit `id` if the ID was taken from the file or export name.",
   },
   {
+    code: "RELKIT_EVALUATOR_BUN_RUNTIME_REQUIRED",
+    title: "A source file imports a module that needs Bun",
+    happened:
+      "RelKit loads your source files on the runtime the command runs on. The command runs on Node, and a file imports a module that exists only on Bun, such as `bun:sqlite` or `drizzle-orm/bun-sql`.",
+    fix: "Run the command with Bun, for example `bun --bun run check`, or open the database with a client that selects the driver for the runtime: `openSqliteDatabase` from `@relkit/drizzle/sqlite`, `openPostgresDatabase` from `@relkit/drizzle/pg` or `openMysqlDatabase` from `@relkit/drizzle/mysql`.",
+  },
+  {
     code: "RELKIT_EVALUATOR_IMPORT_FAILED",
     title: "A source file failed to load",
     happened:
@@ -621,7 +628,7 @@ export const compilerCodes = [
     title: "Provider works only locally",
     happened:
       "A provider binding is set up for local use only, but this build targets a real deployment.",
-    fix: "Configure a connected or infrastructure source for the provider binding named in the error.",
+    fix: 'At the binding the error points at, give the adapter inside `docker(…)` its binding values, for example `docker(s3({ endpoint: env.url("S3_ENDPOINT"), … }))`, so release builds resolve them, or select an infrastructure source such as `aws(s3())` from `@relkit/aws`.',
   },
   {
     code: "RELKIT_PROVIDER_RUNTIME_INVALID",
@@ -729,7 +736,7 @@ export const compilerCodes = [
     title: "Integration package is missing",
     happened:
       "The app needs an integration package that is not installed or has no RelKit details.",
-    fix: "Install the integration package named in the error with `bun add`, then run `relkit build` again.",
+    fix: "Add the integration package named in the error to the project's dependencies, then run `relkit build` again.",
   },
   {
     code: "RELKIT_RUNTIME_INTEGRATION_PLAN_REFERENCE_INVALID",

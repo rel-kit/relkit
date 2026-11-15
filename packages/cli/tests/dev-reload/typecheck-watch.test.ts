@@ -56,9 +56,10 @@ test(
       functionSource("a2", "v1", typeError),
     );
     await dev.waitFor("/a2", "a2 v1");
+    // The terminal prints the diagnostic, not the event's name. The save lands while the checker
+    // may still be on its first pass, which must not leave the error unreported.
     const deadline = Date.now() + 240_000;
-    while (!dev.output().includes("dev.typecheck.failed") && Date.now() < deadline)
-      await Bun.sleep(200);
+    while (!dev.output().includes("TS2322") && Date.now() < deadline) await Bun.sleep(200);
     expect(dev.output()).toContain("src/services/alpha/functions/a2.function.ts:");
     expect(dev.output()).toContain("TS2322");
   },

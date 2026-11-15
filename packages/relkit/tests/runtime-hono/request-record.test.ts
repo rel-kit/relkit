@@ -33,7 +33,7 @@ test("records an error status returned without a thrown failure as a failed outc
     );
 
   expect(response.status).toBe(404);
-  expect(record).toMatchObject({ status: 404, outcome: "declared-error" });
+  expect(record).toMatchObject({ status: 404, outcome: "refused" });
   expect(span?.events?.map((event) => event.name)).toContain("http.declared-error");
   expect(span?.events?.map((event) => event.name)).not.toContain("http.success");
 });
@@ -210,14 +210,43 @@ test("answers unmatched paths with a 404 problem and wrong methods with a 405 pr
     code: "not-found",
     detail: "No route matches this request.",
     traceId: expect.stringMatching(/^[0-9a-f]{32}$/),
+    requestId: missing.headers.get("x-request-id"),
   });
 
   const wrongMethod = await app.request("http://localhost/hello", { method: "DELETE" });
   expect(wrongMethod.status).toBe(405);
-  expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD");
+  expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD, OPTIONS");
   expect(await wrongMethod.json()).toMatchObject({
     status: 405,
     code: "method-not-allowed",
-    detail: "This path does not accept DELETE; it accepts GET, HEAD.",
+    detail: "This path does not accept DELETE; it accepts GET, HEAD, OPTIONS.",
   });
+});
+
+test("answers OPTIONS on a routed path with 204 and Allow, and leaves a declared OPTIONS route alone", async () => {
+  const base = plan();
+  const declared = {
+    ...base.httpTriggers[0]!,
+    id: "hello.options.route",
+    targetFunctionId: "hello.options",
+    config: { ...base.httpTriggers[0]!.config, method: "OPTIONS", path: "/declared" },
+  } as RegistrationPlan["httpTriggers"][number];
+  const app = createApp({
+    plan: { ...base, httpTriggers: [...base.httpTriggers, declared] },
+    manifest: manifest(),
+    engine: { invoke: async () => ({ declared: true }) },
+  });
+
+  const options = await app.request("http://localhost/hello", { method: "OPTIONS" });
+  expect(options.status).toBe(204);
+  expect(options.headers.get("allow")).toBe("GET, HEAD, OPTIONS");
+  expect(options.headers.get("x-request-id")).toBeTruthy();
+  expect(await options.text()).toBe("");
+
+  const missing = await app.request("http://localhost/missing", { method: "OPTIONS" });
+  expect(missing.status).toBe(404);
+
+  const own = await app.request("http://localhost/declared", { method: "OPTIONS" });
+  expect(own.status).toBe(200);
+  expect(await own.json()).toEqual({ declared: true });
 });

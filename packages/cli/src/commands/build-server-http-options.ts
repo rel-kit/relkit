@@ -5,6 +5,7 @@
  */
 import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 import type { ServerSourceConfiguration } from "./build-server.types.js";
+import { inspectionGraphSource } from "./build-server-deferred-inspector.js";
 
 /** Emits the complete application configuration without evaluating declarations.
  * @param configuration - Checked server and inspector settings.
@@ -36,6 +37,9 @@ function coreHttpOptionsSource(configuration: ServerSourceConfiguration): string
   },
   observability: telemetry,
   responseMapping: { mode: environment },
+  // Development prints framework logs of a request, such as the redacted cause of a 500, in the
+  // terminal; production keeps them in the observability sink only.
+  ...(environment === "production" ? {} : { effectLogger: { human: { write: (_line, record) => writeHttpLog(record) } } }),
   middlewareContext: routeMiddlewareContext,
   middleware: httpMiddlewareOptions,
   apiDocs: {
@@ -139,8 +143,7 @@ ${configuration.runtime === "workers" ? STATIC_FILES_FROM_PLATFORM : STATIC_FILE
       graphContractVersion: ${GRAPH_VERSION},
       manifestContractVersion: ${MANIFEST_VERSION},
       manifestGeneratorVersion: ${GENERATOR_VERSION},
-      graph,
-    },
+    },${inspectionGraphSource(configuration)}
     ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
       ? {}
       : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),

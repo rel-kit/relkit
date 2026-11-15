@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { API_BASE_PATH, API_VERSION, canonicalJson } from "relkit/contracts";
 import { createRegistrationPlan, type RegistrationPlan } from "relkit/graph";
 import { generateClient } from "../../../packages/cli/src/client-generator/index.ts";
-import { generateOpenApiJson } from "relkit/openapi";
+import { generateOpenApiJson, type OpenApiDocument } from "relkit/openapi";
 import { createApp, type RuntimeManifest } from "relkit/runtime-hono";
 import { createTestHttpClient } from "../../../packages/testing/src/index.ts";
 import { runtimeCohort } from "../runtime-cohort.ts";
@@ -35,6 +35,17 @@ test("keeps runtime, OpenAPI, and generated client contracts aligned", async () 
     expect(invalid.status).toBe(422);
     expect(await invalid.json()).toMatchObject({ code: "validation" });
     expect(calls).toHaveLength(2);
+
+    // Every status the server sent is declared; 500 is declared although it did not occur, and a
+    // route that reads no body declares no 413.
+    const declared = Object.keys(
+      (JSON.parse(generateOpenApiJson(graph)) as OpenApiDocument).paths["/orders/{orderId}"]?.get
+        ?.responses ?? {},
+    );
+    for (const response of [success, missing, invalid])
+      expect(declared).toContain(String(response.status));
+    expect(declared).toContain("500");
+    expect(declared).not.toContain("413");
 
     expect(generateOpenApiJson(graph)).toBe(
       await readFixture("orders.openapi.json", generateOpenApiJson(graph)),

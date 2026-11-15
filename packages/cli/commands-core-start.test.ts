@@ -21,7 +21,13 @@ test("start serves core HTTP without rich inspection and rejects an invalid buil
   const manifestPath = join(built.buildDirectory, "manifest.json");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
   expect(manifest.entrypoint).toBe("server/index.js");
-  const started = await startProject({ projectRoot: root, port: 0, healthTimeoutMs: 3_000 });
+  // The activation probe is a development surface; production is the default for start.
+  const started = await startProject({
+    projectRoot: root,
+    port: 0,
+    healthTimeoutMs: 3_000,
+    environment: { RELKIT_ENV: "development" },
+  });
   try {
     await Effect.runPromise(assertStartedHttp(started, built));
   } finally {

@@ -1,4 +1,5 @@
 import {
+  EVENT_ACTIONS_INSPECTOR_SOURCE,
   NATIVE_JOBS_INSPECTOR_SOURCE,
   RESOURCE_INSPECTOR_SOURCE,
 } from "./build-server-inspector-runtime.js";
@@ -10,16 +11,20 @@ import type { ServerSourceConfiguration } from "./build-server-http.js";
  * @returns Pure source retaining query, native jobs, and resource inspection contracts.
  */
 export function inspectorEndpointsSource(configuration: ServerSourceConfiguration): string {
-  return `installInspectorEndpoints(app, {
+  return `const inspectionAuthorize = (request) => process.env.RELKIT_INSPECTOR_SESSION_TOKEN !== undefined && request.headers.get("x-relkit-inspector-session-token") === process.env.RELKIT_INSPECTOR_SESSION_TOKEN;
+// Agent workflow and execution routes on this router answer only the inspection session.
+app[Symbol.for("relkit.inspection.authorize")] = inspectionAuthorize;
+installInspectorEndpoints(app, {
   mode: environment,
   enabled: internalEndpointsEnabled,
-  authorize: (request) => process.env.RELKIT_INSPECTOR_SESSION_TOKEN !== undefined && request.headers.get("x-relkit-inspector-session-token") === process.env.RELKIT_INSPECTOR_SESSION_TOKEN,
+  authorize: inspectionAuthorize,
   activeGeneration: {
     generationId,
     graphHash,
     activationFingerprint,
     graph,
     diagnostics: [],
+    observedEdges: () => [...observedEdges.values()],
     integrations: runtimeIntegrationsPlan,
     localServices: localServicesInspector,
     telemetry: () => ({
@@ -44,6 +49,7 @@ ${NATIVE_JOBS_INSPECTOR_SOURCE}    actions: {
         retry: (request) => nativeJobControl(request.instanceId, "retry", request.reason),
         cancel: (request) => nativeJobControl(request.instanceId, "cancel", request.reason),
       },
+${EVENT_ACTIONS_INSPECTOR_SOURCE}
     },
 ${RESOURCE_INSPECTOR_SOURCE}
   },

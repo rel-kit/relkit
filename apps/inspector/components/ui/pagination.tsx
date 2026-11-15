@@ -23,7 +23,7 @@ export function Pagination({
       <Button
         variant="secondary"
         size="sm"
-        isDisabled={!hasPrevious || disabled}
+        isDisabled={!hasPrevious || disabled === true}
         onPress={onPrevious}
       >
         <ChevronLeft aria-hidden="true" className="size-3.5" /> Previous
@@ -31,7 +31,12 @@ export function Pagination({
       <span className="text-xs text-[var(--muted)]" aria-live="polite">
         Page {page}
       </span>
-      <Button variant="secondary" size="sm" isDisabled={!hasNext || disabled} onPress={onNext}>
+      <Button
+        variant="secondary"
+        size="sm"
+        isDisabled={!hasNext || disabled === true}
+        onPress={onNext}
+      >
         Next <ChevronRight aria-hidden="true" className="size-3.5" />
       </Button>
     </nav>

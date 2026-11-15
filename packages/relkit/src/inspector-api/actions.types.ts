@@ -98,6 +98,20 @@ export interface InspectorEventActionService {
   readonly cancel?: (request: InspectorEventActionRequest) => MaybePromise<unknown>;
 }
 
+/** What a development server supplies to {@link InspectorEventActionService} publish and replay. */
+export interface InspectorEventActionsOptions {
+  /** Declared events of the active generation, each with its provider profile. */
+  readonly events: readonly {
+    readonly id: string;
+    readonly version: number;
+    readonly profile: string;
+  }[];
+  /** Resolves the event provider of a profile, waiting for providers to be ready. */
+  readonly provider: (profile: string) => MaybePromise<unknown>;
+  /** Function, target and service descriptors searched for each event's payload schema. */
+  readonly descriptors: () => Iterable<unknown>;
+}
+
 /** Existing authoritative tool decision states. */
 export type InspectorToolApprovalState = "pending" | "approved" | "denied";
 
@@ -144,6 +158,22 @@ export interface InspectorAuditRecord {
   readonly requestedAt: string;
   readonly errorCode?: string;
   readonly reason?: string;
+}
+
+/**
+ * The application's answer to a refused action, under `cause` in the rejected action body: the
+ * HTTP status it would have sent and its safe error code (`unauthenticated`, `access-denied`, a
+ * declared error id, `validation`, or a failure class such as `internal-error`). Messages, data and
+ * rejected values are never included.
+ */
+export interface InspectorActionCause {
+  readonly status: number;
+  readonly code: string;
+  /** Invalid input fields by path, with the issue code when the schema reports one. */
+  readonly issues?: readonly {
+    readonly path: readonly (string | number)[];
+    readonly code: string;
+  }[];
 }
 
 /** Native action authorities retained by the active generation, including best-effort audit delivery. */

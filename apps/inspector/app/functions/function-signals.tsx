@@ -4,19 +4,23 @@ import type { InspectorObject } from "../../lib/api-types";
 import { Section } from "../../components/blocks/section";
 import { HistoryList, type HistoryEntry } from "../../components/neon/history-list";
 import type { StatusTone } from "../../components/neon/status-badge";
+import { emptySignalText } from "../../lib/signal-empty";
 import { Count } from "../domains/catalog-kit";
 
 export function FunctionSignals({
   logs,
   traces,
+  unavailable = false,
 }: {
   readonly logs: readonly InspectorObject[];
   readonly traces: readonly InspectorObject[];
+  /** History cannot be read, so empty lists mean nothing. */
+  readonly unavailable?: boolean;
 }) {
   return (
     <div className="grid min-w-0 gap-4 2xl:grid-cols-2">
-      <SignalPanel title="Recent traces" items={traces} kind="trace" />
-      <SignalPanel title="Recent logs" items={logs} kind="log" />
+      <SignalPanel title="Recent traces" items={traces} kind="trace" unavailable={unavailable} />
+      <SignalPanel title="Recent logs" items={logs} kind="log" unavailable={unavailable} />
     </div>
   );
 }
@@ -25,10 +29,12 @@ function SignalPanel({
   title,
   items,
   kind,
+  unavailable,
 }: {
   readonly title: string;
   readonly items: readonly InspectorObject[];
   readonly kind: "log" | "trace";
+  readonly unavailable: boolean;
 }) {
   const entries = items.map((item, index) => entry(item, kind, index));
   return (
@@ -41,12 +47,15 @@ function SignalPanel({
           ? "Invocations correlated with this function"
           : "Structured logs it emitted"
       }
-      actions={<Count value={items.length} />}
+      actions={unavailable ? null : <Count value={items.length} />}
       flush
     >
-      {entries.length === 0 ? (
-        <p className="m-0 px-4 py-3 text-xs text-muted-foreground">
-          No correlated {kind}s are retained.
+      {unavailable || entries.length === 0 ? (
+        <p
+          className="m-0 px-4 py-3 text-xs text-muted-foreground"
+          {...(unavailable ? { role: "alert" } : {})}
+        >
+          {emptySignalText(kind, unavailable)}
         </p>
       ) : (
         <HistoryList

@@ -6,7 +6,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { relativeTime } from "@/lib/format";
+import { relativeTime, utcTimestamp } from "@/lib/format";
 import { EmptyState } from "./empty-state";
 import type { StatusTone } from "./status-badge";
 
@@ -76,7 +76,7 @@ export function Timeline({
                 {item.at ? (
                   <time
                     dateTime={item.at}
-                    title={item.at}
+                    title={utcTimestamp(item.at)}
                     className="ml-auto shrink-0 font-mono text-[10.5px] text-muted-foreground/80 tabular-nums"
                   >
                     {relativeTime(item.at)}

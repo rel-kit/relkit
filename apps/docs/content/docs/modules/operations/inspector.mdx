@@ -11,8 +11,11 @@ import inspectorShell from "../../../../../../tests/e2e/inspector-redesign.spec.
 The Inspector is an optional tool for browsing your running application's routes, resources, traces, and history. Inspection is optional and disabled by default.
 The separate `@relkit/inspector` package owns the UI and diagnostic history. `relkit add inspector`
 enables the application bridge and installs that package as a project devDependency; `relkit inspector`
-launches it. The tool requires Bun 1.3.10 or newer and Node.js 20.9.0 or newer.
-The backend-only development workflow needs no Node.js installation.
+launches it. The tool requires Node.js 20.9.0 or newer on `PATH`: its interface and history worker run
+on a real Node.js, also when you start the launcher with `bun --bun run inspector`, where `node` is
+Bun's alias and RelKit looks for the next `node` on `PATH`. Without one, the Inspector stops with
+`ui.node-missing` or `ui.node-unsupported` and says what to install. The backend-only development
+workflow needs no Node.js installation.
 
 `relkit jobs` reads and controls live provider state on the application backend;
 it works independently of the inspector UI and application inspection setting.
@@ -148,6 +151,24 @@ than as empty history, and closing the Inspector never cancels accepted work.
 Generation views expose the composite activation fingerprint. If a new candidate fails graph, manifest,
 integration-plan, local-service, readiness, or override validation, traffic remains on the last known good
 generation and the Inspector continues to show that active state.
+
+## Know what the Inspector records and does
+
+- **Status.** The header shows three states apart: the page's stream to the Inspector, the
+  Inspector's session with your application, and history. When the application stops, pages say so
+  and keep showing retained history. The application's session state is separate from the
+  Inspector's own stream, so "stream connected" does not mean "application running".
+- **Actions run without a user session.** Invoking a function, sending a route request, connecting
+  to a channel and publishing an event act as an anonymous caller. A function or route that needs a
+  session answers `401`, and the Inspector shows that answer. Choosing a user to act as is not
+  supported.
+- **Captured content.** HTTP headers and raw request and response bodies are not recorded. A
+  request's function input and result are recorded when redacted capture is on, with secrets
+  removed before they are stored.
+- **Finding a request.** Paste a request ID or trace ID into the Requests page's text filter or the
+  command palette; see [Find a request](/docs/modules/http/responses#find-a-request).
+- **Failed requests.** A `500` request shows the redacted cause of the failure, which the response
+  itself never carries.
 
 ## Resolve common Inspector problems
 

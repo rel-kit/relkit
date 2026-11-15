@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { schemaFields, type SchemaField } from "../lib/schema-model";
+import { fieldRequirement, schemaFields, type SchemaField } from "../lib/schema-model";
 import { cn } from "../lib/utils";
 
 /** Shared control styling for schema-generated and route-composer inputs. */
@@ -16,16 +16,18 @@ export function FieldLabel({
   name,
   hint,
   required,
+  defaultValue,
 }: {
   readonly name: string;
   readonly hint: string;
   readonly required: boolean;
+  readonly defaultValue?: unknown;
 }) {
   return (
     <span className="flex min-w-0 items-baseline gap-1.5">
       <span className="truncate font-mono text-xs font-medium text-foreground">{name}</span>{" "}
       <small className="truncate font-mono text-[11px] text-muted-foreground">
-        ({hint}) · {required ? "required" : "optional"}
+        ({hint}) · {fieldRequirement({ required, defaultValue })}
       </small>
     </span>
   );
@@ -89,7 +91,12 @@ function SchemaFieldInput({
       className={cn("grid min-w-0 content-start gap-1.5", wide && "@xl:col-span-2")}
       htmlFor={id}
     >
-      <FieldLabel name={field.key} hint={field.type} required={field.required} />
+      <FieldLabel
+        name={field.key}
+        hint={field.type}
+        required={field.required}
+        defaultValue={field.defaultValue}
+      />
       {enumValues.length > 0 ? (
         <select
           id={id}

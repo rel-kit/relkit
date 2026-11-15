@@ -1878,6 +1878,15 @@ export interface ModuleReloader {
   /** @returns Loaded application modules whose file changed or disappeared since `record`. */
   readonly changed: () => readonly string[];
   /**
+   * Drops, by path, every file evicted since it last loaded, and the new files it imports,
+   * whether loaded or not. Call it after an import fails: a module that failed to parse stays in
+   * the runtime's loader without appearing in the registry keys, and a later import of it, or of
+   * a module importing it, never settles; one that threw at the top level stays half-initialized.
+   * `invalidate` first drops the ones that are not loaded, which covers the next reload.
+   * @returns The dropped absolute files, sorted.
+   */
+  readonly discardFailed: () => readonly string[];
+  /**
    * Evicts files and every loaded module that transitively imports them.
    * @param files - Absolute or project-relative changed files.
    * @returns Every evicted absolute file, sorted.

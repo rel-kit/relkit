@@ -10,9 +10,12 @@ import { Effect } from "effect";
 import { relative } from "node:path";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
+import { bunRuntimeFailures } from "./check-runtime-imports.js";
+import { buildErrorDiagnostic, rootCauseKey } from "./check-build-errors.js";
 
 /** Projects evaluator evidence into compiler diagnostics with source locations.
  * @param failures - Complete evaluator evidence.
+ * @param sources - Application files, used to locate the import behind a Bun-only module.
  * @returns Compiler diagnostics preserving optional source locations and existing message projection.
  */
 export function evaluatorDiagnostics(
@@ -20,16 +23,60 @@ export function evaluatorDiagnostics(
     readonly code: string;
     readonly message: string;
     readonly module?: string;
+    readonly stack?: string;
+    readonly buildErrors?: readonly {
+      readonly file: string;
+      readonly line: number;
+      readonly column: number;
+      readonly message: string;
+    }[];
   }[],
+  sources: readonly { readonly fileName: string; readonly text: string }[] = [],
 ): readonly Diagnostic[] {
-  return failures.map((failure) =>
-    createDiagnostic({
-      code: failure.code,
-      severity: "error",
-      message: safeMessage(failure.message),
-      ...(failure.module === undefined ? {} : { file: failure.module, line: 1, column: 1 }),
-    }),
-  );
+  const causes = rootCauses(failures);
+  const runtimeFailures = bunRuntimeFailures(causes, sources);
+  return causes.flatMap((failure, index) => {
+    const runtimeFailure = runtimeFailures[index];
+    if (runtimeFailure === "covered") return [];
+    return [
+      runtimeFailure ??
+        buildErrorDiagnostic(failure) ??
+        createDiagnostic({
+          code: failure.code,
+          severity: "error",
+          message: safeMessage(failure.message),
+          ...(failure.module === undefined ? {} : { file: failure.module, line: 1, column: 1 }),
+        }),
+    ];
+  });
+}
+
+/**
+ * Keeps one failure per distinct message (and parse error location). A file that imports a failing
+ * file fails with the same error, so the failure kept is the file the message or stack names, else
+ * the first one.
+ * @param failures - Evaluator failures in evaluation order.
+ * @returns The failures that are root causes, in their original order.
+ */
+function rootCauses<
+  Failure extends Parameters<typeof rootCauseKey>[0] & {
+    readonly module?: string;
+    readonly stack?: string;
+  },
+>(failures: readonly Failure[]): readonly Failure[] {
+  const groups = new Map<string, Failure[]>();
+  for (const failure of failures)
+    groups.set(rootCauseKey(failure), [...(groups.get(rootCauseKey(failure)) ?? []), failure]);
+  const named = (group: readonly Failure[], text: (failure: Failure) => string | undefined) =>
+    group.find(
+      (failure) => failure.module !== undefined && text(failure)?.includes(failure.module),
+    );
+  return failures.filter((failure) => {
+    const group = groups.get(rootCauseKey(failure))!;
+    const kept =
+      named(group, (entry) => entry.message) ?? named(group, (entry) => entry.stack) ?? group[0];
+    return kept === failure;
+  });
 }
 
 /** Projects warnings the application reported while it was imported, such as a deprecation.

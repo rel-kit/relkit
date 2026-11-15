@@ -73,7 +73,10 @@ export function makeRecord(event: EffectLogger.Options<unknown>, component: stri
     component: text(annotations.component) ?? component,
     message: formatMessage(event.message),
     fields: jsonObject(fields),
-    ...optional("functionId", trace?.functionId ?? annotations.functionId),
+    // Provider operations log from their own Effect run without InvocationTrace; the native
+    // execution context still names the invocation's function. Contexts outside an invocation
+    // (the HTTP boundary) carry no function, so nothing leaks onto their logs.
+    ...optional("functionId", trace?.functionId ?? active?.functionId ?? annotations.functionId),
     ...optional("requestId", active?.requestId ?? annotations.requestId),
     ...optional("originRequestId", active?.originRequestId ?? annotations.originRequestId),
     ...optional(
@@ -89,7 +92,7 @@ export function makeRecord(event: EffectLogger.Options<unknown>, component: stri
     ...optional("generationId", active?.generationId ?? annotations.generationId),
     ...optional("graphHash", active?.graphHash ?? annotations.graphHash),
     ...optional("source", trace?.source ?? annotations.source),
-    ...optional("serviceId", trace?.serviceId ?? annotations.serviceId),
+    ...optional("serviceId", trace?.serviceId ?? active?.serviceId ?? annotations.serviceId),
   });
 }
 

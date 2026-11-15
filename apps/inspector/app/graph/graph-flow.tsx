@@ -12,6 +12,7 @@ import {
   type Node,
 } from "@xyflow/react";
 import type { FilteredGraph } from "../../lib/graph-filter";
+import { THEMED_CONTROLS } from "./graph-canvas";
 import { layoutGraph, type GraphDirection, type GraphLayout } from "../../lib/graph-layout";
 import type { GraphNode, GraphSnapshot } from "../../lib/graph-model";
 
@@ -138,7 +139,7 @@ export function GraphFlow({
           bgColor="var(--panel)"
           ariaLabel="Graph minimap"
         />
-        <Controls showInteractive={false} />
+        <Controls showInteractive={false} style={THEMED_CONTROLS} />
         <Background variant={BackgroundVariant.Dots} gap={18} size={1} />
       </ReactFlow>
     </div>

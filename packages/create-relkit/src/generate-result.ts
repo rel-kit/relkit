@@ -16,6 +16,7 @@ import { createGenerateNextSteps } from "./generate-output.js";
  * @param destination - Atomically published final directory.
  * @param gitInitialized - Existing optional Git step result.
  * @param context - Working directory for printed local commands.
+ * @param notice - Why a dependency repair was skipped, when it was.
  * @returns Frozen output; listing failures retain their original channel.
  */
 export const generationResult = Effect.fn("ProjectGeneration.result")(
@@ -24,6 +25,7 @@ export const generationResult = Effect.fn("ProjectGeneration.result")(
     destination: string,
     gitInitialized: boolean,
     context: GenerateProjectContext,
+    notice?: string,
   ) {
     const nextSteps = createGenerateNextSteps(options, destination, context.cwd);
     return Object.freeze({
@@ -38,16 +40,17 @@ export const generationResult = Effect.fn("ProjectGeneration.result")(
       installed: options.install,
       gitInitialized,
       additions: Object.freeze([]),
-      warnings: Object.freeze(
-        !options.install
-          ? [
+      warnings: Object.freeze([
+        ...(notice === undefined ? [] : [{ code: "dependency-patch-skipped", message: notice }]),
+        ...(options.install
+          ? []
+          : [
               {
                 code: "validation-skipped",
                 message: `Install dependencies, then check the project with ${nextSteps.commands.prepare} before ${nextSteps.commands.dev}.`,
               },
-            ]
-          : [],
-      ),
+            ]),
+      ]),
       nextSteps,
     });
   },

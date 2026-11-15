@@ -83,11 +83,23 @@ async function pdfPreview(driver: BrowserAcceptanceDriver): Promise<void> {
   await run("wait", "--text", "documents/sample.pdf");
   tree = await snapshot();
   await run("click", reference(tree, 'button "Preview"'));
-  await run("wait", 'iframe[title="Preview of documents/sample.pdf"][sandbox]');
+  // The page shows a PDF in an <object> on a blob: URL it makes itself, never a frame. The
+  // driver runs without Chrome's PDF viewer (see browserEnvironment), so this checks the
+  // markup the page produces, not how a browser renders the PDF.
+  const pdf = 'object[type="application/pdf"][aria-label="Preview of documents/sample.pdf"]';
+  await run("wait", pdf);
   includes(
     await run(
       "eval",
-      "Boolean(document.querySelector('iframe[title=\"Preview of documents/sample.pdf\"][sandbox]'))",
+      `document.querySelector('${pdf}')?.data.startsWith('blob:' + location.origin + '/') && !document.querySelector('iframe[title="Preview of documents/sample.pdf"]')`,
+    ),
+    "true",
+  );
+  includes(await run("get", "url"), `${baseUrl}/buckets/assets`);
+  includes(
+    await run(
+      "eval",
+      "document.querySelector('a[download=\"sample.pdf\"]')?.textContent === 'Download sample.pdf'",
     ),
     "true",
   );
@@ -104,7 +116,7 @@ async function metadataPreviews(driver: BrowserAcceptanceDriver): Promise<void> 
   tree = await snapshot();
   includes(tree, 'cell "unsafe/page.html"');
   await run("click", reference(tree, 'button "Preview"'));
-  await run("wait", "--text", "metadata-only");
+  await metadataOnly(driver, "unsafe/page.html");
   await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
@@ -113,7 +125,7 @@ async function metadataPreviews(driver: BrowserAcceptanceDriver): Promise<void> 
   await run("wait", "--text", "binary/oversized.bin");
   tree = await snapshot();
   await run("click", reference(tree, 'button "Preview"'));
-  await run("wait", "--text", "metadata-only");
+  await metadataOnly(driver, "binary/oversized.bin");
   await run("open", `${baseUrl}/buckets/assets`);
   await run("wait", "--text", "docs/readme.txt");
   tree = await snapshot();
@@ -124,6 +136,30 @@ async function metadataPreviews(driver: BrowserAcceptanceDriver): Promise<void> 
   await run("wait", "--text", "does not support inspection");
   await run("open", `${baseUrl}/buckets/broken`);
   await run("wait", "--text", "Provider explorer failed.");
+}
+
+/** The preview of an object the Inspector does not render says so, lists the key and size the
+ * provider reports, and mounts no frame, object or image for the content.
+ */
+async function metadataOnly(driver: BrowserAcceptanceDriver, key: string): Promise<void> {
+  const { run, includes } = driver;
+  await run("wait", "--text", "The Inspector shows no content for this type.");
+  const dialog = "document.querySelector('dialog[open], [role=dialog]')";
+  includes(
+    await run(
+      "eval",
+      `[...${dialog}.querySelectorAll('dd')].some(dd => dd.textContent === '${key}')`,
+    ),
+    "true",
+  );
+  includes(
+    await run(
+      "eval",
+      `${dialog}.querySelector('dt')?.textContent === 'Key' && ${dialog}.textContent.includes(' bytes')`,
+    ),
+    "true",
+  );
+  includes(await run("eval", `!${dialog}.querySelector('iframe, object, img')`), "true");
 }
 
 async function cachePreview(driver: BrowserAcceptanceDriver): Promise<void> {

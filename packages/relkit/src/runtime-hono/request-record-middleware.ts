@@ -89,6 +89,8 @@ function fallbackStatus(outcome: RequestOutcome, responseStatus: number): number
   if (outcome === "success") return responseStatus || 200;
   if (outcome === "validation-error") return 422;
   if (outcome === "timeout") return 504;
-  if (outcome === "cancelled") return 499;
+  // The response passed in was already materialized for the client, so a cancellation after it
+  // keeps the status that was sent; 499 remains only for a request without any status.
+  if (outcome === "cancelled") return responseStatus || 499;
   return 500;
 }

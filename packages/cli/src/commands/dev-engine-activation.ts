@@ -6,6 +6,7 @@
 import { Cause, Deferred, Effect, Queue, Ref } from "effect";
 import { observeCli } from "../cli-runtime.js";
 import { activateCandidateEffect } from "./dev-activation.js";
+import { reloadGenerationLog } from "./dev-activation-identity.js";
 import { provideDevEngine } from "./dev-engine-state.js";
 import type { CliAdapterError } from "../cli-errors.js";
 import type { DevEngineState } from "./dev-engine-state.types.js";
@@ -64,7 +65,7 @@ const reloadOrActivate = Effect.fn("Dev.reloadOrActivate")(function* (
       version,
       changedFiles,
       signal: session.abortController.signal,
-      log: session.log,
+      log: reloadGenerationLog(session),
     });
     if (outcome === "swapped") return true;
     if (outcome === "failed") return false;

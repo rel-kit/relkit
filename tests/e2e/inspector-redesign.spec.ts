@@ -6,6 +6,10 @@ import { playwrightSelection } from "../../scripts/playwright-selection.js";
 
 const { backend } = playwrightSelection("inspector");
 
+// The Inspector follows the system colour scheme until a theme is chosen (IN-41); these
+// baselines were taken in dark.
+test.use({ colorScheme: "dark" });
+
 test.beforeEach(async ({ page, request }) => {
   await request.post(`${backend}/__fixture__/reset`);
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -15,7 +19,9 @@ test("centers select labels before and after changing selection", async ({ page 
   for (const width of [1280, 390]) {
     await page.setViewportSize({ width, height: 900 });
     for (const [path, label, initial, selected] of [
-      ["/jobs", "Status", "All", "available"],
+      // The Jobs status filter lists run states; "available" was a state of the legacy queue
+      // runtime, which was removed (relkit#175), so the spec picks a state the page offers.
+      ["/jobs", "Status", "All", "queued"],
       ["/routes", "Kind", "All", "POST"],
     ] as const) {
       await page.goto(path);
@@ -42,7 +48,7 @@ test("centers select labels before and after changing selection", async ({ page 
 
 test("supports keyboard search and accessible route table quick views", async ({ page }) => {
   await page.goto("/routes");
-  await expect(page.getByRole("heading", { name: "Routes" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Routes", exact: true })).toBeVisible();
   await page.addStyleTag({ content: "nextjs-portal { display: none !important; }" });
   await page.keyboard.press("ControlOrMeta+K");
   const search = page.getByRole("dialog", { name: "Search inspector" });

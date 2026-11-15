@@ -40,5 +40,6 @@ test("model records are versioned, correlated, and JSON-safe", () => {
     "timeout",
     "cancelled",
     "defect",
+    "refused",
   ]);
 });

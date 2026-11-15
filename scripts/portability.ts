@@ -17,9 +17,13 @@ import {
 } from "./portability-scan.js";
 
 /** Recorded call-site counts of one file. */
-export type PortabilityBaseline = Readonly<
-  Record<string, Partial<Record<PortabilityKind, number>>>
->;
+export type PortabilityBaseline = Readonly<Record<string, PortabilityBaselineEntry>>;
+
+/** Allowed call sites of one file; `reason` and `guard` say why a Bun site may stay. */
+export type PortabilityBaselineEntry = Partial<Record<PortabilityKind, number>> & {
+  readonly reason?: string;
+  readonly guard?: string;
+};
 
 /**
  * Packages that only run as tools on Bun or Node, where `node:` imports are portable. The Docker
@@ -99,14 +103,21 @@ export function shrinkBaseline(
   baseline: PortabilityBaseline,
 ): PortabilityBaseline {
   const counts = countUses(uses);
-  const next: Record<string, Partial<Record<PortabilityKind, number>>> = {};
+  const next: Record<string, PortabilityBaselineEntry> = {};
   for (const file of Object.keys(baseline).sort()) {
+    const { reason, guard, ...recordedKinds } = baseline[file]!;
     const kinds: Partial<Record<PortabilityKind, number>> = {};
-    for (const [kind, recorded] of Object.entries(baseline[file]!) as [PortabilityKind, number][]) {
+    for (const [kind, recorded] of Object.entries(recordedKinds) as [PortabilityKind, number][]) {
       const count = Math.min(recorded, counts[file]?.[kind] ?? 0);
       if (count > 0) kinds[kind] = count;
     }
-    if (Object.keys(kinds).length > 0) next[file] = kinds;
+    if (Object.keys(kinds).length === 0) continue;
+    // The stated reason and guard belong to the remaining sites, so they survive a lowering.
+    next[file] = {
+      ...kinds,
+      ...(reason === undefined ? {} : { reason }),
+      ...(guard === undefined ? {} : { guard }),
+    };
   }
   return next;
 }

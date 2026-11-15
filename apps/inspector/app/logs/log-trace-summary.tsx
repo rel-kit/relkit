@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { StatusBadge, type StatusTone } from "../../components/neon/status-badge";
 import type { InspectorObject } from "../../lib/api-types";
-import { clockTime, formatDuration } from "../../lib/format";
+import { formatDuration, formatTimestamp, utcTimestamp } from "../../lib/format";
 import { text } from "../../lib/observability-model";
 
 /**
@@ -93,8 +93,11 @@ export function TraceSummary({ summary }: { readonly summary: InspectorObject })
           <li>
             <span className="trace-summary-marker" data-tone="neutral" aria-hidden="true" />
             <span className="trace-summary-label">Started at</span>
-            <time dateTime={started || undefined} title={started || undefined}>
-              {started ? clockTime(started) : "—"}
+            <time
+              dateTime={started || undefined}
+              title={started ? utcTimestamp(started) : undefined}
+            >
+              {started ? formatTimestamp(started, { date: false }) : "—"}
             </time>
           </li>
           <li className="trace-summary-span" aria-hidden="true">
@@ -108,8 +111,8 @@ export function TraceSummary({ summary }: { readonly summary: InspectorObject })
               aria-hidden="true"
             />
             <span className="trace-summary-label">Ended at</span>
-            <time dateTime={ended || undefined} title={ended || undefined}>
-              {ended ? clockTime(ended) : "In progress"}
+            <time dateTime={ended || undefined} title={ended ? utcTimestamp(ended) : undefined}>
+              {ended ? formatTimestamp(ended, { date: false }) : "In progress"}
             </time>
           </li>
         </ol>

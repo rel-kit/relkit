@@ -7,15 +7,22 @@ import type { HttpRouteRequest, RouteMaterializationOptions } from "./materializ
 import { getRequestState, type HttpRequestState } from "./middleware.js";
 import { nativeStreamResponse } from "./native-stream.js";
 import { requestFromContext } from "./request-context.js";
-import { decodeInferredInput } from "./request-inference.js";
-import { isRequestMappingFailure, mapRequest } from "./request-mapping.js";
-import { invokeWithRecord, mapInputWithRecord, recordDetail } from "./request-record-utils.js";
+import { isRequestMappingFailure } from "./request-mapping.js";
+import {
+  failureOutcome,
+  invokeWithRecord,
+  mapInputWithRecord,
+  recordDetail,
+} from "./request-record-utils.js";
 import {
   mapFailureResponse,
   mapInputValidationResponse,
   type ResponseMappingOptions,
 } from "./response-mapping.js";
+import { payloadTooLargeResponse, withDefaultHeaders } from "./response-mapping-utils.js";
+import { exceededBodyLimit, getEntry, routeAccessFailure, routeInput } from "./route-input.js";
 import { routeSuccessResponse } from "./route-response.js";
+export { getEntry, isRecord, routeInput } from "./route-input.js";
 
 /** Builds the Hono request adapter over the route workflow service.
  * @param trigger - Registered route declaration with its target and transport contract.
@@ -29,11 +36,13 @@ export function createRouteHandler(
   return async (context) =>
     stripHead(
       trigger,
-      await runHttp(
-        Effect.gen(function* () {
-          const service = yield* HttpRoutes;
-          return yield* service.handle(context, trigger, options);
-        }).pipe(Effect.provide(HttpRoutesLive)),
+      await withDefaultHeaders(
+        await runHttp(
+          Effect.gen(function* () {
+            const service = yield* HttpRoutes;
+            return yield* service.handle(context, trigger, options);
+          }).pipe(Effect.provide(HttpRoutesLive)),
+        ),
       ),
     );
 }
@@ -81,7 +90,15 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
       : yield* httpBoundary("route.resolveTarget", () =>
           Promise.resolve(options.resolveTarget!(trigger.targetFunctionId)),
         );
-
+  // Who may call is decided before the request's input is read or reported.
+  const denied = yield* routeAccessFailure(context, target, options);
+  if (denied !== undefined) {
+    const recorded = failureOutcome(denied);
+    builder?.setOutcome(recorded.outcome, recorded.errorId);
+    return yield* httpBoundary("route.failureResponse", () =>
+      mapFailureResponse(trigger, denied, responseOptions),
+    );
+  }
   const input = yield* httpBoundary("route.mapInput", () =>
     mapInputWithRecord(
       () => routeInput(request, trigger, trigger.targetFunctionId, options, target),
@@ -90,8 +107,11 @@ const handleRoute = Effect.fn("HttpRoutes.handle")(function* (
     ),
   );
   if (isRequestMappingFailure(input)) {
-    frameworkTrace.event("http.validation.failed");
+    // The validation response records the issues' codes and paths on `http.validation.failed`.
     builder?.setOutcome("validation-error");
+    // D6: an oversize body is 413 `payload-too-large` everywhere, not a 422 validation issue.
+    const limit = exceededBodyLimit(input.issues, trigger, options);
+    if (limit !== undefined) return payloadTooLargeResponse(limit, responseOptions);
     return mapInputValidationResponse(trigger, input.issues, responseOptions);
   }
   frameworkTrace.event("http.validation.completed");
@@ -171,10 +191,11 @@ function stripHead(trigger: HttpTriggerRegistration, response: Response): Respon
   });
 }
 
-/** Combines route response validation options with the request's signal and trace ID.
+/** Combines route response validation options with the request's signal, trace and request IDs.
  * @param options - Application dependencies and configuration for this domain.
- * @param state - Request state supplying the cancellation signal and trace ID.
- * @returns Configured response options with manifest schemas, the signal and the trace ID.
+ * @param state - Request state supplying the cancellation signal and the IDs.
+ * @returns Configured response options with manifest schemas, the signal and both IDs, which
+ *   Problem Details bodies carry.
  */
 function responseOptionsFor(
   options: RouteMaterializationOptions,
@@ -185,65 +206,10 @@ function responseOptionsFor(
     ...(options.manifest.responseSchemas === undefined
       ? {}
       : { responseSchemas: options.manifest.responseSchemas }),
-    ...(state === undefined ? {} : { signal: state.signal, traceId: state.traceId }),
-  };
-}
-
-/** Selects custom request mapping or declarative mapping followed by schema inference.
- * @param request - Native request whose headers, body and cancellation signal define this operation.
- * @param trigger - Registered route declaration with its target and transport contract.
- * @param targetFunctionId - target function id supplied by the caller.
- * @param options - Application dependencies and configuration for this domain.
- * @returns The mapped target input or the public request-mapping failure envelope.
- */
-export async function routeInput(
-  request: HttpRouteRequest,
-  trigger: HttpTriggerRegistration,
-  targetFunctionId: string,
-  options: RouteMaterializationOptions,
-  target = getEntry(options.manifest.targets ?? {}, trigger.targetFunctionId),
-): Promise<unknown> {
-  if (options.mapInput !== undefined)
-    return options.mapInput(request, trigger, targetFunctionId, trigger.config.request);
-  const result = await mapRequest(request, trigger.config.request, {
-    ...(options.requestMapping ?? {}),
-    ...(trigger.config.maxBodyBytes === undefined
+    ...(state === undefined
       ? {}
-      : { maxBodyBytes: trigger.config.maxBodyBytes }),
-    transforms: options.manifest.requestTransforms,
-  });
-  return isRequestMappingFailure(result)
-    ? result
-    : decodeInferredInput(
-        result.value,
-        getEntry(options.manifest.routes ?? {}, trigger.id) ??
-          (isRecord(trigger.config.request) && trigger.config.request.kind === "input"
-            ? {}
-            : { request: trigger.config.request }),
-        target,
-      );
-}
-
-/** Looks up an own entry in either a readonly object or map.
- * @param entries - Readonly lookup table supplied as an object or map.
- * @param id - Stable declaration identifier used for lookup.
- * @typeParam T - Value type retained by this operation.
- * @returns The matching own record property or map entry, or undefined.
- */
-export function getEntry<T>(
-  entries: Readonly<Record<string, T>> | ReadonlyMap<string, T>,
-  id: string,
-): T | undefined {
-  if (entries instanceof Map) return entries.get(id);
-  const record = entries as Readonly<Record<string, T>>;
-  return Object.prototype.hasOwnProperty.call(record, id) ? record[id] : undefined;
-}
-/** Recognizes a non-null object before reading its named properties.
- * @param value - Value inspected, validated or projected by this operation.
- * @returns Whether the inspected value satisfies the declared type guard.
- */
-export function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && (typeof value === "object" || typeof value === "function");
+      : { signal: state.signal, traceId: state.traceId, requestId: state.requestId }),
+  };
 }
 
 /** Coordinates mapping, invocation and response construction inside the owning request. */

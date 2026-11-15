@@ -94,6 +94,8 @@ The complete service includes optional models and overrides:
   /_snippets/source/examples/data-model/src/services/database/service.ts
 </include>
 
+The example opens SQLite with `bun:sqlite`, so it runs on Bun. To run the same service on Node.js, open the database with `openSqliteDatabase` from `@relkit/drizzle/sqlite`; see [Runtimes](/docs/modules/deployment/runtimes).
+
 `schema` is the flat map of table exports. `client({ env })` returns the actual Drizzle database, or a
 promise for it. Open the connection inside this factory, not at module top level. Descriptor discovery
 inspects the schema without activating the factory; the generated server activates it during startup.
@@ -111,11 +113,11 @@ database recovery; shutdown hooks are not backup or durability guarantees.
 
 ## Choose and customize the driver
 
-| Dialect    | What changes                                                            | Important integration limit                                                                                                                       |
-| ---------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| SQLite     | SQLite tables, Bun SQLite client, file path or memory database          | The portable transaction helper shares a connection; review its [concurrency limits](/docs/modules/database/transactions).                        |
-| PostgreSQL | PostgreSQL table definitions and a compatible async Drizzle client/pool | Portable transactions delegate to the client's transaction implementation.                                                                        |
-| MySQL      | MySQL tables and a compatible async Drizzle client/pool                 | Returned mutation rows need a recoverable primary/unique key; see [queries](/docs/modules/database/queries#understand-dialect-and-upsert-limits). |
+| Dialect    | What changes                                                             | Important integration limit                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SQLite     | SQLite tables, the runtime's SQLite client, file path or memory database | The portable transaction helper shares a connection; review its [concurrency limits](/docs/modules/database/transactions).                        |
+| PostgreSQL | PostgreSQL table definitions and a compatible async Drizzle client/pool  | Portable transactions delegate to the client's transaction implementation.                                                                        |
+| MySQL      | MySQL tables and a compatible async Drizzle client/pool                  | Returned mutation rows need a recoverable primary/unique key; see [queries](/docs/modules/database/queries#understand-dialect-and-upsert-limits). |
 
 Driver construction remains native Drizzle configuration. Configure TLS, connection limits, query
 timeouts, logging, and pool disposal there as appropriate for that driver. RelKit does not add these as

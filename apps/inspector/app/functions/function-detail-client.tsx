@@ -5,6 +5,9 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { recentQuery } from "../../lib/recent-signals";
+import { isHistoryUnavailable } from "../../lib/history-status";
+import { useHistoryFailed } from "../../lib/stream-application-store";
 import { invokeFunction, type FunctionInvocationResult } from "../../lib/function-invocation";
 import { Radio } from "lucide-react";
 import { Section } from "../../components/blocks/section";
@@ -13,6 +16,7 @@ import { DetailLayout } from "../detail-layout";
 import { SourceLink } from "../source-link";
 import { DetailPending, ExposureBadge, GraphAction, MetaItem } from "../domains/catalog-kit";
 import { FunctionContract, FunctionFacts } from "./function-contract";
+import { NeedsApplication } from "../application-state";
 import { FunctionInvocation } from "./function-invocation";
 import { FunctionSignals } from "./function-signals";
 
@@ -24,6 +28,11 @@ interface FunctionSnapshot {
   readonly observedEdges: readonly InspectorObject[];
 }
 
+/** The answer for a signal query that failed because history cannot be read. */
+const unread = { items: [] as readonly InspectorObject[] };
+const unreadable = (cause: unknown) =>
+  isHistoryUnavailable(cause) ? unread : { items: [] as readonly InspectorObject[] };
+
 export function FunctionDetailClient() {
   const params = useParams<{ id: string }>();
   const id = typeof params?.id === "string" ? params.id : "";
@@ -31,21 +40,26 @@ export function FunctionDetailClient() {
   const [logs, setLogs] = useState<readonly InspectorObject[]>([]);
   const [traces, setTraces] = useState<readonly InspectorObject[]>([]);
   const [error, setError] = useState(false);
+  // History that cannot be read leaves the lists empty; the page must not call that "none".
+  const historyFailed = useHistoryFailed();
+  const [signalsDown, setSignalsDown] = useState(false);
 
   const loadSignals = () => {
     if (id === "") return;
     const api = createInspectorClient();
     void Promise.all([
-      api.query<InspectorObject>("logs", { functionId: id, limit: 10 }),
-      api.query<InspectorObject>("traces", { functionId: id, limit: 10 }),
+      api.query<InspectorObject>("logs", recentQuery({ functionId: id })),
+      api.query<InspectorObject>("traces", recentQuery({ functionId: id })),
     ])
       .then(([logPage, tracePage]) => {
         setLogs(logPage.items);
         setTraces(tracePage.items);
+        setSignalsDown(false);
       })
-      .catch(() => {
+      .catch((cause: unknown) => {
         setLogs([]);
         setTraces([]);
+        setSignalsDown(isHistoryUnavailable(cause));
       });
   };
 
@@ -55,14 +69,11 @@ export function FunctionDetailClient() {
     const api = createInspectorClient();
     void Promise.all([
       api.detail<InspectorObject>("functions", id),
-      api
-        .query<InspectorObject>("logs", { functionId: id, limit: 10 })
-        .catch(() => ({ items: [] as readonly InspectorObject[] })),
-      api
-        .query<InspectorObject>("traces", { functionId: id, limit: 10 })
-        .catch(() => ({ items: [] as readonly InspectorObject[] })),
+      api.query<InspectorObject>("logs", recentQuery({ functionId: id })).catch(unreadable),
+      api.query<InspectorObject>("traces", recentQuery({ functionId: id })).catch(unreadable),
     ])
       .then(([detail, logPage, tracePage]) => {
+        if (current) setSignalsDown(logPage === unread || tracePage === unread);
         const node = record(detail.node) ?? record(detail.descriptor) ?? record(detail);
         const generationId = text(detail.generationId);
         const graphHash = text(detail.graphHash);
@@ -139,16 +150,19 @@ export function FunctionDetailClient() {
           </p>
         </Section>
       ) : (
-        <FunctionInvocation
-          functionId={id}
-          generationId={snapshot.generationId}
-          graphHash={snapshot.graphHash}
-          inputSchema={node.input}
-          invoke={(input) => invokeFunction(api, input)}
-          onComplete={(_result: FunctionInvocationResult) => loadSignals()}
-        />
+        <NeedsApplication>
+          <FunctionInvocation
+            functionId={id}
+            generationId={snapshot.generationId}
+            graphHash={snapshot.graphHash}
+            inputSchema={node.input}
+            hasAccessRule={record(node.access) !== undefined}
+            invoke={(input) => invokeFunction(api, input)}
+            onComplete={(_result: FunctionInvocationResult) => loadSignals()}
+          />
+        </NeedsApplication>
       )}
-      <FunctionSignals logs={logs} traces={traces} />
+      <FunctionSignals logs={logs} traces={traces} unavailable={historyFailed || signalsDown} />
       <FunctionContract {...snapshot} />
     </DetailLayout>
   );

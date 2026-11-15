@@ -52,19 +52,25 @@
   },
   "devDependencies": {
     "@effect/vitest": "catalog:",
+    "@types/pg": "catalog:",
     "drizzle-orm": "catalog:",
-    "mysql2": "3.23.1",
+    "mysql2": "catalog:",
+    "pg": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
     "drizzle-orm": "catalog:",
-    "mysql2": ">=2.0.0"
+    "mysql2": ">=2.0.0",
+    "pg": ">=8.0.0"
   },
   "peerDependenciesMeta": {
     "drizzle-orm": {
       "optional": true
     },
     "mysql2": {
+      "optional": true
+    },
+    "pg": {
       "optional": true
     }
   },
@@ -97,13 +103,25 @@
         {
           "package": "mysql2",
           "supportedRange": ">=2.0.0",
-          "installSection": "devDependencies",
+          "installSection": "dependencies",
           "capabilities": [
             "mysql"
           ],
           "phases": [
             "check",
-            "build"
+            "build",
+            "runtime"
+          ]
+        },
+        {
+          "package": "pg",
+          "supportedRange": ">=8.0.0",
+          "installSection": "dependencies",
+          "capabilities": [
+            "pg"
+          ],
+          "phases": [
+            "runtime"
           ]
         }
       ]

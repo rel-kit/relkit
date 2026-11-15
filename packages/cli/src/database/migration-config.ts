@@ -1,9 +1,11 @@
 /** Loads optional modules exclusively from the selected application's dependency graph. */
 import { createRequire } from "node:module";
 import { readFile, stat } from "node:fs/promises";
-import { resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Schema } from "effect";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
+import { configLoadMessage } from "./migration-diagnostics.js";
 import { MigrationConfig, MigrationFailure } from "./migration.schemas.js";
 
 /** Rejects non-app roots before evaluating authored migration configuration. */
@@ -24,10 +26,8 @@ export async function loadMigrationConfig(
   try {
     const module: unknown = await import(pathToFileURL(configPath).href);
     value = record(module) ? module.default : undefined;
-  } catch {
-    throw usage(
-      "Could not load Drizzle configuration. Check its required environment and installed dependencies.",
-    );
+  } catch (error) {
+    throw usage(configLoadMessage(error, root));
   }
   const config = Schema.decodeUnknownOption(MigrationConfig)(value);
   if (config._tag === "None")
@@ -69,7 +69,36 @@ export async function consumerPath(root: string, specifier: string): Promise<str
     throw new MigrationFailure({
       code: "RELKIT_DB_DEPENDENCY",
       exitCode: 2,
-      message: `Install ${name === "drizzle-kit" ? "drizzle-kit" : "drizzle-orm"} in this application with bun add before migrating.`,
+      message: `Install ${name === "drizzle-kit" ? "drizzle-kit" : "drizzle-orm"} in this application with ${packageManagerCommands(projectPackageManager(root)).add} before migrating.`,
+    });
+  }
+}
+
+/**
+ * Finds the installed directory of a declared consumer package. Node enforces `exports`, and
+ * drizzle-kit does not export `./package.json`, so the main entry is resolved and the directory
+ * holding the package's own manifest is taken.
+ * @param root - Application root.
+ * @param name - Declared package name.
+ * @returns The package directory; a missing or undeclared package fails like {@link consumerPath}.
+ */
+export async function consumerPackageDirectory(root: string, name: string): Promise<string> {
+  try {
+    return dirname(await consumerPath(root, `${name}/package.json`));
+  } catch {
+    let directory = dirname(await consumerPath(root, name));
+    while (dirname(directory) !== directory) {
+      const manifest: unknown = await readFile(resolve(directory, "package.json"), "utf8").then(
+        JSON.parse,
+        () => undefined,
+      );
+      if (record(manifest) && manifest.name === name) return directory;
+      directory = dirname(directory);
+    }
+    throw new MigrationFailure({
+      code: "RELKIT_DB_DEPENDENCY",
+      exitCode: 2,
+      message: `Install ${name} in this application before migrating.`,
     });
   }
 }
@@ -84,7 +113,7 @@ export async function consumerModule(
   return value;
 }
 
-/** Creates a controlled configuration diagnostic without carrying authored error contents. */
+/** Creates a controlled configuration diagnostic; authored text in it is sanitized first. */
 export function usage(message: string): MigrationFailure {
   return new MigrationFailure({ code: "RELKIT_DB_CONFIG", exitCode: 2, message });
 }

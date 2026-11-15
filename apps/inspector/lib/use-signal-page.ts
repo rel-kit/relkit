@@ -8,6 +8,7 @@ import {
   INSPECTOR_BACKEND_CONNECTED_EVENT,
 } from "./client";
 import { logQuery } from "./log-query";
+import { useInspectorState, useLiveUpdates } from "./stream-application-store";
 import { signalEventTypes } from "./signal-events";
 
 export function useSignalPage(
@@ -21,7 +22,6 @@ export function useSignalPage(
   const [state, setState] = useState("loading");
   const [live, setLive] = useState("connecting");
   const [pending, setPending] = useState(false);
-  const [storage, setStorage] = useState<InspectorObject>();
   const hold = useRef(blocked);
   useEffect(() => {
     hold.current = blocked;
@@ -87,21 +87,6 @@ export function useSignalPage(
         void refresh();
       }
     }, 500);
-    const readStorage = () => {
-      void client
-        .request<InspectorObject>("/_relkit/v1/storage", {
-          responseProtocols: ["relkit.observability.query"],
-          cache: "no-store",
-        })
-        .then((value) => {
-          if (!disposed) setStorage(value);
-        })
-        .catch(() => {
-          if (!disposed) setStorage({ state: "unavailable" });
-        });
-    };
-    readStorage();
-    const statusTimer = setInterval(readStorage, 10_000);
     const stream = createInspectorBackendStream({
       onStateChange: (snapshot) => {
         if (!disposed) {
@@ -119,10 +104,13 @@ export function useSignalPage(
     return () => {
       disposed = true;
       clearInterval(timer);
-      clearInterval(statusTimer);
       stream.stop();
       window.removeEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, notify);
     };
   }, [kind, queryKey, revision]);
-  return { items, nextCursor, state, live, pending, storage };
+  const inspector = useInspectorState();
+  const storage: InspectorObject | undefined = inspector.statusFailed
+    ? { state: "unavailable" }
+    : inspector.status;
+  return { items, nextCursor, state, live: useLiveUpdates(live), pending, storage };
 }

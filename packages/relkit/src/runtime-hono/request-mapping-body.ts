@@ -51,8 +51,27 @@ async function parseJsonBody(state: BodyState): Promise<BodyValue<unknown>> {
       value: MISSING,
       issue: { code: "content-type", message: "Request content type must be application/json" },
     };
+  const charset = declaredCharset(state.request.headers.get("content-type"));
+  if (charset !== undefined && charset !== "utf-8" && charset !== "utf8")
+    return {
+      value: MISSING,
+      issue: {
+        code: "content-type",
+        message: "Request content type must declare the charset UTF-8",
+      },
+    };
+  let text: string;
   try {
-    return { value: JSON.parse(new TextDecoder().decode(body.bytes)) };
+    // JSON text is UTF-8: a fatal decoder refuses bytes that would become U+FFFD.
+    text = new TextDecoder("utf-8", { fatal: true }).decode(body.bytes);
+  } catch {
+    return {
+      value: MISSING,
+      issue: { code: "malformed-json", message: "Request body is not valid UTF-8" },
+    };
+  }
+  try {
+    return { value: JSON.parse(text) };
   } catch {
     return {
       value: MISSING,
@@ -120,4 +139,21 @@ async function readBodyBytes(
  */
 function mediaType(value: string | null): string {
   return value?.split(";", 1)[0]?.trim().toLowerCase() ?? "";
+}
+
+/** Reads the charset a content type declares.
+ * @param value - Value of the `Content-Type` header.
+ * @returns The lowercase charset without quotes, or undefined when none is declared.
+ */
+function declaredCharset(value: string | null): string | undefined {
+  const parameter = value
+    ?.split(";")
+    .slice(1)
+    .map((part) => part.trim())
+    .find((part) => part.toLowerCase().startsWith("charset="));
+  return parameter
+    ?.slice("charset=".length)
+    .trim()
+    .replace(/^"(.*)"$/, "$1")
+    .toLowerCase();
 }

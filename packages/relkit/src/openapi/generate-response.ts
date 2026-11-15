@@ -1,5 +1,13 @@
 import { Effect } from "effect";
 import { observeOpenApi } from "./generate-observability.js";
+import {
+  PROBLEM,
+  PROBLEM_REFERENCE,
+  problemSchema,
+  rateLimitHeaders,
+  rateLimitSchema,
+  validationSchema,
+} from "./generate-problem.js";
 import type {
   FunctionNode,
   JsonValue,
@@ -7,64 +15,11 @@ import type {
   OpenApiSchema,
 } from "./generate-response.types.js";
 
-const PROBLEM = "application/problem+json";
-
-/** The Problem Details body every RelKit error response has, narrowed by `fields`.
- * @param required - Fields the narrowed problem always has, beyond the common ones.
- * @param fields - Property schemas that replace or add to the common ones.
- * @returns A JSON Schema for the problem body.
- */
-export function problemSchema(
-  required: readonly string[] = [],
-  fields: Readonly<Record<string, OpenApiSchema>> = {},
-): OpenApiSchema {
-  return {
-    type: "object",
-    required: ["type", "title", "status", "code", "detail", ...required],
-    properties: {
-      type: { type: "string" },
-      title: { type: "string" },
-      status: { type: "integer", minimum: 100, maximum: 599 },
-      code: { type: "string" },
-      detail: { type: "string" },
-      traceId: { type: "string" },
-      ...fields,
-    },
-  };
-}
-
-const validationSchema = problemSchema(["issues"], {
-  type: { const: "/errors/validation", type: "string" },
-  code: { const: "validation", type: "string" },
-  issues: {
-    type: "array",
-    items: {
-      type: "object",
-      required: ["code", "message", "path"],
-      properties: {
-        code: { type: "string" },
-        message: { type: "string" },
-        path: { type: "array", items: { anyOf: [{ type: "string" }, { type: "integer" }] } },
-      },
-    },
-  },
-});
-
-const rateLimitSchema = problemSchema(["data"], {
-  type: { const: "/errors/rate-limited", type: "string" },
-  status: { const: 429, type: "integer" },
-  code: { const: "rate-limited", type: "string" },
-  data: {
-    type: "object",
-    required: ["retryAfterMs"],
-    properties: { retryAfterMs: { type: "integer", minimum: 0 } },
-  },
-});
-
-/** Project declared responses and the validation fallback for one function.
+/** Project the responses a function's route declares.
  * @param values - Serializable response declarations.
  * @param target - Target function and error definitions.
- * @returns Effect containing status-indexed responses; no expected failure.
+ * @returns Effect containing status-indexed responses; no expected failure. The statuses the
+ *   runtime sends beyond these come from `runtimeProblems`.
  * @example Effect.runSync(buildResponsesEffect(responses, functionNode));
  */
 export const buildResponsesEffect = Effect.fn("OpenApi.buildResponses")(
@@ -80,7 +35,6 @@ export const buildResponsesEffect = Effect.fn("OpenApi.buildResponses")(
               Number(left.status) - Number(right.status) ||
               String(left.id).localeCompare(String(right.id)),
           );
-        const hasValidation = entries.some((entry) => entry.kind === "validation-error");
         for (const entry of entries) {
           const status = String(entry.status);
           const schema =
@@ -97,15 +51,14 @@ export const buildResponsesEffect = Effect.fn("OpenApi.buildResponses")(
             rateLimited ? "Rate limit exceeded" : description(entry),
             status === "204" || status === "304"
               ? undefined
-              : (schema ?? (rateLimited ? rateLimitSchema : problem ? problemSchema() : undefined)),
+              : (schema ??
+                  (rateLimited ? rateLimitSchema : problem ? PROBLEM_REFERENCE : undefined)),
             rateLimited,
             problem ? PROBLEM : "application/json",
           );
           const previous = result[status];
           result[status] = previous === undefined ? next : mergeResponses(previous, next);
         }
-        if (!hasValidation)
-          result["422"] = makeResponse("Validation error", validationSchema, false, PROBLEM);
         return result;
       }),
     ),
@@ -169,29 +122,6 @@ function makeResponse(
     ...(rateLimited ? { headers: rateLimitHeaders } : {}),
   };
 }
-
-const rateLimitHeaders = {
-  "RateLimit-Policy": {
-    description: "Limit and window policy applied to the route",
-    schema: { type: "string" },
-  },
-  "RateLimit-Limit": {
-    description: "Request limit for the active window",
-    schema: { type: "integer" },
-  },
-  "RateLimit-Remaining": {
-    description: "Requests remaining in the active window",
-    schema: { type: "integer" },
-  },
-  "RateLimit-Reset": {
-    description: "Seconds until the active window resets",
-    schema: { type: "integer" },
-  },
-  "Retry-After": {
-    description: "Seconds before another request should be attempted",
-    schema: { type: "integer" },
-  },
-} satisfies NonNullable<OpenApiResponse["headers"]>;
 
 /** Choose a stable description for each response kind. */
 function description(entry: Record<string, unknown>): string {

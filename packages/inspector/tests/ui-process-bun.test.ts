@@ -1,7 +1,7 @@
 /** Actual Node child ownership: exit, pending readiness cancellation and private environment isolation. */
 import { expect, test } from "bun:test";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { delimiter, dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { Effect, Fiber, Schedule } from "effect";
 import { acquireInspectorUi } from "../src/ui-native.service.js";
@@ -93,6 +93,45 @@ test("the UI child does not inherit an application's bridge token", async () => 
     await f.close();
   }
 });
+
+test("with `node` aliased to Bun first on PATH the UI child still runs on a real Node", async () => {
+  const f = await fixture(
+    `writeFileSync(${JSON.stringify(`${process.pid}.runtime`)}, JSON.stringify({ bun: process.versions.bun ?? null, path: process.env.PATH }));\nsetInterval(() => {}, 1000);`,
+  );
+  const alias = await mkdtemp(join(tmpdir(), "bun-node-alias-"));
+  await symlink(process.execPath, join(alias, "node"));
+  const previous = process.env.PATH;
+  process.env.PATH = `${alias}${delimiter}${previous}`;
+  try {
+    await Effect.runPromise(
+      Effect.scoped(
+        Effect.gen(function* () {
+          const fiber = yield* Effect.forkChild(
+            Effect.scoped(acquireInspectorUi(f.entry, f.options, "http://127.0.0.1:1", "private")),
+          );
+          yield* receipt(f.marker);
+          const started = yield* runtimeReceipt(join(dirname(f.entry), `${process.pid}.runtime`));
+          expect(started.bun).toBeNull();
+          expect(started.path.split(delimiter)).not.toContain(alias);
+          yield* Fiber.interrupt(fiber);
+        }),
+      ),
+    );
+  } finally {
+    process.env.PATH = previous;
+    await rm(alias, { recursive: true, force: true });
+    await f.close();
+  }
+});
+
+/** Reads the runtime the child reported about itself. */
+function runtimeReceipt(path: string) {
+  return Effect.tryPromise({
+    try: async () =>
+      JSON.parse(await readFile(path, "utf8")) as { bun: string | null; path: string },
+    catch: (cause) => cause,
+  }).pipe(Effect.retry(Schedule.spaced(10)), Effect.timeout(5000));
+}
 
 test("an occupied UI port fails before spawning instead of trusting the other server", async () => {
   const f = await fixture("setInterval(() => {}, 1000);");

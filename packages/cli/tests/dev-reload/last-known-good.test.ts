@@ -31,6 +31,11 @@ test(
     const deadline = Date.now() + 240_000;
     while (!dev.output().includes("Reload failed") && Date.now() < deadline) await Bun.sleep(200);
     expect(dev.output()).toContain("Reload failed; previous version is still serving");
+    // The failure is reported as soon as evaluation fails; the type-check watch adds the
+    // location when its pass over the save ends, which can be later.
+    const located = Date.now() + 60_000;
+    while (!/b1\.function\.ts:\d+:\d+/u.test(dev.output()) && Date.now() < located)
+      await Bun.sleep(100);
     expect(dev.output()).toMatch(/b1\.function\.ts:\d+:\d+/u);
     const served = await dev.get("/b1");
     expect(served).toEqual({ message: "b1 v0", pid: before.pid });

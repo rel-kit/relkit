@@ -51,6 +51,8 @@ export interface InspectorIdentity {
 export interface InspectorPage<T = InspectorObject> extends InspectorIdentity {
   readonly items: readonly T[];
   readonly nextCursor?: string;
+  /** Number of matching records, ignoring the cursor; graph and runtime collection pages carry it. */
+  readonly total?: number;
 }
 export interface InspectorRunPage<T = InspectorObject> extends InspectorIdentity {
   readonly items: readonly T[];
@@ -126,6 +128,10 @@ export interface InspectorEventRuntime extends InspectorIdentity {
   readonly deliveries: readonly InspectorObject[];
   readonly deadLetters: readonly InspectorObject[];
   readonly nextCursor?: string;
+  /** Number of matching deliveries; present only when the provider reports it. */
+  readonly total?: number;
+  /** Deliveries per state; present only when the provider reports them. */
+  readonly counts?: Readonly<Record<string, number>>;
 }
 export interface ObservabilityPage<T = InspectorObject> extends Omit<
   InspectorIdentity,
@@ -134,6 +140,8 @@ export interface ObservabilityPage<T = InspectorObject> extends Omit<
   readonly protocol: InspectorResponseProtocol;
   readonly items: readonly T[];
   readonly nextCursor?: string;
+  /** Number of matching records, ignoring the cursor; present when the query set `count`. */
+  readonly total?: number;
 }
 export interface InspectorGraph extends InspectorIdentity {
   readonly graph?: InspectorObject;

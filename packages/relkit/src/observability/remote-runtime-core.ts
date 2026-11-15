@@ -6,8 +6,13 @@ import { telemetryExportDecision } from "./telemetry-sampling.js";
 import { telemetryExporterDiagnostic } from "./telemetry-exporter-diagnostic.js";
 import { createLocalBatchQueue } from "./local/batch-queue.js";
 import { releaseResources } from "./resource-release.js";
+import { createInspectionStream } from "./inspection-stream.js";
 import { remoteFetchLayer, remoteRequestEffect } from "./remote-request-effect.js";
-import { makeDirectExportEffect } from "./direct-export.js";
+import {
+  countDirectExportFailure,
+  directExportTarget,
+  makeDirectExportEffect,
+} from "./direct-export.js";
 import type { ObservabilityRecord } from "./model.js";
 import type { ObservabilityQuery } from "./query-types.js";
 import type { ObservabilityRuntimeOptions } from "./runtime.js";
@@ -86,19 +91,29 @@ async function createRemoteObservabilityRuntime(
     },
   );
   let closePromise: Promise<void> | undefined;
-  const counters = { exportSelected: 0, sampledOut: 0, severityFiltered: 0, exportFailures: 0 };
-  const exportRecord = options.exporter?.exportRecord ?? options.exportRecord;
+  const counters = {
+    exportSelected: 0,
+    sampledOut: 0,
+    severityFiltered: 0,
+    exportFailures: 0,
+    exportCapacityRejections: 0,
+  };
+  const exportRecord = directExportTarget(options);
   const directExport =
     exportRecord === undefined
       ? undefined
       : await Effect.runPromise(
-          makeDirectExportEffect(exportRecord, () => {
-            counters.exportFailures += 1;
-          }),
+          makeDirectExportEffect(exportRecord, (error) =>
+            countDirectExportFailure(counters, error),
+          ),
         );
+  const inspection = createInspectionStream(
+    (record) => queue.enqueue({ key: `${source}:${++sequence}`, origin: "application", record }),
+    { frameworkSuccessLogs: remote.frameworkSuccessLogs === true },
+  );
   const publish = (record: ReturnType<typeof collector.collect>, external = true) => {
     if (!record) return record;
-    queue.enqueue({ key: `${source}:${++sequence}`, origin: "application", record });
+    inspection.offer(record);
     if (external) {
       const decision = telemetryExportDecision(record, configuration.exportSampling);
       if (decision === "export") counters.exportSelected++;
@@ -112,6 +127,7 @@ async function createRemoteObservabilityRuntime(
     publish(collector.collectRequired(telemetryExporterDiagnostic(failure)), false),
   );
   const flush = async () => {
+    inspection.flush();
     await queue.flush();
     if (directExport !== undefined)
       await Effect.runPromise(directExport.flush().pipe(Effect.mapError((error) => error.cause)));
@@ -120,6 +136,7 @@ async function createRemoteObservabilityRuntime(
     await report();
   };
   const queryPath = async <T>(kind: string, input: object = {}): Promise<T> => {
+    inspection.flush();
     await queue.flush();
     const params = new URLSearchParams(
       Object.entries(input).map(([key, value]): [string, string] => [key, String(value)]),

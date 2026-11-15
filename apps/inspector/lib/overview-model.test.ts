@@ -1,7 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
   formatRate,
-  generationEvents,
   isFailedRequest,
   requestSummary,
   requestVolume,
@@ -9,7 +8,17 @@ import {
 } from "./overview-model";
 
 describe("requestSummary", () => {
-  test("links completed requests and prefers the normalized route", () => {
+  test("labels a request as the requests page does: raw path, then route id (IN-36)", () => {
+    expect(requestSummary({ routeId: "trips.get.http", rawPath: "/trips/42" }).path).toBe(
+      "/trips/42",
+    );
+    expect(requestSummary({ routeId: "trips.get.http", normalizedRoute: "unknown" }).path).toBe(
+      "trips.get.http",
+    );
+    expect(requestSummary({}).path).toBe("request");
+  });
+
+  test("links completed requests", () => {
     const summary = requestSummary({
       requestId: "request-1",
       method: "POST",
@@ -23,7 +32,7 @@ describe("requestSummary", () => {
     expect(summary).toMatchObject({
       id: "request-1",
       method: "POST",
-      path: "/trips/:id",
+      path: "/trips/42",
       status: 201,
       tone: "success",
       statusLabel: "HTTP 201 success",
@@ -85,57 +94,37 @@ describe("formatRate", () => {
   });
 });
 
-describe("generationEvents", () => {
-  test("orders newest first and tags only the newest activation as current", () => {
-    const events = generationEvents([
-      {
-        message: "dev.generation.active",
-        cursor: "1",
-        timestamp: "2026-10-30T10:00:00.000Z",
-        fields: { version: 0, initial: true, durationMs: 1959, changedFiles: 0 },
-      },
-      {
-        message: "dev.generation.failed",
-        cursor: "3",
-        timestamp: "2026-10-30T12:00:00.000Z",
-        fields: { message: "\nCandidate validation failed.\nmore" },
-      },
-      {
-        message: "dev.generation.active",
-        cursor: "2",
-        timestamp: "2026-10-30T11:00:00.000Z",
-        fields: { version: 1, changedFiles: 1 },
-      },
-      { message: "dev.build.started", cursor: "4", timestamp: "2026-10-30T13:00:00.000Z" },
-    ]);
-    expect(events.map((event) => [event.id, event.state, event.current])).toEqual([
-      ["3", "failed", false],
-      ["2", "active", true],
-      ["1", "active", false],
-    ]);
-    expect(events[0]!.message).toBe("Candidate validation failed.");
-    expect(events[2]).toMatchObject({ version: 0, initial: true, durationMs: 1959 });
-  });
-
-  test("caps the number of events", () => {
-    const items = Array.from({ length: 5 }, (_, index) => ({
-      message: "dev.generation.active",
-      cursor: String(index),
-    }));
-    expect(generationEvents(items, 2)).toHaveLength(2);
-  });
-});
-
 describe("storageHealth", () => {
   test("maps storage states onto badge words", () => {
     expect(storageHealth(undefined)).toEqual({ tone: "live", label: "checking" });
     expect(storageHealth({ state: "unavailable" }).tone).toBe("neutral");
     expect(storageHealth({ error: "history.writer-conflict" }).tone).toBe("danger");
+    // An application outage leaves history ready when the tool sends `collection`.
+    expect(
+      storageHealth({ state: "ready", collection: "application-unreachable", error: "x" }),
+    ).toEqual({ tone: "success", label: "ready" });
+    expect(storageHealth({ collection: "history-unavailable" }).label).toBe("degraded");
     expect(storageHealth({ state: "degraded" }).label).toBe("degraded");
     expect(storageHealth({ state: "ready", incomplete: true }).tone).toBe("warning");
+    // No record was lost, so nothing is incomplete.
+    expect(
+      storageHealth({
+        state: "ready",
+        incomplete: true,
+        recordsLostBeforeHistory: { byApplicationProducer: 0, byInspectionBuffer: 0 },
+      }),
+    ).toEqual({ tone: "success", label: "ready" });
     expect(storageHealth({ state: "ready", connection: "connected" })).toEqual({
       tone: "success",
-      label: "connected",
+      label: "ready",
     });
+  });
+
+  test("history stays ready while the application is away (IN-09)", () => {
+    expect(storageHealth({ state: "ready", connection: "disconnected" })).toEqual({
+      tone: "success",
+      label: "ready",
+    });
+    expect(storageHealth({ state: "ready", connection: "ambiguous" }).label).toBe("ready");
   });
 });

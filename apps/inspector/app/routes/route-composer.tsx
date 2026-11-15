@@ -1,16 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { InspectorObject } from "../../lib/api-types";
-import { collectRouteFields, composeRouteRequest, type RouteField } from "../../lib/route-composer";
-import type { RouteInvocationResult } from "../../lib/route-request";
-import type { RouteStreamFrame } from "../../lib/route-request";
-import type { FormEvent } from "react";
+import {
+  collectRouteFields,
+  composeRouteRequest,
+  cookieFieldNames,
+  editableRouteFields,
+} from "../../lib/route-composer";
+import { routeSessionNote } from "../../lib/session-note";
+import type { RouteInvocationResult, RouteStreamFrame } from "../../lib/route-request";
+import { routeOutcome, type RouteOutcome } from "../../lib/route-status";
 import { Send } from "lucide-react";
 import { Section } from "../../components/blocks/section";
 import { StatusBadge } from "../../components/neon/status-badge";
 import { Button } from "../../components/ui/button";
 import { MethodChip } from "../domains/catalog-kit";
+import {
+  CookieNote,
+  defaults,
+  groupFields,
+  RouteResult,
+  sourceLabel,
+  StreamFrames,
+} from "./route-composer-parts";
 import { RouteFieldInput } from "./route-field";
 
 export function RouteComposer({
@@ -33,11 +46,15 @@ export function RouteComposer({
   readonly onComplete: (result: RouteInvocationResult) => void;
 }) {
   const config = record(route.config);
-  const fields = collectRouteFields(config?.request, target?.input);
+  const mapped = collectRouteFields(config?.request, target?.input);
+  const fields = editableRouteFields(mapped);
+  const cookies = cookieFieldNames(mapped);
   const [values, setValues] = useState<Record<string, unknown>>(() => defaults(fields));
   const [errors, setErrors] = useState<readonly { key: string; message: string }[]>([]);
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState("");
+  const [outcome, setOutcome] = useState<RouteOutcome>();
+  const [sessionNote, setSessionNote] = useState("");
   const [streamFrames, setStreamFrames] = useState<
     readonly { readonly id: number; readonly frame: RouteStreamFrame }[]
   >([]);
@@ -47,12 +64,14 @@ export function RouteComposer({
   const nextFrameId = useRef(0);
   useEffect(() => () => streamController.current?.abort(), []);
 
-  const focusField = (key: string): void => {
-    if (key === "request") {
-      summaryRef.current?.focus();
-      return;
-    }
-    fieldRefs.current[key]?.focus();
+  const focusField = (key: string): void =>
+    (key === "request" ? summaryRef.current : fieldRefs.current[key])?.focus();
+
+  const finish = (result: RouteInvocationResult, headers: Headers): void => {
+    const next = routeOutcome(result, headers.has("authorization"));
+    setSessionNote(routeSessionNote(headers));
+    setOutcome(next);
+    setStatus(next.text);
   };
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -74,27 +93,28 @@ export function RouteComposer({
       return;
     }
     setPending(true);
+    setOutcome(undefined);
     setStatus(invokeStream === undefined ? "Sending request…" : "Opening stream…");
     try {
       if (invokeStream === undefined) {
-        onComplete(await invoke({ path: built.path, init: built.init }));
-        setStatus("Request completed.");
+        const result = await invoke({ path: built.path, init: built.init });
+        onComplete(result);
+        finish(result, new Headers(built.init.headers));
       } else {
         streamController.current?.abort();
         const controller = new AbortController();
         streamController.current = controller;
         setStreamFrames([]);
-        onComplete(
-          await invokeStream(
-            { path: built.path, init: built.init },
-            (frame) => {
-              const id = nextFrameId.current++;
-              setStreamFrames((current) => [...current.slice(-99), { id, frame }]);
-            },
-            controller.signal,
-          ),
+        const result = await invokeStream(
+          { path: built.path, init: built.init },
+          (frame) => {
+            const id = nextFrameId.current++;
+            setStreamFrames((current) => [...current.slice(-99), { id, frame }]);
+          },
+          controller.signal,
         );
-        setStatus("Stream ended.");
+        onComplete(result);
+        finish(result, new Headers(built.init.headers));
       }
     } catch (error) {
       setErrors([
@@ -173,6 +193,7 @@ export function RouteComposer({
             </fieldset>
           ))
         )}
+        <CookieNote names={cookies} />
         {errors.length > 0 && (
           <ul
             ref={summaryRef}
@@ -200,101 +221,22 @@ export function RouteComposer({
               Cancel stream
             </Button>
           )}
-          <span className="ml-auto font-mono text-[11px] text-muted-foreground" aria-hidden="true">
-            {status}
-          </span>
+          {outcome === undefined ? (
+            <span
+              className="ml-auto font-mono text-[11px] text-muted-foreground"
+              aria-hidden="true"
+            >
+              {status}
+            </span>
+          ) : null}
         </div>
+        {outcome === undefined ? null : <RouteResult outcome={outcome} sessionNote={sessionNote} />}
       </form>
-      {streamFrames.length === 0 ? null : (
-        <div className="mt-4 overflow-hidden rounded-md border border-border bg-background">
-          <div className="flex h-8 items-center justify-between border-b border-border px-3 text-[11px] text-muted-foreground">
-            <span className="font-medium tracking-wide uppercase">Stream</span>
-            <span className="font-mono tabular-nums">{streamFrames.length} frames</span>
-          </div>
-          <ul
-            className="neon-scroll-fade m-0 max-h-80 list-none overflow-y-auto p-0 font-mono text-[11px] leading-5"
-            aria-label="Stream frames"
-          >
-            {streamFrames.map(({ id, frame }) => (
-              <li
-                className="grid grid-cols-[3rem_6rem_minmax(0,1fr)] gap-2 border-b border-border/50 px-3 py-1 last:border-b-0"
-                key={id}
-              >
-                <span className="text-muted-foreground/70 tabular-nums">#{id + 1}</span>
-                <strong className="truncate font-medium text-info">
-                  {frame.kind === "sse" ? frame.event : frame.kind}
-                </strong>
-                <span className="min-w-0 break-all whitespace-pre-wrap text-foreground/90">
-                  {framePreview(frame)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <StreamFrames frames={streamFrames} />
     </Section>
   );
 }
 
-const SOURCE_ORDER = ["path", "query", "header", "cookie", "body", "whole-body", "multipart"];
-
-function groupFields(
-  fields: readonly RouteField[],
-): readonly { source: string; fields: readonly RouteField[] }[] {
-  const groups = new Map<string, RouteField[]>();
-  for (const field of fields) {
-    const list = groups.get(field.source) ?? [];
-    list.push(field);
-    groups.set(field.source, list);
-  }
-  return [...groups.entries()]
-    .sort(([left], [right]) => rank(left) - rank(right))
-    .map(([source, list]) => ({ source, fields: list }));
-}
-
-function rank(source: string): number {
-  const index = SOURCE_ORDER.indexOf(source);
-  return index === -1 ? SOURCE_ORDER.length : index;
-}
-
-function sourceLabel(source: string): string {
-  switch (source) {
-    case "path":
-      return "Path params";
-    case "query":
-      return "Query";
-    case "header":
-      return "Headers";
-    case "cookie":
-      return "Cookies";
-    case "body":
-      return "Body";
-    case "whole-body":
-      return "Raw body";
-    case "multipart":
-      return "Multipart";
-    default:
-      return source;
-  }
-}
-
-function framePreview(frame: RouteStreamFrame): string {
-  if (frame.kind === "text") return frame.value;
-  if (frame.kind === "bytes") return `${frame.byteLength} bytes`;
-  try {
-    return typeof frame.data === "string" ? frame.data : JSON.stringify(frame.data);
-  } catch {
-    return "unavailable";
-  }
-}
-
-function defaults(fields: readonly RouteField[]): Record<string, unknown> {
-  return Object.fromEntries(
-    fields.flatMap((field) =>
-      field.defaultValue === undefined ? [] : [[field.key, field.defaultValue]],
-    ),
-  );
-}
 function record(value: unknown): InspectorObject | undefined {
   return value !== null && typeof value === "object" && !Array.isArray(value)
     ? (value as InspectorObject)

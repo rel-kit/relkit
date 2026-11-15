@@ -51,7 +51,11 @@ Create a new RelKit application
 
 #### Examples
 
-`relkit create` — Create a new RelKit application
+`relkit create my-app` — Create an application named `my-app` and install its packages
+
+`relkit create my-app --template fullstack` — Start from the fullstack template instead of the default
+
+`relkit create my-app --no-install --no-git` — Write the files only, without installing packages or starting a Git repository
 
 ### `relkit add <kind>`
 
@@ -59,7 +63,11 @@ Add a compile-ready artifact
 
 #### Examples
 
-`relkit add` — Add a compile-ready artifact
+`relkit add service orders` — Create an `orders` service in `src/services`
+
+`relkit add function create-order --service orders` — Add a function to the `orders` service
+
+`relkit add inspector` — Install the development inspector and its local UI
 
 #### `relkit add service [name]`
 
@@ -514,13 +522,15 @@ Manage application database migrations
 
 Apply pending migrations using the application's installed tools
 
-| Option   | Value  | Description                                                                                        |
-| -------- | ------ | -------------------------------------------------------------------------------------------------- |
-| --config | string | Application Drizzle config; defaults to drizzle.config.ts. Relative paths use the application root |
+| Option   | Value  | Description                                                                                                                                                                                                                                                                         |
+| -------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| --config | string | Application Drizzle config; defaults to drizzle.config.ts. Relative paths use the application root. The config reads the process environment and the application's .env, .env.&lt;mode>, .env.local and .env.&lt;mode>.local files; a value already in the process environment wins |
 
 ##### Examples
 
-`relkit db migrate` — Apply pending migrations using the application's installed tools
+`relkit db migrate` — Apply the pending migrations with the project's Drizzle configuration
+
+`relkit db migrate --config ./drizzle.staging.config.ts` — Use another Drizzle configuration file
 
 ### `relkit dev`
 
@@ -539,7 +549,11 @@ Run the app and its selected development features
 
 #### Examples
 
-`relkit dev` — Run the app and its selected development features
+`relkit dev` — Run the application and rebuild it on every save
+
+`relkit dev --port 4100` — Serve the application on port 4100
+
+`relkit dev --project-root ./apps/api --log-level debug` — Run another application in the repository and show debug events
 
 ### `relkit inspector`
 
@@ -553,7 +567,9 @@ Run the project-local development inspector UI
 
 #### Examples
 
-`relkit inspector` — Run the project-local development inspector UI
+`relkit inspector` — Open the inspector UI on port 3210 for the project in the current folder
+
+`relkit inspector --port 3211 --project-root ./apps/api` — Serve the inspector for another application on another port
 
 ### `relkit mcp`
 
@@ -571,31 +587,40 @@ Serve the running development session to coding agents over MCP (stdio)
 
 Compile descriptors, infer eligible IDs, and validate the application
 
-| Option         | Value  | Description                             |
-| -------------- | ------ | --------------------------------------- |
-| --project-root | string | Application directory (defaults to cwd) |
+| Option            | Value   | Description                                                                                 |
+| ----------------- | ------- | ------------------------------------------------------------------------------------------- |
+| --project-root    | string  | Application directory (defaults to cwd)                                                     |
+| --include-outputs | boolean | With --json, include the text of every generated file; paths and hashes are always included |
 
 #### Examples
 
-`relkit check` — Compile descriptors, infer eligible IDs, and validate the application
+`relkit check` — Check the application in the current folder
+
+`relkit check --project-root ./apps/api` — Check another application in the repository
+
+`relkit check --json --include-outputs` — Print the result as JSON with the text of every generated file
 
 ### `relkit build`
 
 Build the checked graph, manifest, OpenAPI, and client
 
-| Option         | Value              | Description                             |
-| -------------- | ------------------ | --------------------------------------- |
-| --project-root | string             | Application directory (defaults to cwd) |
-| --runtime      | bun, node, workers | Runtime the production server runs on   |
-| --target       | vercel             | Deploy target whose build rules apply   |
+| Option         | Value              | Description                                                                                                |
+| -------------- | ------------------ | ---------------------------------------------------------------------------------------------------------- |
+| --project-root | string             | Application directory (defaults to cwd)                                                                    |
+| --runtime      | bun, node, workers | Runtime the production server runs on (default: node when relkit runs on Node.js, bun when it runs on Bun) |
+| --target       | vercel             | Deploy target whose build rules apply                                                                      |
 
 #### Examples
 
-`relkit build` — Build the checked graph, manifest, OpenAPI, and client
+`relkit build` — Build the application for the runtime that runs relkit
+
+`relkit build --runtime node` — Build a Node.js server, whichever runtime runs relkit
+
+`relkit build --target vercel` — Build for Vercel, which runs the Node.js server
 
 ### `relkit start`
 
-Start a built application
+Start the built application; run `relkit build` first
 
 | Option         | Value   | Description                             |
 | -------------- | ------- | --------------------------------------- |
@@ -604,7 +629,11 @@ Start a built application
 
 #### Examples
 
-`relkit start` — Start a built application
+`relkit start` — Start the build in `.relkit/build`; it fails until `relkit build` has succeeded
+
+`relkit start --port 8080` — Start the existing build on port 8080
+
+`relkit start --project-root ./apps/api` — Start the build of another application in the repository
 
 ### `relkit graph <command>`
 
@@ -612,7 +641,9 @@ Inspect deterministic application graphs
 
 #### Examples
 
-`relkit graph` — Inspect deterministic application graphs
+`relkit graph print .relkit/build/application.graph.json` — Print the built application graph
+
+`relkit graph diff before.graph.json after.graph.json` — Compare two graphs and list the compatibility changes
 
 #### `relkit graph print [graph]`
 
@@ -670,7 +701,11 @@ Inspect value-free environment contracts
 
 #### Examples
 
-`relkit env` — Inspect value-free environment contracts
+`relkit env check` — Check that every required environment variable has a value
+
+`relkit env list --environment production` — List which variables are set for the production environment, without printing values
+
+`relkit env example --write` — Write a safe `.env.example` for the project
 
 #### `relkit env check`
 
@@ -736,7 +771,11 @@ Manage project-scoped local services
 
 #### Examples
 
-`relkit local` — Manage project-scoped local services
+`relkit local up` — Start the local services the application declares
+
+`relkit local status` — Show which local services run and who holds them
+
+`relkit local reset --dry-run` — List what a reset would remove, and remove nothing
 
 #### `relkit local up`
 
@@ -803,7 +842,11 @@ Inspect and operate task-backed jobs
 
 #### Examples
 
-`relkit jobs` — Inspect and operate task-backed jobs
+`relkit jobs list` — List the jobs the application defines
+
+`relkit jobs trigger --job orders.send --input-file ./input.json` — Run a job with the input in a JSON file
+
+`relkit jobs runs list` — List the runs the jobs service accepted
 
 #### `relkit jobs list`
 
@@ -1068,7 +1111,11 @@ Check local prerequisites and ports
 
 #### Examples
 
-`relkit doctor` — Check local prerequisites and ports
+`relkit doctor` — Check the tools and ports the application needs
+
+`relkit doctor --port 4100` — Check that port 4100 is free for the application
+
+`relkit doctor --no-ports` — Check the tools only, without testing ports
 
 ### `relkit deploy <command>`
 

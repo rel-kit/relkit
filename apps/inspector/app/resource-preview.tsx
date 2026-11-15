@@ -8,6 +8,7 @@ import { OverlayDialog } from "../components/ui/dialog";
 import { CodeBlock } from "../components/blocks/code-block";
 import { LoadingRows } from "../components/blocks/block-state";
 import { Eye, FileWarning } from "lucide-react";
+import { MetadataOnly, PdfPreview } from "./resource-object-preview";
 
 export function BucketPreview({
   bucketId,
@@ -89,7 +90,7 @@ export function CachePreview({
       ) : value === undefined ? (
         <LoadingRows label="Loading value…" rows={4} className="p-0" />
       ) : value.truncated ? (
-        <MetadataOnly bytes={value.bytes} />
+        <TooLarge bytes={value.bytes} />
       ) : (
         <div className="grid gap-2">
           <PreviewMeta
@@ -117,16 +118,7 @@ function Preview({ value }: { readonly value: InspectorBucketPreview }) {
       />
     );
   }
-  if (value.kind === "pdf" && value.content !== undefined) {
-    return (
-      <iframe
-        className="min-h-[60vh] w-full rounded-md border border-border"
-        title={`Preview of ${value.key}`}
-        sandbox=""
-        src={`data:application/pdf;base64,${value.content}`}
-      />
-    );
-  }
+  if (value.kind === "pdf") return <PdfPreview value={value} />;
   if ((value.kind === "json" || value.kind === "text") && value.content !== undefined) {
     return (
       <div className="grid gap-2">
@@ -135,14 +127,19 @@ function Preview({ value }: { readonly value: InspectorBucketPreview }) {
       </div>
     );
   }
-  return <MetadataOnly bytes={value.totalBytes} />;
+  return (
+    <MetadataOnly
+      value={value}
+      reason="The Inspector shows no content for this type. This is what the provider reports about the object."
+    />
+  );
 }
 
-function MetadataOnly({ bytes }: { readonly bytes: number }) {
+function TooLarge({ bytes }: { readonly bytes: number }) {
   return (
     <p className="m-0 flex items-center gap-2 rounded-md border border-dashed border-border px-3 py-4 text-[13px] text-muted-foreground">
       <FileWarning aria-hidden="true" className="size-4 shrink-0" />
-      This format is metadata-only ({bytes.toLocaleString("en-US")} bytes).
+      This value is too large to show here ({bytes.toLocaleString("en-US")} bytes).
     </p>
   );
 }

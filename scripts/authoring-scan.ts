@@ -136,7 +136,14 @@ function scanFragment(
   for (const reference of importReferences(source)) {
     const dependency = dependencyName(reference.specifier);
     if (
-      (isFixtureForbidden(reference.specifier) && !integrations.has(dependency ?? "")) ||
+      // A subpath of a scoped integration package is judged by the package: `@relkit/drizzle/sqlite`
+      // is public because `@relkit/drizzle` is. Subpaths of `relkit` itself stay listed one by one.
+      (isFixtureForbidden(
+        reference.specifier.startsWith("@relkit/")
+          ? (dependency ?? reference.specifier)
+          : reference.specifier,
+      ) &&
+        !integrations.has(dependency ?? "")) ||
       (!setupSource &&
         /^(?:effect|hono|next|pulumi|aws-sdk|fs|node:fs(?:\/promises)?|node:process|dotenv|@(?:effect|hono|next|pulumi|aws-sdk|azure|google-cloud|cloudflare)\/)/.test(
           reference.specifier,

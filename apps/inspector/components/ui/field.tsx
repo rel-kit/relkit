@@ -47,7 +47,7 @@ export function Field({
             "h-8 w-full rounded-md border border-input bg-background px-2.5 text-[13px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-ring focus:ring-2 focus:ring-ring/25",
             icon && "pl-8",
           )}
-          placeholder={placeholder}
+          {...(placeholder === undefined ? {} : { placeholder })}
         />
       </div>
       {description && (

@@ -190,10 +190,13 @@ declare const s3XmlValue: (xml: string, name: string) => string | undefined;
 
 ### S3BucketOptions (interface)
 
+Endpoint, credentials and the bucket's limits; `put` and `createWriteUrl` apply the limits
+the way the local provider does.
+
 **Signature**
 
 ```ts
-export interface S3BucketOptions {
+export interface S3BucketOptions extends BucketPolicy {
   readonly endpoint: string;
   readonly bucketName: string;
   readonly region: string;
@@ -204,7 +207,7 @@ export interface S3BucketOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/s3.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/s3.ts#L25)
 
 ### S3BucketProvider (interface)
 
@@ -232,7 +235,7 @@ export interface S3BucketProvider extends BucketProvider {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/s3.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/s3.ts#L35)
 
 ### createS3BucketProvider
 
@@ -242,7 +245,7 @@ export interface S3BucketProvider extends BucketProvider {
 declare const createS3BucketProvider: (options: S3BucketOptions) => S3BucketProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/s3.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/s3.ts#L54)
 
 ## `signing.ts`
 
@@ -295,7 +298,7 @@ export interface SignedRequestOptions {
 declare const assertResponse: (response: Response, operation: string) => Promise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/signing.ts#L104)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/signing.ts#L108)
 
 ### presignS3Url
 
@@ -307,11 +310,28 @@ declare const presignS3Url: (
   method: "GET" | "PUT",
   region: string,
   expiresSeconds: number,
-  options?: Pick<SignedRequestOptions, "credentials" | "fetch">,
+  options?: Pick<SignedRequestOptions, "credentials" | "fetch"> & {
+    readonly headers?: Readonly<Record<string, string>>;
+  },
 ) => Promise<string>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/signing.ts#L35)
+
+### presignedHeaders
+
+Canonical form of the host plus the headers a presigned URL binds, sorted by name.
+
+**Signature**
+
+```ts
+declare const presignedHeaders: (
+  host: string,
+  headers?: Readonly<Record<string, string>>,
+) => { readonly canonical: string; readonly names: string };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/s3/src/runtime/signing.ts#L156)
 
 ### signedRequest
 

@@ -196,6 +196,7 @@ declare const openDuckdbDatabaseEffect: (
           log: StoredLocalRecord;
           items: ReadonlyArray<never>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -213,6 +214,7 @@ declare const openDuckdbDatabaseEffect: (
           incomplete: readonly string[];
           items: ReadonlyArray<never>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -222,6 +224,7 @@ declare const openDuckdbDatabaseEffect: (
           records: ReadonlyArray<StoredLocalRecord>;
           items: ReadonlyArray<StoredLocalRecord>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -305,6 +308,7 @@ declare const openDuckdbDatabase: (
             log: StoredLocalRecord;
             items: ReadonlyArray<never>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -322,6 +326,7 @@ declare const openDuckdbDatabase: (
             incomplete: readonly string[];
             items: ReadonlyArray<never>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -331,6 +336,7 @@ declare const openDuckdbDatabase: (
             records: ReadonlyArray<StoredLocalRecord>;
             items: ReadonlyArray<StoredLocalRecord>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -345,6 +351,7 @@ declare const openDuckdbDatabase: (
         log: StoredLocalRecord;
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -362,6 +369,7 @@ declare const openDuckdbDatabase: (
         incomplete: readonly string[];
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -371,6 +379,7 @@ declare const openDuckdbDatabase: (
         records: ReadonlyArray<StoredLocalRecord>;
         items: ReadonlyArray<StoredLocalRecord>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -544,7 +553,7 @@ declare const startLocalWorkerEffect: (
 ) => Effect.Effect<LocalWorkerEffects, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L24)
 
 ## `worker-client-service.ts`
 

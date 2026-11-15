@@ -68,7 +68,7 @@ export const rollbackCodeMigration = Effect.fn("Migration.code.rollback")(
   function* (root: string, path: string) {
     const record = yield* readCodeReceipt(resolve(root), path);
     yield* restoreCodeEdits(record.path, record.receipt, record.receipt.status !== "committed");
-    return codeRollbackResult(record.receipt, record.path);
+    return codeRollbackResult(resolve(root), record.receipt, record.path);
   },
   (effect) => observeCli("migration.code.rollback", effect),
 );

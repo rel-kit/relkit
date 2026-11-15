@@ -209,9 +209,9 @@
       "requiredIn": [],
       "sensitive": false,
       "source": {
-        "column": 16,
+        "column": 3,
         "file": "relkit.config.ts",
-        "line": 7
+        "line": 4
       },
       "type": "port"
     },

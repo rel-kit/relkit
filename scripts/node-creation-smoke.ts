@@ -22,6 +22,8 @@ import { packBaselineArtifacts } from "./dev-readiness/packed-artifacts.js";
 import type { PreparedRegistryIndex } from "./node-creation-registry.js";
 
 const root = resolve(import.meta.dir, "..");
+/** Packages the extended run installs with `relkit add database` and `relkit add inspector`. */
+const ADDED_PACKAGES = ["@relkit/drizzle", "@relkit/inspector"] as const;
 
 /** Reads one `--name value` option. @param name - Option name. @returns Its value. */
 function option(name: string): string | undefined {
@@ -37,7 +39,7 @@ async function main(): Promise<void> {
   try {
     const tarballs =
       artifacts === undefined
-        ? await Effect.runPromise(packBaselineArtifacts(temporary, manifests))
+        ? await Effect.runPromise(packBaselineArtifacts(temporary, manifests, ADDED_PACKAGES))
         : await loadReleaseTarballs(resolve(artifacts));
     const verified = await registryPackages(tarballs, manifests, readPackedManifest);
     await rm(out, { recursive: true, force: true });

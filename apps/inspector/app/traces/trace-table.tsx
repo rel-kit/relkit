@@ -122,7 +122,7 @@ function traceStatus(outcome: string | undefined) {
       label: "Succeeded",
       className: "text-success",
     } as const;
-  if (outcome === "timeout" || outcome === "cancelled")
+  if (outcome === "timeout" || outcome === "cancelled" || outcome === "refused")
     return {
       icon: CircleAlert,
       tone: "warning",

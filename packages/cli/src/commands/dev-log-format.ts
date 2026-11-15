@@ -48,6 +48,8 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
                 ? String(f.message ?? "Unknown error")
                 : String(f.message ?? "Unknown error").split("\n")[0]!,
             ];
+      // What the failed process wrote, such as the parse error and its location.
+      if (typeof f.cause === "string") details.push(...f.cause.split("\n"));
       if (!options.verbose && (f.error || String(f.message).includes("\n")))
         details.push("Use --verbose for diagnostic details.");
     } else if (event === "dev.ready") {
@@ -79,25 +81,33 @@ export function formatDevLog(record: LogRecord, options: DevLogFormatOptions = {
     scope = "http";
     message = `${f.method} ${f.path} → ${f.status ?? "cancelled"}${duration}`;
   }
-  details.push(...devLogDetails(record, options.verbose === true));
+  // A recorded exception's message is the line itself; its stack shows only with --verbose.
+  const fields = typeof f["exception.type"] === "string" ? exceptionFields(f, options) : f;
+  if (fields !== f && options.verbose && typeof f["exception.stacktrace"] === "string")
+    details.push(...stackFrames(f["exception.stacktrace"]));
+  details.push(...devLogDetails({ ...record, fields }, options.verbose === true));
   if (
     options.verbose &&
     message === event &&
     record.component !== "inspector" &&
     typeof f.message !== "string"
   )
-    details.push(JSON.stringify({ ...f, ...correlations(record) }));
+    details.push(JSON.stringify({ ...fields, ...correlations(record) }));
   const width = Math.max(40, options.columns ?? 100);
   const scopeWidth = width < 80 ? 10 : 16;
   const time = timestamp(record.timestamp);
   const level = record.level.toUpperCase().padEnd(5);
-  const prefix = `${time} ${color(level, record.level, options.color)} ${middle(scope, scopeWidth).padEnd(scopeWidth)}  `;
-  const indent = " ".repeat(time.length + 1 + 5 + 1 + scopeWidth + 2);
+  // A long scope widens its own line rather than losing the middle of its name.
+  const label = scope.padEnd(scopeWidth);
+  const prefix = `${time} ${color(level, record.level, options.color)} ${label}  `;
+  const indent = " ".repeat(time.length + 1 + 5 + 1 + label.length + 2);
   const [first = "", ...continuation] = message.split("\n");
   const contentWidth = Math.max(1, width - indent.length);
   const body = [...continuation, ...details].flatMap((detail) => detail.split("\n"));
-  const lines = [first, ...body].flatMap((line) => {
-    if (event === "dev.ready" || options.verbose) return [line];
+  // The request line stays whole so its status and duration never land on a second line.
+  const requestLine = scope === "http";
+  const lines = [first, ...body].flatMap((line, index) => {
+    if (event === "dev.ready" || options.verbose || (requestLine && index === 0)) return [line];
     return wrap(line, contentWidth);
   });
   return (
@@ -127,6 +137,35 @@ function wrap(value: string, width: number): string[] {
   return [...lines, line];
 }
 
+/** Keeps the fields of a recorded exception that its line does not already show.
+ * @param fields - Record fields with `exception.*` attributes.
+ * @param options - Detail policy; without `verbose` no metadata is shown.
+ * @returns The fields without the message and stack, or none outside verbose mode.
+ */
+function exceptionFields(
+  fields: LogRecord["fields"],
+  options: DevLogFormatOptions,
+): LogRecord["fields"] {
+  if (!options.verbose) return {};
+  const {
+    "exception.message": _message,
+    "exception.stacktrace": _stack,
+    ...rest
+  } = fields as Record<string, LogRecord["fields"][string]>;
+  return rest;
+}
+
+/** Selects the call frames of a stack, trimmed.
+ * @param stack - Stack text whose first line repeats the message.
+ * @returns The `at …` lines.
+ */
+function stackFrames(stack: string): string[] {
+  return stack
+    .split("\n")
+    .filter((line) => /^\s*at /.test(line))
+    .map((line) => line.trim());
+}
+
 /** Renders the nonempty correlation fields of a validated log envelope.
  * @param record - Admitted envelope.
  * @returns Existing nonempty correlation labels for verbose rendering.
@@ -152,17 +191,6 @@ function timestamp(value: string): string {
       .map((part) => String(part).padStart(2, "0"))
       .join(":") + `.${String(date.getMilliseconds()).padStart(3, "0")}`
   );
-}
-
-/** Fits a scope label to its allotted width using middle ellipsis.
- * @param value - Scope label.
- * @param maximum - Available label width.
- * @returns Middle-ellipsized presentation without changing record content.
- */
-function middle(value: string, maximum: number): string {
-  if (value.length <= maximum) return value;
-  const side = Math.floor((maximum - 1) / 2);
-  return `${value.slice(0, side)}…${value.slice(-(maximum - side - 1))}`;
 }
 
 /** Applies the configured terminal severity color to a label.

@@ -15,14 +15,16 @@ import type { Manifest } from "../pack-and-smoke-create-relkit-support.js";
  * Produces verified tarballs with one current release identity.
  * @param temporary - Measurement-owned directory for tarballs and build output.
  * @param manifests - Current workspace declarations supplied by the packing adapter.
+ * @param extraRoots - Workspace packages packed in addition to the creation closure.
  * @returns Package names mapped to external tarballs after the finite adapter settles.
  */
 export const packBaselineArtifacts = Effect.fn("ReadinessBenchmark.packArtifacts")(function* (
   temporary: string,
   manifests: Map<string, { directory: string; manifest: Manifest }>,
+  extraRoots: readonly string[] = [],
 ) {
   const built = yield* ownedNativePromise("benchmark.buildPackages", () =>
-    packPackages(temporary, manifests),
+    packPackages(temporary, manifests, extraRoots),
   );
   const items = [...built.keys()].map((name) => {
     const source = manifests.get(name);

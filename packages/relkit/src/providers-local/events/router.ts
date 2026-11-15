@@ -8,6 +8,7 @@ import type { EventContractInput } from "./admin-contracts.js";
 import type { EventLogRecord } from "./log.js";
 import { createEventDelivery } from "./delivery.js";
 import { createEphemeralDelivery } from "./ephemeral.js";
+import { routerAdmin } from "./router-admin.js";
 import type {
   EventDeliveryResult,
   EventFanoutResult,
@@ -225,6 +226,7 @@ export async function createEventRouter(
     runNext,
     drain,
     retry,
+    ...routerAdmin(triggers, publications, ensureOpen),
     snapshot,
     close,
   });

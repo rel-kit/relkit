@@ -3,10 +3,19 @@
  * renders its human summary: changed files with the rules that changed them, then every
  * finding as `file:line  message`, then the next commands. File bytes never appear.
  */
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
 import type { CodeMigrationPlan, CodeMigrationResult } from "./code-migration.types.js";
 import type { CodeReceiptRecord } from "./code-receipt.schemas.js";
 
-const nextSteps = ["bun install", "bun run check", "bun run typecheck", "bun run test"];
+/**
+ * Spells the commands to run after a migration with the project's package manager.
+ * @param root - Project root.
+ * @returns Install, check, typecheck and test commands.
+ */
+function nextSteps(root: string): readonly string[] {
+  const manager = packageManagerCommands(projectPackageManager(root));
+  return [manager.installText, manager.run("check"), manager.run("typecheck"), manager.run("test")];
+}
 
 /**
  * Builds the result of a preview or write.
@@ -30,17 +39,22 @@ export function codeMigrationResult(
     })),
     findings: plan.findings,
     ...(receipt === undefined ? {} : { receipt }),
-    nextSteps: status === "committed" ? nextSteps : [],
+    nextSteps: status === "committed" ? nextSteps(plan.root) : [],
   };
 }
 
 /**
  * Builds the result of a rollback.
+ * @param root - Project root.
  * @param receipt - Restored record.
  * @param path - Record path.
  * @returns The printable result.
  */
-export function codeRollbackResult(receipt: CodeReceiptRecord, path: string): CodeMigrationResult {
+export function codeRollbackResult(
+  root: string,
+  receipt: CodeReceiptRecord,
+  path: string,
+): CodeMigrationResult {
   return {
     ok: true,
     status: "rolled-back",
@@ -51,7 +65,7 @@ export function codeRollbackResult(receipt: CodeReceiptRecord, path: string): Co
     })),
     findings: [],
     receipt: path,
-    nextSteps,
+    nextSteps: nextSteps(root),
   };
 }
 

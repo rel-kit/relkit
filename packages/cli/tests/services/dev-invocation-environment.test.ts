@@ -18,6 +18,7 @@ test("generated HTTP invocation forwards resolved environment into the engine", 
     graph: { nodes: [] },
     plan: { jobs: [] },
     telemetry: {},
+    recordObservedEdge: () => undefined,
     runtimeOwner: { track: (work: Promise<void>) => work },
     authRequestStorage: { getStore: () => undefined },
     invoke: async (options: { readonly env?: object }) => {

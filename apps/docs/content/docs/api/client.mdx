@@ -4164,7 +4164,29 @@ declare const abortable: <A>(
 ) => Promise<A>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L58)
+
+### abortableIterator
+
+Ties an async iterator to a signal: an abort settles a pending `next()` with the signal's
+reason and returns the source, so iteration ends even when the source misses the abort.
+
+**Example**
+
+```ts
+for await (const frame of abortableIterator(stream, signal)) use(frame);
+```
+
+**Signature**
+
+```ts
+declare const abortableIterator: <A>(
+  source: AsyncIterator<A>,
+  signal: AbortSignal,
+) => AsyncIterableIterator<A>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L90)
 
 ### delay
 
@@ -4182,7 +4204,7 @@ await delay(250, signal);
 declare const delay: (ms: number, signal?: AbortSignal) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/native/iterate.ts#L141)
 
 ### iterateNative
 
@@ -9295,7 +9317,7 @@ Selects WebSocket once, falling back to HTTP only when initial establishment fai
 declare const selectAutoTransport: (options: CreateAutoClientOptions) => TransportSelection;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/transport.service.ts#L52)
 
 ## `transport.ts`
 

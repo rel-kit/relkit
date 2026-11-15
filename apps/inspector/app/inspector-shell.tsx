@@ -1,7 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+const noSubscription = () => () => undefined;
 import { GitCommitHorizontal, Moon, MoreHorizontal, Sun } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Breadcrumbs } from "../components/ui/breadcrumb";
@@ -9,7 +11,9 @@ import { Button } from "../components/ui/button";
 import { DropdownMenu } from "../components/ui/dropdown-menu";
 import { Tooltip } from "../components/ui/tooltip";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
-import { StatusBadge, statusTone } from "../components/neon/status-badge";
+import { useInspectorState } from "../lib/stream-application-store";
+import { sidebarStatus } from "../lib/sidebar-status";
+import { ApplicationBanner, InspectorStatus } from "./application-state";
 import { CopyButton } from "../components/blocks/copy-button";
 import { useInspectorGraph } from "../lib/use-graph";
 import { SCALAR_API_REFERENCE_URL } from "../lib/api-reference";
@@ -19,17 +23,30 @@ import { AppSidebar } from "../components/app-sidebar";
 import { CommandPalette } from "./command-palette";
 import { navigation } from "./navigation-data";
 import { DevelopmentFailureBanner } from "./development-failure-banner";
-import { applyInspectorTheme, readInspectorTheme, type InspectorTheme } from "./theme-storage";
+import {
+  applyInspectorTheme,
+  followSystemTheme,
+  readInspectorTheme,
+  type InspectorTheme,
+} from "./theme-storage";
 
 export function InspectorShell({ children }: { readonly children: ReactNode }) {
   const pathname = usePathname() ?? "/";
+  const hydrated = useSyncExternalStore(
+    noSubscription,
+    () => true,
+    () => false,
+  );
   const graph = useInspectorGraph();
   const [searchOpen, setSearchOpen] = useState(false);
   // Dark is rendered on the server and corrected before paint by the script in layout.tsx;
   // this state only mirrors what is already applied.
   const [theme, setTheme] = useState<InspectorTheme>("dark");
 
-  useEffect(() => setTheme(readInspectorTheme()), []);
+  useEffect(() => {
+    setTheme(readInspectorTheme());
+    return followSystemTheme(setTheme);
+  }, []);
   useEffect(() => {
     const openSearch = (event: KeyboardEvent): void => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -46,7 +63,8 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
     setTheme(next);
     applyInspectorTheme(next);
   };
-  const status = graph.error ? "offline" : graph.connection;
+  const inspector = useInspectorState();
+  const status = sidebarStatus(inspector, graph.error);
   const generationId = graph.graph?.generationId;
   const graphHash = graph.graph?.graphHash;
 
@@ -60,7 +78,9 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
         <header className="shell-header">
           <SidebarTrigger aria-label="Toggle navigation" />
           <span aria-hidden="true" className="h-4 w-px bg-border" />
-          <Breadcrumbs items={breadcrumbs(pathname)} />
+          {/* A built 404 is prerendered as `/_not-found`, so the server's pathname differs from
+              the browser's and the trail mismatched on hydration (IN-42). It renders after it. */}
+          <Breadcrumbs items={hydrated ? breadcrumbs(pathname) : []} />
           <div className="header-actions">
             <div className="generation-bar" aria-label="Active generation">
               <GitCommitHorizontal aria-hidden="true" className="size-3.5 text-muted-foreground" />
@@ -78,12 +98,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
               ) : null}
             </div>
             <CommandPalette isOpen={searchOpen} onOpenChange={setSearchOpen} graph={graph.graph} />
-            <StatusBadge
-              className="health-badge"
-              data-state={status}
-              tone={status === "connected" ? "live" : statusTone(status)}
-              label={status}
-            />
+            <InspectorStatus />
             <Tooltip
               trigger={
                 <Button
@@ -112,6 +127,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
             />
           </div>
         </header>
+        <ApplicationBanner />
         <DevelopmentFailureBanner {...(generationId === undefined ? {} : { generationId })} />
         <div id="main-content" className="main-content" tabIndex={-1}>
           {children}

@@ -6,6 +6,7 @@
 import { Effect, Layer } from "effect";
 import type { LoadedToolingConfig } from "../compiler/index.js";
 import { doctorCommandEffect, availablePortEffect } from "./doctor-native.js";
+import { lockfileReason } from "./doctor-lockfile-reason.js";
 import { checkPortsEffect } from "./doctor-ports.js";
 export { checkPortsEffect } from "./doctor-ports.js";
 import { runCliEffect, observeCli } from "../cli-runtime.js";
@@ -92,13 +93,23 @@ export const checkLockfileEffect = Effect.fn("Doctor.lockfile")(
         ? process.execPath
         : (runtime.processes.which(manager.name) ?? manager.name);
     const result = yield* doctorCommandEffect([executable, ...manager.frozenCheck], root, runner);
+    if (result.exitCode === 0)
+      return { name: "lockfile", ok: true, message: "Frozen lockfile is consistent." };
+    // The package manager's own words say which dependency does not match the lockfile.
+    const reason = lockfileReason(result.output ?? "", root);
     return {
       name: "lockfile",
-      ok: result.exitCode === 0,
-      message:
-        result.exitCode === 0
-          ? "Frozen lockfile is consistent."
-          : "Frozen lockfile consistency check failed.",
+      ok: false,
+      message: "Frozen lockfile consistency check failed.",
+      ...(reason.length === 0
+        ? {}
+        : {
+            details: {
+              packageManager: manager.name,
+              command: [manager.name, ...manager.frozenCheck].join(" "),
+              reason,
+            },
+          }),
     };
   },
   (effect) => observeCli("doctor.lockfile", effect),

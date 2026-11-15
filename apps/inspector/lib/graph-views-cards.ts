@@ -42,9 +42,12 @@ export function routeGroupCard(group: GraphNode, hierarchy: AppHierarchy): ViewN
     for (const name of routeNames) if (!names.includes(name)) names.push(name);
   }
   const total = routes.length;
+  // The graph has no marker for "public". The API reports a function's access rule; an application
+  // on an older RelKit does not, and its guarded routes look like routes that declare nothing, so
+  // "public" is never claimed.
   const access =
     protectedCount === 0
-      ? "all public"
+      ? "no access rule reported"
       : protectedCount === total
         ? "all protected"
         : `${protectedCount} protected`;
@@ -63,6 +66,9 @@ export function routeGroupCard(group: GraphNode, hierarchy: AppHierarchy): ViewN
   };
 }
 
+// Buckets have a card of their own on the map; caches are listed on their domain's card.
+const RESOURCE_KINDS: readonly string[] = ["cache"];
+
 export function domainCard(domain: DomainGroup): ViewNode {
   const counts = [
     { label: "routes", value: domain.routes.length },
@@ -72,6 +78,12 @@ export function domainCard(domain: DomainGroup): ViewNode {
   ].filter((count) => count.value > 0);
   if (domain.agents.length > 0) counts.push({ label: "agents", value: domain.agents.length });
   if (domain.jobs.length > 0) counts.push({ label: "jobs", value: domain.jobs.length });
+  // Owned caches have no card of their own on the map (IN-45): list them here.
+  const resources = domain.members.filter((node) => RESOURCE_KINDS.includes(node.kind));
+  for (const kind of RESOURCE_KINDS) {
+    const value = resources.filter((node) => node.kind === kind).length;
+    if (value > 0) counts.push({ label: value === 1 ? kind : `${kind}s`, value });
+  }
   return {
     id: domain.id,
     type: "service",
@@ -80,6 +92,9 @@ export function domainCard(domain: DomainGroup): ViewNode {
     subtitle: nodeDescription(domain.service) ?? "Domain",
     counts,
     node: domain.service,
+    ...(resources.length === 0
+      ? {}
+      : { resources: resources.map((node) => `${node.kind} ${nodeTitle(node)}`) }),
   };
 }
 

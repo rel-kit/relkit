@@ -2,10 +2,13 @@ import { RPCHandler, type MinimalWebsocket } from "@orpc/server/websocket";
 import { FRAMEWORK_RPC_PATH, REALTIME_RUNTIME_LIMITS } from "../contracts/index.js";
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
+import { captureRequestContext } from "./http-logging.js";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { createRpcRouter, type RpcContext } from "./rpc.js";
 import { errorStatusInterceptor, rpcHeadersInterceptor } from "./rpc-handler-options.js";
-import { assertWebSocketRequest } from "./transport-security.js";
+import { isRpcFrame } from "./rpc-websocket-frame.js";
+import { contextProblem } from "./problem-details.js";
+import { assertWebSocketRequest, TransportSecurityError } from "./transport-security.js";
 
 /** Installs the oRPC WebSocket adapter on the same router and policies as HTTP RPC.
  * @param app - Hono application receiving the configured endpoints or middleware.
@@ -25,14 +28,31 @@ export function installRpcWebSocket(
   });
   app.get(
     FRAMEWORK_RPC_PATH,
-    upgradeWebSocket(async (hono) => {
-      if (options.transportSecurity !== undefined) {
-        await assertWebSocketRequest(hono.req.raw, options.transportSecurity);
+    async (hono, next) => {
+      const security = options.transportSecurity;
+      if (security === undefined || hono.req.header("upgrade")?.toLowerCase() !== "websocket")
+        return next();
+      try {
+        await assertWebSocketRequest(hono.req.raw, security);
+      } catch (error) {
+        if (!(error instanceof TransportSecurityError)) throw error;
+        // The same answer as an HTTP request from a refused origin, before any upgrade.
+        return contextProblem(hono, {
+          status: 403,
+          code: "origin-denied",
+          detail: "The request was rejected.",
+        });
       }
+      return next();
+    },
+    upgradeWebSocket(async (hono) => {
       const context: RpcContext = {
         hono,
         auth: options.auth?.contextFor(hono.req.raw),
       };
+      // Socket messages arrive outside the upgrade request's asynchronous context. Each one runs
+      // in it again, so channel guards see the application (`getRelkit()`) as they do over HTTP.
+      const inUpgradeContext = captureRequestContext();
       return {
         /** Forwards one admitted WebSocket message to the protocol handler.
          * @param event - Event or record being projected into the target protocol.
@@ -44,8 +64,14 @@ export function installRpcWebSocket(
             socket.close(1009, "RelKit frame exceeds the transport limit.");
             return;
           }
+          if (!isRpcFrame(event.data)) {
+            socket.close(1007, "RelKit RPC frame is not valid.");
+            return;
+          }
           const peer = (socket.raw ?? socket) as MinimalWebsocket;
-          void handler.message(peer, event.data as string | ArrayBuffer, { context }).catch(() => {
+          void inUpgradeContext(() =>
+            handler.message(peer, event.data as string | ArrayBuffer, { context }),
+          ).catch(() => {
             socket.close(1011, "RelKit RPC transport failed.");
           });
         },

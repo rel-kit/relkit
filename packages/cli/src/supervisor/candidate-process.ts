@@ -42,11 +42,14 @@ export async function resolvePort(options: CandidateOptions, hostname: string): 
 }
 
 /** Projects inherited/native child environment. @param values - Explicit overrides.
- * @param token - Candidate identity. @param port - Private listener port. @returns Existing child environment shape. */
+ * @param token - Candidate identity. @param port - Private listener port.
+ * @param hostname - Host the port was allocated on; the generated server binds only there.
+ * @returns Existing child environment shape. */
 export function childEnvironment(
   values: Readonly<Record<string, string | undefined>> | undefined,
   token: SupervisorCandidateToken,
   port: number,
+  hostname = "127.0.0.1",
 ): Record<string, string> {
   const inherited = Object.fromEntries(
     Object.entries(process.env).filter(
@@ -61,6 +64,7 @@ export function childEnvironment(
   return {
     ...inherited,
     PORT: String(port),
+    RELKIT_HOSTNAME: hostname,
     RELKIT_SOURCE_TOKEN: String(token.sourceToken),
     RELKIT_GENERATION_TOKEN: String(token.generationToken),
   };

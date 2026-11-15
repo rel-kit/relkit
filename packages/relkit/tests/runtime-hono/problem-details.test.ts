@@ -123,6 +123,9 @@ async function problem(response: Response, status: number, code: string) {
   expect(response.headers.get("content-type")).toBe("application/problem+json");
   const body = await response.json();
   expect(body).toMatchObject({ type: `/errors/${code}`, status, code, traceId });
+  // The body's request ID is the one in the `x-request-id` header, so a client can quote either.
+  expect(body.requestId).toEqual(expect.any(String));
+  expect(body.requestId).toBe(response.headers.get("x-request-id"));
   expect(typeof body.title).toBe("string");
   expect(typeof body.detail).toBe("string");
   expect(JSON.stringify(body)).not.toContain("secret");
@@ -140,6 +143,7 @@ test("a declared error is a problem with its code, data and Retry-After", async 
     detail: "Order service is busy",
     data: { queue: "orders" },
     traceId,
+    requestId: response.headers.get("x-request-id"),
   });
 });
 
@@ -184,6 +188,6 @@ test("unmatched routes are 404 and 405 problems", async () => {
     method: "DELETE",
     headers: { origin: "https://app.example" },
   });
-  expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD");
+  expect(wrongMethod.headers.get("allow")).toBe("GET, HEAD, OPTIONS");
   await problem(wrongMethod, 405, "method-not-allowed");
 });

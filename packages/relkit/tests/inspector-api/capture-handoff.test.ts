@@ -43,16 +43,16 @@ test("an ACK retires only its frozen prefix while later arrivals remain redacted
   );
 });
 
-test("default overflow retains exactly 2048 and cumulative loss survives every ACK", async () => {
+test("default overflow retains exactly 8192 and cumulative loss survives every ACK", async () => {
   await Effect.runPromise(
     Effect.gen(function* () {
       const capture = yield* InspectionCapture.make({});
-      for (let i = 0; i < 2050; i++) yield* capture.append(record);
+      for (let i = 0; i < 8194; i++) yield* capture.append(record);
       const response = yield* capture.records(
         new Request("http://localhost/_relkit/bridge/v1/records"),
       );
       expect(yield* Effect.promise(() => response.json())).toMatchObject({
-        bufferedRecords: 2048,
+        bufferedRecords: 8192,
         droppedRecords: 2,
         incomplete: true,
       });
@@ -60,7 +60,7 @@ test("default overflow retains exactly 2048 and cumulative loss survives every A
         new Request("http://localhost/_relkit/bridge/v1/ack", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: '{"through":2050}',
+          body: '{"through":8194}',
         }),
       );
       const status = yield* capture.records(

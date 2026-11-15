@@ -1,11 +1,13 @@
 "use client";
 
 /** Keeps route metadata and composer calls on one observed browser generation across rerenders. */
+import { NeedsApplication } from "../application-state";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { InspectorObject, ObservabilityPage } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { recentQuery } from "../../lib/recent-signals";
 import { CodeBlock } from "../../components/blocks/code-block";
 import { Section } from "../../components/blocks/section";
 import { StatusBadge } from "../../components/neon/status-badge";
@@ -40,7 +42,7 @@ export function RouteDetailClient() {
   const loadRequests = () => {
     if (id === "") return;
     void createInspectorClient()
-      .query<InspectorObject>("requests", { routeId: id, limit: 10 })
+      .query<InspectorObject>("requests", recentQuery({ routeId: id }))
       .then((page: ObservabilityPage<InspectorObject>) => setRequests(page.items))
       .catch(() => setRequests([]));
   };
@@ -50,7 +52,7 @@ export function RouteDetailClient() {
     void Promise.all([
       api.detail<InspectorObject>("routes", id),
       api
-        .query<InspectorObject>("requests", { routeId: id, limit: 10 })
+        .query<InspectorObject>("requests", recentQuery({ routeId: id }))
         .catch(() => ({ items: [] as readonly InspectorObject[] })),
     ])
       .then(async ([routePayload, requestPayload]) => {
@@ -137,16 +139,30 @@ export function RouteDetailClient() {
       }}
       aside={<RouteFacts route={route} target={target} />}
     >
-      <RouteComposer
-        route={route}
-        target={target}
-        invoke={(input) => api.invokeRoute(input)}
-        {...streamInvocation(route, api)}
-        onComplete={(next) => {
-          setResult(next);
-          loadRequests();
-        }}
-      />
+      {route.system === true ? (
+        <Section id="route-send-note">
+          <p className="m-0 text-xs text-muted-foreground">
+            RelKit handles this route itself, so there is no request to compose here.{" "}
+            <Link className="text-link" href={`/requests?routeId=${encodeURIComponent(routeId)}`}>
+              View the requests it handled
+            </Link>
+            .
+          </p>
+        </Section>
+      ) : (
+        <NeedsApplication>
+          <RouteComposer
+            route={route}
+            target={target}
+            invoke={(input) => api.invokeRoute(input)}
+            {...streamInvocation(route, api)}
+            onComplete={(next) => {
+              setResult(next);
+              loadRequests();
+            }}
+          />
+        </NeedsApplication>
+      )}
       {result !== undefined && <InvocationResult result={result} />}
       <RecentRequests requests={requests} />
       <RouteContract route={route} target={target} />

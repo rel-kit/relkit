@@ -106,9 +106,13 @@ export function toCapability(value: EventTriggerSnapshot): EventTriggerCapabilit
 
 /** Projects a publication record into bounded inspection metadata.
  * @param value - Value to validate, normalize or project.
+ * @param withPayload - Whether to include the stored payload, for a lookup of one publication.
  * @returns The safe publication inspection record.
  */
-export function toPublication(value: EventLogRecord): EventPublicationContract {
+export function toPublication(
+  value: EventLogRecord,
+  withPayload = false,
+): EventPublicationContract {
   const envelope = value.envelope;
   const propagation = parseTracePropagation(envelope.propagation);
   return eventVersioned({
@@ -129,6 +133,7 @@ export function toPublication(value: EventLogRecord): EventPublicationContract {
       : { originRequestId: propagation.originRequestId }),
     ...(propagation === undefined ? {} : { producerTraceId: propagation.producer.traceId }),
     attributes: envelope.attributes,
+    ...(withPayload ? { payload: envelope.payload } : {}),
   });
 }
 

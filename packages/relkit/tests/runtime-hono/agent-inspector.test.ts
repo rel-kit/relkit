@@ -7,14 +7,50 @@ import type {
 import type { RegistrationPlan } from "../../src/graph/index.js";
 import { z } from "../../src/schema/index.js";
 import { Hono } from "hono";
-import { installAgentInspectorEndpoints } from "../../src/runtime-hono/agent-inspector.ts";
+import {
+  INSPECTION_AUTHORIZE,
+  installAgentInspectorEndpoints,
+} from "../../src/runtime-hono/agent-inspector.ts";
 import type { RouteMaterializationOptions } from "../../src/runtime-hono/materialize-routes.ts";
 import { runtimeCohort } from "./test-cohort.ts";
 
-test("Inspector workflow and execution endpoints expose safe structural metadata", async () => {
+/**
+ * Installs the agent inspection routes behind a development inspection session check.
+ * @returns The router; requests pass with `x-relkit-inspector-session-token: session-token`.
+ */
+function inspectedApp(): Hono {
   const app = new Hono();
+  Object.assign(app, {
+    [INSPECTION_AUTHORIZE]: (request: Request) =>
+      request.headers.get("x-relkit-inspector-session-token") === "session-token",
+  });
   installAgentInspectorEndpoints(app, options(), {});
-  const workflow = await app.request("http://relkit.test/_relkit/v1/agents/review/workflow");
+  return app;
+}
+
+const session = { "x-relkit-inspector-session-token": "session-token" };
+
+test("agent inspection routes need the inspection session (RK-03)", async () => {
+  const open = new Hono();
+  installAgentInspectorEndpoints(open, options(), {});
+  for (const path of ["agents/review/workflow", "runtime/agents/review/executions?threadId=t"])
+    expect((await open.request(`http://relkit.test/_relkit/v1/${path}`)).status).toBe(404);
+  const app = inspectedApp();
+  const denied = await app.request("http://relkit.test/_relkit/v1/agents/review/workflow", {
+    headers: { "x-relkit-inspector-session-token": "wrong" },
+  });
+  expect(denied.status).toBe(401);
+  const executions = await app.request(
+    "http://relkit.test/_relkit/v1/runtime/agents/review/executions?threadId=thread-1",
+  );
+  expect(executions.status).toBe(401);
+});
+
+test("Inspector workflow and execution endpoints expose safe structural metadata", async () => {
+  const app = inspectedApp();
+  const workflow = await app.request("http://relkit.test/_relkit/v1/agents/review/workflow", {
+    headers: session,
+  });
   expect(workflow.status).toBe(200);
   expect(await workflow.json()).toMatchObject({
     agentId: "review",
@@ -24,7 +60,13 @@ test("Inspector workflow and execution endpoints expose safe structural metadata
 
   const response = await app.request(
     "http://relkit.test/_relkit/v1/runtime/agents/review/executions?threadId=thread-1&mode=history",
-    { headers: { "x-relkit-identity-scope": "viewer", "x-relkit-session-epoch": "session" } },
+    {
+      headers: {
+        ...session,
+        "x-relkit-identity-scope": "viewer",
+        "x-relkit-session-epoch": "session",
+      },
+    },
   );
   expect(response.status).toBe(200);
   const text = await response.text();

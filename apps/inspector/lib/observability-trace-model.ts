@@ -1,3 +1,4 @@
+import { optional } from "./optional";
 import type { InspectorObject } from "./api-types";
 import { requestForSpan, traceIo } from "./trace-io";
 import { traceOperationType } from "./trace-operation-type";
@@ -153,9 +154,7 @@ function spanEvents(
         ...(isRecord(value.attributes)
           ? { attributes: redact(value.attributes) as InspectorObject }
           : {}),
-        ...(number(value.droppedAttributes) === undefined
-          ? {}
-          : { droppedAttributes: number(value.droppedAttributes) }),
+        ...optional("droppedAttributes", number(value.droppedAttributes)),
         offsetPercent: Math.max(0, Math.min(100, ((at - origin) / total) * 100)),
       },
     ];

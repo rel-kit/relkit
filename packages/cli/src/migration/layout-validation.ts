@@ -5,6 +5,7 @@ import { fromGraph } from "relkit/deploy";
 import { validateGraphShape, type ApplicationGraph } from "relkit/graph";
 import { canonicalJson } from "relkit/contracts";
 import { Effect, Schema } from "effect";
+import { projectPackageManager, type PackageManagerName } from "create-relkit/package-manager";
 import { checkProjectEffect } from "../commands/check.js";
 import { cliTry } from "../cli-errors.js";
 import { fail } from "../main-support.js";
@@ -42,8 +43,9 @@ export const validateLayoutCandidate = Effect.fn("Migration.validate")(function*
     yield* fs.symlink(join(plan.root, "node_modules"), join(baseline, "node_modules"));
     yield* fs.symlink(join(plan.root, "node_modules"), join(candidate, "node_modules"));
   }
-  const original = yield* validationProjection(baseline);
-  const moved = yield* validationProjection(candidate);
+  const manager = projectPackageManager(plan.root);
+  const original = yield* validationProjection(baseline, manager);
+  const moved = yield* validationProjection(candidate, manager);
   if (original !== moved)
     return yield* Effect.fail(
       fail(
@@ -54,11 +56,26 @@ export const validateLayoutCandidate = Effect.fn("Migration.validate")(function*
 });
 
 /**
+ * Spells the project's `typecheck` script for its own package manager (`<manager> run typecheck`
+ * for npm, pnpm and Bun), so a project without Bun does not need it for this step.
+ * @param root - Directory to run the script in.
+ * @param manager - Package manager of the project being migrated.
+ * @returns Process request for the project's `typecheck` script.
+ */
+export function typecheckRequest(root: string, manager: PackageManagerName) {
+  return { command: manager, args: ["run", "typecheck"], cwd: root } as const;
+}
+
+/**
  * Runs compiler and project typecheck, then validates complete logical/deployment projections.
  * @param root - Isolated staged project root.
+ * @param manager - Package manager of the project being migrated.
  * @returns Secret-free canonical comparison document; no runtime resources are acquired.
  */
-const validationProjection = Effect.fn("Migration.validate.project")(function* (root: string) {
+const validationProjection = Effect.fn("Migration.validate.project")(function* (
+  root: string,
+  manager: PackageManagerName,
+) {
   const result = yield* checkProjectEffect({ projectRoot: root });
   if (!result.ok)
     return yield* Effect.fail(
@@ -68,7 +85,7 @@ const validationProjection = Effect.fn("Migration.validate.project")(function* (
       ),
     );
   const processes = yield* CliProcess;
-  const checked = yield* processes.run({ command: "bun", args: ["run", "typecheck"], cwd: root });
+  const checked = yield* processes.run(typecheckRequest(root, manager));
   if (checked.exitCode !== 0)
     return yield* Effect.fail(
       fail(

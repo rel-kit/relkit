@@ -14,6 +14,12 @@ import { devSessionCapabilitiesLayer } from "./dev-session-engine.js";
 import { acquireActivationAttempt, acquireActivationCandidate } from "./dev-activation-acquire.js";
 import { publishActivation, observeActivatedChild } from "./dev-activation-publish.js";
 import { drainCandidateEffect } from "./dev-drain.js";
+import {
+  CandidateExitedError,
+  failOnCandidateExit,
+  releaseHeldOutput,
+} from "./dev-activation-exit.js";
+import { generationIdentity } from "./dev-activation-identity.js";
 import type { DevSession } from "./dev-session.js";
 import type { DevActivationAttempt } from "./dev-activation.types.js";
 export { drainCandidate, drainCandidateEffect } from "./dev-drain.js";
@@ -35,6 +41,8 @@ export const activateCandidateEffect = Effect.fn("Dev.activate")(
           const { generationToken } = attempt.token;
           const rejected = session.options.inspectionRejected?.(generationToken);
           return yield* runActivation(attempt).pipe(
+            // Output held while the reload was verified is logged unless the failure carries it.
+            Effect.ensuring(Effect.sync(() => releaseHeldOutput(attempt.output, session.log))),
             // A generation that never became the serving target rolls back inspection resources
             // prepared for it; one published before a later failure keeps them.
             Effect.onExit(() =>
@@ -96,10 +104,15 @@ const runActivation = Effect.fn("Dev.activation.protocol")(function* (
   });
   const routeVerification =
     session.options.candidateVerificationEffect?.(candidate, signal) ?? Effect.void;
-  yield* Effect.all([supervisorVerification, routeVerification], {
-    concurrency: "unbounded",
-    discard: true,
-  });
+  // A process that exits while it is verified fails the attempt now, not at the health timeout.
+  yield* Effect.raceFirst(
+    Effect.all([supervisorVerification, routeVerification], {
+      concurrency: "unbounded",
+      discard: true,
+    }),
+    failOnCandidateExit(attempt, candidate),
+  );
+  releaseHeldOutput(attempt.output, session.log);
   const previous = session.active;
   const published = yield* publishActivation(attempt, candidate, fingerprint).pipe(
     Effect.onExit((exit) =>
@@ -134,6 +147,7 @@ const runActivation = Effect.fn("Dev.activation.protocol")(function* (
       changedFiles: changedFiles.length,
       initial,
       durationMs: performance.now() - startedAt,
+      ...generationIdentity(session, initial ? "start" : "restart"),
     },
   });
   return true;
@@ -152,13 +166,18 @@ const recoverActivation = Effect.fn("Dev.activation.failure")(function* (
   const { session, token, initial } = attempt;
   yield* cliTry("dev.state.failed", () => failState(session, token, cliOriginalError(error)));
   if (initial) return yield* Effect.fail(error);
+  const original = cliOriginalError(error);
   session.log({
     level: session.abortController.signal.aborted ? "debug" : "error",
     event: "dev.generation.failed",
     fields: {
       message: error.message,
-      error: redactFailureDetail(cliOriginalError(error), undefined, 0, true),
+      error: redactFailureDetail(original, undefined, 0, true),
       previousActive: session.active !== undefined,
+      ...(original instanceof CandidateExitedError && original.output !== ""
+        ? { cause: redactFailureDetail(original.output) }
+        : {}),
+      ...generationIdentity(session, "restart"),
     },
   });
   return false;

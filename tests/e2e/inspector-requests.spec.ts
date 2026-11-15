@@ -1,6 +1,7 @@
 /** Preserves live request, pause/resume and correlated failure assertions on this invocation's exact backend. */
-import { expect, test } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 import { playwrightSelection } from "../../scripts/playwright-selection.js";
+import { FAILURE_FIXTURE_IDS } from "../inspector/fixture-failures";
 const { backend } = playwrightSelection("inspector");
 test.beforeAll(async ({ request }) => {
   // Compile this flow's cold routes outside the separate interaction deadline.
@@ -95,6 +96,282 @@ test("follows a paused request through completion and linked work", async ({ pag
   ).toHaveCount(1);
   await page.getByRole("link", { name: /222222222222/ }).click();
   await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
+});
+
+interface HistorySeed {
+  readonly seeded: number;
+  readonly serverErrors: number;
+  readonly declared: number;
+  readonly posts: number;
+  readonly total: number;
+}
+const seedHistory = async (request: APIRequestContext): Promise<HistorySeed> =>
+  (await request.post(`${backend}/__fixture__/history`)).json();
+const rows = (page: Page) =>
+  page.getByRole("list", { name: "Request results" }).getByRole("listitem");
+
+test("lists the newest requests first and pages back to the oldest", async ({ page, request }) => {
+  const seed = await seedHistory(request);
+  const ordered = page.waitForRequest(
+    (sent) => sent.url().includes("/requests?") && sent.url().includes("order=desc"),
+  );
+  await page.goto("/requests");
+  await ordered;
+  await expect(page.getByText("Newest first · 50 per page")).toBeVisible();
+  await expect(page.getByText(`${seed.total} requests`, { exact: true })).toBeVisible();
+  await expect(rows(page)).toHaveCount(50);
+  await expect(rows(page).first()).toContainText("request-history-130");
+  await expect(rows(page).last()).toContainText("request-history-081");
+
+  await page.getByRole("button", { name: "Older requests" }).click();
+  await expect(page).toHaveURL(/cursor=50/);
+  await expect(rows(page).first()).toContainText("request-history-080");
+  await page.getByRole("button", { name: "Older requests" }).click();
+  await expect(rows(page)).toHaveCount(seed.total - 100);
+  await expect(rows(page).last()).toContainText("request-initial");
+  await expect(page.getByRole("button", { name: "Older requests" })).toBeDisabled();
+
+  await page.getByRole("button", { name: "Newer requests" }).click();
+  await expect(rows(page).first()).toContainText("request-history-080");
+  await page.goBack();
+  await expect(rows(page).first()).toContainText("request-history-030");
+});
+
+test("filters by status, method, path and text, keeps them in the URL, and counts the matches", async ({
+  page,
+  request,
+}) => {
+  const seed = await seedHistory(request);
+  await page.goto("/requests");
+  await expect(page.getByText(`${seed.total} requests`, { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "5xx" }).click();
+  await expect(page).toHaveURL(/status=5xx/);
+  await expect(page.getByText(`${seed.serverErrors} requests match`)).toBeVisible();
+  await expect(rows(page)).toHaveCount(seed.serverErrors);
+
+  await page.reload();
+  await expect(page.getByRole("button", { name: "5xx" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText(`${seed.serverErrors} requests match`)).toBeVisible();
+  await expect(rows(page)).toHaveCount(seed.serverErrors);
+
+  await page.getByLabel("Status", { exact: true }).fill("409");
+  await page.getByLabel("Path starts with").fill("/vehicles");
+  await page.getByLabel("Method").selectOption("POST");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page).toHaveURL(/status=409/);
+  await expect(page).toHaveURL(/path=%2Fvehicles/);
+  await expect(page.getByText(`${seed.declared} requests match`)).toBeVisible();
+  await expect(rows(page).first()).toContainText("/vehicles");
+
+  await page.getByLabel("Search", { exact: true }).fill("no-such-text");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page.getByText("No requests match")).toBeVisible();
+  await expect(page.getByText("No retained requests match the active filters.")).toBeVisible();
+
+  await page.goBack();
+  await expect(page.getByText(`${seed.declared} requests match`)).toBeVisible();
+  await page.getByRole("button", { name: "Reset" }).click();
+  await expect(page).toHaveURL(/\/requests$/);
+  await expect(page.getByText(`${seed.total} requests`, { exact: true })).toBeVisible();
+});
+
+test("offers the recorded outcomes and shows a rejected filter at its field", async ({
+  page,
+  request,
+}) => {
+  await seedHistory(request);
+  await page.goto("/requests");
+  const outcome = page.getByLabel("Outcome");
+  await expect(outcome.getByRole("option")).toHaveText([
+    "All outcomes",
+    "Success",
+    "Declared error",
+    "Validation error",
+    "Refused by the framework",
+    "Timeout",
+    "Cancelled",
+    "Unexpected failure",
+  ]);
+  // The development server may reload the page once while it compiles; a reload clears the draft.
+  await expect(async () => {
+    await outcome.selectOption("validation-error");
+    await page.getByRole("button", { name: "Apply filters" }).click();
+    await expect(page).toHaveURL(/outcome=validation-error/, { timeout: 2_000 });
+  }).toPass({ timeout: 15_000 });
+
+  await page.goto("/requests");
+  await page.getByLabel("Status", { exact: true }).fill("700");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  const message = "Status must be a code from 100 to 599, or a class such as 5xx.";
+  await expect(page.getByText(message)).toBeVisible();
+  await expect(page.getByLabel("Status", { exact: true })).toHaveAccessibleDescription(message);
+  await expect(page).toHaveURL(/\/requests$/);
+
+  // A link with a value the page would not send: the Inspector rejects it and the page says so.
+  await page.goto("/requests?status=abc");
+  await expect(page.getByText("These filters were not accepted.")).toBeVisible();
+  await expect(page.getByLabel("Status", { exact: true })).toHaveAccessibleDescription(
+    /status is invalid/,
+  );
+});
+
+test("shows the Inspector's own message for a rejected filter at the field it names", async ({
+  page,
+  request,
+}) => {
+  await seedHistory(request);
+  await page.goto("/requests?status=999");
+  const status = page.getByLabel("Status", { exact: true });
+  await expect(page.getByText("These filters were not accepted.")).toBeVisible();
+  // The server's message names the parameter and the rule, and replaces the page's own sentence.
+  await expect(status).toHaveAccessibleDescription(
+    "Observability query status is invalid: expected an HTTP status from 100 to 599 or a class from 1xx to 5xx",
+  );
+  await expect(status).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByText(/Status must be a code from 100 to 599/)).toHaveCount(0);
+
+  // Editing the field drops the refused value's message; a valid value loads the list again.
+  await status.fill("404");
+  await expect(status).not.toHaveAttribute("aria-invalid", "true");
+  await page.getByRole("button", { name: "Apply filters" }).click();
+  await expect(page).toHaveURL(/status=404/);
+  await expect(page.getByText("These filters were not accepted.")).toHaveCount(0);
+});
+
+test("a declared error names its identifier and links to its contract", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.declared}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByText("The application ended this request with the error")).toBeVisible();
+  await expect(panel.getByRole("link", { name: "fleet.plate-taken" })).toHaveAttribute(
+    "href",
+    "/errors/fleet.plate-taken",
+  );
+  const record = page.getByRole("region", { name: "Request record" });
+  await expect(record.getByText("Error", { exact: true })).toBeVisible();
+  await expect(record.getByRole("link", { name: "fleet.plate-taken" })).toBeVisible();
+});
+
+test("a validation failure lists the fields and the kind of problem, never values", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.invalid}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByRole("columnheader", { name: "Field" })).toBeVisible();
+  await expect(panel.getByRole("columnheader", { name: "Problem" })).toBeVisible();
+  await expect(panel.getByRole("row", { name: /plate\s+Missing/ })).toBeVisible();
+  await expect(panel.getByRole("row", { name: /vehicle\.wheels\.9/ })).toBeVisible();
+  await expect(panel.getByRole("row")).toHaveCount(11);
+  await expect(panel.getByText("and 2 more")).toBeVisible();
+  await expect(panel.getByText(/never the values that were sent/)).toBeVisible();
+});
+
+test("an internal failure shows its recorded cause, with the stack collapsed", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.defectDev}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByText("DatabaseError", { exact: true })).toBeVisible();
+  await expect(panel.getByText(/Failed query: insert into vehicles/)).toContainText(
+    "params: [REDACTED]",
+  );
+  await expect(panel.getByText("RELKIT_UNEXPECTED_DEFECT")).toBeVisible();
+  await expect(panel.getByText(/at insertVehicle/)).toBeHidden();
+  await panel.getByText("Stack trace").click();
+  await expect(panel.getByText(/at insertVehicle/)).toBeVisible();
+  await expect(panel.getByText("The cause is recorded only in development.")).toBeHidden();
+});
+
+test("outside development only the error type is recorded, and the page says so", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.defectTypeOnly}`);
+  const panel = page.getByRole("region", { name: "Why this request failed" });
+  await expect(panel.getByText("UnexpectedDefect", { exact: true })).toBeVisible();
+  await expect(panel.getByText("The cause is recorded only in development.")).toBeVisible();
+
+  await request.post(`${backend}/__fixture__/outcome/defect`);
+  await page.goto("/requests/request-defect");
+  await expect(page.getByText("No cause was recorded for this request.")).toBeVisible();
+});
+
+test("the record and the timeline agree on the span count and show times with a zone", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto(`/requests/${FAILURE_FIXTURE_IDS.captured}`);
+  const record = page.getByRole("region", { name: "Request record" });
+  // Three records (the root span, and the function span reported at start and at end) are two spans.
+  await expect(record.getByText("Spans", { exact: true })).toBeVisible();
+  await expect(record.locator("dt:has-text('Spans') + dd")).toHaveText("2");
+  await expect(page.getByText("2 spans", { exact: true })).toBeVisible();
+
+  const started = record.locator("time").first();
+  await expect(started).toHaveText(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \S+$/);
+  await expect(started).toHaveAttribute(
+    "title",
+    /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} UTC$/,
+  );
+});
+
+test("system routes show their path with the route id beside it, never unknown", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto("/requests?path=%2Fapi%2Fauth");
+  const row = rows(page).first();
+  await expect(row).toContainText("/api/auth/sign-in");
+  await expect(row).toContainText("relkit.auth");
+  await expect(row).not.toContainText("unknown");
+});
+
+test("the command palette takes the cursor on open and opens a pasted request or trace id", async ({
+  page,
+  request,
+}) => {
+  await request.post(`${backend}/__fixture__/failures`);
+  await page.goto("/requests");
+  await expect(page.getByRole("heading", { name: "Requests" })).toBeVisible();
+
+  await page.keyboard.press("Control+k");
+  const search = page.getByRole("dialog").getByRole("combobox", { name: "Destination" });
+  await expect(search).toBeFocused();
+
+  // Typing goes straight into the field, and Enter opens the request.
+  await page.keyboard.type(FAILURE_FIXTURE_IDS.declared);
+  await expect(
+    page.getByRole("dialog").getByText(`Open request ${FAILURE_FIXTURE_IDS.declared}`).first(),
+  ).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(new RegExp(`/requests/${FAILURE_FIXTURE_IDS.declared}$`));
+  await expect(page.getByRole("heading", { name: "Request detail" })).toBeVisible();
+
+  const traceId = "9".repeat(32);
+  await page.keyboard.press("Control+k");
+  await expect(search).toBeFocused();
+  await page.keyboard.type(traceId);
+  await page.getByRole("button", { name: `Open trace ${traceId}` }).click();
+  await expect(page).toHaveURL(new RegExp(`/traces/${traceId}$`));
+  await expect(page.getByRole("heading", { name: "Trace detail" })).toBeVisible();
+
+  // Text that is not an identifier still searches pages and graph entities.
+  await page.keyboard.press("Control+k");
+  await expect(search).toBeFocused();
+  await page.keyboard.type("Requests");
+  await expect(page.locator(".command-result", { hasText: "Requests" }).first()).toBeVisible();
+  await expect(page.getByRole("dialog").getByText("Open request")).toHaveCount(0);
 });
 
 test("pinpoints failed, timed out, cancelled, and incomplete requests", async ({

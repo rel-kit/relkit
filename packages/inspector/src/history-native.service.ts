@@ -25,10 +25,11 @@ export const InspectorHistoryNativeLive = Layer.effect(
 const acquireNative = Effect.fn("Inspector.acquireNativeHistory")(function* (
   root: string,
   projectId: string,
+  onFailure?: (error: Error) => void,
 ) {
   yield* bindInspectorHistory(root, projectId);
   const worker = yield* Effect.acquireRelease(
-    startLocalWorkerEffect().pipe(
+    startLocalWorkerEffect(onFailure).pipe(
       Effect.catchCause((cause) => Effect.failCause(Cause.map(cause, historyNativeFailure))),
     ),
     (worker) =>

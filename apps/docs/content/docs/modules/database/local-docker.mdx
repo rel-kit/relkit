@@ -93,7 +93,7 @@ There is no `database` profile to add to `defineApp`: the specialized service re
 bun run relkit env check
 ```
 
-Bun loads `.env.local`; `.env.example` is only a template. Drizzle Kit and the app must use
+RelKit's commands load `.env.local`; `.env.example` is only a template. Drizzle Kit and the app must use
 the same `DATABASE_URL`. Keep production credentials out of this local file and browser bundles.
 
 </Step>
@@ -102,7 +102,7 @@ the same `DATABASE_URL`. Keep production credentials out of this local file and 
 Review the scaffolded table, then generate the initial migration:
 
 ```sh title="Terminal — application root"
-bun --bun drizzle-kit generate --name=initial
+bun x drizzle-kit generate --name=initial
 ```
 
 Review the SQL and snapshots in `src/services/database/migrations`. Apply the reviewed history
