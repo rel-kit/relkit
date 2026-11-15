@@ -232,6 +232,6 @@
 
 **Findings:** RK-37, RK-38. **Owns:** `packages/create-relkit/src/package-manager.ts`, `packages/cli/src/scaffolding/**` and `packages/cli/src/commands/add*.ts` for the install step and the printed next steps.
 
-- [ ] 24.1 RK-37: make the install that `relkit add` runs succeed in a pnpm, npm and Bun project when `CI` is set, by telling each package manager that the lockfile may change (`packages/create-relkit/src/package-manager.ts`, around line 58), without changing what a plain install does elsewhere; verify with a test per manager and the pnpm leg of the Node acceptance run.
+- [x] 24.1 RK-37: make the install that `relkit add` runs succeed in a pnpm, npm and Bun project when `CI` is set, by telling each package manager that the lockfile may change (`packages/create-relkit/src/package-manager.ts`, around line 58), without changing what a plain install does elsewhere; verify with a test per manager and the pnpm leg of the Node acceptance run.
 - [ ] 24.2 RK-38: name the project's package manager in every message `relkit add` prints (the failed-install text and the next steps), and in the other commands' next steps where the scan finds a hard-coded `bun`; verify with tests for an npm and a pnpm project.
 

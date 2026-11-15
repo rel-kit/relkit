@@ -49,6 +49,32 @@ test("an existing project names its manager by packageManager, then by lockfile"
   }
 });
 
+test("the install after a manifest change may update the lockfile for every manager", () => {
+  // pnpm treats a plain install as frozen when CI is set, so it is told not to freeze.
+  expect(packageManagerCommands("pnpm").install).toEqual(["install", "--no-frozen-lockfile"]);
+  // npm install and bun install update the lockfile under CI; npm ci and --frozen-lockfile do not.
+  expect(packageManagerCommands("npm").install).toEqual(["install", "--no-audit", "--no-fund"]);
+  expect(packageManagerCommands("bun").install).toEqual(["install"]);
+  for (const name of ["bun", "npm", "pnpm"] as const) {
+    const commands = packageManagerCommands(name);
+    expect(commands.install).not.toContain("--frozen-lockfile");
+    expect(commands.install).not.toContain("ci");
+    expect(commands.installText).toBe(`${name} install`);
+  }
+});
+
+test("the reproducibility check stays frozen for every manager", () => {
+  expect(packageManagerCommands("bun").frozenCheck).toContain("--frozen-lockfile");
+  expect(packageManagerCommands("npm").frozenCheck[0]).toBe("ci");
+  expect(packageManagerCommands("pnpm").frozenCheck).toContain("--frozen-lockfile");
+});
+
+test("dependency additions are spelled for the manager", () => {
+  expect(packageManagerCommands("bun").add).toBe("bun add");
+  expect(packageManagerCommands("npm").add).toBe("npm install");
+  expect(packageManagerCommands("pnpm").add).toBe("pnpm add");
+});
+
 test("next steps and installs are spelled for the selected manager", () => {
   expect(packageManagerCommands("npm").frozenCheck).toEqual([
     "ci",
