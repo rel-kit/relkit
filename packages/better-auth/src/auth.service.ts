@@ -12,6 +12,7 @@ import { Context, Effect, Layer, Schema } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 import { AuthFactory, authFactoryLiveLayer } from "./auth.factory.js";
 import { AuthBasePath } from "./auth.schemas.js";
+import { checkAuthSchema } from "./auth-schema.js";
 import type { AuthConfiguration, AuthDatabase, AuthServiceInterface } from "./auth.types.js";
 import { checkNativeAuthDependencies } from "./dependencies.js";
 import { databaseServiceOf, withAuthWork } from "./auth-database.js";
@@ -77,7 +78,9 @@ function acquireAuth(configuration: AuthConfiguration) {
       database: ownDatabase ?? (yield* drizzleDatabase(configuration.database, adapterOptions)),
     });
     // Better Auth starts async plugin initialization eagerly; retain the borrow until it settles.
-    yield* nativePromise("auth.acquire", () => native.$context);
+    const context = yield* nativePromise("auth.acquire", () => native.$context);
+    // Better Auth only logs a schema mismatch here and fails every request later; fail now instead.
+    yield* checkAuthSchema(context);
     return createService(native, configuration.database);
   });
 }

@@ -1,0 +1,31 @@
+import { boolean, index, pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+
+export const account = pgTable(
+  "account",
+  {
+    id: text().primaryKey(),
+    accountId: text().notNull(),
+    providerId: text().notNull(),
+    userId: text().notNull(),
+    password: text(),
+    createdAt: timestamp({ withTimezone: true }).notNull(),
+    updatedAt: timestamp({ withTimezone: true }).notNull(),
+  },
+);
+
+export const member = pgTable(
+  "member",
+  {
+    id: text().primaryKey(),
+    organizationId: text().notNull(),
+    userId: text().notNull(),
+    role: text().notNull().default("member"),
+    createdAt: timestamp({ withTimezone: true }).notNull(),
+  },
+  (table) => [
+    index("member_user_id_idx").on(table.userId),
+    uniqueIndex("member_organization_user_idx").on(table.organizationId, table.userId),
+  ],
+);
+
+export const flags = pgTable("flags", { id: text().primaryKey(), enabled: boolean().notNull() });

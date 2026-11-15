@@ -12,7 +12,7 @@ import {
   defineBetterAuthService,
 } from "../src/drizzle.ts";
 
-import * as authSchema from "./auth/native-schema.js";
+import * as authSchema from "./auth/full-schema.ts";
 
 test("creates a stable lazy handler and registers its mount route", async () => {
   const database = defineDrizzleService({

@@ -13,6 +13,7 @@ import { dependencyDeclarationsRule } from "./dependency-declarations.js";
 import { contextCallsRule } from "./context-calls.js";
 import { serviceRoutesRule } from "./service-routes.js";
 import { betterAuthFileRule } from "./better-auth-file.js";
+import { betterAuthAccountIssuerRule } from "./better-auth-account-issuer.js";
 import { clientHooksRule } from "./client-hooks.js";
 import { agentRuntimeRule } from "./agent-runtime.js";
 import { schemaBuilderRule } from "./schema-builder.js";
@@ -30,6 +31,7 @@ export const codeRules: readonly CodeRule[] = [
   serviceRoutesRule,
   routeAuthRule,
   betterAuthFileRule,
+  betterAuthAccountIssuerRule,
   clientHooksRule,
   agentRuntimeRule,
   problemDetailsRule,

@@ -19,7 +19,7 @@ interface AuthDialect {
  */
 const DIALECTS: Readonly<Record<DatabaseDialect, AuthDialect>> = {
   sqlite: {
-    imports: "integer, sqliteTable, text, uniqueIndex",
+    imports: "integer, sqliteTable, text",
     table: "sqliteTable",
     string: "text()",
     token: "text()",
@@ -27,7 +27,7 @@ const DIALECTS: Readonly<Record<DatabaseDialect, AuthDialect>> = {
     timestamp: `integer({ mode: "timestamp" })`,
   },
   postgresql: {
-    imports: "boolean, pgTable, text, timestamp, uniqueIndex",
+    imports: "boolean, pgTable, text, timestamp",
     table: "pgTable",
     string: "text()",
     token: "text()",
@@ -35,7 +35,7 @@ const DIALECTS: Readonly<Record<DatabaseDialect, AuthDialect>> = {
     timestamp: `timestamp({ withTimezone: true })`,
   },
   mysql: {
-    imports: "boolean, datetime, mysqlTable, text, uniqueIndex, varchar",
+    imports: "boolean, datetime, mysqlTable, text, varchar",
     table: "mysqlTable",
     string: "varchar({ length: 255 })",
     token: "text()",
@@ -83,25 +83,20 @@ ${authAccountTables(value)}
 }
 
 function authAccountTables(value: AuthDialect): string {
-  return `export const account = ${value.table}(
-  "account",
-  {
-    id: ${value.string}.primaryKey(),
-    accountId: ${value.string}.notNull(),
-    issuer: ${value.string}.notNull(),
-    providerId: ${value.string}.notNull(),
-    userId: ${value.string}.notNull(),
-    accessToken: ${value.token},
-    refreshToken: ${value.token},
-    idToken: ${value.token},
-    accessTokenExpiresAt: ${value.timestamp},
-    refreshTokenExpiresAt: ${value.timestamp},
-    scope: ${value.string},
-    password: ${value.token},
-    ...timestamps,
-  },
-  (table) => [uniqueIndex("account_issuer_account_id").on(table.issuer, table.accountId)],
-);
+  return `export const account = ${value.table}("account", {
+  id: ${value.string}.primaryKey(),
+  accountId: ${value.string}.notNull(),
+  providerId: ${value.string}.notNull(),
+  userId: ${value.string}.notNull(),
+  accessToken: ${value.token},
+  refreshToken: ${value.token},
+  idToken: ${value.token},
+  accessTokenExpiresAt: ${value.timestamp},
+  refreshTokenExpiresAt: ${value.timestamp},
+  scope: ${value.string},
+  password: ${value.token},
+  ...timestamps,
+});
 
 export const verification = ${value.table}("verification", {
   id: ${value.string}.primaryKey(),

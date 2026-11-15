@@ -44,7 +44,7 @@ The current integration requires one Drizzle service, one Better Auth service, a
 
 ## Add the authentication tables
 
-The executable `examples/auth-drizzle` application uses Better Auth `1.7.1` and the repository's pinned
+The executable `examples/auth-drizzle` application uses Better Auth `1.7.7` and the repository's pinned
 Drizzle version. Its table definitions are:
 
 <include
@@ -57,8 +57,9 @@ Drizzle version. Its table definitions are:
 
 The singular export keys `user`, `session`, `account`, and `verification` match the adapter's default
 model names. Preserve required fields, nullability, key types, and timestamp/boolean mappings for your
-installed Better Auth version. This version's account model includes `issuer` and the compound
-`issuer`/`accountId` identity; do not substitute an older four-table example without comparing it.
+installed Better Auth version. Since 1.7.3 the account model identifies an account by `providerId` and
+`accountId` and has no `issuer` column; a project created for Better Auth 1.7.0 to 1.7.2 must
+[remove that column](/docs/modules/auth/better-auth#remove-the-account-issuer-column).
 
 Add these table exports to the schema map already passed to `defineDrizzleService`. If you split them
 into `src/services/database/schema/auth.ts`, re-export them from the schema entry point used by both the service

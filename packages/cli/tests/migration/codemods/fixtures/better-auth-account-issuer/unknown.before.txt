@@ -1,0 +1,18 @@
+import { pgTable, text, uniqueIndex } from "drizzle-orm/pg-core";
+
+const accountIndexes = (table: { issuer: unknown; accountId: unknown }) => [
+  uniqueIndex("account_issuer_account_id").on(table.issuer as never, table.accountId as never),
+];
+
+export const account = pgTable(
+  "account",
+  {
+    id: text().primaryKey(),
+    accountId: text().notNull(),
+    issuer: text().notNull(),
+    providerId: text().notNull(),
+  },
+  (table) => accountIndexes({ issuer: table.issuer, accountId: table.accountId }),
+);
+
+export const audit = pgTable("audit", { issuer: text().notNull() });

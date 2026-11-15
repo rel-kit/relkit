@@ -1,0 +1,17 @@
+import { datetime, index, mysqlTable, text, varchar } from "drizzle-orm/mysql-core";
+
+export const account = mysqlTable(
+  "account",
+  {
+    id: varchar({ length: 255 }).primaryKey(),
+    accountId: varchar({ length: 255 }).notNull(),
+    providerId: varchar({ length: 255 }).notNull(),
+    userId: varchar({ length: 255 }).notNull(),
+    password: text(),
+    createdAt: datetime().notNull(),
+    updatedAt: datetime().notNull(),
+  },
+  (table) => [
+    index("account_user_id_idx").on(table.userId),
+  ],
+);

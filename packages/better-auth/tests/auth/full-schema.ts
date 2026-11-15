@@ -1,5 +1,5 @@
-/** Full Better Auth SQLite tables for tests that sign users up through the Drizzle adapter. */
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+/** Full Better Auth SQLite tables. Better Auth checks the Drizzle schema when it starts, so every test that acquires auth declares all of them. */
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 const timestamps = {
   createdAt: integer({ mode: "timestamp" }).notNull(),
@@ -25,25 +25,20 @@ export const session = sqliteTable("session", {
   ...timestamps,
 });
 
-export const account = sqliteTable(
-  "account",
-  {
-    id: text().primaryKey(),
-    accountId: text().notNull(),
-    issuer: text().notNull(),
-    providerId: text().notNull(),
-    userId: text().notNull(),
-    accessToken: text(),
-    refreshToken: text(),
-    idToken: text(),
-    accessTokenExpiresAt: integer({ mode: "timestamp" }),
-    refreshTokenExpiresAt: integer({ mode: "timestamp" }),
-    scope: text(),
-    password: text(),
-    ...timestamps,
-  },
-  (table) => [uniqueIndex("account_issuer_account_id").on(table.issuer, table.accountId)],
-);
+export const account = sqliteTable("account", {
+  id: text().primaryKey(),
+  accountId: text().notNull(),
+  providerId: text().notNull(),
+  userId: text().notNull(),
+  accessToken: text(),
+  refreshToken: text(),
+  idToken: text(),
+  accessTokenExpiresAt: integer({ mode: "timestamp" }),
+  refreshTokenExpiresAt: integer({ mode: "timestamp" }),
+  scope: text(),
+  password: text(),
+  ...timestamps,
+});
 
 export const verification = sqliteTable("verification", {
   id: text().primaryKey(),
