@@ -1,4 +1,5 @@
 import { RPCHandler, type MinimalWebsocket } from "@orpc/server/websocket";
+import { AsyncLocalStorage } from "node:async_hooks";
 import { FRAMEWORK_RPC_PATH, REALTIME_RUNTIME_LIMITS } from "../contracts/index.js";
 import type { Hono } from "hono";
 import type { UpgradeWebSocket } from "hono/ws";
@@ -33,6 +34,9 @@ export function installRpcWebSocket(
         hono,
         auth: options.auth?.contextFor(hono.req.raw),
       };
+      // Socket messages arrive outside the upgrade request's asynchronous context. Each one runs
+      // in it again, so channel guards see the application (`getRelkit()`) as they do over HTTP.
+      const inUpgradeContext = AsyncLocalStorage.snapshot();
       return {
         /** Forwards one admitted WebSocket message to the protocol handler.
          * @param event - Event or record being projected into the target protocol.
@@ -45,7 +49,9 @@ export function installRpcWebSocket(
             return;
           }
           const peer = (socket.raw ?? socket) as MinimalWebsocket;
-          void handler.message(peer, event.data as string | ArrayBuffer, { context }).catch(() => {
+          void inUpgradeContext(() =>
+            handler.message(peer, event.data as string | ArrayBuffer, { context }),
+          ).catch(() => {
             socket.close(1011, "RelKit RPC transport failed.");
           });
         },
