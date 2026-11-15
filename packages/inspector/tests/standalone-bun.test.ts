@@ -133,7 +133,7 @@ test("standalone UI connects, persists redacted records, restarts and leaves its
       yield* capture.append({
         version: 2,
         signal: "log",
-        timestamp: "2026-10-23T00:00:00.000Z",
+        timestamp: new Date().toISOString(),
         level: "info",
         component: "app",
         message: "standalone persisted",
