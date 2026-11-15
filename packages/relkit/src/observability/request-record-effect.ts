@@ -172,11 +172,13 @@ export const makeRequestRecordBuilderEffect = Effect.fn("ObservabilityRequestRec
 );
 /**
  * Names the framework's own refusals: a 404 or 405 that no route answered is not a declared
- * error, and a body over the limit (413, declared or streamed) is not a validation error.
+ * error, nor is a 404 from the RPC endpoint (a procedure it does not serve, or a resource it
+ * conceals), and a body over the limit (413, declared or streamed) is not a validation error.
  */
 function refusedOutcome(outcome: RequestOutcome, routeId: string, status: number): RequestOutcome {
   if (outcome === "declared-error" && routeId === "unknown" && (status === 404 || status === 405))
     return "refused";
+  if (outcome === "declared-error" && routeId === "relkit.rpc" && status === 404) return "refused";
   return outcome === "validation-error" && status === 413 ? "refused" : outcome;
 }
 function text(value: string | undefined): string | undefined {
