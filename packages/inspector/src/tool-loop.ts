@@ -15,7 +15,14 @@ import {
   selectionKey,
   selectionNotices,
 } from "./live-events.js";
-import { acquireHistory, historyFailureHint, recoverInspection } from "./tool-history.js";
+import {
+  acquireHistory,
+  historyFailureHint,
+  historyRoot,
+  quietHistory,
+  recoverInspection,
+} from "./tool-history.js";
+import { readHistoryOwner } from "./history-owner.js";
 
 /** Fast history retries before backing off; a released lock is still picked up later. */
 const HISTORY_FAST_RETRIES = 3;
@@ -65,15 +72,20 @@ export const inspectionLoop = Effect.fn("Inspector.collectLoop")(function* (
           historyFailures++;
           if (historyFailures >= HISTORY_FAST_RETRIES)
             nextHistoryRetry = now + HISTORY_SLOW_RETRY_MS;
-          const hint = historyFailureHint(error);
           // Counted per episode, not per historyFailures: that only resets once collection
           // succeeds, so a later conflict while disconnected would otherwise never be named.
-          if (hint && ++lockNotices === 1)
-            notice = Effect.logWarning(
-              historyFailures >= HISTORY_FAST_RETRIES ? `${hint}; retrying every 30s` : hint,
-            );
-          else if (hint && historyFailures === HISTORY_FAST_RETRIES)
-            notice = Effect.logWarning(`${hint}; retrying every 30s`);
+          const first = ++lockNotices === 1;
+          if (first || historyFailures === HISTORY_FAST_RETRIES) {
+            const retrying = historyFailures >= HISTORY_FAST_RETRIES;
+            notice = Effect.gen(function* () {
+              const owner =
+                error.operation === "history.writer-conflict"
+                  ? yield* readHistoryOwner(historyRoot(options))
+                  : undefined;
+              const hint = historyFailureHint(error, owner);
+              yield* Effect.logWarning(retrying ? `${hint}; retrying every 30s` : hint);
+            });
+          }
         }
         return notice.pipe(
           Effect.andThen(recoverInspection(state, error)),
@@ -160,7 +172,7 @@ const collectCurrent = Effect.fn("Inspector.collectCurrent")(function* (
   const after = sessionId === current.sessionId ? current.through : 0;
   const batch = yield* collectInspectionBatch(
     remote,
-    current.history.operations,
+    quietHistory(current.history.operations),
     current.selection.connection,
     after,
     options.target,

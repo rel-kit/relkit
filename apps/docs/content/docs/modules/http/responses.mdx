@@ -84,6 +84,9 @@ Some details that surprise people:
 - **Malformed JSON and a wrong content type are `422`.** The `issues` carry the codes
   `malformed-json`, `content-type`, `malformed-multipart`, and `body-not-object` for a JSON body
   that is `null`, an array, a string or a number where the route maps fields.
+  A JSON body is UTF-8 text: bytes that are not valid UTF-8, or a `Content-Type` that declares
+  another charset such as `charset=iso-8859-1`, answer `422` instead of being stored with
+  replacement characters.
 - **JSON strings are not converted.** Path, query, header and cookie values are text, so RelKit
   converts them to the numbers and booleans your schema expects. A JSON body is validated as sent:
   `{"quantity":"3"}` fails an integer field with `422`.

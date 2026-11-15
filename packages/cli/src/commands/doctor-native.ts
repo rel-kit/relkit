@@ -16,7 +16,7 @@ import { runtime } from "../runtime/index.js";
  * @param command - Literal command vector.
  * @param cwd - Project working directory.
  * @param runner - Optional compatibility runner, which must settle after cancellation.
- * @returns A lazy exit status; interruption waits for the runner's physical settlement.
+ * @returns A lazy exit status with the command's output; interruption waits for the runner's physical settlement.
  */
 export const doctorCommandEffect = Effect.fn("Doctor.command")(
   function* (command: readonly string[], cwd: string, runner?: DoctorCommandRunner) {
@@ -31,7 +31,7 @@ export const doctorCommandEffect = Effect.fn("Doctor.command")(
       cwd,
       maximumOutputBytes: 65_536,
     });
-    return { exitCode: result.exitCode };
+    return { exitCode: result.exitCode, output: [result.stderr, result.stdout].join("\n") };
   },
   (effect) => observeCli("doctor.command", effect),
 );

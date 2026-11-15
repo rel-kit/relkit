@@ -3,6 +3,7 @@ import { Context, Effect, Layer } from "effect";
 import type { Context as HonoContext, Hono } from "hono";
 import { httpBoundary, HttpBoundaryError, observeHttp, runHttp } from "./http-effect.js";
 import { TransportSecurityError } from "./transport-security-errors.js";
+import { isTrustedServiceCall } from "./transport-security-trust.js";
 import type { TransportSecurityOptions } from "./transport-security.types.js";
 import { contextProblem } from "./problem-details.js";
 export { TransportSecurityError } from "./transport-security-errors.js";
@@ -63,12 +64,7 @@ const stateChangingRequest = Effect.fn("RequestSecurity.stateChanging")(function
   request: Request,
   options: TransportSecurityOptions,
 ) {
-  if (
-    yield* httpBoundary("security.trusted", () =>
-      Promise.resolve(options.trustedService?.(request)),
-    )
-  )
-    return;
+  if (yield* httpBoundary("security.trusted", () => isTrustedServiceCall(request, options))) return;
   const origin = request.headers.get("origin") ?? refererOrigin(request.headers.get("referer"));
   if (origin === new URL(request.url).origin) return;
   if (origin === null || !allowedOrigins(options.allowedOrigins).has(origin)) {
@@ -147,7 +143,7 @@ export async function assertWebSocketRequest(
   request: Request,
   options: TransportSecurityOptions,
 ): Promise<void> {
-  if (await options.trustedService?.(request)) return;
+  if (await isTrustedServiceCall(request, options)) return;
   assertWebSocketOrigin(request, options);
 }
 

@@ -15,6 +15,9 @@ import type { DevSession } from "./dev-session.js";
 import type { EffectDevSourceWatcher, DevSourceWatcher } from "./dev-watch.types.js";
 export type { DevSourceWatcher } from "./dev-watch.types.js";
 
+/** Root files that restart or rebuild the application when they change. */
+const watchedConfigFiles = ["relkit.config.ts", "package.json", "bun.lock", "tsconfig.json"];
+
 /**
  * Owns native watching and bounded source/config admission for either service layout.
  * @param session - Session-local activator and generation lifetime.
@@ -29,6 +32,13 @@ export const makeDevSourceWatcherEffect = Effect.fn("Dev.watch")(
       existsSync(join(root, "src")) ? join(root, "src") : root,
     );
     yield* syncWatchConfigurations(root, native, owner);
+    // What the first build reads is the baseline an event is compared with, taken before any
+    // watcher opens so an edit after this point always differs from it.
+    yield* cliTry("dev.watch.baseline", () => {
+      owner.state.content.record(sourceRoot);
+      if (sourceRoot !== root)
+        for (const file of watchedConfigFiles) owner.state.content.record(join(root, file));
+    });
     const sourceChange = (filename: string) => {
       const file = relative(root, join(sourceRoot, filename)).replaceAll("\\", "/");
       if (!ignoredWatchPath(file) && file !== relative(root, sourceRoot)) owner.notify([file]);
@@ -45,12 +55,7 @@ export const makeDevSourceWatcherEffect = Effect.fn("Dev.watch")(
           root,
           false,
           (filename) => {
-            if (
-              ["relkit.config.ts", "package.json", "bun.lock", "tsconfig.json"].includes(
-                filename,
-              ) ||
-              owner.state.configPaths.has(filename)
-            )
+            if (watchedConfigFiles.includes(filename) || owner.state.configPaths.has(filename))
               owner.notify([filename]);
           },
           owner.failure,

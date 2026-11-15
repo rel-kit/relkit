@@ -112,7 +112,10 @@ const runTool = Effect.fn("Inspector.run")(function* (
         ),
       ),
     );
-    const exited = yield* ui.start(options, backend, token);
+    // Starting the interface succeeds quietly; the "listening" line says the rest, and a failure still logs.
+    const exited = yield* ui
+      .start(options, backend, token)
+      .pipe(Effect.provideService(ExecutionSuccessLogs, false));
     yield* exited;
   }).pipe(Scope.use(scope));
 });

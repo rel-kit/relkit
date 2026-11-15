@@ -1,4 +1,4 @@
-import type { DoctorResult, ParsedDoctorArgs } from "./doctor.types.js";
+import type { DoctorCheck, DoctorResult, ParsedDoctorArgs } from "./doctor.types.js";
 import { DoctorCommandError } from "./doctor-error.js";
 export type {
   DoctorCheck,
@@ -85,10 +85,24 @@ function requiredValue(args: readonly string[], index: number, option: string): 
  */
 export function formatDoctor(result: DoctorResult): string {
   return [
-    ...result.checks.map(
-      (check) =>
-        `${check.ok ? (check.details?.["severity"] === "warning" ? "!" : "✓") : "✗"} ${check.name}: ${check.message}`,
-    ),
+    ...result.checks.flatMap((check) => [
+      `${check.ok ? (check.details?.["severity"] === "warning" ? "!" : "✓") : "✗"} ${check.name}: ${check.message}`,
+      ...reasonRows(check),
+    ]),
     result.ok ? "Doctor passed." : "Doctor found prerequisite failures.",
   ].join("\n");
+}
+
+/** Lists the package manager's reason under a failed check, as indented rows.
+ * @param check - One prerequisite result.
+ * @returns The command and its first lines, or nothing when the check gives no reason.
+ */
+function reasonRows(check: DoctorCheck): string[] {
+  const reason = check.details?.["reason"];
+  if (check.ok || !Array.isArray(reason)) return [];
+  const command = check.details?.["command"];
+  return [
+    ...(typeof command === "string" ? [`  \`${command}\` reported:`] : []),
+    ...reason.map((line) => `    ${String(line)}`),
+  ];
 }

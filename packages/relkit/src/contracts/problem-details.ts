@@ -44,11 +44,14 @@ export function problemBody(input: ProblemInput): ProblemDetails {
 
 /** Builds a Problem Details response.
  * @param input - Status, stable code, safe detail, optional data, issues and headers.
- * @returns An `application/problem+json` response; `retryAfterMs` sets `Retry-After` in seconds.
+ * @returns An `application/problem+json` response with `X-Content-Type-Options: nosniff` and, unless
+ *   the input sets its own, `Cache-Control: no-store`; `retryAfterMs` sets `Retry-After` in seconds.
  */
 export function problemResponse(input: ProblemInput): Response {
   const headers = new Headers(input.headers);
   headers.set("content-type", PROBLEM_CONTENT_TYPE);
+  headers.set("x-content-type-options", "nosniff");
+  if (!headers.has("cache-control")) headers.set("cache-control", "no-store");
   if (input.retryAfterMs !== undefined)
     headers.set("retry-after", String(Math.max(0, Math.ceil(input.retryAfterMs / 1000))));
   return new Response(JSON.stringify(problemBody(input)), { status: input.status, headers });

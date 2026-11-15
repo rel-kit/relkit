@@ -31,5 +31,7 @@ test("a writer conflict names only the lock holder's PID", () => {
   expect(hint).toContain("(PID 20123)");
   expect(hint).toContain("--history-directory");
   expect(hint).not.toContain("/private/app");
-  expect(historyFailureHint(historyNativeFailure(new Error("permission denied")))).toBeUndefined();
+  expect(historyFailureHint(historyNativeFailure(new Error("permission denied")))).not.toContain(
+    "PID",
+  );
 });
