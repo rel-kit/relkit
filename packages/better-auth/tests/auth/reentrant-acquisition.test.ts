@@ -5,7 +5,7 @@ import { expect, it } from "@effect/vitest";
 import { activateDrizzleService, defineDrizzleService } from "@relkit/drizzle";
 import { Effect } from "effect";
 import { activateBetterAuthService, defineBetterAuthService } from "../../src/drizzle.js";
-import * as authSchema from "./native-schema.js";
+import * as authSchema from "./full-schema.ts";
 
 it.effect(
   "auth acquisition inherits a transaction lease without retaining it for later calls",

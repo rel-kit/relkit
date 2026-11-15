@@ -8,7 +8,7 @@ import { authNativeAdapter } from "../../src/activation.js";
 import { activateBetterAuthService, defineBetterAuthService } from "../../src/drizzle.js";
 import { AuthService, authNativeOf } from "../../src/auth.service.js";
 import { authTestDatabase, managedTestAuth, nativeAuthStub } from "./auth-test-layer.js";
-import * as authSchema from "./native-schema.js";
+import * as authSchema from "./full-schema.ts";
 
 /** Captures actual configured logging and metrics without changing service instrumentation. */
 function instrumentationFixture() {
