@@ -26,3 +26,22 @@ Stopping a command with an interrupt or termination signal SHALL exit with the c
 
 - **WHEN** the developer presses Ctrl+C
 - **THEN** the output ends with a neutral stop line and the exit status is 130
+
+### Requirement: The development server judges origins against the address the client used
+
+Behind the development proxy, the worker SHALL see the authority the client connected to on every supported runtime, for HTTP requests and for WebSocket connections, so same-origin checks compare a request's `Origin` with the public address. The worker SHALL NOT take that authority from a forwarding header a client can send.
+
+#### Scenario: Same-origin POST on Node
+
+- **WHEN** `relkit dev` runs on Node and a `POST` arrives whose `Origin` equals the server's public origin
+- **THEN** the request is served, and a `POST` from another origin answers 403 `origin-denied`
+
+#### Scenario: Same-origin WebSocket on Node
+
+- **WHEN** `relkit dev` runs on Node and a WebSocket opens with an `Origin` equal to the server's public origin
+- **THEN** the connection is accepted, and one from another origin is refused
+
+#### Scenario: Forged forwarding headers
+
+- **WHEN** a request carries `X-Forwarded-Host` or `Forwarded` naming another host
+- **THEN** the origin verdict is the same as without them
