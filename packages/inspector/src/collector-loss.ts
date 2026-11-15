@@ -32,13 +32,35 @@ export const persistCollectionLoss = Effect.fn("Inspector.persistLoss")(function
             code: "RELKIT_INSPECTION_INCOMPLETE",
             severity: "warning",
             occurredAt: new Date().toISOString(),
-            message: `Inspection is incomplete: ${totals[0]} retained records lost (${totals[1]} bytes), ${totals[2]} producer failures, ${totals[3]} producer records dropped.`,
+            message: `Inspection is incomplete: ${totals[0]} retained records lost (${totals[1]} bytes${lostKinds(batch.droppedByKind)}), ${totals[2]} producer failures, ${totals[3]} producer records dropped.`,
           },
         },
       ],
     });
   return key;
 });
+
+/** Names of the buffer's loss kinds, in the order it gives them up. */
+const KIND_NAMES: Readonly<Record<string, string>> = {
+  frameworkLogs: "framework success logs",
+  logs: "other logs",
+  spans: "unfinished span revisions",
+  other: "other records",
+  requestStarts: "request starts",
+  requestEnds: "request ends",
+};
+
+/**
+ * Says what the lost records were.
+ * @param kinds - Lost records by kind, when the application reports them.
+ * @returns A clause such as `: 120 framework success logs, 3 other logs`, or nothing.
+ */
+export function lostKinds(kinds: Readonly<Record<string, number>> | undefined): string {
+  const named = Object.entries(KIND_NAMES)
+    .filter(([kind]) => (kinds?.[kind] ?? 0) > 0)
+    .map(([kind, name]) => `${kinds![kind]} ${name}`);
+  return named.length === 0 ? "" : `: ${named.join(", ")}`;
+}
 
 /**
  * Records skipped sequences, such as records retired before this Inspector read them, as loss.

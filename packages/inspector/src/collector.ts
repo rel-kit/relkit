@@ -54,7 +54,8 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
       through = entry.sequence;
     }
     const records = yield* admitBatch(connection.descriptor.sessionId, batch.records);
-    if (Buffer.byteLength(JSON.stringify(records)) > 1_048_576)
+    const bytes = Buffer.byteLength(JSON.stringify(records));
+    if (bytes > 1_048_576)
       return yield* new InspectionConnectionError({
         operation: "collection.oversized",
         cause: new Error("Persistence batch exceeds one MiB"),
@@ -80,6 +81,8 @@ export const collectInspectionBatch = Effect.fn("Inspector.collectBatch")(
       droppedRecords: batch.droppedRecords,
       incomplete: batch.incomplete,
       records: batch.records.length,
+      // A batch that reached its count or byte bound leaves records behind it; pull again at once.
+      backlog: batch.records.length === 256 || bytes > 786_432,
       lossKey,
       producerFailed: batch.producerFailed ?? 0,
       producerDropped: batch.producerDropped ?? 0,
