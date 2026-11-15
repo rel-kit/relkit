@@ -34,7 +34,8 @@ import {
  * @param stage - Scope-owned sibling directory.
  * @param options - Normalized creation selection.
  * @param context - Template and deterministic failure authority.
- * @returns Lazy materialization; failures abort before publication.
+ * @returns Lazy materialization yielding the notice for a skipped dependency repair, if any;
+ * failures abort before publication.
  */
 export const materializeGenerationStage = Effect.fn("ProjectGeneration.materializeStage")(
   function* (stage: string, options: CreateOptions, context: GenerateProjectContext) {
@@ -57,6 +58,7 @@ export const materializeGenerationStage = Effect.fn("ProjectGeneration.materiali
       creationPackageManager(options.packageManager),
     );
     if (notice !== undefined) context.onProgress?.(notice);
+    return notice;
   },
   (effect) => observeExecution("generator", "generation.materializeStage", effect),
 );

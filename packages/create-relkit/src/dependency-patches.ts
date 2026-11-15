@@ -43,14 +43,22 @@ export const readDrizzlePatchEffect = Effect.fn("DependencyPatch.read")(
 );
 
 /**
- * Plans byte-identical repair ownership without mutating project assets.
+ * Plans byte-identical repair ownership without mutating project assets: the `package.json` entry
+ * for Bun, the `pnpm-workspace.yaml` entry for pnpm (which ignores the manifest field), and nothing
+ * for npm, which applies no patches.
  * @param projectRoot - Project whose asset and manifest will commit together.
  * @param source - Current or already-planned package manifest bytes.
  * @param patch - Verified release-owned repair.
- * @returns Manifest changes and optional asset creation.
+ * @param manager - Package manager the repair is delivered for; by default the project's own.
+ * @returns Manifest changes, optional asset and workspace file operations, or the skipped notice.
  */
 export const planDependencyPatchEffect = Effect.fn("DependencyPatch.plan")(
-  function* (projectRoot: string, source: string, patch: DependencyPatch) {
+  function* (
+    projectRoot: string,
+    source: string,
+    patch: DependencyPatch,
+    manager: PackageManagerName = patchManager(projectRoot),
+  ) {
     const parsed = yield* domainTry(() => JSON.parse(source) as unknown);
     const manifest = yield* Schema.decodeUnknownEffect(ProjectManifest)(parsed).pipe(
       Effect.mapError(() =>
@@ -72,27 +80,36 @@ export const planDependencyPatchEffect = Effect.fn("DependencyPatch.plan")(
         ),
       ),
     );
-    if (patchManager(projectRoot) === "npm") {
+    if (manager === "npm") {
       const skipped: DependencyPatchPlan = { content: source, notice: SKIPPED_PATCH };
       return skipped;
     }
     const entries = manifest.patchedDependencies ?? {};
     const current = entries[patch.key];
-    if (current !== undefined && current !== patch.path)
+    if (manager !== "pnpm" && current !== undefined && current !== patch.path)
       return yield* collision(`package.json already declares a different patch for ${patch.key}.`);
     const existing = yield* projectPatchContentEffect(projectRoot, patch.path);
     if (existing !== undefined && existing !== patch.content)
       return yield* collision(`${patch.path} already contains a different dependency patch.`);
+    const asset =
+      existing === undefined
+        ? { operation: { path: patch.path, action: "create" as const, content: patch.content } }
+        : {};
+    if (manager === "pnpm") {
+      const workspace = yield* pnpmWorkspacePatchEffect(projectRoot, patch);
+      const plan: DependencyPatchPlan = {
+        content: source,
+        ...asset,
+        ...(workspace === undefined ? {} : { workspace }),
+      };
+      return plan;
+    }
     const content =
       current === undefined
         ? `${JSON.stringify({ ...original, patchedDependencies: Object.fromEntries(Object.entries({ ...entries, [patch.key]: patch.path }).sort()) }, null, 2)}\n`
         : source;
-    return {
-      content,
-      ...(existing === undefined
-        ? { operation: { path: patch.path, action: "create" as const, content: patch.content } }
-        : {}),
-    };
+    const plan: DependencyPatchPlan = { content, ...asset };
+    return plan;
   },
   (effect) => observeExecution("generator", "planning.planDependencyPatch", effect),
 );
@@ -122,24 +139,14 @@ export const prepareProjectDependencyPatchEffect = Effect.fn("DependencyPatch.pr
       return undefined;
     if (manager === "npm") return SKIPPED_PATCH;
     const patch = yield* readDrizzlePatchEffect();
-    const operations: ScaffoldFileOperation[] = [];
-    if (manager === "pnpm") {
-      const existing = yield* projectPatchContentEffect(projectRoot, patch.path);
-      if (existing !== undefined && existing !== patch.content)
-        return yield* collision(`${patch.path} already contains a different dependency patch.`);
-      if (existing === undefined)
-        operations.push({ path: patch.path, action: "create", content: patch.content });
-      operations.push(yield* pnpmWorkspacePatchEffect(projectRoot, patch));
-    } else {
-      const result: DependencyPatchPlan = yield* planDependencyPatchEffect(
-        projectRoot,
-        source,
-        patch,
-      );
-      if (result.operation) operations.push(result.operation);
-      if (result.content !== source)
-        operations.push({ path: "package.json", action: "update", content: result.content });
-    }
+    const plan = yield* planDependencyPatchEffect(projectRoot, source, patch, manager);
+    const operations: ScaffoldFileOperation[] = [
+      ...(plan.operation === undefined ? [] : [plan.operation]),
+      ...(plan.workspace === undefined ? [] : [plan.workspace]),
+      ...(plan.content === source
+        ? []
+        : [{ path: "package.json", action: "update" as const, content: plan.content }]),
+    ];
     yield* validateOperationActionsEffect(projectRoot, operations);
     yield* applyFileOperationsEffect(projectRoot, operations, new Set());
     return undefined;
@@ -160,14 +167,16 @@ export function readDrizzlePatch(): Promise<DependencyPatch> {
  * @param projectRoot - Absolute project root.
  * @param source - Authored source text inspected or transformed without execution.
  * @param patch - Validated portable patch descriptor, destination path and canonical bytes.
+ * @param manager - Package manager the repair is delivered for; by default the project's own.
  * @returns The manifest projection and optional patch file operation after collision preflight.
  */
 export function planDependencyPatch(
   projectRoot: string,
   source: string,
   patch: DependencyPatch,
+  manager?: PackageManagerName,
 ): Promise<DependencyPatchPlan> {
-  return runGeneratorPromise(planDependencyPatchEffect(projectRoot, source, patch));
+  return runGeneratorPromise(planDependencyPatchEffect(projectRoot, source, patch, manager));
 }
 
 /**
@@ -189,7 +198,7 @@ export function prepareProjectDependencyPatch(
  * @param projectRoot - Absolute project root.
  * @returns The project's package manager.
  */
-function patchManager(projectRoot: string): PackageManagerName {
+export function patchManager(projectRoot: string): PackageManagerName {
   return projectPackageManager(projectRoot, "bun/0.0.0");
 }
 

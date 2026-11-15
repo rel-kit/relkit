@@ -107,13 +107,13 @@ export function project(template: string): Promise<string> {
  * Exercises the actual public scaffold plan/apply ABI with an explicit finite command replacement.
  * @param root - Test-owned app.
  * @param args - Literal native add arguments.
- * @returns Completion after the owned SDK operation settles.
+ * @returns The add result, after the owned SDK operation settles.
  */
-export function add(root: string, args: readonly string[]): Promise<void> {
+export function add(root: string, args: readonly string[]) {
   return fixtureOwner().runPromise(
     native("add", async () => {
       const request = normalizeAddRequest([...args, "--project-root", root]);
-      await applyScaffoldPlan(await planAdd(request), {
+      return applyScaffoldPlan(await planAdd(request), {
         commandRunner: async () => ({ exitCode: 0 }),
         relkitExecutable: "relkit",
       });
