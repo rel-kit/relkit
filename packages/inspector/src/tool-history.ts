@@ -125,6 +125,7 @@ export function historyFailureHint(
   const holder =
     owner === undefined
       ? `Another process already holds this project's history${pid ? ` (PID ${pid})` : ""}`
-      : `Another Inspector already holds this project's history (${pid ? `PID ${pid}, ` : ""}listening at ${owner.url})`;
+      : // The lock names the history worker; the record names the Inspector a developer can stop.
+        `Another Inspector already holds this project's history (PID ${owner.pid}, listening at ${owner.url})`;
   return `${holder}. This Inspector runs without history. Stop the other one, or pass --history-directory`;
 }

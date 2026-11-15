@@ -47,7 +47,9 @@ it.effect("a lock conflict names the other Inspector and where it listens", () =
     const owner = yield* readHistoryOwner(directory);
     const hint = historyFailureHint(historyNativeFailure(lock), owner);
     expect(hint).toContain("Another Inspector already holds this project's history");
-    expect(hint).toContain(`PID 20123`);
+    // The Inspector's own process, not the history worker the lock names.
+    expect(hint).toContain(`PID ${process.ppid}`);
+    expect(hint).not.toContain("PID 20123");
     expect(hint).toContain("http://127.0.0.1:3341");
     expect(hint).toContain("--history-directory");
     expect(hint).not.toContain("/private/app");
