@@ -2,6 +2,7 @@ import type { TestProviderReplacements } from "./provider-replacements.types.js"
 export type { TestProviderReplacements } from "./provider-replacements.types.js";
 import { isStableId, type JsonValue } from "relkit/contracts";
 import {
+  bindBucketPolicy,
   createProviderRegistry,
   type ProviderCapability,
   type ProviderRegistry,
@@ -164,12 +165,14 @@ function wireProviderClients(
     const logical = byId.get(edge.from);
     if (!isProvider(binding) || logical === undefined) continue;
     const category = dependencyCategory(binding.capability);
-    if (category !== undefined)
-      fakes.setClient(
-        category,
-        logical.id,
-        registry.resolve(binding.capability, binding.profile).value,
-      );
+    if (category === undefined) continue;
+    const provider = registry.resolve(binding.capability, binding.profile).value;
+    // A bucket's declared limits hold for every provider, as in the generated server.
+    fakes.setClient(
+      category,
+      logical.id,
+      logical.kind === "bucket" ? bindBucketPolicy(provider, logical) : provider,
+    );
   }
 }
 

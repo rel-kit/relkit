@@ -46,6 +46,40 @@ The assertions cover:
 The HTTP harness does not store browser cookies automatically; the test forwards the returned cookie
 explicitly. It does not read the developer's cookie jar or mutate `./auth.sqlite`.
 
+## Test a protected route in process
+
+The in-process HTTP client decides a function's `access` rule as the served application does. The
+caller is the request's session, and roles and permissions come from the Better Auth organization
+plugin. A caller without a session gets `401 unauthenticated` and a signed-in caller without the
+role or permission gets `403 access-denied`. Both happen before the request body is validated, so
+an invalid body from either caller never returns `422`. To act as a user, sign in through the
+application's own auth routes and send the returned cookie:
+
+```ts title="tests/integration/vehicles.route.test.ts"
+const signUp = await app.http.post("/api/auth/sign-up/email", {
+  json: { email: "owner@example.com", password: "correct-horse-battery", name: "Owner" },
+});
+const cookie = signUp.headers.get("set-cookie")?.split(";", 1)[0] ?? "";
+const created = await app.http.post<{ id: string }>("/api/auth/organization/create", {
+  json: { name: "Fleet", slug: "fleet" },
+  headers: { cookie },
+});
+await app.http.post("/api/auth/organization/set-active", {
+  json: { organizationId: (await created.json()).id },
+  headers: { cookie },
+});
+
+// access: { permissions: ["vehicle:create"] }
+expect((await app.http.post("/vehicles", { json: { plate: "AB-123" } })).status).toBe(401);
+const response = await app.http.post("/vehicles", {
+  json: { plate: "AB-123" },
+  headers: { cookie },
+});
+expect(response.ok).toBe(true);
+```
+
+Create other users the same way and give them a lesser role in the organization to check `403`.
+
 ## Keep test state isolated
 
 Create the environment before loading the auth service: its `baseURL` option is evaluated when the
@@ -67,6 +101,21 @@ library, then check the resulting HTTP behavior.
 For a domain function, use [function testing](/docs/modules/operations/testing) with an explicit
 `context.auth.getSession` result. Test at least an anonymous caller, the resource owner, and another
 authenticated caller. Assert that denied requests do not read or mutate protected data.
+
+`invokeFunction` checks the function's `access` rule too. Without an HTTP request it has no session,
+so the call is anonymous. A session from `context.auth.getSession` carries the session's roles but no
+permissions. To test a rule with roles or permissions directly, pass the caller as `principal`:
+
+```ts
+await invokeFunction(createVehicle, { plate: "AB-123" }, {
+  principal: async () => ({
+    kind: "user",
+    session,
+    roles: ["owner"],
+    hasPermission: async (permission) => permission === "vehicle:create",
+  }),
+});
+```
 
 Do not let a fake “authenticated” result bypass ownership or membership checks. If the operation is
 reachable through jobs, tools, or direct invocation, test that transport's identity contract as well;

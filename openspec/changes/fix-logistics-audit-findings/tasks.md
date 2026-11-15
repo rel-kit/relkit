@@ -219,6 +219,6 @@
 
 **Findings:** RK-36 (the application's tests avoid the in-process client because it "does not evaluate function access rules"), and the testing side of RK-12. **Owns:** `packages/testing/src/**` except `buckets-conformance*.ts`, `packages/testing/tests/**`.
 
-- [ ] 22.1 RK-36: write a test that calls a route with an access rule through the in-process HTTP client of `@relkit/testing` as an anonymous caller, a caller without the permission and a permitted caller; if the rule is not evaluated, make the harness run the same access path as the served application; verify 401, 403 and success, and that existing harness tests still pass.
-- [ ] 22.2 RK-12: bind a bucket's declared limits to the clients the harness wires for replacement providers (`packages/testing/src/provider-replacements.ts`, `bindBucketPolicy` from `relkit/engine`); verify a replacement provider refuses a disallowed upload in a harness test.
+- [x] 22.1 RK-36: write a test that calls a route with an access rule through the in-process HTTP client of `@relkit/testing` as an anonymous caller, a caller without the permission and a permitted caller; if the rule is not evaluated, make the harness run the same access path as the served application; verify 401, 403 and success, and that existing harness tests still pass.
+- [x] 22.2 RK-12: bind a bucket's declared limits to the clients the harness wires for replacement providers (`packages/testing/src/provider-replacements.ts`, `bindBucketPolicy` from `relkit/engine`); verify a replacement provider refuses a disallowed upload in a harness test.
 

@@ -7,6 +7,7 @@ import type { TestRuntime } from "./runtime.js";
 import type { TestRoute } from "./application-routes.js";
 import type { TestApplicationServices } from "./application-services.types.js";
 import { handleTestRequest } from "./application-http.js";
+import { requestPrincipal } from "./application-access.js";
 
 /**
  * Binds HTTP admission and request-local authentication to an acquired runtime.
@@ -49,10 +50,15 @@ export function createApplicationRequest(
         ) {
           return services.authHandler(request);
         }
-        return handleTestRequest(routes, applicationRuntime, request, () =>
-          services.auth === undefined
-            ? Promise.resolve(null)
-            : services.auth.contextFor(request).getSession(),
+        return handleTestRequest(
+          routes,
+          applicationRuntime,
+          request,
+          () =>
+            services.auth === undefined
+              ? Promise.resolve(null)
+              : services.auth.contextFor(request).getSession(),
+          requestPrincipal(services.auth, request),
         );
       });
     },

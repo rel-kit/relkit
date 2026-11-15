@@ -3,13 +3,16 @@ import { InvocationValidationError } from "relkit/engine";
 import { problemResponse } from "relkit/contracts";
 import { applyRouteResponse } from "relkit/routes";
 import { normalizeFailure } from "relkit/runtime-effect";
+import type { AccessPrincipalSource } from "relkit/engine";
 import type { TestRuntime } from "./runtime.js";
+import { accessBeforeInput, accessFailureResponse } from "./application-access.js";
 /**
  * Dispatches a matched route through existing engine validation and error mapping.
  * @param routes - Loaded native filesystem routes.
  * @param runtime - Acquired deterministic invocation runtime.
  * @param request - Native operation input carrying explicit identity and execution context.
  * @param getSession - The request's memoized session lookup, for routes with `auth: "required"`.
+ * @param principal - The request's caller, when the application declares an auth service.
  * @returns The native HTTP response; errors are Problem Details like the runtime's.
  */
 export async function handleTestRequest(
@@ -17,6 +20,7 @@ export async function handleTestRequest(
   runtime: TestRuntime,
   request: Request,
   getSession: () => Promise<unknown> = () => Promise.resolve(null),
+  principal?: AccessPrincipalSource,
 ): Promise<Response> {
   const url = new URL(request.url);
   const matched = routes.find(
@@ -36,12 +40,15 @@ export async function handleTestRequest(
       code: "unauthenticated",
       detail: "This route requires a signed-in session.",
     });
+  const denied = await accessBeforeInput(matched.target, principal);
+  if (denied !== undefined) return denied;
   const params = match(matched.path, url) ?? {};
   const body = await readBody(request);
   try {
     const value = await runtime.invoke(
       matched.target,
       mapInput(matched.request, url, params, request, body),
+      principal === undefined ? undefined : { principal },
     );
     const status = matched.responses.find((response) => response.kind === "success")?.status ?? 200;
     const mapped = new Response(value === undefined ? null : JSON.stringify(value), {
@@ -76,6 +83,8 @@ export async function handleTestRequest(
       });
     }
     const failure = normalizeFailure(error);
+    const access = accessFailureResponse(failure);
+    if (access !== undefined) return access;
     if (failure.kind === "application") {
       const declaration = matched.responses.find(
         (response) =>
