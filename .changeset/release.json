@@ -1,102 +1,102 @@
 {
   "protocol": "relkit.release-plan.v1",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "packages": [
     {
-      "name": "@relkit/testing",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/cloudflare",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/cli",
-      "version": "0.9.0"
-    },
-    {
-      "name": "create-relkit",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/aws",
-      "version": "0.9.0"
-    },
-    {
       "name": "relkit",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/redis",
-      "version": "0.9.0"
+      "version": "0.9.1"
     },
     {
       "name": "@relkit/inspector",
-      "version": "0.9.0"
+      "version": "0.9.1"
     },
     {
-      "name": "@relkit/better-auth",
-      "version": "0.9.0"
+      "name": "@relkit/cli",
+      "version": "0.9.1"
     },
     {
       "name": "@relkit/client",
-      "version": "0.9.0"
+      "version": "0.9.1"
     },
     {
-      "name": "@relkit/docker",
-      "version": "0.9.0"
+      "name": "@relkit/better-auth",
+      "version": "0.9.1"
+    },
+    {
+      "name": "create-relkit",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/testing",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/cloudflare",
+      "version": "0.9.1"
     },
     {
       "name": "@relkit/drizzle",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/s3",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/app",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/langchain",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/pulumi",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/inngest",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/trigger",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/effect-mq",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/sentry",
-      "version": "0.9.0"
-    },
-    {
-      "name": "@relkit/otlp",
-      "version": "0.9.0"
+      "version": "0.9.1"
     },
     {
       "name": "@relkit/ai-sdk",
-      "version": "0.9.0"
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/app",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/aws",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/docker",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/effect-mq",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/inngest",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/langchain",
+      "version": "0.9.1"
     },
     {
       "name": "@relkit/local",
-      "version": "0.9.0"
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/otlp",
+      "version": "0.9.1"
     },
     {
       "name": "@relkit/postgres",
-      "version": "0.9.0"
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/pulumi",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/redis",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/sentry",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/trigger",
+      "version": "0.9.1"
+    },
+    {
+      "name": "@relkit/s3",
+      "version": "0.9.1"
     }
   ]
 }

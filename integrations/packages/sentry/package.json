@@ -1,6 +1,6 @@
 {
   "name": "@relkit/sentry",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Sentry telemetry integration for RelKit.",
   "license": "MIT",
   "repository": {

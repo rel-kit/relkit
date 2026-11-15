@@ -1,5 +1,0 @@
----
-"@relkit/inspector": patch
----
-
-Connecting to a channel from the Inspector works again on Node and Bun. Since the Inspector stopped forwarding the browser's cookies, the application gave each of its identity calls a new anonymous identity, so every connect failed with 409 `IDENTITY_PRECONDITION_FAILED`, "The client identity changed before this operation was submitted." The Inspector now keeps the cookies the application's identity endpoint (`/_relkit/v1/client/identity`) sets in a jar of its own, one per running Inspector, and sends them on its later calls, so all its pages are one anonymous visitor. It still never forwards the browser's cookies for the application, and the identity cookies no longer reach the browser, where they would replace your own for the application's host. A connect to a public channel succeeds; a channel that needs a signed-in user answers as not found, and the channel page now says that the Inspector connects as an anonymous visitor instead of with your browser's session.
