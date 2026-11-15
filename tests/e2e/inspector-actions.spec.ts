@@ -130,7 +130,10 @@ test("the route composer's status line follows the response", async ({ page }) =
   await page.getByRole("button", { name: "Send request" }).click();
   const outcome = page.locator("#route-outcome");
   await expect(outcome).toContainText("The application refused this request (401)");
-  await expect(outcome).toContainText("signed in to the application in this browser");
+  await expect(outcome).toContainText("no user session is attached");
+  await expect(page.locator("#route-session-note")).toHaveText(
+    "This request was sent without a user session.",
+  );
 
   await page.unroute("**/_relkit/backend/orders");
   await page.route("**/_relkit/backend/orders", (route) =>

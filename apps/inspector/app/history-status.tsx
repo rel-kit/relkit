@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import type { InspectorObject } from "../lib/api-types";
 import { createInspectorClient } from "../lib/client";
-import { historyIncomplete, historyStatusMessage } from "../lib/history-status";
+import { historyFailed, historyIncomplete, historyStatusMessage } from "../lib/history-status";
 import { cn } from "../lib/utils";
 
 /** Shares the tool-owned collection status across historical views. */
 export function HistoryStatus({ value }: { readonly value: InspectorObject | undefined }) {
-  const alert = historyIncomplete(value) || value?.state === "degraded";
+  const alert = historyIncomplete(value) || historyFailed(value);
   const tone = historyTone(value, alert);
   return (
     <div
@@ -38,7 +38,7 @@ const DOT = {
 } as const;
 
 function historyTone(value: InspectorObject | undefined, alert: boolean): keyof typeof DOT {
-  if (value?.state === "degraded" || value?.error !== undefined) return "danger";
+  if (historyFailed(value)) return "danger";
   if (alert || value?.connection === "ambiguous" || value?.connection === "disconnected")
     return "warning";
   if (!value || value.state === "unavailable") return "neutral";

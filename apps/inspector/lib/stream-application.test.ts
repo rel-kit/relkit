@@ -193,4 +193,15 @@ describe("history availability", () => {
     expect(historyAvailability(run(status(undefined, { state: "degraded" })))).toBe("degraded");
     expect(historyAvailability(run({ type: "status-failed" }))).toBe("unavailable");
   });
+
+  test("an application outage is not a history failure when the tool sends collection", () => {
+    const outage = { collection: "application-unreachable", error: "connect.failed" };
+    expect(historyAvailability(run(status(undefined, outage)))).toBe("ready");
+    expect(historyAvailability(run(status(undefined, { collection: "history-unavailable" })))).toBe(
+      "degraded",
+    );
+    expect(historyAvailability(run(status(undefined, { error: "connect.failed" })))).toBe(
+      "degraded",
+    );
+  });
 });

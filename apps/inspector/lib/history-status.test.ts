@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  historyFailed,
   historyIncomplete,
   historyStatusMessage,
   missedLiveUpdatesNote,
@@ -73,6 +74,65 @@ test("storage failure recovery names the tool and preserves data", () => {
     "Restart the Inspector",
   );
   expect(historyStatusMessage(undefined)).toContain("unavailable");
+});
+
+describe("the tool's collection state says an application outage apart from a history failure", () => {
+  const outage = {
+    state: "ready",
+    collection: "application-unreachable",
+    connection: "disconnected",
+  };
+
+  test("an unreachable application leaves retained history intact", () => {
+    const status = { ...outage, applicationError: "connect.failed" };
+    expect(historyStatusMessage(status)).toBe(
+      "The application is unreachable. Retained history is intact.",
+    );
+    expect(historyFailed(status)).toBe(false);
+  });
+
+  test("an error beside collection does not make the outage a history failure", () => {
+    expect(historyFailed({ ...outage, error: "connect.failed" })).toBe(false);
+    expect(historyStatusMessage({ ...outage, error: "connect.failed" })).not.toMatch(/degraded/i);
+  });
+
+  test("waiting and invalid applications have their own words", () => {
+    expect(historyStatusMessage({ state: "ready", collection: "waiting-for-application" })).toBe(
+      "Waiting for the application to connect. Retained history is readable.",
+    );
+    expect(historyStatusMessage({ state: "ready", collection: "application-invalid" })).toBe(
+      "The application sent records the Inspector could not accept. Retained history is intact.",
+    );
+  });
+
+  test("a collecting tool keeps the connected sentence", () => {
+    expect(historyStatusMessage({ state: "ready", collection: "collecting" })).toContain(
+      "History collection connected",
+    );
+  });
+
+  test("a history failure is still degraded", () => {
+    const failed = { state: "degraded", collection: "history-unavailable", error: "history.open" };
+    expect(historyFailed(failed)).toBe(true);
+    expect(historyStatusMessage(failed)).toContain("History collection unavailable");
+    expect(historyFailed({ collection: "history-unavailable" })).toBe(true);
+  });
+
+  test("an older tool without collection reads degraded and error as before", () => {
+    expect(historyFailed({ state: "degraded" })).toBe(true);
+    expect(historyFailed({ state: "ready", error: "connect.failed" })).toBe(true);
+    expect(historyFailed({ state: "ready" })).toBe(false);
+  });
+
+  test("an outage still reports the records that never reached history", () => {
+    const message = historyStatusMessage({
+      ...outage,
+      incomplete: true,
+      recordsLostBeforeHistory: { byApplicationProducer: 0, byInspectionBuffer: 4 },
+    });
+    expect(message).toContain("The application is unreachable. Retained history is intact.");
+    expect(message).toContain("the buffer dropped 4");
+  });
 });
 
 describe("nothing is missing when no record was lost (NF-9, NF-11)", () => {

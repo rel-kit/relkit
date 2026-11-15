@@ -1,18 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { InspectorObject } from "../../lib/api-types";
-import { collectRouteFields, composeRouteRequest, type RouteField } from "../../lib/route-composer";
-import type { RouteInvocationResult } from "../../lib/route-request";
+import {
+  collectRouteFields,
+  composeRouteRequest,
+  cookieFieldNames,
+  editableRouteFields,
+} from "../../lib/route-composer";
+import { routeSessionNote } from "../../lib/session-note";
+import type { RouteInvocationResult, RouteStreamFrame } from "../../lib/route-request";
 import { routeOutcome, type RouteOutcome } from "../../lib/route-status";
-import type { RouteStreamFrame } from "../../lib/route-request";
-import type { FormEvent } from "react";
 import { Send } from "lucide-react";
 import { Section } from "../../components/blocks/section";
 import { StatusBadge } from "../../components/neon/status-badge";
 import { Button } from "../../components/ui/button";
 import { MethodChip } from "../domains/catalog-kit";
-import { defaults, groupFields, sourceLabel, StreamFrames } from "./route-composer-parts";
+import {
+  CookieNote,
+  defaults,
+  groupFields,
+  RouteResult,
+  sourceLabel,
+  StreamFrames,
+} from "./route-composer-parts";
 import { RouteFieldInput } from "./route-field";
 
 export function RouteComposer({
@@ -35,12 +46,15 @@ export function RouteComposer({
   readonly onComplete: (result: RouteInvocationResult) => void;
 }) {
   const config = record(route.config);
-  const fields = collectRouteFields(config?.request, target?.input);
+  const mapped = collectRouteFields(config?.request, target?.input);
+  const fields = editableRouteFields(mapped);
+  const cookies = cookieFieldNames(mapped);
   const [values, setValues] = useState<Record<string, unknown>>(() => defaults(fields));
   const [errors, setErrors] = useState<readonly { key: string; message: string }[]>([]);
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState("");
   const [outcome, setOutcome] = useState<RouteOutcome>();
+  const [sessionNote, setSessionNote] = useState("");
   const [streamFrames, setStreamFrames] = useState<
     readonly { readonly id: number; readonly frame: RouteStreamFrame }[]
   >([]);
@@ -50,16 +64,12 @@ export function RouteComposer({
   const nextFrameId = useRef(0);
   useEffect(() => () => streamController.current?.abort(), []);
 
-  const focusField = (key: string): void => {
-    if (key === "request") {
-      summaryRef.current?.focus();
-      return;
-    }
-    fieldRefs.current[key]?.focus();
-  };
+  const focusField = (key: string): void =>
+    (key === "request" ? summaryRef.current : fieldRefs.current[key])?.focus();
 
-  const finish = (result: RouteInvocationResult): void => {
-    const next = routeOutcome(result);
+  const finish = (result: RouteInvocationResult, headers: Headers): void => {
+    const next = routeOutcome(result, headers.has("authorization"));
+    setSessionNote(routeSessionNote(headers));
     setOutcome(next);
     setStatus(next.text);
   };
@@ -89,7 +99,7 @@ export function RouteComposer({
       if (invokeStream === undefined) {
         const result = await invoke({ path: built.path, init: built.init });
         onComplete(result);
-        finish(result);
+        finish(result, new Headers(built.init.headers));
       } else {
         streamController.current?.abort();
         const controller = new AbortController();
@@ -104,7 +114,7 @@ export function RouteComposer({
           controller.signal,
         );
         onComplete(result);
-        finish(result);
+        finish(result, new Headers(built.init.headers));
       }
     } catch (error) {
       setErrors([
@@ -183,6 +193,7 @@ export function RouteComposer({
             </fieldset>
           ))
         )}
+        <CookieNote names={cookies} />
         {errors.length > 0 && (
           <ul
             ref={summaryRef}
@@ -219,15 +230,7 @@ export function RouteComposer({
             </span>
           ) : null}
         </div>
-        {outcome === undefined ? null : (
-          <p
-            id="route-outcome"
-            data-tone={outcome.tone}
-            className="m-0 max-w-none text-xs leading-5 text-muted-foreground data-[tone=danger]:text-danger data-[tone=success]:text-success"
-          >
-            {outcome.text}
-          </p>
-        )}
+        {outcome === undefined ? null : <RouteResult outcome={outcome} sessionNote={sessionNote} />}
       </form>
       <StreamFrames frames={streamFrames} />
     </Section>

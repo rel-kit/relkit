@@ -5,17 +5,40 @@ export function historyStatusMessage(value: InspectorObject | undefined): string
   if (!value || value.state === "unavailable") return "History status unavailable.";
   if (value.error === "history.writer-conflict")
     return "History unavailable: another Inspector writer owns this directory. Stop that writer before retrying; preserve the database.";
-  if (value.state === "degraded")
+  if (historyFailed(value))
     return "History collection unavailable. Check the history directory. Restart the Inspector. Existing data is preserved; the app continues running.";
   // The application session has its own status; this line is about history only.
-  const collection =
-    value.connection === "ambiguous" || value.connection === "disconnected"
-      ? "Retained history remains readable; new records arrive when the application connects."
-      : "History collection connected; app buffering and retention are bounded.";
+  const collection = collectionSentence(value);
   if (!historyIncomplete(value)) return collection;
   const lost = recordsLost(value);
   const sentence = lost === undefined ? undefined : recordsLostSentence(lost);
   return `${collection} ${sentence ?? "Some records from this session are missing from history."} Missing records cannot be reconstructed.`;
+}
+
+/**
+ * Whether history itself failed. A tool that sends `collection` says so with `history-unavailable`
+ * and reports `error` only for history; an older tool sends `error` for an unreachable
+ * application too, so there any `error` or a degraded state counts.
+ */
+export function historyFailed(value: InspectorObject | undefined): boolean {
+  if (value === undefined) return false;
+  if (typeof value.collection === "string") return value.collection === "history-unavailable";
+  return value.state === "degraded" || value.error !== undefined;
+}
+
+function collectionSentence(value: InspectorObject): string {
+  switch (value.collection) {
+    case "application-unreachable":
+      return "The application is unreachable. Retained history is intact.";
+    case "waiting-for-application":
+      return "Waiting for the application to connect. Retained history is readable.";
+    case "application-invalid":
+      return "The application sent records the Inspector could not accept. Retained history is intact.";
+    default:
+      return value.connection === "ambiguous" || value.connection === "disconnected"
+        ? "Retained history remains readable; new records arrive when the application connects."
+        : "History collection connected; app buffering and retention are bounded.";
+  }
 }
 
 /**

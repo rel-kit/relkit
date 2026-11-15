@@ -99,6 +99,11 @@ describe("storageHealth", () => {
     expect(storageHealth(undefined)).toEqual({ tone: "live", label: "checking" });
     expect(storageHealth({ state: "unavailable" }).tone).toBe("neutral");
     expect(storageHealth({ error: "history.writer-conflict" }).tone).toBe("danger");
+    // An application outage leaves history ready when the tool sends `collection`.
+    expect(
+      storageHealth({ state: "ready", collection: "application-unreachable", error: "x" }),
+    ).toEqual({ tone: "success", label: "ready" });
+    expect(storageHealth({ collection: "history-unavailable" }).label).toBe("degraded");
     expect(storageHealth({ state: "degraded" }).label).toBe("degraded");
     expect(storageHealth({ state: "ready", incomplete: true }).tone).toBe("warning");
     // No record was lost, so nothing is incomplete.
