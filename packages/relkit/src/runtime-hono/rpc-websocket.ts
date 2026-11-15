@@ -6,7 +6,8 @@ import type { UpgradeWebSocket } from "hono/ws";
 import type { RouteMaterializationOptions } from "./materialize-routes.js";
 import { createRpcRouter, type RpcContext } from "./rpc.js";
 import { errorStatusInterceptor, rpcHeadersInterceptor } from "./rpc-handler-options.js";
-import { assertWebSocketRequest } from "./transport-security.js";
+import { contextProblem } from "./problem-details.js";
+import { assertWebSocketRequest, TransportSecurityError } from "./transport-security.js";
 
 /** Installs the oRPC WebSocket adapter on the same router and policies as HTTP RPC.
  * @param app - Hono application receiving the configured endpoints or middleware.
@@ -26,10 +27,24 @@ export function installRpcWebSocket(
   });
   app.get(
     FRAMEWORK_RPC_PATH,
-    upgradeWebSocket(async (hono) => {
-      if (options.transportSecurity !== undefined) {
-        await assertWebSocketRequest(hono.req.raw, options.transportSecurity);
+    async (hono, next) => {
+      const security = options.transportSecurity;
+      if (security === undefined || hono.req.header("upgrade")?.toLowerCase() !== "websocket")
+        return next();
+      try {
+        await assertWebSocketRequest(hono.req.raw, security);
+      } catch (error) {
+        if (!(error instanceof TransportSecurityError)) throw error;
+        // The same answer as an HTTP request from a refused origin, before any upgrade.
+        return contextProblem(hono, {
+          status: 403,
+          code: "origin-denied",
+          detail: "The request was rejected.",
+        });
       }
+      return next();
+    },
+    upgradeWebSocket(async (hono) => {
       const context: RpcContext = {
         hono,
         auth: options.auth?.contextFor(hono.req.raw),

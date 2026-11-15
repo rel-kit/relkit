@@ -5,6 +5,7 @@
  * HTTP stream and over a WebSocket that carries the session cookie on its upgrade.
  */
 import { createRequire } from "node:module";
+import { connect } from "node:net";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -86,6 +87,7 @@ export async function startSessionGuardServer(runtime: RuntimeAdapter) {
       provider: () => provider,
       trustedContext: ({ request, auth }) => ({ request, auth }),
     },
+    transportSecurity: { allowedOrigins: [] },
   });
   const server = await runtime.serve({
     hostname: "127.0.0.1",
@@ -108,6 +110,39 @@ export async function startSessionGuardServer(runtime: RuntimeAdapter) {
     await rm(root, { recursive: true, force: true });
   };
   return { origin, http, socket, close };
+}
+
+/**
+ * Sends a WebSocket handshake with a foreign `Origin` and reads the head of the answer.
+ * @param origin - The application's origin.
+ * @returns The status line's code and the lower-cased answer.
+ */
+export function foreignHandshake(origin: string): Promise<{ status: number; raw: string }> {
+  const url = new URL(origin);
+  return new Promise((resolve, reject) => {
+    const socket = connect(Number(url.port), url.hostname);
+    let raw = "";
+    const settle = (): void => {
+      socket.destroy();
+      resolve({ status: Number(/^HTTP\/1\.1 (\d{3})/u.exec(raw)?.[1] ?? 0), raw: raw.toLowerCase() });
+    };
+    socket.setTimeout(1_000, settle);
+    socket.on("error", reject);
+    socket.on("end", settle);
+    socket.on("data", (chunk) => (raw += chunk.toString("latin1")));
+    socket.write(
+      [
+        "GET /_relkit/v1/rpc HTTP/1.1",
+        `Host: ${url.host}`,
+        "Upgrade: websocket",
+        "Connection: Upgrade",
+        "Sec-WebSocket-Version: 13",
+        "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==",
+        "Origin: http://attacker.example",
+        "Cookie: session=ada",
+      ].join("\r\n") + "\r\n\r\n",
+    );
+  });
 }
 
 /**
