@@ -228,3 +228,10 @@
 
 - [ ] 23.1 RK-20: move the scaffolded and tested `better-auth` version to the first release without the advisories `npm audit` reports (1.7.7 or later in the same minor line), make the generated authentication schema, the examples and the package's tests match what that release accepts (it rejects the `account.issuer` column the current schema declares), and give existing projects a documented way forward (a `relkit migrate` rule or a doctor finding with the exact schema change and migration to run); verify the Better Auth package suite, a generated project with authentication on Bun and on Node, and that `npm audit` on a fresh project with authentication and a database attributes nothing to a version RelKit pins or writes.
 
+## 24. Package manager neutrality of `relkit add`
+
+**Findings:** RK-37, RK-38. **Owns:** `packages/create-relkit/src/package-manager.ts`, `packages/cli/src/scaffolding/**` and `packages/cli/src/commands/add*.ts` for the install step and the printed next steps.
+
+- [ ] 24.1 RK-37: make the install that `relkit add` runs succeed in a pnpm, npm and Bun project when `CI` is set, by telling each package manager that the lockfile may change (`packages/create-relkit/src/package-manager.ts`, around line 58), without changing what a plain install does elsewhere; verify with a test per manager and the pnpm leg of the Node acceptance run.
+- [ ] 24.2 RK-38: name the project's package manager in every message `relkit add` prints (the failed-install text and the next steps), and in the other commands' next steps where the scan finds a hard-coded `bun`; verify with tests for an npm and a pnpm project.
+
