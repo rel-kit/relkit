@@ -122,23 +122,22 @@ function observe(
           if (signal?.aborted) return [[], Option.none<typeof state>()] as const;
           const resolved = yield* authorize(state.after);
           if (state.wait && state.after !== undefined) {
-            const checkpoint = state.after;
-            const now = yield* Clock.currentTimeMillis;
-            const waited = yield* httpBoundary("realtime.wait", (fiberSignal) =>
+            const { after: checkpoint } = state;
+            const deadlineMs = (yield* Clock.currentTimeMillis) + 15_000;
+            const callerStayed = yield* httpBoundary("realtime.wait", (fiberSignal) =>
               resolved.provider.waitAfter({
                 ...resolved.scope,
                 after: checkpoint,
-                deadlineMs: now + 15_000,
+                deadlineMs,
                 signal: signal === undefined ? fiberSignal : AbortSignal.any([signal, fiberSignal]),
               }),
             ).pipe(
               Effect.as(true),
-              // The caller went away during the wait: the stream ends, nothing failed.
-              Effect.catch((error) =>
-                signal?.aborted ? Effect.succeed(false) : Effect.fail(error),
+              Effect.catch((cause) =>
+                signal?.aborted ? Effect.succeed(false) : Effect.fail(cause),
               ),
             );
-            if (!waited) return [[], Option.none<typeof state>()] as const;
+            if (!callerStayed) return [[], Option.none<typeof state>()] as const;
           }
           const page = yield* observeHttp(
             "realtime.read",
