@@ -10,6 +10,7 @@ import { ADD_FAILURE_CODES, AddScaffoldError, type ScaffoldPlan } from "create-r
 import { GeneratorFileSystem } from "create-relkit/generator-filesystem";
 import { GeneratorProcess } from "create-relkit/generator-process";
 import { domainError } from "create-relkit/generator-errors";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
 
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
 
@@ -29,7 +30,10 @@ export const checkEffect = Effect.fn("ScaffoldTransaction.check")(
       ADD_FAILURE_CODES.validation,
       plan.projectRoot,
     );
-    return { status: "passed" as const, command: "bun run check" };
+    return {
+      status: "passed" as const,
+      command: packageManagerCommands(projectPackageManager(plan.projectRoot)).run("check"),
+    };
   },
   (effect) => observeExecution("generator", "ScaffoldTransaction.check", effect),
 );
@@ -40,6 +44,7 @@ export const checkEffect = Effect.fn("ScaffoldTransaction.check")(
  * @param command - Literal executable and argument vector.
  * @param code - Stable category code included in the resulting diagnostic.
  * @param cwd - Working directory for the operation.
+ * @param label - Text that names the command in a failure message, such as `pnpm install failed: `.
  * @returns Completion after the command exits successfully; cancellation/nonzero exit retain public failure codes.
  */
 export const runEffect = Effect.fn("ScaffoldTransaction.run")(
@@ -48,6 +53,7 @@ export const runEffect = Effect.fn("ScaffoldTransaction.run")(
     command: readonly string[],
     code: typeof ADD_FAILURE_CODES.installation | typeof ADD_FAILURE_CODES.validation,
     cwd: string,
+    label = "",
   ) {
     const result = yield* (yield* GeneratorProcess).run(command, cwd);
     if (context.signal?.aborted) return yield* Effect.fail(domainError(cancelled()));
@@ -56,7 +62,7 @@ export const runEffect = Effect.fn("ScaffoldTransaction.run")(
         domainError(
           new AddScaffoldError(
             code,
-            result.stderr?.trim() || result.stdout?.trim() || `${command[0]} failed.`,
+            label + (result.stderr?.trim() || result.stdout?.trim() || `${command[0]} failed.`),
           ),
         ),
       );

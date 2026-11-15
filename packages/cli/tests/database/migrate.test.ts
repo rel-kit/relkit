@@ -1,7 +1,7 @@
 /** Exercises real finite SQLite workers, selected configuration, safe output and lazy preflight. */
 import { expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { rm, readFile, rename } from "node:fs/promises";
+import { rm, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Database } from "bun:sqlite";
 import { app, config, migrate, write } from "./fixture.js";
@@ -117,12 +117,26 @@ test("SQL errors are operational failures without retry or successful publicatio
   expect(result.result.ok).toBe(false);
 });
 
+test.each([
+  ["bun@1.3.10", "with bun add before"],
+  ["npm@11.19.1", "with npm install before"],
+  ["pnpm@11.1.0", "with pnpm add before"],
+])("missing consumer ORM names the %s install command", async (packageManager, spelling) => {
+  const root = await app();
+  const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+  await writeFile(join(root, "package.json"), JSON.stringify({ ...manifest, packageManager }));
+  await rm(join(root, "node_modules/drizzle-orm"));
+  const result = await migrate(root);
+  expect(result.code).toBe(2);
+  expect(result.result.error.message).toContain(spelling);
+});
+
 test("missing consumer ORM is actionable without a CLI or workspace fallback", async () => {
   const root = await app();
   await rm(join(root, "node_modules/drizzle-orm"));
   const result = await migrate(root);
   expect(result.code).toBe(2);
-  expect(result.result.error.message).toContain("bun add");
+  expect(result.result.error.message).toMatch(/with (bun add|npm install|pnpm add) before/);
   expect(existsSync(join(root, "data"))).toBe(false);
   expect(
     JSON.parse(await readFile(join(root, "package.json"), "utf8")).dependencies,

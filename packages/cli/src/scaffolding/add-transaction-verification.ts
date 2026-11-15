@@ -12,7 +12,11 @@ import {
 import type { ApplyScaffoldContext } from "./add-transaction.types.js";
 
 import { checkEffect, runEffect, packagesAvailableEffect } from "./add-transaction-process.js";
-import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
+import {
+  packageManagerCommands,
+  projectPackageManager,
+  type PackageManagerCommands,
+} from "create-relkit/package-manager";
 export const verifyScaffoldTransaction = Effect.fn("ScaffoldTransaction.verify")(function* (
   plan: ScaffoldPlan,
   context: ApplyScaffoldContext,
@@ -20,20 +24,22 @@ export const verifyScaffoldTransaction = Effect.fn("ScaffoldTransaction.verify")
   patchChanged: boolean,
   installRequired: boolean,
 ) {
+  const manager = packageManagerCommands(projectPackageManager(plan.projectRoot));
   let verification: ScaffoldVerification;
   if (context.deferVerification)
     verification = {
       status: "skipped",
       reason: "Validation is deferred until project creation finishes.",
-      command: "bun run check",
+      command: manager.run("check"),
     };
   else if (installRequired && plan.request.install) {
     context.onProgress?.("Installing dependencies...");
     yield* runEffect(
       context,
-      installCommand(plan.projectRoot, context.bunExecutable),
+      installCommand(manager, context.bunExecutable),
       ADD_FAILURE_CODES.installation,
       plan.projectRoot,
+      `${manager.installText} failed: `,
     );
     verification = yield* checkEffect(plan, context);
   } else if (
@@ -43,9 +49,9 @@ export const verifyScaffoldTransaction = Effect.fn("ScaffoldTransaction.verify")
     verification = {
       status: "skipped",
       reason: patchChanged
-        ? "Dependency patches require bun install before checking the project."
+        ? `Dependency patches require ${manager.installText} before checking the project.`
         : `New packages are not installed: ${packages.join(", ")}`,
-      command: "bun run check",
+      command: manager.run("check"),
     };
   else verification = yield* checkEffect(plan, context);
   return verification;
@@ -57,6 +63,7 @@ export function scaffoldTransactionResult(
   packages: readonly string[],
   verification: ScaffoldVerification,
 ) {
+  const { installText } = packageManagerCommands(projectPackageManager(plan.projectRoot));
   return Object.freeze({
     ok: true as const,
     command: "add" as const,
@@ -74,7 +81,7 @@ export function scaffoldTransactionResult(
     nextSteps: Object.freeze([
       ...plan.nextSteps,
       ...(verification.status === "skipped" && !context.deferVerification
-        ? ["bun install", verification.command]
+        ? [installText, verification.command]
         : []),
     ]),
   });
@@ -82,12 +89,14 @@ export function scaffoldTransactionResult(
 
 /**
  * Spells the project's install with its package manager.
- * @param root - Project root.
+ * @param manager - The project's package manager.
  * @param bunExecutable - Explicit Bun executable, when given.
  * @returns Executable and arguments.
  */
-function installCommand(root: string, bunExecutable: string | undefined): string[] {
-  const manager = packageManagerCommands(projectPackageManager(root));
+function installCommand(
+  manager: PackageManagerCommands,
+  bunExecutable: string | undefined,
+): string[] {
   if (manager.name !== "bun") return [manager.name, ...manager.install];
   const onBun = typeof globalThis.process.versions.bun === "string";
   return [bunExecutable ?? (onBun ? globalThis.process.execPath : "bun"), ...manager.install];
