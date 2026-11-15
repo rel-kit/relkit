@@ -13,6 +13,61 @@ For configuration and examples, read [inspector](/docs/modules/operations/inspec
 
 <include>/_snippets/generated/exports/inspector.mdx</include>
 
+## `application-identity.ts`
+
+Path of the application's client identity document; `CLIENT_IDENTITY_PATH` of
+`relkit/runtime-hono`, repeated here so the tool does not load the HTTP runtime.
+
+### ApplicationIdentityJar (interface)
+
+The tool's cookies for the applications it calls.
+
+**Signature**
+
+```ts
+export interface ApplicationIdentityJar {
+  /**
+   * @param projectId - Project of the application called.
+   * @returns The `Cookie` header for a call to it, or undefined when the jar holds none.
+   */
+  readonly cookie: (projectId: string) => string | undefined;
+  /**
+   * Keeps the cookies an identity response set: a new value replaces the old one, and an
+   * expired cookie (`Max-Age=0` or a past `Expires`) is removed.
+   * @param projectId - Project of the application that answered.
+   * @param setCookies - The response's `Set-Cookie` values.
+   */
+  readonly keep: (projectId: string, setCookies: readonly string[]) => void;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/application-identity.ts#L28)
+
+### CLIENT_IDENTITY_PATH
+
+Path of the application's client identity document; `CLIENT_IDENTITY_PATH` of
+`relkit/runtime-hono`, repeated here so the tool does not load the HTTP runtime.
+
+**Signature**
+
+```ts
+declare const CLIENT_IDENTITY_PATH: "/_relkit/v1/client/identity";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/application-identity.ts#L18)
+
+### makeApplicationIdentityJar
+
+Creates an empty jar for one tool process.
+
+**Signature**
+
+```ts
+declare const makeApplicationIdentityJar: () => ApplicationIdentityJar;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/application-identity.ts#L47)
+
 ## `backend-forward.ts`
 
 Live operations are forwarded once; bridge rejections retain their HTTP status in the UI protocol.
@@ -23,7 +78,8 @@ Sends an accepted page request to the application as the Inspector's own call, a
 by the session's bridge token. Inspection actions (`/_relkit/v1/...`) and route requests from
 the composer are both sent without the browser's `Origin`, `Referer`, `Sec-Fetch-*` and
 cookies, so they run without a user session; `Authorization` a developer typed, operation IDs
-and streaming bodies are kept.
+and streaming bodies are kept. With a jar, the call carries the tool's own anonymous identity
+cookies, and the cookies the identity endpoint sets go to the jar instead of the browser.
 
 **Signature**
 
@@ -33,10 +89,11 @@ declare const forwardBackend: (
   connection: InspectionConnectionFile,
   request: Request,
   target?: string | undefined,
+  jar?: ApplicationIdentityJar | undefined,
 ) => Effect.Effect<Response, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-forward.ts#L17)
 
 ## `backend-history.ts`
 
@@ -108,7 +165,7 @@ Copies a browser request's headers for the Inspector's own call to the applicati
 declare const inspectorCallHeaders: (incoming: Headers) => Headers;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/browser-boundary.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/browser-boundary.ts#L51)
 
 ## `collection.schemas.ts`
 
@@ -231,6 +288,41 @@ declare const persistCollectionLoss: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-loss.ts#L8)
 
+## `collector-refusal.ts`
+
+Keeps one record the history store refuses from stopping collection. The store refuses a batch
+as a whole, so a batch it refuses is stored again one record at a time; only the records it
+still refuses are given up, and only after the store has proved that it stores by keeping a
+diagnostic that names them. A failure of the store itself gives up nothing.
+
+### appendCollected
+
+Appends a batch; when the store refuses it, appends its records one by one.
+
+**Signature**
+
+```ts
+declare const appendCollected: (
+  history: InspectorHistoryOperations,
+  records: ReadonlyArray<LocalRecord>,
+  sessionId: string,
+) => Effect.Effect<number, InspectionConnectionError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-refusal.ts#L34)
+
+### refusedByStore
+
+Whether the worker answered that it refused the records, as opposed to failing itself.
+
+**Signature**
+
+```ts
+declare const refusedByStore: (error: InspectionConnectionError) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector-refusal.ts#L18)
+
 ## `collector.ts`
 
 Commits a finite replay batch before ACK; lost ACKs replay stable keys without duplicate writes.
@@ -250,6 +342,7 @@ declare const collectInspectionBatch: (
   target?: string | undefined,
   previousLossKey?: string | undefined,
   previousDropped?: number | undefined,
+  pulled?: ((records: number, through: number) => Effect.Effect<void>) | undefined,
 ) => Effect.Effect<
   {
     through: number;
@@ -257,6 +350,7 @@ declare const collectInspectionBatch: (
     droppedRecords: number;
     incomplete: boolean;
     records: number;
+    refused: number;
     backlog: boolean;
     lossKey: string | undefined;
     producerFailed: number;
@@ -280,7 +374,7 @@ declare const collectInspectionBatch: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/collector.ts#L24)
 
 ## `container-bin.ts`
 
@@ -461,7 +555,7 @@ declare const historyNativeFailure: <Cause extends Error>(
 ) => InspectionConnectionError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-native.service.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-native.service.ts#L53)
 
 ## `history-native.types.ts`
 
@@ -475,14 +569,83 @@ Owns project binding, worker open and joined physical shutdown as one acquisitio
 
 ```ts
 export interface InspectorHistoryNativeOperations {
+  /**
+   * @param root - History directory.
+   * @param projectId - Project the directory must belong to.
+   * @param onFailure - Told once when the worker stops or fails without being closed.
+   */
   readonly acquire: (
     root: string,
     projectId: string,
+    onFailure?: (error: Error) => void,
   ) => Effect.Effect<LocalWorkerEffects, InspectionConnectionError, Scope.Scope>;
 }
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-native.types.ts#L7)
+
+## `history-owner.ts`
+
+Records which Inspector holds a project's history and where it listens, so a second Inspector
+that cannot open the history can say who has it. The record sits beside the history, is private
+to the user, and names an address only while the process that wrote it is alive.
+
+### HistoryOwner (interface)
+
+The Inspector that holds a history directory.
+
+**Signature**
+
+```ts
+export interface HistoryOwner {
+  readonly pid: number;
+  /** Origin of its interface, for example `http://127.0.0.1:3210`. */
+  readonly url: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L15)
+
+### publishHistoryOwner
+
+Writes this process as the history's owner; a failure leaves no record and nothing else changes.
+
+**Signature**
+
+```ts
+declare const publishHistoryOwner: (
+  root: string,
+  options: InspectorOptions,
+) => Effect.Effect<void, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L27)
+
+### readHistoryOwner
+
+Reads the record of another live Inspector.
+
+**Signature**
+
+```ts
+declare const readHistoryOwner: (
+  root: string,
+) => Effect.Effect<HistoryOwner | undefined, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L64)
+
+### removeHistoryOwner
+
+Removes the record when this process wrote it.
+
+**Signature**
+
+```ts
+declare const removeHistoryOwner: (root: string) => Effect.Effect<void, never, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-owner.ts#L46)
 
 ## `history-reply.ts`
 
@@ -523,7 +686,7 @@ type CollectionState =
   | "history-unavailable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L39)
 
 ### collectionState
 
@@ -535,7 +698,19 @@ Names where collection stands, for the `/_relkit/v1/storage` answer.
 declare const collectionState: (current: InspectorToolState) => CollectionState;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L55)
+
+### historyError
+
+Names what is wrong with history itself.
+
+**Signature**
+
+```ts
+declare const historyError: (current: InspectorToolState) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history-state.ts#L32)
 
 ### historyFailure
 
@@ -591,7 +766,7 @@ declare const inspectorHistoryLayer: (
 ) => Layer.Layer<InspectorHistory, InspectionConnectionError, InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history.service.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/history.service.ts#L50)
 
 ## `history.types.ts`
 
@@ -1095,7 +1270,7 @@ declare const prepareDuckdbBatch: (
 ) => Effect.Effect<Map<string, PreparedDuckdbRecord>, DuckdbError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-prepare.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-batch-prepare.ts#L14)
 
 ## `duckdb-batch-receipts.ts`
 
@@ -2821,6 +2996,24 @@ export interface LegacyImportSummary {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/import-history.types.ts#L16)
 
+## `well-formed.ts`
+
+Makes record text storable. A JavaScript string can hold an unpaired UTF-16 surrogate (a JSON
+body may escape `\ud800`, and `JSON.parse` keeps it), but DuckDB's JSON column refuses such text
+and with it the whole batch. Each unpaired surrogate becomes U+FFFD, as a UTF-8 encoder writes it.
+
+### wellFormedValue
+
+Replaces unpaired surrogates in every string of a JSON-like value, object keys included.
+
+**Signature**
+
+```ts
+declare const wellFormedValue: <Value>(value: Value) => Value;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/well-formed.ts#L15)
+
 ## `worker-client-effect.ts`
 
 Acquires the optional isolated Node worker and exposes shared structural effects.
@@ -3263,7 +3456,32 @@ declare const inspectorBackend: (
 ) => (request: Request) => Effect.Effect<Response, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L52)
+
+## `tool-collect.ts`
+
+Collects one batch from the connected application session into history. A batch is
+acknowledged to the application only once history holds it, so a batch history could not store
+stays in the application's buffer and the next pull stores it. What still goes missing is
+counted and named: records the store refuses, and a pulled batch whose session ended before
+history could store it.
+
+### collectCurrent
+
+Pulls, stores and acknowledges one batch of the connected session.
+
+**Signature**
+
+```ts
+declare const collectCurrent: (
+  state: InspectorToolStateRef,
+  remote: InspectorRemoteOperations,
+  options: InspectorOptions,
+  stream: ObservabilityStream,
+) => Effect.Effect<false | { backlog: boolean }, InspectionConnectionError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-collect.ts#L26)
 
 ## `tool-history.ts`
 
@@ -3283,20 +3501,62 @@ declare const acquireHistory: (
 ) => Effect.Effect<undefined, InspectionConnectionError, Scope.Scope | InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L13)
 
 ### historyFailureHint
 
-Names the remedy for a locked history database. DuckDB reports the holder's
-PID; only that number is echoed, never the file path or the rest of the message.
+Says what is wrong with the history and what to do. A lock conflict names the other holder:
+DuckDB reports its PID, and only that number is echoed, never the file path or the rest of the
+message. Any other failure is named by its code alone.
 
 **Signature**
 
 ```ts
-declare const historyFailureHint: (error: InspectionConnectionError) => string | undefined;
+declare const historyFailureHint: (
+  error: InspectionConnectionError,
+  owner?: HistoryOwner,
+) => string | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L117)
+
+### historyRoot
+
+The directory that holds a project's history.
+
+**Signature**
+
+```ts
+declare const historyRoot: (options: InspectorOptions) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L91)
+
+### quiet
+
+Runs an operation without log records; its failure is reported once by the collection loop.
+
+**Signature**
+
+```ts
+declare const quiet: <A, E, R>(
+  self: Effect.Effect<A, E, R>,
+) => Effect.Effect<A, E, Exclude<R, never>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L98)
+
+### quietHistory
+
+Wraps history operations so their failures leave no log records of their own.
+
+**Signature**
+
+```ts
+declare const quietHistory: (operations: InspectorHistoryOperations) => InspectorHistoryOperations;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L105)
 
 ### recoverInspection
 
@@ -3311,7 +3571,7 @@ declare const recoverInspection: (
 ) => Effect.Effect<void, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-history.ts#L66)
 
 ## `tool-loop.ts`
 
@@ -3334,7 +3594,7 @@ declare const inspectionLoop: (
 ) => Effect.Effect<never, InspectionConnectionError, Scope | InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L30)
 
 ## `tool-main.ts`
 
@@ -3365,6 +3625,11 @@ export interface InspectorHistoryOwner {
   readonly projectId: string;
   readonly scope: Scope.Closeable;
   readonly operations: InspectorHistoryOperations;
+  /**
+   * Why the worker stopped on its own, such as `history.worker-exited`, or undefined while it
+   * runs. Read on every status request, so a lost worker is reported before the next command.
+   */
+  readonly failure?: () => string | undefined;
 }
 ```
 
@@ -3395,10 +3660,21 @@ export interface InspectorToolState {
   readonly lossKey?: string | undefined;
   readonly producerFailed?: number | undefined;
   readonly producerDropped?: number | undefined;
+  /**
+   * The last batch pulled from an application session and not stored yet, because history
+   * failed. The application keeps it until acknowledged, so a later pull stores it; when the
+   * session ends first, it is lost.
+   */
+  readonly unstored?: InspectorUnstoredBatch | undefined;
+  /**
+   * Records this run of the tool pulled from the application that history does not hold: refused
+   * by the store, or still unstored when their session ended. Counted over the whole run.
+   */
+  readonly historyLost?: number | undefined;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L19)
 
 ### InspectorToolStateRef (type alias)
 
@@ -3410,7 +3686,26 @@ Shared projection is owned by the acquired tool, never module global.
 type InspectorToolStateRef = Ref.Ref<InspectorToolState>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L61)
+
+### InspectorUnstoredBatch (interface)
+
+A pulled batch that history has not stored.
+
+**Signature**
+
+```ts
+export interface InspectorUnstoredBatch {
+  readonly sessionId: string;
+  /** Last sequence stored before it. */
+  readonly after: number;
+  /** Its last sequence. */
+  readonly through: number;
+  readonly records: number;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L51)
 
 ## `tool.service.ts`
 
