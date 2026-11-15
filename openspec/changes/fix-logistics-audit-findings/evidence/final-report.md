@@ -8,7 +8,8 @@ Re-audited 2026-11-15 on packages packed from this change's branch. The baseline
 - **RelKit findings:** 43 recorded (35 at the baseline, 8 found while fixing and re-auditing). 34 are fixed, 7 are fixed with a stated remainder, and 2 are answered by design.
 - **Inspector findings:** 48 recorded. 46 are fixed, 2 are deferred as new capabilities.
 - **Found by the re-audit itself:** 19 Inspector items, and further items from the exploratory run, the command re-run and the review. All are listed below; all are fixed except the ones under "Not fixed".
-- **Not verified on this machine:** the application's own integration suite (59 tests), Linux screenshot baselines, Windows. Reasons are under "Limits".
+- **The application's own suites:** 59 integration and 11 unit tests pass in both copies on the final candidates.
+- **Not verified on this machine:** Linux screenshot baselines, Windows, one clean full run of the browser suite. Reasons are under "Limits".
 
 ## Method
 
@@ -210,7 +211,7 @@ Accepted from the review: a body without `Content-Length` is buffered outside `t
 
 ## The audited application
 
-Its `audit-fixes` branch: the database service uses `@relkit/drizzle/pg` and runs on Node; Better Auth 1.7.7 with the `account.issuer` migration; signed uploads declare type and length; text inputs refuse a NUL character; the constraint mapping reads the code Bun's driver reports; a status change is conditional on the status it read; `@relkit/client` is declared; the README is npm first. Its lockfile is not regenerated, because the candidate packages are not public: it must be regenerated after the release.
+Its `audit-fixes` branch: the database service uses `@relkit/drizzle/pg` and runs on Node; Better Auth 1.7.7 with the `account.issuer` migration; signed uploads declare type and length; text inputs refuse a NUL character; the constraint mapping reads the code Bun's driver reports; a status change is conditional on the status it read; `@relkit/client` is declared; the README is npm first; the upload size test follows the signed-upload behaviour. Its lockfile is not regenerated, because the candidate packages are not public: it must be regenerated after the release.
 
 ## Repository verification
 
@@ -224,6 +225,7 @@ Run on the merged branch with no fix session working. The code commit verified i
 | Inspector browser suite (105 tests, Playwright, macOS) | Every test passes, but no single run was clean: three full runs passed 98, 104 and 100 of 105 with a different set failing each time. The first run's seven included one real defect (the banner, above) and three stale expectations, all corrected; every other failure was a timeout while the machine was loaded by other work, and the six spec files that had any failure pass 50 of 50 when run on their own |
 | Inspector acceptance script (a real browser driven through every action) | passes |
 | Reload recovery probe (a rejected reload and its repair under traffic) | passes: 205 requests, no outage or rollback |
+| The application's own suites, both copies, final candidates | 59 of 59 integration, 11 of 11 unit |
 | `openspec validate fix-logistics-audit-findings --strict` | valid |
 | Generated documentation | current |
 
@@ -233,7 +235,7 @@ The candidates were packed five times. The last round repeated the install compa
 
 ## Limits
 
-- **Application integration suite (59 tests):** not run. The local PostgreSQL server on the audit machine refuses `CREATE DATABASE` because of missing directories in its data folder, which is unrelated to RelKit. The two audit databases created earlier kept working, so the harness ran.
+- **Application integration suite (59 tests):** run last, after the audit machine's PostgreSQL server was repaired (its data folder had lost twelve empty directories, which made `CREATE DATABASE` fail; unrelated to RelKit). 59 of 59 pass in the npm copy and in the Bun copy on the final candidates. One test was corrected first: it expected a file larger than declared to be stored and then discarded at confirm (422), and with signed uploads the store refuses that file, so confirm answers 409 `documents.upload-missing`.
 - **Linux:** the Inspector's screenshot baselines for Linux must be regenerated in CI; only the macOS ones were regenerated and viewed. Every suite above ran on macOS only.
 - **Browser suite:** not one clean full run on the audit machine (see the table); a quiet machine or CI should show one.
 - **Windows:** not tested.
