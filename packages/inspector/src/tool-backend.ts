@@ -12,10 +12,11 @@ import type { InspectorToolState, InspectorToolStateRef } from "./tool-state.typ
 import type { InspectorOptions } from "./options.types.js";
 import { historyResponse, backendError } from "./backend-history.js";
 import { forwardBackend } from "./backend-forward.js";
+import { makeApplicationIdentityJar, type ApplicationIdentityJar } from "./application-identity.js";
 import { ExecutionSuccessLogs } from "relkit/contracts/operation";
 import { publishSelectionState } from "./live-events.js";
 import { crossSiteRefusal } from "./browser-boundary.js";
-import { collectionState, historyFailure, historyReadable } from "./history-state.js";
+import { collectionState, historyError, historyFailure, historyReadable } from "./history-state.js";
 
 /**
  * The Inspector's session with the application, apart from the UI's own stream to the Inspector.
@@ -55,8 +56,10 @@ export function inspectorBackend(
   options: InspectorOptions,
   stream: ObservabilityStream,
 ) {
+  // One anonymous identity with the application for every page of this Inspector.
+  const jar = makeApplicationIdentityJar();
   return (request: Request) => {
-    const served = serveBackend(state, remote, token, options, stream, request).pipe(
+    const served = serveBackend(state, remote, token, options, stream, request, jar).pipe(
       Effect.catchTag("InspectionConnectionError", (error) =>
         Effect.succeed(
           backendError(
@@ -90,6 +93,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
   options: InspectorOptions,
   stream: ObservabilityStream,
   request: Request,
+  jar: ApplicationIdentityJar,
 ) {
   const expected = Buffer.from(token);
   const received = Buffer.from(request.headers.get("x-relkit-inspector-token") ?? "");
@@ -126,7 +130,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
         : "Inspector disconnected",
       503,
     );
-  return yield* forwardBackend(remote, current.selection.connection, request, options.target);
+  return yield* forwardBackend(remote, current.selection.connection, request, options.target, jar);
 });
 
 /**
@@ -165,15 +169,19 @@ function backendStatus(
         connection: current.selection.state,
         application: applicationStatus(current),
         // Pages read any `error` as a history failure, so an application's failure is apart.
-        error: current.error && historyFailure(current.error) ? current.error : undefined,
+        error: historyError(current),
         applicationError:
           current.error && !historyFailure(current.error) ? current.error : undefined,
-        incomplete: current.incomplete,
+        // A record this run of the tool could not store keeps history incomplete for the run.
+        incomplete: current.incomplete || (current.historyLost ?? 0) > 0,
         recordsLostBeforeHistory: {
           // Records the application's producer could not hand to its inspection buffer.
           byApplicationProducer: current.producerDropped ?? 0,
           // Records the application's inspection buffer evicted before the Inspector stored them.
           byInspectionBuffer: current.droppedRecords,
+          // Records the Inspector collected that its history did not store: refused by the
+          // store, or still unstored when their session ended. Counted over the tool's run.
+          byHistoryStore: current.historyLost ?? 0,
         },
         // Invalidations the tool's stream dropped for a slow interface; no record is lost.
         missedLiveUpdates: stream.counters().subscriberDropped,
@@ -190,7 +198,9 @@ function backendStatus(
       { state: current.selection.state },
       {
         status:
-          current.selection.state === "connected" && current.history && current.error === undefined
+          current.selection.state === "connected" &&
+          historyReadable(current) &&
+          current.error === undefined
             ? 200
             : 503,
       },

@@ -14,8 +14,8 @@ describe("a refused channel connection", () => {
   test("says the application refused or concealed a channel that exists", () => {
     const text = channelFailure(new RpcError("NOT_FOUND", "Channel resource was not found."));
     expect(text).toContain("refused or concealed");
-    expect(text).toContain("this browser's session for the application's origin");
-    expect(text).toContain("signed in to the application in this browser");
+    expect(text).toContain("anonymous visitor without a user session");
+    expect(text).not.toContain("this browser");
   });
 
   test("says that a missing session was refused", () => {

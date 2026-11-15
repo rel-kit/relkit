@@ -14,7 +14,7 @@ const entry = {
   record: {
     version: 2 as const,
     signal: "log" as const,
-    timestamp: "2026-10-23T00:00:00.000Z",
+    timestamp: new Date().toISOString(),
     level: "info" as const,
     component: "app",
     message: "preserve",

@@ -6,10 +6,9 @@ import type { InspectorDiscoveryOperations, InspectorSelection } from "./discove
 import type { InspectorRemoteOperations } from "./remote.types.js";
 import type { InspectorOptions } from "./options.types.js";
 import type { InspectorToolStateRef } from "./tool-state.types.js";
-import { collectInspectionBatch } from "./collector.js";
+import { collectCurrent } from "./tool-collect.js";
 import type { ObservabilityStream } from "relkit/observability";
 import {
-  publishCollection,
   publishSelection,
   publishSelectionState,
   selectionKey,
@@ -19,7 +18,6 @@ import {
   acquireHistory,
   historyFailureHint,
   historyRoot,
-  quietHistory,
   recoverInspection,
 } from "./tool-history.js";
 import { readHistoryOwner } from "./history-owner.js";
@@ -157,41 +155,4 @@ const applySelection = Effect.fn("Inspector.applySelection")(function* (
           ? value.lastSession
           : { sessionId: stopped, stoppedAt: now },
   }));
-});
-
-/** A durable receipt advances state only after collection and acknowledgement complete. */
-const collectCurrent = Effect.fn("Inspector.collectCurrent")(function* (
-  state: InspectorToolStateRef,
-  remote: InspectorRemoteOperations,
-  options: InspectorOptions,
-  stream: ObservabilityStream,
-) {
-  const current = yield* Ref.get(state);
-  if (current.selection.state !== "connected" || !current.history) return false;
-  const sessionId = current.selection.connection.descriptor.sessionId;
-  const after = sessionId === current.sessionId ? current.through : 0;
-  const batch = yield* collectInspectionBatch(
-    remote,
-    quietHistory(current.history.operations),
-    current.selection.connection,
-    after,
-    options.target,
-    current.lossKey,
-    sessionId === current.sessionId ? current.droppedRecords : 0,
-  );
-  publishCollection(stream, batch.changes);
-  yield* Ref.update(state, (value) => ({
-    ...value,
-    sessionId,
-    through: batch.through,
-    error: undefined,
-    // A gap is reported by one batch only; the records it skipped stay missing for the session.
-    incomplete:
-      batch.incomplete || batch.gap || (value.sessionId === sessionId && value.incomplete),
-    droppedRecords: batch.droppedRecords,
-    lossKey: batch.lossKey,
-    producerFailed: batch.producerFailed,
-    producerDropped: batch.producerDropped,
-  }));
-  return { backlog: batch.backlog };
 });

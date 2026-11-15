@@ -156,8 +156,8 @@ export function ChannelLiveConsole({ channel }: { readonly channel: InspectorObj
             onChange={(event) => setParams(event.target.value)}
           />
           <small className="text-[11px] leading-4 text-muted-foreground">
-            Starts from the parameters this channel declares. The connection uses this browser’s
-            session for the application, if you are signed in.
+            Starts from the parameters this channel declares. The Inspector connects as an anonymous
+            visitor, without this browser’s cookies or a user session.
           </small>
         </label>
         <div className="flex flex-wrap items-center gap-2">

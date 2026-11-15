@@ -17,6 +17,13 @@ export const acquireHistory = Effect.fn("Inspector.acquireHistory")(function* (
 ) {
   const current = yield* Ref.get(state);
   if (current.history) {
+    // A worker that stopped on its own is replaced through the loop's recovery and backoff.
+    const stopped = current.history.failure?.();
+    if (stopped !== undefined)
+      return yield* new InspectionConnectionError({
+        operation: stopped,
+        cause: new Error("The history worker stopped"),
+      });
     if (
       current.selection.state === "connected" &&
       current.history.projectId !== current.selection.connection.descriptor.projectId
@@ -35,8 +42,11 @@ export const acquireHistory = Effect.fn("Inspector.acquireHistory")(function* (
   if (projectId === undefined) return;
   const scope = yield* Scope.fork(yield* Effect.scope);
   const root = historyRoot(options);
+  let stopped: string | undefined;
   // A refused opening is reported once by the loop; its own failure record would repeat it.
-  const operations = yield* InspectorHistory.make(root, projectId).pipe(
+  const operations = yield* InspectorHistory.make(root, projectId, () => {
+    stopped = "history.worker-exited";
+  }).pipe(
     quiet,
     Scope.provide(scope),
     Effect.onExit((exit) => (Exit.isSuccess(exit) ? Effect.void : Scope.close(scope, exit))),
@@ -44,7 +54,12 @@ export const acquireHistory = Effect.fn("Inspector.acquireHistory")(function* (
   // Another Inspector for this project that cannot open the history reads who holds it here.
   yield* publishHistoryOwner(root, options);
   yield* Scope.addFinalizer(scope, removeHistoryOwner(root));
-  yield* Ref.update(state, (value) => ({ ...value, history: { projectId, scope, operations } }));
+  yield* Ref.update(state, (value) => ({
+    ...value,
+    history: { projectId, scope, operations, failure: () => stopped },
+    // The failure that closed the previous history is over; one of the application stays.
+    error: value.error?.startsWith("history.") ? undefined : value.error,
+  }));
 });
 
 /** Recovery detaches unavailable history and its connection fence before awaiting a slow close. */
