@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   asInputSchema,
   fieldRequirement,
+  requiredKeys,
   schemaFields,
   schemaInput,
   schemaTemplate,
@@ -111,6 +112,11 @@ describe("forms read the input schema", () => {
       jsonSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
     };
     expect(schemaFields(decoded).map((field) => field.required)).toEqual([true]);
+  });
+
+  test("the keys a caller must send leave out the ones with a default", () => {
+    expect(requiredKeys(withDefault.jsonSchema)).toEqual(["id"]);
+    expect(requiredKeys(undefined)).toEqual([]);
   });
 
   test("describes a field's requirement, with its default when it has one", () => {

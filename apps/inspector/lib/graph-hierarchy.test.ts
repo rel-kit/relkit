@@ -182,23 +182,24 @@ describe("graph views", () => {
   });
 
   test("a bucket a domain owns is a node of its own, linked to the domain (IN-45)", () => {
-    const withBucket = normalizeGraphResponse({
-      ...payload,
-      graph: {
-        ...payload.graph,
-        nodes: [
-          ...payload.graph.nodes,
-          { id: "trips.photos", kind: "bucket", domainId: "trips", label: "photos" },
-        ],
-        edges: [
-          ...payload.graph.edges,
-          { kind: "uses-bucket", from: "trips.create-trip", to: "trips.photos" },
-        ],
-      },
-    } as InspectorGraph);
-    const view = architectureView(buildHierarchy(withBucket));
-    const bucket = view.nodes.find((node) => node.id === "trips.photos");
-    expect(bucket).toMatchObject({ title: "photos", domainId: "trips" });
+    const base = payload.graph as { nodes: unknown[]; edges: unknown[] };
+    const graphWith = (nodes: unknown[], edges: unknown[] = []) =>
+      normalizeGraphResponse({
+        ...payload,
+        graph: { ...base, nodes: [...base.nodes, ...nodes], edges: [...base.edges, ...edges] },
+      } as InspectorGraph);
+    const view = architectureView(
+      buildHierarchy(
+        graphWith(
+          [{ id: "trips.photos", kind: "bucket", domainId: "trips", label: "photos" }],
+          [{ kind: "uses-bucket", from: "trips.create-trip", to: "trips.photos" }],
+        ),
+      ),
+    );
+    expect(view.nodes.find((node) => node.id === "trips.photos")).toMatchObject({
+      title: "photos",
+      domainId: "trips",
+    });
     expect(view.edges.find((edge) => edge.id === "trips->trips.photos")).toMatchObject({
       from: "trips",
       to: "trips.photos",
@@ -206,17 +207,11 @@ describe("graph views", () => {
     // The domain card no longer lists the bucket it now points at.
     expect(view.nodes.find((node) => node.id === "trips")?.resources).toBeUndefined();
 
-    const unused = normalizeGraphResponse({
-      ...payload,
-      graph: {
-        ...payload.graph,
-        nodes: [
-          ...payload.graph.nodes,
-          { id: "trips.exports", kind: "bucket", domainId: "trips", label: "exports" },
-        ],
-      },
-    } as InspectorGraph);
-    const linked = architectureView(buildHierarchy(unused));
+    const linked = architectureView(
+      buildHierarchy(
+        graphWith([{ id: "trips.exports", kind: "bucket", domainId: "trips", label: "exports" }]),
+      ),
+    );
     expect(linked.edges.some((edge) => edge.id === "trips->trips.exports")).toBe(true);
   });
 

@@ -6,7 +6,7 @@
 import type { ReactNode } from "react";
 import { Section } from "../components/blocks/section";
 import { CopyButton } from "../components/blocks/copy-button";
-import { schemaRecord, schemaStrings, schemaText, unwrapSchema } from "../lib/schema-model";
+import { requiredKeys, schemaRecord, schemaText, unwrapSchema } from "../lib/schema-model";
 import { cn } from "../lib/utils";
 
 type SchemaRecord = Record<string, unknown>;
@@ -80,11 +80,7 @@ function SchemaNode({ value, depth }: { readonly value: unknown; readonly depth:
     return (
       <>
         <SchemaSummary schema={schema} />
-        <PropertyRows
-          properties={properties}
-          required={schemaStrings(schema.required)}
-          depth={depth}
-        />
+        <PropertyRows properties={properties} required={requiredKeys(schema)} depth={depth} />
       </>
     );
   }
@@ -151,11 +147,7 @@ function PropertyRows({
               <code className="min-w-0 truncate bg-transparent p-0 font-mono text-xs text-foreground">
                 {name}
               </code>
-              {requiredSet.has(name) && property.default === undefined ? (
-                <Mark tone="strong">required</Mark>
-              ) : (
-                <Mark>optional</Mark>
-              )}
+              {requiredSet.has(name) ? <Mark tone="strong">required</Mark> : <Mark>optional</Mark>}
               <span className="ml-auto min-w-0 shrink-0 pl-2 text-right">
                 <TypeLabel schema={property} />
               </span>
@@ -376,7 +368,7 @@ function nestedProperties(
 ): { properties: SchemaRecord; required: readonly string[] } | undefined {
   const properties = schemaRecord(schema.properties);
   if (properties && Object.keys(properties).length > 0)
-    return { properties, required: schemaStrings(schema.required) };
+    return { properties, required: requiredKeys(schema) };
   const items = schemaRecord(unwrapSchema(schema.items));
   if (items) return nestedProperties(items);
   for (const branch of branchList(schema) ?? []) {

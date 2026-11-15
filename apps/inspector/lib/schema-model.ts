@@ -30,6 +30,14 @@ export function schemaFields(value: unknown): readonly SchemaField[] {
   });
 }
 
+/** The properties a caller must send: listed as required and without a default. */
+export function requiredKeys(schema: SchemaRecord | undefined): readonly string[] {
+  const properties = schemaRecord(schema?.properties);
+  return schemaStrings(schema?.required).filter(
+    (key) => schemaRecord(unwrapSchema(properties?.[key]))?.default === undefined,
+  );
+}
+
 /** "required", "optional", or "optional · default <value>" for a field that has a default. */
 export function fieldRequirement(field: {
   readonly required: boolean;
