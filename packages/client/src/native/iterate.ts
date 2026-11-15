@@ -57,7 +57,11 @@ export async function* iterateNative<A>(
  */
 export function abortable<A>(promise: PromiseLike<A>, signal: AbortSignal | undefined): Promise<A> {
   if (signal === undefined) return Promise.resolve(promise);
-  if (signal.aborted) return Promise.reject(signal.reason);
+  if (signal.aborted) {
+    // The work is given up, not awaited: its own rejection must not surface as unhandled.
+    Promise.resolve(promise).then(undefined, () => undefined);
+    return Promise.reject(signal.reason);
+  }
   return new Promise<A>((resolve, reject) => {
     const abort = (): void => reject(signal.reason);
     signal.addEventListener("abort", abort, { once: true });

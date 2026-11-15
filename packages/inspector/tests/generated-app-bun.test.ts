@@ -8,9 +8,12 @@ import {
   toolReply,
 } from "../../../tests/fixtures/inspector/generated-app.js";
 
-/** Reads generated application storage ownership from the actual compiled bundle. */
+/**
+ * Reads generated application storage ownership from the generation's server entry. Development
+ * runs `server/index.ts` directly; only a build bundles it into `server/index.js`.
+ */
 async function assertLeanBundle(directory: string) {
-  const bundle = await readFile(join(directory, "server/index.js"), "utf8");
+  const bundle = await readFile(join(directory, "server/index.ts"), "utf8");
   expect(bundle).not.toContain("duckdb.node");
   expect(bundle).not.toContain("@duckdb/node-api");
 }
@@ -35,6 +38,7 @@ test("generated requests retain correlated logs and traces across app reload and
         cursor: string;
         component: string;
         level: string;
+        fields?: { path?: string; status?: number };
       }[];
     };
     const appLog = page.items.find((item) => item.message === "hello invoked")!;
@@ -42,9 +46,19 @@ test("generated requests retain correlated logs and traces across app reload and
     expect(await toolReply(tool, `/_relkit/v1/traces/${appLog.traceId}`, appLog.spanId!)).toContain(
       appLog.spanId!,
     );
-    for (const level of ["info", "warn"])
+    // Both request lines are retained; a 404 no route answered is logged at info, like a 200.
+    for (const [path, status] of [
+      ["/hello", 200],
+      ["/missing-route", 404],
+    ] as const)
       expect(
-        page.items.some((item) => item.component === "runtime.http" && item.level === level),
+        page.items.some(
+          (item) =>
+            item.component === "runtime.http" &&
+            item.level === "info" &&
+            item.fields?.path === path &&
+            item.fields.status === status,
+        ),
       ).toBe(true);
     const identity = f.session.inspectionConnection!.descriptor;
     expect(await f.session.notifySourceChange(1, ["src/platform/env.ts"])).toBe(true);
