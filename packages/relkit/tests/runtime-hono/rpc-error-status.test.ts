@@ -106,7 +106,7 @@ async function subscribeAs(identityScope: string) {
   return { response, provider };
 }
 
-test("a realtime subscription with a stale identity scope answers 409 before opening", async () => {
+test("a realtime subscribe call with a stale identity scope answers 409 before opening", async () => {
   const { response, provider } = await subscribeAs("someone-else");
   expect(response.status).toBe(409);
   expect(await response.text()).toContain("IDENTITY_PRECONDITION_FAILED");

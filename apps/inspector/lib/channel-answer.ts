@@ -7,7 +7,7 @@ export function channelParamsText(paramsSchema: unknown): string {
 
 /**
  * Puts a failed channel connection into words. The browser connects straight to the application
- * with this browser's session, and the application answers a denied subscription as `NOT_FOUND`
+ * with this browser's session, and the application answers a denied subscribe call as `NOT_FOUND`
  * so that it does not confirm that the channel exists.
  * @param cause - The failure thrown by the application client.
  * @returns A sentence for the page.

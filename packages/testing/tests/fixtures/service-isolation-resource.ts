@@ -28,5 +28,7 @@ export const auth = defineBetterAuthService({
   baseURL: "http://relkit.test",
   secret: "testing-isolated-auth-owner-secret-at-least-32-bytes",
   emailAndPassword: { enabled: true },
+  // This fixture declares no account tables and sends only session reads.
+  advanced: { database: { validateSchema: false } },
 });
 export const authRoute = defineRoute({ handler: auth.handler });

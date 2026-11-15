@@ -36,7 +36,7 @@ export function createClientTransport(select: TransportSelection): ClientTranspo
         const link = await abortable(selected(), signal);
         signal.throwIfAborted();
         const output = await link.call(path, input, { ...options, signal });
-        // A subscription outlives this call; its reads must still end when the call aborts.
+        // A channel stream outlives this call; its reads must still end when the call aborts.
         return isAsyncIterator(output) ? abortableIterator(output, signal) : output;
       }, options.signal),
     close: () => owner.close(),

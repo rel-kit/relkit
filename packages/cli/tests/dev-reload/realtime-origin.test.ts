@@ -85,7 +85,7 @@ afterAll(async () => {
   fixture.remove();
 }, 60_000);
 
-/** A frame of the subscription stream. */
+/** A frame of the channel stream. */
 interface Frame {
   readonly kind: string;
   readonly event?: { readonly name?: string; readonly payload?: unknown };

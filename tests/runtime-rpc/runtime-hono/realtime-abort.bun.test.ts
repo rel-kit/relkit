@@ -13,7 +13,7 @@ beforeAll(async () => {
 afterAll(() => server.close());
 
 test(
-  "a Bun subscription ends promptly when aborted after a replay and a live event",
+  "a Bun channel stream ends promptly when aborted after a replay and a live event",
   async () => {
     for (let run = 0; run < repetitions; run++) {
       const outcome = await abortAfterReplayAndLive(server);

@@ -1,5 +1,5 @@
 /**
- * Shared scenario for a realtime subscription that the caller aborts after a replay and a live
+ * Shared scenario for a realtime channel stream that the caller aborts after a replay and a live
  * event, served over real HTTP so the runtime's own `fetch` carries the event stream.
  */
 import { mkdtemp, rm } from "node:fs/promises";
@@ -16,7 +16,7 @@ import {
 } from "../../../packages/relkit/tests/runtime-hono/fixtures/channel-plan.ts";
 import { createFixtureClient } from "./fixture-client.js";
 
-/** Outcome of one aborted subscription. */
+/** Outcome of one aborted channel stream. */
 export interface AbortOutcome {
   /** Milliseconds between the abort and the end of `for await`. */
   readonly endedAfterMs: number;
@@ -54,13 +54,13 @@ export async function startRealtimeServer(serve: RuntimeAdapter["serve"]) {
     },
     realtime: { applicationId: "fixture", environment: "test", provider: () => provider },
   });
-  // The server's view of each subscription: its request signal aborts when the client lets go.
-  const subscriptions: AbortSignal[] = [];
+  // The server's view of each subscribe request: its request signal aborts when the client lets go.
+  const subscribeSignals: AbortSignal[] = [];
   const server = await serve({
     hostname: "127.0.0.1",
     port: 0,
     fetch: (request) => {
-      if (request.url.endsWith("/relkit.realtime.subscribe")) subscriptions.push(request.signal);
+      if (request.url.endsWith("/relkit.realtime.subscribe")) subscribeSignals.push(request.signal);
       return app.fetch(request);
     },
   });
@@ -83,7 +83,7 @@ export async function startRealtimeServer(serve: RuntimeAdapter["serve"]) {
     await server.stop(true);
     await rm(root, { recursive: true, force: true });
   };
-  return { baseUrl: `http://127.0.0.1:${server.port}`, publish, close, subscriptions };
+  return { baseUrl: `http://127.0.0.1:${server.port}`, publish, close, subscribeSignals };
 }
 
 /**
@@ -133,7 +133,7 @@ export async function abortAfterReplayAndLive(
     if (!caller.signal.aborted) throw error;
   }
   const endedAt = performance.now();
-  const request = server.subscriptions.at(-1);
+  const request = server.subscribeSignals.at(-1);
   while (request?.aborted === false && performance.now() - endedAt < 2_000)
     await new Promise((resolve) => setTimeout(resolve, 5));
   return {

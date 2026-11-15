@@ -78,7 +78,7 @@ export function abortable<A>(promise: PromiseLike<A>, signal: AbortSignal | unde
  * Ties an async iterator to a signal: an abort settles a pending `next()` with the signal's
  * reason and returns the source, so iteration ends even when the source misses the abort.
  * @typeParam A - Item type.
- * @param source - Iterator one request owns, such as a subscription's event stream.
+ * @param source - Iterator one request owns, such as a channel's event stream.
  * @param signal - Abort that ends the iteration and releases the source.
  * @returns An iterator over the same items; the source is returned at most once.
  * @example for await (const frame of abortableIterator(stream, signal)) use(frame);

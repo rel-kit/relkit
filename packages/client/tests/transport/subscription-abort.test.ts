@@ -44,7 +44,7 @@ function within<A>(promise: Promise<A>, ms: number): Promise<A | "timeout"> {
   ]);
 }
 
-it("a subscription ends promptly when its caller aborts during a pending read", async () => {
+it("a channel stream ends promptly when its caller aborts during a pending read", async () => {
   const frames = [
     { kind: "event", event: "changed", payload: { value: 1 } },
     { kind: "caught-up" },

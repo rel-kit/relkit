@@ -20,8 +20,8 @@ export function realtimeProcedures(
     "relkit.realtime.subscribe": os
       .$context<RpcContext>()
       .handler(async ({ input, context, signal }) => {
-        const subscription = input as SubscribeInput | undefined;
-        await assertExpectedIdentity(context, clientIdentity, subscription?.expectedIdentity);
+        const subscribeInput = input as SubscribeInput | undefined;
+        await assertExpectedIdentity(context, clientIdentity, subscribeInput?.expectedIdentity);
         return observeRealtime(input as SubscribeInput, context, options, signal);
       }),
     "relkit.realtime.presence": os
