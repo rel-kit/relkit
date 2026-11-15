@@ -27,6 +27,8 @@ export interface ServedRevision {
 
 /** A running `relkit dev`. */
 export interface DevProcess {
+  /** Public origin of the development front, such as `http://127.0.0.1:51234`. */
+  readonly origin: string;
   /**
    * Requests a route.
    * @param path - Route path.
@@ -34,11 +36,12 @@ export interface DevProcess {
    */
   readonly get: (path: string) => Promise<ServedRevision | undefined>;
   /**
-   * Sends a GET request and returns the raw response, whatever its status.
+   * Sends a request (GET unless `init` says otherwise) and returns the raw response, whatever its status.
    * @param path - Route path.
+   * @param init - Optional method, headers and body.
    * @returns The response.
    */
-  readonly request: (path: string) => Promise<Response>;
+  readonly request: (path: string, init?: RequestInit) => Promise<Response>;
   /**
    * Polls a route until it serves a message.
    * @param path - Route path.
