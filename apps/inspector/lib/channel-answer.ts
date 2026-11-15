@@ -1,3 +1,4 @@
+import { STALE_GENERATION_TEXT } from "./action-answer";
 import { schemaTemplate } from "./schema-model";
 
 /** The text a channel's params box starts with: its declared required parameters, filled in. */
@@ -18,6 +19,9 @@ export function channelFailure(cause: unknown): string {
     return "The application refused or concealed this channel. The Inspector connects with this browser's session for the application's origin, and there is none unless you are signed in to the application in this browser.";
   if (code === "UNAUTHORIZED")
     return "The application refused this connection: no session is attached. The Inspector connects with this browser's session for the application's origin, so sign in to the application in this browser first.";
+  // The application's bare "Conflict" (409) is its answer to a call made for a generation that a
+  // reload has replaced; any longer message says something specific and is kept.
+  if (cause instanceof Error && cause.message === "Conflict") return STALE_GENERATION_TEXT;
   return cause instanceof Error && cause.message !== ""
     ? cause.message
     : "Channel operation failed.";

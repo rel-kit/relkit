@@ -1,3 +1,6 @@
+/** The code of the tool's 409 for a mutation that names an older generation. */
+export const STALE_GENERATION = "generation.stale";
+
 /** Browser controls use the generation the user observed; explicit action identities win. */
 export function observedGeneration<Value>(value: Value): string | undefined {
   return value !== null &&

@@ -1,4 +1,5 @@
 import { InspectorApiError } from "./api-types";
+import { isStaleGeneration } from "./inspector-actions";
 import { BARE_FORBIDDEN_TEXT, ORIGIN_DENIED, ORIGIN_DENIED_TEXT } from "./origin-denied";
 import { issueProblem, type ValidationIssue } from "./request-failure";
 
@@ -67,6 +68,8 @@ const NO_SESSION =
   "The application refused this call (401): no user session is attached. Inspector invocations run without a session, so functions that require one can only be invoked through the application.";
 const ACCESS_DENIED =
   "The application refused this call (403): its access rule does not allow a call without a user session. Inspector invocations run without a session, so functions with an access rule can only be invoked through the application.";
+/** The page was loaded before the application reloaded; also shown when the one retry failed too. */
+export const STALE_GENERATION_TEXT = "The application reloaded since this page loaded. Try again.";
 const CAUSE_HINT = "Open the request in Requests to see the cause.";
 
 /**
@@ -85,6 +88,8 @@ export function actionAnswer(
   const cause = actionCause(error);
   if (cause !== undefined) return fromCause(cause, subject);
   // The application's own problem answer, such as its origin check, is not an Inspector envelope.
+  if (isStaleGeneration(error))
+    return { text: STALE_GENERATION_TEXT, noSession: false, sent: false };
   if (error instanceof InspectorApiError && error.body?.code === ORIGIN_DENIED)
     return { text: ORIGIN_DENIED_TEXT, noSession: false, sent: true };
   if (error instanceof InspectorApiError && error.code === "HTTP_403" && error.body === undefined)

@@ -19,7 +19,7 @@ import {
 import { assertEnvelope, isEnvelope } from "./api-validation";
 import { resolveBackendUrl } from "./backend-url";
 import { invokeInspectorRouteStream } from "./api-methods";
-import { mutationGeneration, observedGeneration } from "./api-generation";
+import { mutationGeneration, observedGeneration, STALE_GENERATION } from "./api-generation";
 import type {
   RouteInvocationInput,
   RouteInvocationResult,
@@ -43,7 +43,9 @@ function failure(
   responseProtocols: InspectorRequestOptions["responseProtocols"],
 ): InspectorApiError {
   const envelope = isEnvelope(payload, ["relkit.inspector", ...(responseProtocols ?? [])]);
-  const code = envelope ? errorCode(payload) : undefined;
+  // The tool refuses a mutation for an older generation before it reaches the application, in a
+  // body that is not an envelope; the page needs the code to tell it from any other 409.
+  const code = envelope ? errorCode(payload) : staleCode(payload);
   const named = code ?? `HTTP_${response.status}`;
   const message =
     envelope && typeof payload.message === "string" && payload.message !== ""
@@ -56,6 +58,10 @@ function failure(
     "http",
     envelope ? payload : problemDetails(payload),
   );
+}
+
+function staleCode(payload: unknown): string | undefined {
+  return errorCode(payload) === STALE_GENERATION ? STALE_GENERATION : undefined;
 }
 
 /**
