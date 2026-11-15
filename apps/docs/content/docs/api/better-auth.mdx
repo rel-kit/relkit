@@ -234,6 +234,67 @@ Projects native SDK callables through the existing admitted auth service.
 
 Preserves auth failures, mixed causes and native leases at the Promise boundary.
 
+## `auth-schema.ts`
+
+Runs Better Auth's own schema check while auth starts and reports a mismatch as one coded failure.
+Better Auth only logs a mismatch at startup and then rejects every authentication request; RelKit
+stops activation instead, naming each table and column and the change that resolves it.
+
+### AUTH_SCHEMA_MISMATCH
+
+Code RelKit reports when the project's schema cannot hold what Better Auth writes.
+
+**Signature**
+
+```ts
+declare const AUTH_SCHEMA_MISMATCH: "RELKIT_AUTH_SCHEMA_MISMATCH";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth-schema.ts#L11)
+
+### AuthSchemaFinding (interface)
+
+One problem Better Auth's schema check found, as its `SchemaMismatchError.findings` holds it.
+
+**Signature**
+
+```ts
+export interface AuthSchemaFinding {
+  /** `missing-table`, `missing-column` or `unexpected-required-column`. */
+  readonly kind: string;
+  /** Table name as the adapter addresses it (the Drizzle export name). */
+  readonly table: string;
+  /** Column name for column findings; absent for a missing table. */
+  readonly column?: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth-schema.ts#L14)
+
+### AuthSchemaMismatchError (class)
+
+The project's schema does not match the installed Better Auth release; auth did not start.
+
+**Signature**
+
+```ts
+declare class AuthSchemaMismatchError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth-schema.ts#L24)
+
+### checkAuthSchema
+
+Awaits the schema check Better Auth registered for its adapter, when it has one.
+
+**Signature**
+
+```ts
+declare const checkAuthSchema: (context: object) => Effect.Effect<void, AuthFailure, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth-schema.ts#L40)
+
 ## `auth.errors.ts`
 
 ### AuthFailure (class)
@@ -344,7 +405,7 @@ Native auth service; each method admits DB work and retains SDK completion.
 declare class AuthService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L25)
 
 ### authLiveLayer
 
@@ -362,7 +423,7 @@ declare const authLiveLayer: (
 ) => Layer.Layer<AuthService, AuthFailure | DrizzleFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L169)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L172)
 
 ### authServiceLayer
 
@@ -389,7 +450,7 @@ declare const authServiceLayer: (
 ) => Layer.Layer<AuthService, AuthFailure | DrizzleFailure, AuthFactory>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.service.ts#L45)
 
 ## `auth.types.ts`
 
@@ -1033,11 +1094,38 @@ declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L22)
 
+## `openapi-nullable.ts`
+
+Better Auth describes optional values with the OpenAPI 3.0 keyword `nullable: true`. RelKit's
+document is OpenAPI 3.1, where that keyword does not exist: a validator reads `type: "string"`
+and rejects the `null` the server sends (`user.image` of a new account). This converts the 3.0
+form to the 3.1 form, `type: ["string", "null"]`.
+
+### nullableToType
+
+Rewrites every `nullable` keyword in a JSON document to its OpenAPI 3.1 equivalent.
+
+**Example**
+
+```ts
+nullableToType({ type: "string", nullable: true }); // { type: ["string", "null"] }
+```
+
+**Signature**
+
+```ts
+declare const nullableToType: (value: JsonValue) => JsonValue;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-nullable.ts#L21)
+
 ## `openapi-projection.ts`
 
 Validates native schema JSON, prefixes mounted paths and component identities,
-and removes token requirements from browser-session documentation. This pure
-projection is called by AuthOpenApi; malformed metadata throws at that adapter.
+and removes token requirements from browser-session documentation. It also makes the document
+true to what the endpoints send: OpenAPI 3.1 nullability, the success answers the SDK's generator
+describes wrongly, and the oversize and media-type answers. This pure projection is called by
+AuthOpenApi; malformed metadata throws at that adapter.
 
 ### projectAuthOpenApi
 
@@ -1053,7 +1141,7 @@ TypeError When the metadata is not JSON or lacks paths.
 declare const projectAuthOpenApi: <Input>(document: Input, basePath?: string) => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-projection.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-projection.ts#L20)
 
 ## `openapi-query.ts`
 
@@ -1106,6 +1194,24 @@ declare const documentQueryParameters: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-query.ts#L30)
+
+## `openapi-responses.ts`
+
+Corrects the responses Better Auth's generator gets wrong and adds the answers its operations
+send that it does not declare. Each correction was read from the SDK's source and applies only
+when the document still holds the wrong form, so a release that fixes it is left alone.
+
+### correctAuthResponses
+
+Applies the corrections to an already mounted and renamed document.
+
+**Signature**
+
+```ts
+declare const correctAuthResponses: (document: JsonObject, basePath: string) => JsonObject;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/openapi-responses.ts#L73)
 
 ## `openapi.ts`
 

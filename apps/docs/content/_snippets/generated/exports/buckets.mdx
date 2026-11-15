@@ -1,6 +1,6 @@
 ## Public imports
 
-- `relkit/buckets` — 48 exports
+- `relkit/buckets` — 57 exports
 
 ## All exported APIs
 
@@ -12,6 +12,7 @@ Names link to their complete contracts. Re-exports share their original contract
 | [asProviderEffect](/docs/api/buckets#asprovidereffect)                                 | Value | `relkit/buckets` | [API example](/docs/api/buckets#asprovidereffect)                     |
 | [assertBucketDescriptor](/docs/api/buckets#assertbucketdescriptor)                     | Value | `relkit/buckets` | [API example](/docs/api/buckets#assertbucketdescriptor)               |
 | [assertBucketDescriptorEffect](/docs/api/buckets#assertbucketdescriptoreffect)         | Value | `relkit/buckets` | [API example](/docs/api/buckets#assertbucketdescriptoreffect)         |
+| [assertWriteUrlAllowed](/docs/api/buckets#assertwriteurlallowed)                       | Value | `relkit/buckets` | [API example](/docs/api/buckets#assertwriteurlallowed)                |
 | [BucketBridgeOptions](/docs/api/buckets#bucketbridgeoptions-interface)                 | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketbridgeoptions-interface)        |
 | [BucketCapabilities](/docs/api/buckets#bucketcapabilities-interface)                   | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketcapabilities-interface)         |
 | [BucketCapability](/docs/api/buckets#bucketcapability-type-alias)                      | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketcapability-type-alias)          |
@@ -30,6 +31,9 @@ Names link to their complete contracts. Re-exports share their original contract
 | [BucketOperationObservation](/docs/api/buckets#bucketoperationobservation-interface)   | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketoperationobservation-interface) |
 | [BucketOperationOutcome](/docs/api/buckets#bucketoperationoutcome-type-alias)          | Type  | `relkit/buckets` | [Module example](/docs/modules/storage/define)                        |
 | [BucketOperationTimeoutError](/docs/api/buckets#bucketoperationtimeouterror-class)     | Value | `relkit/buckets` | [API example](/docs/api/buckets#bucketoperationtimeouterror-class)    |
+| [BucketPolicy](/docs/api/buckets#bucketpolicy-interface)                               | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketpolicy-interface)               |
+| [BucketPolicyError](/docs/api/buckets#bucketpolicyerror-class)                         | Value | `relkit/buckets` | [API example](/docs/api/buckets#bucketpolicyerror-class)              |
+| [bucketPolicyViolation](/docs/api/buckets#bucketpolicyviolation)                       | Value | `relkit/buckets` | [API example](/docs/api/buckets#bucketpolicyviolation)                |
 | [BucketProvider](/docs/api/buckets#bucketprovider-interface)                           | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketprovider-interface)             |
 | [BucketProviderError](/docs/api/buckets#bucketprovidererror-class)                     | Value | `relkit/buckets` | [API example](/docs/api/buckets#bucketprovidererror-class)            |
 | [BucketProviderFailureError](/docs/api/buckets#bucketproviderfailureerror-class)       | Value | `relkit/buckets` | [API example](/docs/api/buckets#bucketproviderfailureerror-class)     |
@@ -40,6 +44,7 @@ Names link to their complete contracts. Re-exports share their original contract
 | [BucketTelemetryLive](/docs/api/buckets#buckettelemetrylive)                           | Value | `relkit/buckets` | [API example](/docs/api/buckets#buckettelemetrylive)                  |
 | [BucketValidationError](/docs/api/buckets#bucketvalidationerror-class)                 | Value | `relkit/buckets` | [API example](/docs/api/buckets#bucketvalidationerror-class)          |
 | [BucketVisibility](/docs/api/buckets#bucketvisibility-type-alias)                      | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketvisibility-type-alias)          |
+| [BucketWriteUrlOptions](/docs/api/buckets#bucketwriteurloptions-interface)             | Type  | `relkit/buckets` | [API example](/docs/api/buckets#bucketwriteurloptions-interface)      |
 | [createBucketClient](/docs/api/buckets#createbucketclient)                             | Value | `relkit/buckets` | [API example](/docs/api/buckets#createbucketclient)                   |
 | [createBucketClientEffect](/docs/api/buckets#createbucketclienteffect)                 | Value | `relkit/buckets` | [API example](/docs/api/buckets#createbucketclienteffect)             |
 | [createBucketReadUrlEffect](/docs/api/buckets#createbucketreadurleffect)               | Value | `relkit/buckets` | [API example](/docs/api/buckets#createbucketreadurleffect)            |
@@ -54,5 +59,9 @@ Names link to their complete contracts. Re-exports share their original contract
 | [isBucketDescriptor](/docs/api/buckets#isbucketdescriptor)                             | Value | `relkit/buckets` | [API example](/docs/api/buckets#isbucketdescriptor)                   |
 | [isBucketDescriptorEffect](/docs/api/buckets#isbucketdescriptoreffect)                 | Value | `relkit/buckets` | [API example](/docs/api/buckets#isbucketdescriptoreffect)             |
 | [listBucketEffect](/docs/api/buckets#listbucketeffect)                                 | Value | `relkit/buckets` | [API example](/docs/api/buckets#listbucketeffect)                     |
+| [matchesContentType](/docs/api/buckets#matchescontenttype)                             | Value | `relkit/buckets` | [API example](/docs/api/buckets#matchescontenttype)                   |
+| [normalizeBucketPolicy](/docs/api/buckets#normalizebucketpolicy)                       | Value | `relkit/buckets` | [API example](/docs/api/buckets#normalizebucketpolicy)                |
+| [normalizeWriteUrlOptions](/docs/api/buckets#normalizewriteurloptions)                 | Value | `relkit/buckets` | [API example](/docs/api/buckets#normalizewriteurloptions)             |
 | [observeBucket](/docs/api/buckets#observebucket)                                       | Value | `relkit/buckets` | [API example](/docs/api/buckets#observebucket)                        |
 | [putBucketEffect](/docs/api/buckets#putbucketeffect)                                   | Value | `relkit/buckets` | [API example](/docs/api/buckets#putbucketeffect)                      |
+| [signedUploadHeaders](/docs/api/buckets#signeduploadheaders)                           | Value | `relkit/buckets` | [API example](/docs/api/buckets#signeduploadheaders)                  |

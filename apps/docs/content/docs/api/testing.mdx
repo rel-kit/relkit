@@ -294,6 +294,73 @@ export interface AgentConformanceTurn {
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/agents-conformance.types.ts#L5)
 
+## `application-access.ts`
+
+Function access rules on in-process routes, decided as the served application decides them:
+the request's session is the caller, roles and permissions come from the auth service's
+resolver, a rule's roles and permissions are checked before input is read, and the built-in
+`unauthenticated` and `access-denied` failures answer 401 and 403 without a declaration.
+
+### accessBeforeInput
+
+Rejects a caller who fails a target's roles or permissions before the route reads input.
+
+**Example**
+
+```ts
+const denied = await accessBeforeInput(route.target, principal);
+```
+
+**Signature**
+
+```ts
+declare const accessBeforeInput: (
+  target: unknown,
+  principal: AccessPrincipalSource | undefined,
+) => Promise<Response | undefined>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-access.ts#L36)
+
+### accessFailureResponse
+
+Answers a built-in access failure with its status, as the served application does.
+
+**Example**
+
+```ts
+const response = accessFailureResponse(normalizeFailure(error));
+```
+
+**Signature**
+
+```ts
+declare const accessFailureResponse: (failure: InvocationFailure) => Response | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-access.ts#L57)
+
+### requestPrincipal
+
+Builds the caller of one request from the application's auth runtime.
+
+**Example**
+
+```ts
+const principal = requestPrincipal(services.auth, request);
+```
+
+**Signature**
+
+```ts
+declare const requestPrincipal: (
+  auth: HttpAuthRuntime | undefined,
+  request: Request,
+) => AccessPrincipalSource | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-access.ts#L20)
+
 ## `application-acquisition.ts`
 
 Acquires the general runtime and explicitly selected application services in one scope.
@@ -395,10 +462,11 @@ declare const handleTestRequest: (
   runtime: TestRuntime,
   request: Request,
   getSession?: () => Promise<unknown>,
+  principal?: AccessPrincipalSource,
 ) => Promise<Response>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-http.ts#L18)
 
 ## `application-native-services.types.ts`
 
@@ -588,7 +656,7 @@ declare const createApplicationRequest: (
 ) => TestHttpApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-request.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-request.ts#L20)
 
 ## `application-routes.ts`
 
@@ -807,7 +875,7 @@ declare const acquireApplicationAuth: (
 declare const nativeServiceError: <Failure>(cause: Failure) => Error;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-service-auth.ts#L69)
 
 ## `application-service-discovery.ts`
 
@@ -1330,6 +1398,53 @@ declare const copyBucketObject: (value: TestBucketObject) => TestBucketObject;
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/bucket-validation.ts#L57)
 
+## `buckets-conformance-policy.ts`
+
+Bucket policy cases of the shared bucket conformance suite: a provider created with a bucket's
+limits refuses objects and signed uploads the limits do not allow, and a signed upload URL
+binds the declared content type and length so the storage service rejects any other.
+
+### CONFORMANCE_POLICY
+
+The limits the policy cases create their provider with.
+
+**Signature**
+
+```ts
+declare const CONFORMANCE_POLICY: Readonly<Required<BucketPolicy>>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance-policy.ts#L11)
+
+### policyCase
+
+`put` applies the bucket's size limit and content-type allow-list.
+
+**Signature**
+
+```ts
+declare const policyCase: (provider: BucketsConformanceProvider, prefix: string) => Promise<void>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance-policy.ts#L43)
+
+### signedUploadCase
+
+A signed upload is refused before signing when its declaration breaks the policy, and the
+issued URL makes the storage service reject an upload with another type or length.
+
+**Signature**
+
+```ts
+declare const signedUploadCase: (
+  provider: BucketsConformanceProvider,
+  prefix: string,
+  upload?: typeof globalThis.fetch,
+) => Promise<void | "skipped">;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance-policy.ts#L72)
+
 ## `buckets-conformance.ts`
 
 Shared bucket provider conformance suite. Every first-party bucket provider (local, S3,
@@ -1345,7 +1460,7 @@ Re-exports all named exports from the "./buckets-conformance.types.js" module.
 export * from "./buckets-conformance.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L16)
 
 ### BUCKETS_CONFORMANCE_CASES
 
@@ -1357,7 +1472,7 @@ The cases every bucket provider passes.
 declare const BUCKETS_CONFORMANCE_CASES: ReadonlyArray<BucketsConformanceCase>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L19)
 
 ### createBucketsConformanceHarness
 
@@ -1384,7 +1499,7 @@ declare const createBucketsConformanceHarness: (
 ) => ConformanceHarness<BucketsConformanceCaseId>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.ts#L54)
 
 ## `buckets-conformance.types.ts`
 
@@ -1400,7 +1515,7 @@ One bucket conformance case.
 type BucketsConformanceCase = ConformanceCase<BucketsConformanceCaseId>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L53)
 
 ### BucketsConformanceCaseId (type alias)
 
@@ -1418,10 +1533,12 @@ type BucketsConformanceCaseId =
   | "signed-urls"
   | "cancellation"
   | "closed"
-  | "backend-failure";
+  | "backend-failure"
+  | "policy"
+  | "signed-upload-limits";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets-conformance.types.ts#L39)
 
 ### BucketsConformanceOptions (interface)
 
@@ -1442,6 +1559,18 @@ export interface BucketsConformanceOptions {
    * missing binding, a failing `fetch`). The `backend-failure` case is skipped without it.
    */
   readonly failing?: () => BucketsConformanceProvider;
+  /**
+   * Creates a provider that applies the given bucket limits. The `policy` and
+   * `signed-upload-limits` cases are skipped without it.
+   * @param prefix - Unique key prefix for the case, without a trailing slash.
+   * @param policy - Limits the provider must apply, as a bucket declares them.
+   */
+  readonly limited?: (prefix: string, policy: BucketPolicy) => BucketsConformanceProvider;
+  /**
+   * Sends the uploads of the `signed-upload-limits` case to a signed URL; defaults to the global
+   * `fetch`.
+   */
+  readonly upload?: typeof globalThis.fetch;
 }
 ```
 
@@ -5098,7 +5227,7 @@ type FunctionContextOf<Target> =
     : InvocationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L45)
 
 ### FunctionInput (type alias)
 
@@ -5112,7 +5241,7 @@ type FunctionInput<Target extends { readonly input: StandardSchemaV1 }> = InferI
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L29)
 
 ### FunctionOutput (type alias)
 
@@ -5126,7 +5255,7 @@ type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }> = Infe
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L37)
 
 ### InvokeFunctionOptions (interface)
 
@@ -5144,10 +5273,14 @@ export interface InvokeFunctionOptions<Context extends { readonly signal: AbortS
   readonly idSource?: InvocationIdSource;
   readonly context?: InvocationHooks<Context>["context"];
   readonly hooks?: InvocationHooks<Context>;
+  /** The caller that access rules see. Without it, the caller is read from the context's
+   * `auth.getSession()` session, which has no session (an anonymous caller) unless the
+   * context supplies one, and which carries no permissions. */
+  readonly principal?: AccessPrincipalSource;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L56)
 
 ### StandaloneFunctionTarget (interface)
 
@@ -5169,7 +5302,7 @@ export interface StandaloneFunctionTarget {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L13)
 
 ## `jobs-conformance.ts`
 
@@ -5594,7 +5727,7 @@ declare const activateTestProviders: (
 ) => Promise<ProviderRegistry | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/provider-replacements.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/provider-replacements.ts#L50)
 
 ### copyTestProviderReplacements
 
@@ -5608,7 +5741,7 @@ declare const copyTestProviderReplacements: (
 ) => TestProviderReplacements;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/provider-replacements.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/provider-replacements.ts#L21)
 
 ## `provider-replacements.types.ts`
 

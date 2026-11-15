@@ -39,7 +39,11 @@ test("applies the initial migration once and keeps rows on a second run", async 
         new Response(child.stderr).text(),
       ]);
       if (code !== 0) throw new Error(`Migration failed: ${stdout}\n${stderr}`);
-      expect(stdout).toContain("Database migrations applied.");
+      expect(stdout).toContain(
+        run === 0
+          ? "Applied 1 migration; the database is up to date."
+          : "Database is up to date: no migrations were pending.",
+      );
       const sqlite = new Database(path);
       try {
         const database = drizzle({ client: sqlite });

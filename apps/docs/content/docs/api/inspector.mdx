@@ -45,10 +45,14 @@ Credential-free failures retain the UI's established error protocol.
 **Signature**
 
 ```ts
-declare const backendError: (error: string, status: number) => Response;
+declare const backendError: (
+  error: string,
+  status: number,
+  detail?: { readonly message?: string; readonly parameter?: string },
+) => Response;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L78)
 
 ### historyResponse
 
@@ -64,7 +68,7 @@ declare const historyResponse: (
 ) => Effect.Effect<Response, InspectionConnectionError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/backend-history.ts#L15)
 
 ## `bin.ts`
 
@@ -640,6 +644,21 @@ declare const parseInspectorOptions: (args: readonly string[]) => InspectorOptio
 
 UI invalidations borrow the existing bounded stream, while full records stay in history.
 
+### SelectionNotice (interface)
+
+One terminal line about the application session.
+
+**Signature**
+
+```ts
+export interface SelectionNotice {
+  readonly level: "info" | "warn";
+  readonly message: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L56)
+
 ### acquireLiveEvents
 
 The tool Scope closes every subscriber before releasing its listener.
@@ -665,7 +684,7 @@ declare const publishCollection: (
 ) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L110)
 
 ### publishSelection
 
@@ -682,6 +701,151 @@ declare const publishSelection: (
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L21)
+
+### publishSelectionState
+
+Publishes the application session state whether or not it changed: a new subscriber needs it
+before the next change, and a repeated one only invalidates metadata again.
+
+**Signature**
+
+```ts
+declare const publishSelectionState: (
+  stream: ObservabilityStream,
+  selection: InspectorSelection,
+) => void;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L43)
+
+### selectionKey
+
+**Signature**
+
+```ts
+declare const selectionKey: (selection: InspectorSelection) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L102)
+
+### selectionNotices
+
+Says what changed in the application session, so the terminal never repeats a line per poll.
+
+**Signature**
+
+```ts
+declare const selectionNotices: (
+  previous: InspectorSelection | undefined,
+  next: InspectorSelection,
+  project: string,
+) => SelectionNotice[];
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/live-events.ts#L68)
+
+## `node-executable.ts`
+
+Finds the real Node executable the interface (a Next.js standalone server) and the DuckDB
+history worker need. On Node that is the running executable. On Bun it is the first `node` on
+`PATH` that is not Bun itself: `bun --bun` puts a directory whose `node` is Bun first on `PATH`,
+as a symlink on macOS and possibly a copy or hard link elsewhere, so a candidate that does not
+resolve to Bun's own file is asked for `process.versions.bun`.
+
+### MINIMUM_NODE_VERSION
+
+Lowest Node release the package declares in its engines.
+
+**Signature**
+
+```ts
+declare const MINIMUM_NODE_VERSION: "20.9.0";
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L15)
+
+### NodeExecutable (interface)
+
+Node executable for the Inspector's children.
+
+**Signature**
+
+```ts
+export interface NodeExecutable {
+  /** Absolute path of the executable. */
+  readonly executable: string;
+  /** Its `process.versions.node`. */
+  readonly version: string;
+  /** `PATH` for the children, without the directories whose `node` is Bun. */
+  readonly path: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L18)
+
+### NodeExecutableError (class)
+
+No usable Node was found; the message names Node, the version needed and the Bun alias.
+
+**Signature**
+
+```ts
+declare class NodeExecutableError
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L39)
+
+### NodeExecutableHost (interface)
+
+The process the resolution runs in.
+
+**Signature**
+
+```ts
+export interface NodeExecutableHost {
+  readonly runtime: "bun" | "node";
+  /** The running runtime's executable. */
+  readonly execPath: string;
+  /** The running runtime's `process.versions.node`. */
+  readonly nodeVersion: string;
+  /** Search path. */
+  readonly path: string;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L28)
+
+### findNodeExecutable
+
+Resolves Node for this process, once per runtime and search path.
+
+**Throws**
+
+When no Node of a supported release is found.
+
+**Signature**
+
+```ts
+declare const findNodeExecutable: (host?: NodeExecutableHost) => NodeExecutable;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L53)
+
+### resolveNodeExecutable
+
+Resolves Node for the interface child.
+
+**Signature**
+
+```ts
+declare const resolveNodeExecutable: () => Effect.Effect<
+  NodeExecutable,
+  InspectionConnectionError,
+  never
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/node-executable.ts#L66)
 
 ## `index.ts`
 
@@ -992,6 +1156,7 @@ declare const openDuckdbDatabaseEffect: (
           log: StoredLocalRecord;
           items: ReadonlyArray<never>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -1009,6 +1174,7 @@ declare const openDuckdbDatabaseEffect: (
           incomplete: readonly string[];
           items: ReadonlyArray<never>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -1018,6 +1184,7 @@ declare const openDuckdbDatabaseEffect: (
           records: ReadonlyArray<StoredLocalRecord>;
           items: ReadonlyArray<StoredLocalRecord>;
           nextCursor?: string;
+          total?: number;
           protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
           version: typeof OBSERVABILITY_QUERY_VERSION;
         }
@@ -1101,6 +1268,7 @@ declare const openDuckdbDatabase: (
             log: StoredLocalRecord;
             items: ReadonlyArray<never>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -1118,6 +1286,7 @@ declare const openDuckdbDatabase: (
             incomplete: readonly string[];
             items: ReadonlyArray<never>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -1127,6 +1296,7 @@ declare const openDuckdbDatabase: (
             records: ReadonlyArray<StoredLocalRecord>;
             items: ReadonlyArray<StoredLocalRecord>;
             nextCursor?: string;
+            total?: number;
             protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
             version: typeof OBSERVABILITY_QUERY_VERSION;
           }
@@ -1141,6 +1311,7 @@ declare const openDuckdbDatabase: (
         log: StoredLocalRecord;
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1158,6 +1329,7 @@ declare const openDuckdbDatabase: (
         incomplete: readonly string[];
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1167,6 +1339,7 @@ declare const openDuckdbDatabase: (
         records: ReadonlyArray<StoredLocalRecord>;
         items: ReadonlyArray<StoredLocalRecord>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1480,6 +1653,7 @@ declare const makeDuckdbDetail: (
       log: StoredLocalRecord;
       items: ReadonlyArray<never>;
       nextCursor?: string;
+      total?: number;
       protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
       version: typeof OBSERVABILITY_QUERY_VERSION;
     }
@@ -1493,6 +1667,7 @@ declare const makeDuckdbDetail: (
       incomplete: readonly string[];
       items: ReadonlyArray<never>;
       nextCursor?: string;
+      total?: number;
       protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
       version: typeof OBSERVABILITY_QUERY_VERSION;
     }
@@ -1502,6 +1677,7 @@ declare const makeDuckdbDetail: (
       records: ReadonlyArray<StoredLocalRecord>;
       items: ReadonlyArray<StoredLocalRecord>;
       nextCursor?: string;
+      total?: number;
       protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
       version: typeof OBSERVABILITY_QUERY_VERSION;
     }
@@ -1538,6 +1714,7 @@ declare const makeDuckdbQueryEffect: (
         log: StoredLocalRecord;
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1555,6 +1732,7 @@ declare const makeDuckdbQueryEffect: (
         incomplete: readonly string[];
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1564,6 +1742,7 @@ declare const makeDuckdbQueryEffect: (
         records: ReadonlyArray<StoredLocalRecord>;
         items: ReadonlyArray<StoredLocalRecord>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1640,7 +1819,9 @@ declare const duckdbQueryFilters: (
 
 ## `duckdb-query-list.ts`
 
-Executes a validated list plan and emits versioned cursor pages over committed history.
+Executes a validated list plan and emits versioned cursor pages over committed history. A query
+that asks for `count` also gets `total`, the matching records across all pages, from a second
+count query compiled with the same filters.
 
 ### makeDuckdbList
 
@@ -1649,6 +1830,7 @@ Executes a validated list plan and emits versioned cursor pages over committed h
 ```ts
 declare const makeDuckdbList: (
   rows: DuckdbReadRows,
+  count: DuckdbReadCount,
 ) => (
   kind: "logs" | "requests" | "traces",
   input?: ObservabilityQueryRequest | undefined,
@@ -1659,11 +1841,26 @@ declare const makeDuckdbList: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-list.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-list.ts#L16)
 
 ## `duckdb-query-plan.ts`
 
 Builds history paging SQL with stable request/trace revision selection and bound parameters.
+
+### duckdbCountPlan
+
+Builds the SQL counting every record a list query selects, across all pages.
+
+**Signature**
+
+```ts
+declare const duckdbCountPlan: (
+  kind: "logs" | "requests" | "traces",
+  query: NormalizedQuery,
+) => { sql: string; values: Array<DuckDBValue> };
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-plan.ts#L48)
 
 ### duckdbQueryPlan
 
@@ -1681,6 +1878,22 @@ declare const duckdbQueryPlan: (
 ## `duckdb-query-rows.ts`
 
 Decodes native JSON rows into validated diagnostic records under the shared database permit.
+
+### makeDuckdbCount
+
+**Signature**
+
+```ts
+declare const makeDuckdbCount: (
+  connection: DuckdbConnectionPort,
+  permit: Semaphore.Semaphore,
+) => (
+  sql: string,
+  values?: Array<DuckDBValue> | undefined,
+) => Effect.Effect<number, DuckdbError, never>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-rows.ts#L29)
 
 ### makeDuckdbRows
 
@@ -1701,6 +1914,18 @@ declare const makeDuckdbRows: (
 ## `duckdb-query-rows.types.ts`
 
 SQL row reader shared by native list/detail query operations.
+
+### DuckdbReadCount (type alias)
+
+Reads the single `total` of a native count query.
+
+**Signature**
+
+```ts
+type DuckdbReadCount = (sql: string, values?: DuckDBValue[]) => Effect.Effect<number, DuckdbError>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/duckdb-query-rows.types.ts#L12)
 
 ### DuckdbReadRows (type alias)
 
@@ -1750,6 +1975,7 @@ declare const createDuckdbQuery: (connection: DuckdbConnectionPort) => {
         log: StoredLocalRecord;
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1767,6 +1993,7 @@ declare const createDuckdbQuery: (connection: DuckdbConnectionPort) => {
         incomplete: readonly string[];
         items: ReadonlyArray<never>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -1776,6 +2003,7 @@ declare const createDuckdbQuery: (connection: DuckdbConnectionPort) => {
         records: ReadonlyArray<StoredLocalRecord>;
         items: ReadonlyArray<StoredLocalRecord>;
         nextCursor?: string;
+        total?: number;
         protocol: typeof OBSERVABILITY_QUERY_PROTOCOL;
         version: typeof OBSERVABILITY_QUERY_VERSION;
       }
@@ -2500,7 +2728,7 @@ declare const startLocalWorkerEffect: (
 ) => Effect.Effect<LocalWorkerEffects, LocalWorkerError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client-effect.ts#L24)
 
 ## `worker-client-send.ts`
 
@@ -2925,7 +3153,7 @@ declare const inspectorBackend: (
 ) => (request: Request) => Effect.Effect<Response, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-backend.ts#L49)
 
 ## `tool-history.ts`
 
@@ -2996,7 +3224,7 @@ declare const inspectionLoop: (
 ) => Effect.Effect<never, InspectionConnectionError, Scope | InspectorHistoryNative>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-loop.ts#L25)
 
 ## `tool-main.ts`
 
@@ -3010,7 +3238,7 @@ Shares the native signal owner between package and restricted container entries.
 declare const runInspectorMain: (container: boolean) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-main.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-main.ts#L37)
 
 ## `tool-state.types.ts`
 
@@ -3041,6 +3269,13 @@ Collection state contains only one finite batch at a time; no pending write queu
 ```ts
 export interface InspectorToolState {
   readonly selection: InspectorSelection;
+  /** When the application session entered its current state (ms); undefined before discovery. */
+  readonly selectionSince?: number | undefined;
+  /**
+   * The last application session this run of the tool connected to, kept after it stops
+   * answering. `stoppedAt` (ms) is undefined while that session is still connected.
+   */
+  readonly lastSession?: { readonly sessionId: string; readonly stoppedAt?: number } | undefined;
   readonly history: InspectorHistoryOwner | undefined;
   readonly sessionId: string | undefined;
   readonly through: number;
@@ -3065,7 +3300,7 @@ Shared projection is owned by the acquired tool, never module global.
 type InspectorToolStateRef = Ref.Ref<InspectorToolState>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/tool-state.types.ts#L35)
 
 ## `tool.service.ts`
 
@@ -3109,7 +3344,7 @@ Native UI acquisition is separate from all application/session ownership.
 declare class InspectorUiNative
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L14)
 
 ### InspectorUiNativeLive
 
@@ -3121,7 +3356,7 @@ Live child adapter, acquired only by an explicit standalone launch.
 declare const InspectorUiNativeLive: Layer.Layer<InspectorUiNative, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L30)
 
 ### acquireInspectorUi
 
@@ -3142,7 +3377,7 @@ declare const acquireInspectorUi: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/ui-native.service.ts#L33)
 
 ## `ui-readiness.ts`
 

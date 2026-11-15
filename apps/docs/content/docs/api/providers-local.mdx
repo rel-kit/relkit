@@ -1316,7 +1316,7 @@ declare const makeLocalBucketService: (
 declare const LOCAL_BUCKET_CAPABILITIES: Readonly<BucketCapabilities>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L25)
 
 ### LOCAL_BUCKET_RESERVED_PREFIXES
 
@@ -1326,7 +1326,7 @@ declare const LOCAL_BUCKET_CAPABILITIES: Readonly<BucketCapabilities>;
 declare const LOCAL_BUCKET_RESERVED_PREFIXES: ReadonlyArray<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L30)
 
 ### LocalBucketKeyError (class)
 
@@ -1340,7 +1340,7 @@ declare class LocalBucketKeyError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L33)
 
 ### code (property)
 
@@ -1350,7 +1350,7 @@ declare class LocalBucketKeyError {
 readonly code: "RELKIT_BUCKET_KEY_INVALID"
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L34)
 
 ### LocalBucketListOptions
 
@@ -1360,7 +1360,7 @@ readonly code: "RELKIT_BUCKET_KEY_INVALID"
 declare const LocalBucketListOptions: LocalBucketListOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L17)
 
 ### LocalBucketListPage
 
@@ -1370,7 +1370,7 @@ declare const LocalBucketListOptions: LocalBucketListOptions;
 declare const LocalBucketListPage: LocalBucketListPage;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L18)
 
 ### LocalBucketObjectMetadata
 
@@ -1380,7 +1380,7 @@ declare const LocalBucketListPage: LocalBucketListPage;
 declare const LocalBucketObjectMetadata: LocalBucketObjectMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L19)
 
 ### LocalBucketPaginationError (class)
 
@@ -1414,11 +1414,12 @@ readonly code: "RELKIT_BUCKET_CURSOR_INVALID"
 declare const LocalBucketPolicy: LocalBucketPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L15)
 
 ### LocalBucketPolicyError (class)
 
-Preserves the public local bucket policy error identity and stable error code.
+Preserves the public local bucket policy error identity; every provider's policy error is a
+BucketPolicyError with the same stable code.
 
 **Signature**
 
@@ -1428,17 +1429,7 @@ declare class LocalBucketPolicyError {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L42)
-
-### code (property)
-
-**Signature**
-
-```ts
-readonly code: "RELKIT_BUCKET_POLICY_INVALID"
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L44)
 
 ### LocalBucketProvider
 
@@ -1448,7 +1439,7 @@ readonly code: "RELKIT_BUCKET_POLICY_INVALID"
 declare const LocalBucketProvider: LocalBucketProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L21)
 
 ### LocalBucketProviderOptions
 
@@ -1458,7 +1449,7 @@ declare const LocalBucketProvider: LocalBucketProvider;
 declare const LocalBucketProviderOptions: LocalBucketProviderOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L16)
 
 ### LocalBucketStateError (class)
 
@@ -1492,7 +1483,7 @@ readonly code: "RELKIT_BUCKET_STATE_INVALID"
 declare const LocalBucketUnsupportedCapability: LocalBucketUnsupportedCapability;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L22)
 
 ### StoredLocalBucketObject
 
@@ -1511,7 +1502,7 @@ declare const StoredLocalBucketObject: {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L20)
 
 ## `cache.types.ts`
 
@@ -2554,7 +2545,7 @@ Supported audited event administration action.
 type EventAdminAction = "retry";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L11)
 
 ### EventAdminActionContract (interface)
 
@@ -2570,7 +2561,7 @@ export interface EventAdminActionContract extends EventAdminVersion {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L157)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L166)
 
 ### EventAdminActionOutcome (type alias)
 
@@ -2582,7 +2573,7 @@ Whether an event administration action was applied or rejected.
 type EventAdminActionOutcome = "applied" | "rejected";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L14)
 
 ### EventAdminActionRecord (interface)
 
@@ -2607,7 +2598,7 @@ export interface EventAdminActionRecord extends EventAdminVersion {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L141)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L150)
 
 ### EventAdminActionRequest (interface)
 
@@ -2624,7 +2615,7 @@ export interface EventAdminActionRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L139)
 
 ### EventAdminActionSink (type alias)
 
@@ -2636,7 +2627,7 @@ Optional audit sink isolated from the event action outcome.
 type EventAdminActionSink = (record: EventAdminActionRecord) => MaybePromise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L164)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L173)
 
 ### EventAdminMode (type alias)
 
@@ -2648,7 +2639,7 @@ Environment mode controlling event administration mutations.
 type EventAdminMode = "development" | "test" | "production";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L8)
 
 ### EventAdminVersion (interface)
 
@@ -2663,7 +2654,7 @@ export interface EventAdminVersion {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L17)
 
 ### EventContract (interface)
 
@@ -2675,7 +2666,7 @@ Versioned declared event identity and schema metadata for inspection.
 export interface EventContract extends EventVersioned, EventContractInput {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L38)
 
 ### EventContractInput (interface)
 
@@ -2693,7 +2684,7 @@ export interface EventContractInput {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L29)
 
 ### EventDeadLetterContract (interface)
 
@@ -2708,7 +2699,7 @@ export interface EventDeadLetterContract extends EventDeliveryContract {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L90)
 
 ### EventDeliveryContract (interface)
 
@@ -2734,7 +2725,7 @@ export interface EventDeliveryContract extends EventVersioned {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L73)
 
 ### EventPublicationContract (interface)
 
@@ -2757,10 +2748,12 @@ export interface EventPublicationContract extends EventVersioned {
   readonly originRequestId?: string;
   readonly producerTraceId?: string;
   readonly attributes: Readonly<Record<string, string | number | boolean>>;
+  /** The stored payload; present only when the query selected this publication by id. */
+  readonly payload?: UnknownEventEnvelope["payload"];
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L54)
 
 ### EventQueryContract (interface)
 
@@ -2778,10 +2771,14 @@ export interface EventQueryContract extends EventAdminVersion {
   readonly deliveries: readonly EventDeliveryContract[];
   readonly deadLetters: readonly EventDeadLetterContract[];
   readonly nextCursor?: string;
+  /** Deliveries that match the filters across all pages. */
+  readonly total?: number;
+  /** Deliveries that match the filters, by state; a state with none is absent. */
+  readonly counts?: Readonly<Partial<Record<EventDeliveryContract["state"], number>>>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L118)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L123)
 
 ### EventQueryRequest (interface)
 
@@ -2796,6 +2793,8 @@ export interface EventQueryRequest {
   readonly eventId?: string;
   readonly eventVersion?: number;
   readonly triggerId?: string;
+  /** Selects one publication by instance id and includes its stored payload. */
+  readonly publicationId?: string;
   readonly state?: Exclude<JobQueueState, "accepted">;
   readonly states?: readonly Exclude<JobQueueState, "accepted">[];
   readonly cursor?: string;
@@ -2803,7 +2802,7 @@ export interface EventQueryRequest {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L105)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L108)
 
 ### EventRetryRequest (type alias)
 
@@ -2815,7 +2814,7 @@ Dead-letter retry request preserving event admin protocol identity.
 type EventRetryRequest = EventAdminActionRequest;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L138)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L147)
 
 ### EventTriggerCapabilityContract (interface)
 
@@ -2836,7 +2835,7 @@ export interface EventTriggerCapabilityContract extends EventAdminVersion {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L93)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L96)
 
 ### EventTriggerContract (interface)
 
@@ -2858,7 +2857,7 @@ export interface EventTriggerContract extends EventAdminVersion {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L41)
 
 ### EventVersioned (interface)
 
@@ -2873,7 +2872,7 @@ export interface EventVersioned {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L23)
 
 ## `admin-errors.ts`
 
@@ -3122,7 +3121,7 @@ declare const EVENT_DELIVERY_CAPABILITIES: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L37)
 
 ### EventDelivery
 
@@ -3132,7 +3131,7 @@ declare const EVENT_DELIVERY_CAPABILITIES: Readonly<{
 declare const EventDelivery: EventDelivery;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L39)
 
 ### EventDeliveryBinding
 
@@ -3142,7 +3141,7 @@ declare const EventDelivery: EventDelivery;
 declare const EventDeliveryBinding: EventDeliveryBinding;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L40)
 
 ### EventDeliveryBoundary
 
@@ -3152,7 +3151,7 @@ declare const EventDeliveryBinding: EventDeliveryBinding;
 declare const EventDeliveryBoundary: EventDeliveryBoundary;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L41)
 
 ### EventDeliveryLedgerRecord
 
@@ -3162,7 +3161,7 @@ declare const EventDeliveryBoundary: EventDeliveryBoundary;
 declare const EventDeliveryLedgerRecord: EventDeliveryLedgerRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L42)
 
 ### EventDeliveryOptions
 
@@ -3172,7 +3171,7 @@ declare const EventDeliveryLedgerRecord: EventDeliveryLedgerRecord;
 declare const EventDeliveryOptions: EventDeliveryOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L43)
 
 ### EventDeliveryResult
 
@@ -3182,7 +3181,7 @@ declare const EventDeliveryOptions: EventDeliveryOptions;
 declare const EventDeliveryResult: EventDeliveryResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L44)
 
 ### EventDeliverySnapshot
 
@@ -3192,7 +3191,7 @@ declare const EventDeliveryResult: EventDeliveryResult;
 declare const EventDeliverySnapshot: EventDeliverySnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L45)
 
 ### LocalEventDeliveryService (class)
 
@@ -3204,7 +3203,7 @@ One trigger owns durable admission, retry transitions and handler concurrency.
 declare class LocalEventDeliveryService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L49)
 
 ### createEventDelivery
 
@@ -3220,7 +3219,7 @@ declare const createEventDelivery: (
 ) => Promise<EventDelivery>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L61)
 
 ### eventDeliveryLayer
 
@@ -3236,7 +3235,7 @@ declare const eventDeliveryLayer: (
 ) => Layer.Layer<LocalEventDeliveryService, LocalOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L77)
 
 ### makeEventDelivery
 
@@ -3252,7 +3251,7 @@ declare const makeEventDelivery: (
 ) => Effect.Effect<EventDeliveryEffects, LocalOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L95)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L97)
 
 ## `delivery.types.ts`
 
@@ -3266,10 +3265,19 @@ Compatibility interface for accepting, executing and inspecting durable deliveri
 export interface EventDelivery {
   readonly triggerId: string;
   readonly capabilities: EventDeliveryCapabilities;
-  readonly accept: (envelope: UnknownEventEnvelope) => Promise<EventDeliveryResult>;
+  /**
+   * Durably accepts a delivery of a publication. With `replayId` it accepts a replay: a new
+   * delivery of the same publication under that identity, which the runner marks as replayed.
+   */
+  readonly accept: (
+    envelope: UnknownEventEnvelope,
+    replayId?: string,
+  ) => Promise<EventDeliveryResult>;
   readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EventDeliveryResult>;
   readonly runNext: (deliveryId?: string) => Promise<EventDeliveryResult | undefined>;
   readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled delivery; a running or finished one is refused. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
   readonly drain: () => Promise<readonly EventDeliveryResult[]>;
   readonly recover: (now?: number) => Promise<readonly EventDeliveryLedgerRecord[]>;
   readonly snapshot: () => EventDeliverySnapshot;
@@ -3871,7 +3879,7 @@ export interface EventLogSnapshot {
 declare const LocalEventEffects: LocalEventEffects;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L22)
 
 ### LocalEventProvider
 
@@ -3881,7 +3889,7 @@ declare const LocalEventEffects: LocalEventEffects;
 declare const LocalEventProvider: LocalEventProvider;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L22)
 
 ### LocalEventService (class)
 
@@ -3893,7 +3901,7 @@ Publication and delivery orchestration for one local event provider.
 declare class LocalEventService
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L25)
 
 ### createLocalEventProvider
 
@@ -3905,7 +3913,7 @@ Acquires a scoped event provider behind its established Promise surface.
 declare const createLocalEventProvider: (root: string) => Promise<LocalEventProvider>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L34)
 
 ### localEventLayer
 
@@ -3932,7 +3940,7 @@ declare const localEventLayer: (
 ) => Layer.Layer<LocalEventService, LocalOperationError, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L80)
 
 ### makeLocalEventService
 
@@ -3946,9 +3954,29 @@ declare const makeLocalEventService: (
 ) => Effect.Effect<LocalEventEffects, LocalOperationError, Scope.Scope>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L89)
 
 ## `provider.types.ts`
+
+### EventReplayResult (interface)
+
+The answer of a replay: the publication it re-delivered and its new deliveries.
+
+**Signature**
+
+```ts
+export interface EventReplayResult {
+  readonly replayOf: string;
+  readonly eventId: string;
+  readonly version: number;
+  /** The publication's own instance id: a replay keeps the publication's identity. */
+  readonly instanceId: string;
+  readonly publishedAt: string;
+  readonly deliveries: readonly { readonly triggerId: string; readonly deliveryId?: string }[];
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L17)
 
 ### LocalEventEffects (interface)
 
@@ -3971,10 +3999,19 @@ export interface LocalEventEffects {
     context: EventOperationContext,
   ) => Effect.Effect<EventProviderResult, LocalOperationError>;
   readonly health: () => Effect.Effect<void, LocalOperationError>;
+  readonly retry: (
+    target: DeliveryTarget,
+  ) => Effect.Effect<EventDeliveryContract, LocalOperationError>;
+  readonly cancel: (
+    target: DeliveryTarget,
+  ) => Effect.Effect<EventDeliveryContract, LocalOperationError>;
+  readonly replay: (
+    target: PublicationTarget,
+  ) => Effect.Effect<EventReplayResult, LocalOperationError>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L48)
 
 ### LocalEventProvider (interface)
 
@@ -3987,11 +4024,17 @@ export interface LocalEventProvider extends EventProvider {
   readonly registerContract: EventRouter["registerContract"];
   readonly registerTrigger: EventRouter["registerTrigger"];
   readonly query: (request?: EventQueryRequest) => Promise<EventQueryContract>;
+  /** Runs a dead-lettered delivery again; answers its status. */
+  readonly retry: (target: DeliveryTarget) => Promise<EventDeliveryContract>;
+  /** Cancels a pending or scheduled delivery; answers its status. */
+  readonly cancel: (target: DeliveryTarget) => Promise<EventDeliveryContract>;
+  /** Delivers a stored publication again, as a replay, keeping its identity. */
+  readonly replay: (target: PublicationTarget) => Promise<EventReplayResult>;
   readonly close: () => Promise<void>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L34)
 
 ## `router-model.types.ts`
 
@@ -4059,6 +4102,10 @@ export interface EventRouter {
   readonly runNext: (triggerId?: string) => Promise<EventDeliveryResult | undefined>;
   readonly drain: () => Promise<readonly EventDeliveryResult[]>;
   readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled durable delivery. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Delivers a routed publication again, as a replay, to every trigger of its event. */
+  readonly replay: (publicationId: string) => Promise<EventFanoutResult>;
   readonly snapshot: () => EventRouterSnapshot;
   readonly close: () => Promise<void>;
 }
@@ -4076,7 +4123,7 @@ Publication input accepted as a log record or event envelope.
 type EventRouterInput = EventLogRecord | EventLogInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L119)
 
 ### EventRouterOptions (interface)
 
@@ -4241,7 +4288,19 @@ declare const appendDeliveryAcceptance: (
 ) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L86)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L111)
+
+### isReplayDeliveryId
+
+Tells a replay delivery from a publication's own delivery.
+
+**Signature**
+
+```ts
+declare const isReplayDeliveryId: (deliveryId: string) => boolean;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L101)
 
 ### makeDeliveryId
 
@@ -4254,6 +4313,22 @@ declare const makeDeliveryId: (eventInstanceId: string, triggerId: string) => st
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L74)
+
+### makeReplayDeliveryId
+
+Derives the identity of one replay of a publication to a trigger: a new delivery of it.
+
+**Signature**
+
+```ts
+declare const makeReplayDeliveryId: (
+  eventInstanceId: string,
+  triggerId: string,
+  token: string,
+) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L89)
 
 ### normalizeDelivery
 
@@ -4301,7 +4376,7 @@ Copies an unknown value into canonical JSON for stable durable encoding.
 declare const toJson: (value: DeliveryData) => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L134)
 
 ### validateDeliveryData
 
@@ -4365,7 +4440,7 @@ export interface EventDeliveryRecord {
 declare const EVENT_DELIVERY_VERSION: 1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L48)
 
 ### EventDeliveryRecord
 
@@ -4375,7 +4450,7 @@ declare const EVENT_DELIVERY_VERSION: 1;
 declare const EventDeliveryRecord: EventDeliveryRecord;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L49)
 
 ### EventDeliveryResult
 
@@ -4385,7 +4460,7 @@ declare const EventDeliveryRecord: EventDeliveryRecord;
 declare const EventDeliveryResult: EventDeliveryResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L38)
 
 ### EventFanoutResult
 
@@ -4395,7 +4470,7 @@ declare const EventDeliveryResult: EventDeliveryResult;
 declare const EventFanoutResult: EventFanoutResult;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L39)
 
 ### EventRouter
 
@@ -4405,7 +4480,7 @@ declare const EventFanoutResult: EventFanoutResult;
 declare const EventRouter: EventRouter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L40)
 
 ### EventRouterInput
 
@@ -4415,7 +4490,7 @@ declare const EventRouter: EventRouter;
 declare const EventRouterInput: EventRouterInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L41)
 
 ### EventRouterOptions
 
@@ -4425,7 +4500,7 @@ declare const EventRouterInput: EventRouterInput;
 declare const EventRouterOptions: EventRouterOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L42)
 
 ### EventRouterRouteOptions
 
@@ -4435,7 +4510,7 @@ declare const EventRouterOptions: EventRouterOptions;
 declare const EventRouterRouteOptions: EventRouterRouteOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L43)
 
 ### EventRouterSnapshot
 
@@ -4445,7 +4520,7 @@ declare const EventRouterRouteOptions: EventRouterRouteOptions;
 declare const EventRouterSnapshot: EventRouterSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L44)
 
 ### EventRouterStateError
 
@@ -4455,7 +4530,7 @@ declare const EventRouterSnapshot: EventRouterSnapshot;
 declare const EventRouterStateError: typeof EventRouterStateError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L48)
 
 ### EventRouterTrigger
 
@@ -4465,7 +4540,7 @@ declare const EventRouterStateError: typeof EventRouterStateError;
 declare const EventRouterTrigger: EventRouterTrigger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L45)
 
 ### EventTriggerSnapshot
 
@@ -4475,7 +4550,7 @@ declare const EventRouterTrigger: EventRouterTrigger;
 declare const EventTriggerSnapshot: EventTriggerSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L46)
 
 ### createEventRouter
 
@@ -4490,7 +4565,7 @@ declare const createEventRouter: (
 ) => Promise<EventRouter>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L55)
 
 ## `index.ts`
 

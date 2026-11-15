@@ -1,5 +1,5 @@
 /** Registers tutorial order ownership columns alongside native Better Auth user/session/account/verification tables. */
-import { integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const orders = sqliteTable("orders", {
   orderId: text().primaryKey(),
@@ -32,25 +32,20 @@ export const session = sqliteTable("session", {
   ...timestamps,
 });
 
-export const account = sqliteTable(
-  "account",
-  {
-    id: text().primaryKey(),
-    accountId: text().notNull(),
-    issuer: text().notNull(),
-    providerId: text().notNull(),
-    userId: text().notNull(),
-    accessToken: text(),
-    refreshToken: text(),
-    idToken: text(),
-    accessTokenExpiresAt: integer({ mode: "timestamp" }),
-    refreshTokenExpiresAt: integer({ mode: "timestamp" }),
-    scope: text(),
-    password: text(),
-    ...timestamps,
-  },
-  (table) => [uniqueIndex("account_issuer_account_id").on(table.issuer, table.accountId)],
-);
+export const account = sqliteTable("account", {
+  id: text().primaryKey(),
+  accountId: text().notNull(),
+  providerId: text().notNull(),
+  userId: text().notNull(),
+  accessToken: text(),
+  refreshToken: text(),
+  idToken: text(),
+  accessTokenExpiresAt: integer({ mode: "timestamp" }),
+  refreshTokenExpiresAt: integer({ mode: "timestamp" }),
+  scope: text(),
+  password: text(),
+  ...timestamps,
+});
 
 export const verification = sqliteTable("verification", {
   id: text().primaryKey(),

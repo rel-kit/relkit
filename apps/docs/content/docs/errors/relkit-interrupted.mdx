@@ -14,7 +14,7 @@ sidebar:
 
 ## What happened
 
-The command stopped because it received an interrupt signal, such as Ctrl-C, SIGTERM or SIGHUP.
+The command stopped because it received a signal. Ctrl-C and SIGTERM print `Stopped.` in the terminal and report this code only with `--json`; SIGHUP always reports it.
 
 ## What to do
 

@@ -1171,7 +1171,7 @@ Preserves the patch-installation Promise compatibility API.
 declare const dependencyPatchNeedsInstall: (plan: ScaffoldPlan) => Promise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patch-installation.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patch-installation.ts#L52)
 
 ### dependencyPatchNeedsInstallEffect
 
@@ -1201,7 +1201,20 @@ Says why skipping the repair for npm is safe.
 declare const SKIPPED_PATCH: "Skipped the Drizzle declaration repair: npm does not apply patchedDependencies. This is safe; the repair changes only Drizzle's type declarations, never code that runs.";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L101)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L118)
+
+### patchManager
+
+Reads the manager an existing project names in `packageManager` or by its lockfile. A project
+that names none keeps the repair, which Bun, the templates' manager, applies.
+
+**Signature**
+
+```ts
+declare const patchManager: (projectRoot: string) => PackageManagerName;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L201)
 
 ### planDependencyPatch
 
@@ -1214,14 +1227,17 @@ declare const planDependencyPatch: (
   projectRoot: string,
   source: string,
   patch: DependencyPatch,
+  manager?: PackageManagerName,
 ) => Promise<DependencyPatchPlan>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L165)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L173)
 
 ### planDependencyPatchEffect
 
-Plans byte-identical repair ownership without mutating project assets.
+Plans byte-identical repair ownership without mutating project assets: the `package.json` entry
+for Bun, the `pnpm-workspace.yaml` entry for pnpm (which ignores the manifest field), and nothing
+for npm, which applies no patches.
 
 **Signature**
 
@@ -1230,6 +1246,7 @@ declare const planDependencyPatchEffect: (
   projectRoot: string,
   source: string,
   patch: DependencyPatch,
+  manager?: PackageManagerName | undefined,
 ) => Effect.Effect<
   DependencyPatchPlan,
   GeneratorDomainError | GeneratorIoError,
@@ -1237,7 +1254,7 @@ declare const planDependencyPatchEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L55)
 
 ### prepareProjectDependencyPatch
 
@@ -1252,7 +1269,7 @@ declare const prepareProjectDependencyPatch: (
 ) => Promise<string | undefined>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L179)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L188)
 
 ### prepareProjectDependencyPatchEffect
 
@@ -1274,7 +1291,7 @@ declare const prepareProjectDependencyPatchEffect: (
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L129)
 
 ### readDrizzlePatch
 
@@ -1286,7 +1303,7 @@ Preserves the verified repair Promise API.
 declare const readDrizzlePatch: () => Promise<DependencyPatch>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L154)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/dependency-patches.ts#L161)
 
 ### readDrizzlePatchEffect
 
@@ -3042,8 +3059,14 @@ Command spellings of one package manager.
 ```ts
 export interface PackageManagerCommands {
   readonly name: PackageManagerName;
-  /** Installs a project's dependencies. */
+  /**
+   * Installs a project's dependencies, and may change the lockfile: the install that follows a
+   * manifest change (creation, `relkit add`) must not fail because `CI` is set. An install that
+   * must be reproducible elsewhere uses {@link PackageManagerCommands.frozenCheck}.
+   */
   readonly install: readonly string[];
+  /** The install, for display (`npm install`). */
+  readonly installText: string;
   /** Checks that the lockfile matches the manifest without changing `node_modules`. */
   readonly frozenCheck: readonly string[];
   /**
@@ -3058,6 +3081,8 @@ export interface PackageManagerCommands {
    * @returns Shell text such as `npx --no-install relkit dev --prepare`.
    */
   readonly exec: (command: string) => string;
+  /** Adds a dependency, for display (`bun add`). */
+  readonly add: string;
   /** Adds development dependencies, for display (`bun add -d`). */
   readonly addDev: string;
 }
@@ -3090,7 +3115,7 @@ declare const creationPackageManager: (
 ) => PackageManagerName;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L129)
 
 ### isPackageManagerName
 
@@ -3102,7 +3127,7 @@ Checks a candidate name.
 declare const isPackageManagerName: (value: string) => value is PackageManagerName;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L98)
 
 ### packageManagerCommands
 
@@ -3114,7 +3139,7 @@ Looks up one manager's commands.
 declare const packageManagerCommands: (name: PackageManagerName) => PackageManagerCommands;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L89)
 
 ### packageManagerFromUserAgent
 
@@ -3128,7 +3153,7 @@ declare const packageManagerFromUserAgent: (
 ) => { readonly name: PackageManagerName; readonly version: string | undefined } | undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L90)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L107)
 
 ### projectPackageManager
 
@@ -3143,7 +3168,7 @@ declare const projectPackageManager: (
 ) => PackageManagerName;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L125)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L142)
 
 ### runtimePackageManager
 
@@ -3155,7 +3180,21 @@ The manager to fall back to when nothing names one.
 declare const runtimePackageManager: () => PackageManagerName;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L119)
+
+### withAllowedInstallScript
+
+Approves one package's install script for npm 11, which lists unapproved install scripts on
+every install (and later releases block them): the `allowScripts` field `npm approve-scripts`
+writes. An entry the author already wrote, allowing or denying the script, stays as it is.
+
+**Signature**
+
+```ts
+declare const withAllowedInstallScript: (content: string, name: string) => string;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/package-manager.ts#L172)
 
 ## `project-manifest.schemas.ts`
 
