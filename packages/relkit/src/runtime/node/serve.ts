@@ -6,7 +6,7 @@ import { createAdaptorServer, type WebSocketServerLike } from "@hono/node-server
 import type { Server } from "node:http";
 import { WebSocketServer } from "ws";
 import type { RuntimeServeOptions, RuntimeServer } from "../runtime-adapter.types.js";
-import { lingerOnClose } from "./lingering-close.js";
+import { isClosing, lingerOnClose } from "./lingering-close.js";
 
 /**
  * Gives a request whose client declared no body a null body, as Bun does. Hono's Node server
@@ -40,7 +40,13 @@ function withDeclaredBody(request: Request): Request {
 export async function serve(options: RuntimeServeOptions): Promise<RuntimeServer> {
   const sockets = new WebSocketServer({ noServer: true });
   const server = createAdaptorServer({
-    fetch: (request, bindings) => options.fetch(withDeclaredBody(request), bindings),
+    fetch: (request, bindings) =>
+      // Not handled: the answer could not be delivered, and the client sends the request again.
+      isClosing(
+        (bindings as { readonly incoming?: { readonly socket?: unknown } }).incoming?.socket,
+      )
+        ? new Response(null, { status: 503, headers: { connection: "close" } })
+        : options.fetch(withDeclaredBody(request), bindings),
     hostname: options.hostname,
     port: options.port,
     // `ws` types `options.noServer` as optional; the server is created with it set.

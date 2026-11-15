@@ -10,6 +10,20 @@
 import type { Server } from "node:http";
 import type { Socket } from "node:net";
 
+/** Connections the listener is closing; a request that still arrives on one is not handled. */
+const closingSockets = new WeakSet<object>();
+
+/**
+ * Tells whether the listener is already closing a connection. The connection keeps reading for a
+ * short while, so a request can still arrive on it; its answer could not be delivered, and the
+ * client sends it again on a new connection, so handling it here would run it twice.
+ * @param socket - Connection a request arrived on, when the listener exposes it.
+ * @returns True once the connection started closing.
+ */
+export function isClosing(socket: unknown): boolean {
+  return typeof socket === "object" && socket !== null && closingSockets.has(socket);
+}
+
 /** Longest time a closing connection keeps reading what its client still sends. */
 const LINGER_MS = 2_000;
 
@@ -43,6 +57,7 @@ export function lingerOnClose(server: Server): void {
     socket.destroySoon = () => {
       if (closing) return;
       closing = true;
+      closingSockets.add(socket);
       lingeringClose(socket);
     };
   });
