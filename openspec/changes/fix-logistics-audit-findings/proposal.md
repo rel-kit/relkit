@@ -19,7 +19,7 @@ The baseline found 35 RelKit failures and 48 Inspector failures (`evidence/basel
 - **Command line:** missing prerequisites, unknown commands, repeated migrations and provider bindings get precise messages; `doctor` reports runtime blockers.
 - **Storage and realtime:** signed uploads carry the bucket's limits; precondition failures keep their status; client subscriptions end on abort.
 - **Inspector:** pages show what happened (order, totals, causes, error codes, validation issues, channel contracts, outage state) and say plainly when an action cannot run.
-- **BREAKING (defaults):** `relkit start` defaults to production mode; the core graph probe body shrinks; oversize bodies answer 413 in every path; 500 bodies carry no cause in development.
+- **BREAKING (defaults):** `relkit start` defaults to production mode; the core graph probe body shrinks; oversize bodies answer 413 in every path; 500 bodies carry no cause in development; access rules with roles or permissions answer before input validation; `relkit check --json` lists generated files without their text unless `--include-outputs` is given; an unknown command exits with status 2.
 
 ## Capabilities
 
@@ -30,5 +30,5 @@ The baseline found 35 RelKit failures and 48 Inspector failures (`evidence/basel
 ## Impact
 
 - Packages: decided by triage; expected `relkit`, `@relkit/cli`, `@relkit/inspector`, the Inspector UI, `@relkit/testing`, and the documentation.
-- No breaking change to public API types. Four defaults change as listed above; each is recorded in `design.md` and in a changeset.
+- No breaking change to public API types. The defaults listed above change; each is recorded in `design.md` and in a changeset.
 - Evidence: `evidence/baseline-report.md` and `evidence/final-report.md` in this change, without machine paths.

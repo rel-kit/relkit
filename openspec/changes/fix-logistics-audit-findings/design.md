@@ -67,6 +67,14 @@ Invoke, channel connect and "send request" run without a session. This change ma
 
 Recording HTTP headers and bodies (IN-04, beyond the invocation's captured input and result), the caller on each request record (IN-30), and choosing a user for Inspector actions (IN-02, IN-08, IN-26, beyond saying why they were refused) each add data collection with redaction and privacy rules of their own. They are recorded as follow-ups; this change makes the interface truthful about their absence. Control-plane requests are not recorded by design (IN-44).
 
+### D13. `relkit check --json` lists generated files without their text
+
+The JSON printed by `relkit check --json` embedded the text of every generated file (one line of about 420 KB for the audited application). Nothing in this repository reads that text from the CLI's output, so the default now lists each file's path, hash and size, and `--include-outputs` adds the text. A script outside this repository that read the text must add the flag; the changeset says so. The in-process result of `checkProject()` is unchanged.
+
+### D14. An unknown command exits with the usage status
+
+`relkit <unknown>` now fails with `RELKIT_UNKNOWN_COMMAND` and exit status 2, like other usage errors, instead of `RELKIT_COMMAND_UNAVAILABLE` and status 1. `RELKIT_COMMAND_UNAVAILABLE` keeps its meaning for a command that parses but is not implemented.
+
 ## Risks / Trade-offs
 
 - The application's database layer is Bun-only, so some Node failures belong to the application. Triage separates them; the Node path of RelKit is still exercised up to the point where application code fails.
