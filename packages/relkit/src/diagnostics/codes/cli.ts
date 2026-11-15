@@ -242,8 +242,8 @@ export const cliCodes = [
   },
   {
     code: "RELKIT_COMMAND_UNAVAILABLE",
-    title: "Unknown relkit command",
-    happened: "`relkit` does not have a command with the name you typed.",
+    title: "Command is not implemented",
+    happened: "`relkit` knows this command, but the installed `@relkit/cli` has no implementation.",
     fix: "Run `relkit --help` to see the available commands, and check that `@relkit/cli` is up to date.",
   },
   {
@@ -624,7 +624,7 @@ export const cliCodes = [
     code: "RELKIT_INTERRUPTED",
     title: "Command was interrupted",
     happened:
-      "The command stopped because it received an interrupt signal, such as Ctrl-C, SIGTERM or SIGHUP.",
+      "The command stopped because it received a signal. Ctrl-C and SIGTERM print `Stopped.` in the terminal and report this code only with `--json`; SIGHUP always reports it.",
     fix: "Run the command again when you are ready. If you did not stop it, check what sent the signal.",
   },
   {

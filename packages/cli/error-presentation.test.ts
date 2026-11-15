@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, expect, test } from "vitest";
 import { createDiagnostic, formatDiagnostic } from "relkit/diagnostics";
-import { errorLines, runCli } from "./src/main.js";
+import { errorLines, getCliHelpModel, runCli, toFailure } from "./src/main.js";
 
 const empty = await mkdtemp(join(tmpdir(), "relkit-error-presentation-"));
 afterAll(() => rm(empty, { recursive: true, force: true }));
@@ -86,4 +86,71 @@ test("every RelKit code gets a docs link, known codes also get the next step", (
     ).at(-1),
   ).toMatch(/^ {2}next: /u);
   expect(errorLines("EACCES", "Permission denied")).toEqual(["EACCES: Permission denied"]);
+});
+
+test("start without a build names the missing build and `relkit build`", async () => {
+  const result = await failure(["start", "--project-root", empty]);
+  expect(result.code).toBe(1);
+  expect(result.stdout).toEqual([]);
+  expect(result.stderr).toBe(
+    [
+      "RELKIT_START_BUILD_MISSING: No build found in <empty>/.relkit/build",
+      "  next: Run `relkit build` in the project and wait for it to succeed, then run `relkit start` again.",
+      "  docs: https://relkit.dev/docs/errors/relkit-start-build-missing",
+    ].join("\n"),
+  );
+  expect(result.stderr).not.toContain("ENOENT");
+});
+
+test("native error codes are never printed as RelKit codes", () => {
+  const native = Object.assign(new Error("EACCES: permission denied, open 'x'"), {
+    code: "EACCES",
+  });
+  expect(toFailure(native, new AbortController().signal)).toMatchObject({
+    code: "RELKIT_INTERNAL_ERROR",
+    message: "EACCES: permission denied, open 'x'",
+    exitCode: 1,
+  });
+  const coded = Object.assign(new Error("Port is invalid."), { code: "RELKIT_DEV_USAGE" });
+  expect(toFailure(coded, new AbortController().signal)).toMatchObject({
+    code: "RELKIT_DEV_USAGE",
+    message: "Port is invalid.",
+  });
+});
+
+const available = getCliHelpModel("test")
+  .commands.map(({ name }) => name)
+  .join(", ");
+const nextStep =
+  "  next: Run `relkit --help` to see every command, or `relkit <command> --help` to see its subcommands.";
+
+test("an unknown command is reported as unknown with the available commands", async () => {
+  const result = await failure(["nosuch"]);
+  expect(result.code).toBe(2);
+  expect(result.stdout).toEqual([]);
+  expect(result.stderr).toBe(
+    [
+      `RELKIT_UNKNOWN_COMMAND: Unknown command "nosuch". Available commands: ${available}.`,
+      nextStep,
+      "  docs: https://relkit.dev/docs/errors/relkit-unknown-command",
+    ].join("\n"),
+  );
+});
+
+test("a near miss keeps the parser's suggestion", async () => {
+  const result = await failure(["devv"]);
+  expect(result.code).toBe(2);
+  expect(result.stderr.split("\n")[0]).toBe(
+    `RELKIT_UNKNOWN_COMMAND: Unknown command "devv". Did you mean dev? Available commands: ${available}.`,
+  );
+});
+
+test("an unknown subcommand lists that command's subcommands", async () => {
+  const none = await failure(["graph", "nosuch"]);
+  expect(none.code).toBe(2);
+  expect(none.stderr.split("\n")[0]).toBe(
+    'RELKIT_UNKNOWN_COMMAND: Unknown subcommand "nosuch" for "relkit graph". Available subcommands: print, check, diff.',
+  );
+  const near = await failure(["graph", "prnt"]);
+  expect(near.stderr.split("\n")[0]).toContain("Did you mean print?");
 });

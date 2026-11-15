@@ -4,6 +4,7 @@ import { runCliEffect } from "./cli-runtime.js";
 import { interactionLayer } from "./cli-interaction.service.js";
 import { fileSystemLayer } from "./services/filesystem.service.js";
 import { runCliProgram } from "./main-effect.js";
+import { isStopSignal, STOPPED_LINE, trackClosingLine } from "./cli-stop-line.js";
 import { isJsonMode } from "./cli-effect-runtime.js";
 import {
   createReporter,
@@ -27,7 +28,8 @@ export async function runCli(
   argv: readonly string[] = process.argv.slice(2),
   runtime: CliRuntime = {},
 ): Promise<number> {
-  const io = runtime.io ?? processIo;
+  const closing = trackClosingLine(runtime.io ?? processIo);
+  const io = closing.io;
   const json = isJsonMode(argv);
   const migration = argv.find((argument) => !argument.startsWith("-")) === "migrate";
   const database = argv.find((argument) => !argument.startsWith("-")) === "db";
@@ -62,6 +64,11 @@ export async function runCli(
     return code;
   } catch (error) {
     const failure = toFailure(error, signal);
+    // A stop on Ctrl+C or SIGTERM is not an error: one closing line, the established exit status.
+    if (!json && !migration && !database && isStopSignal(failure)) {
+      if (!closing.closed()) io.stderr(STOPPED_LINE);
+      return failure.exitCode;
+    }
     reporter.error(
       failure.code,
       database

@@ -1,5 +1,5 @@
 /** Validates the built graph and manifest before trusting their fixed production artifact paths. */
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { Effect, Schema } from "effect";
 import {
   CONTRACT_VERSION,
@@ -16,7 +16,13 @@ import {
   type ApplicationGraph,
 } from "relkit/graph";
 import { LOCAL_SERVICE_PLAN_FILE } from "relkit/local-service";
-import { cliAdapterError, cliTry } from "../cli-errors.js";
+import {
+  CliFailureError,
+  cliAdapterError,
+  cliOriginalError,
+  cliTry,
+  type CliAdapterError,
+} from "../cli-errors.js";
 import { observeCli } from "../cli-runtime.js";
 import { CliFileSystem } from "../services/filesystem.service.js";
 import { validateBuiltArtifactsEffect } from "./start-built-artifacts.js";
@@ -47,6 +53,7 @@ const readBuiltGraphEffect = Effect.fn("BuiltProject.graph")(function* (buildDir
   const graphValue: unknown = yield* files
     .readText(join(buildDirectory, "application.graph.json"))
     .pipe(
+      Effect.catch(buildMissing(buildDirectory, "application.graph.json")),
       Effect.flatMap((source) => cliTry("start.graph.json", () => JSON.parse(source) as unknown)),
     );
   // The build-specific version diagnostic precedes the general graph validator,
@@ -72,13 +79,10 @@ const readBuiltManifestEffect = Effect.fn("BuiltProject.manifest")(function* (
   buildDirectory: string,
 ) {
   const files = yield* CliFileSystem;
-  const manifestValue: unknown = yield* files
-    .readText(join(buildDirectory, "manifest.json"))
-    .pipe(
-      Effect.flatMap((source) =>
-        cliTry("start.manifest.json", () => JSON.parse(source) as unknown),
-      ),
-    );
+  const manifestValue: unknown = yield* files.readText(join(buildDirectory, "manifest.json")).pipe(
+    Effect.catch(buildMissing(buildDirectory, "manifest.json")),
+    Effect.flatMap((source) => cliTry("start.manifest.json", () => JSON.parse(source) as unknown)),
+  );
   const manifest = yield* Schema.decodeUnknownEffect(builtManifestSchema)(manifestValue).pipe(
     Effect.mapError(() =>
       cliAdapterError("start.manifest", new Error("Built manifest paths are invalid.")),
@@ -135,6 +139,34 @@ const validateBuiltPathsEffect = Effect.fn("BuiltProject.paths")(function* (
       ),
     );
   const files = yield* CliFileSystem;
-  yield* files.stat(join(buildDirectory, manifest.entrypoint));
-  yield* files.stat(join(buildDirectory, manifest.containerEntrypoint));
+  for (const entrypoint of new Set([manifest.entrypoint, manifest.containerEntrypoint]))
+    yield* files
+      .stat(join(buildDirectory, entrypoint))
+      .pipe(Effect.catch(buildMissing(buildDirectory, entrypoint)));
 });
+
+/**
+ * Turns an absent build file into the product failure that names `relkit build`.
+ * @param buildDirectory - Selected emitted build root.
+ * @param file - Artifact the reader could not find, relative to the build root.
+ * @returns A recovery for the read; other failures pass through unchanged.
+ */
+function buildMissing(buildDirectory: string, file: string) {
+  return (error: CliAdapterError): Effect.Effect<never, CliAdapterError> => {
+    const cause = cliOriginalError(error);
+    if (!(cause instanceof Error) || (cause as NodeJS.ErrnoException).code !== "ENOENT")
+      return Effect.fail(error);
+    const shown = relative(process.cwd(), buildDirectory);
+    const path = shown.startsWith("..") ? buildDirectory : shown;
+    const message =
+      file === "application.graph.json"
+        ? `No build found in ${path}`
+        : `The build in ${path} is incomplete: ${file} is missing`;
+    return Effect.fail(
+      cliAdapterError(
+        "start.build.missing",
+        new CliFailureError({ code: "RELKIT_START_BUILD_MISSING", message, exitCode: 1 }),
+      ),
+    );
+  };
+}

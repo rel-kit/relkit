@@ -12,6 +12,8 @@ export interface ProjectArgs {
   readonly verbose?: boolean;
   readonly noColor?: boolean;
   readonly prepare?: boolean;
+  /** Whether `relkit check --json` carries each generated file's text. */
+  readonly includeOutputs?: boolean;
   /** Runtime `relkit build` emits the production server for. */
   readonly runtime?: RuntimeAdapterName;
   /** Deploy target `relkit build` checks the build against; only `vercel` changes the build. */

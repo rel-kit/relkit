@@ -21,6 +21,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
   let verbose = false;
   let noColor = false;
   let prepare = false;
+  let includeOutputs = false;
   let runtime: "bun" | "node" | "workers" | undefined;
   let target: "vercel" | undefined;
   for (let index = 0; index < args.length; index += 1) {
@@ -38,6 +39,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     } else if (argument === "--verbose" && command === "dev") verbose = true;
     else if (argument === "--no-color" && command === "dev") noColor = true;
     else if (argument === "--prepare" && command === "dev") prepare = true;
+    else if (argument === "--include-outputs" && command === "check") includeOutputs = true;
     else if (argument === "--runtime" && command === "build") {
       const selected = value(args, ++index, argument, command);
       if (selected !== "bun" && selected !== "node" && selected !== "workers")
@@ -75,6 +77,7 @@ export function parseProjectArgs(args: readonly string[], command: string): Proj
     verbose,
     noColor,
     ...(prepare ? { prepare } : {}),
+    ...(includeOutputs ? { includeOutputs } : {}),
     ...(runtime === undefined ? {} : { runtime }),
     ...(target === undefined ? {} : { target }),
   };

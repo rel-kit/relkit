@@ -108,6 +108,7 @@ function projectCommand(
         ...(name === "build"
           ? { runtime: optionalChoice(path, "runtime"), target: optionalChoice(path, "target") }
           : {}),
+        ...(name === "check" ? { includeOutputs: booleanFlag(path, "include-outputs") } : {}),
         ...(name === "dev"
           ? {
               local: optionalChoice(path, "local"),
@@ -128,6 +129,9 @@ function projectCommand(
               : []),
             ...(value && "runtime" in value ? optionArgs("runtime", value.runtime) : []),
             ...(value && "target" in value ? optionArgs("target", value.target) : []),
+            ...("includeOutputs" in value
+              ? booleanArgs("include-outputs", value.includeOutputs)
+              : []),
             ...(value && "local" in value ? optionArgs("local", value.local) : []),
             ...("logLevel" in value ? optionArgs("log-level", value.logLevel) : []),
             ...("verbose" in value ? booleanArgs("verbose", value.verbose) : []),

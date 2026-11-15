@@ -9,6 +9,7 @@ import type { CliInvocation } from "./cli-effect-runtime.js";
 import type { CheckResult } from "./commands/check.js";
 import type { BuildResult } from "./commands/build.js";
 import { optionalProjectRoot } from "./command-start.js";
+import { checkJsonResult } from "./command-check-outputs.js";
 /**
  * Composes project checking/building and stable diagnostic formatting.
  * @param invocation - Selected check or build invocation.
@@ -28,7 +29,10 @@ export const executeProjectEffect = Effect.fn("Cli.project-command")(function* (
     });
     let human: string | undefined;
     if (!context.json) human = yield* formatCheckResult(result);
-    context.reporter.output(result, human);
+    context.reporter.output(
+      context.json ? checkJsonResult(result, options.includeOutputs === true) : result,
+      human,
+    );
     return result.ok ? CLI_EXIT_CODES.success : CLI_EXIT_CODES.failure;
   }
   const result = yield* project.build({

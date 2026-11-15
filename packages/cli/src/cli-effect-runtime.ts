@@ -127,15 +127,26 @@ export function cliErrorMessage(error: CliError.CliError): string {
 
 /** Recognizes unknown-command parser failures for public presentation.
  * @param error - Validated parser failure.
- * @returns Existing unknown-command wording, absent for unrelated failures.
+ * @returns The unknown name, the parser's suggestion and the commands to choose from, absent for unrelated failures.
  */
 export function unknownCommandMessage(error: CliError.CliError): string | undefined {
   if (error._tag !== "ShowHelp") return undefined;
   const unknown = error.errors.find((entry) => entry._tag === "UnknownSubcommand");
   if (!unknown || unknown._tag !== "UnknownSubcommand") return undefined;
-  return unknown.suggestions.length === 0
-    ? `Command is not implemented: ${unknown.subcommand}`
-    : unknown.message;
+  const path = unknown.parent ?? error.commandPath;
+  const parent = path.slice(1);
+  const names = findCliHelp(parent)?.commands.map(({ name }) => name) ?? [];
+  const subject =
+    parent.length === 0
+      ? `Unknown command "${unknown.subcommand}".`
+      : `Unknown subcommand "${unknown.subcommand}" for "${path.join(" ")}".`;
+  const suggestion =
+    unknown.suggestions.length === 0 ? "" : ` Did you mean ${unknown.suggestions.join(" or ")}?`;
+  const choices =
+    names.length === 0
+      ? ""
+      : ` Available ${parent.length === 0 ? "commands" : "subcommands"}: ${names.join(", ")}.`;
+  return `${subject}${suggestion}${choices}`;
 }
 
 /** Normalizes help and version action aliases before parsing.

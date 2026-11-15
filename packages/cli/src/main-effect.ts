@@ -62,10 +62,10 @@ export const runCliProgram = Effect.fn("Cli.invocation")(
       }
       const unknown = unknownCommandMessage(parsed.error);
       reporter.error(
-        unknown === undefined ? "RELKIT_CLI_USAGE" : "RELKIT_COMMAND_UNAVAILABLE",
+        unknown === undefined ? "RELKIT_CLI_USAGE" : "RELKIT_UNKNOWN_COMMAND",
         unknown ?? cliErrorMessage(parsed.error),
       );
-      return unknown === undefined ? CLI_EXIT_CODES.usage : CLI_EXIT_CODES.failure;
+      return CLI_EXIT_CODES.usage;
     }
     if (hasAction(parsed.argv, "version", "v")) {
       reporter.output({ name: "relkit", version }, `relkit ${version}`);

@@ -107,27 +107,16 @@ function commandRunner(context: Context.Context<ContributorWorkspace | CliProces
 /**
  * Runs the existing contributor CLI with one workspace/process graph.
  * @param argv - Literal arguments, defaulting to the native argv.
- * @returns The existing CLI exit status, preserving dev interruption presentation.
+ * @returns The existing CLI exit status.
  */
 export function main(argv: readonly string[] = process.argv.slice(2)): Promise<number> {
   return runCliEffect(
     Effect.gen(function* () {
       const owner = yield* Effect.context<ContributorWorkspace | CliProcess>();
       const runner = commandRunner(owner);
-      const dev = argv.find((argument) => !argument.startsWith("-")) === "dev";
       return yield* contributorCallback("contributor.cli", (signal) =>
         runCli(argv, {
           signal,
-          ...(dev
-            ? {
-                io: {
-                  stdout: (line: string) => process.stdout.write(`${line}\n`),
-                  stderr: (line: string) => {
-                    if (!line.startsWith("RELKIT_INTERRUPTED:")) process.stderr.write(`${line}\n`);
-                  },
-                },
-              }
-            : {}),
           loadCreateRelkit: contributorGenerator(owner, runner),
         }),
       );

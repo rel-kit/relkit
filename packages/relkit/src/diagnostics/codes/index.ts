@@ -4,6 +4,7 @@ import { agentAdapterCodes } from "./agent-adapters.js";
 import { authCodes } from "./auth.js";
 import { checkRuleCodes } from "./check-rules.js";
 import { cliCodes } from "./cli.js";
+import { cliInvocationCodes } from "./cli-invocation.js";
 import { deprecatedCodes } from "./deprecated.js";
 import { deployTargetCodes } from "./deploy-targets.js";
 import { handleCodes } from "./handle.js";
@@ -26,6 +27,7 @@ export const DOCS_ORIGIN = "https://relkit.dev" as const;
 export const DIAGNOSTIC_CODES: readonly DiagnosticCodeEntry[] = Object.freeze(
   [
     ...cliCodes,
+    ...cliInvocationCodes,
     ...launcherCodes,
     ...compilerCodes,
     ...checkRuleCodes,

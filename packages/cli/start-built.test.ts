@@ -1,7 +1,7 @@
 /** Verifies canonical built artifacts and preserves version, completeness and activation cohort guards. */
 import { afterEach, expect, test } from "bun:test";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import {
   CONTRACT_VERSION,
   GENERATOR_VERSION,
@@ -95,6 +95,22 @@ test("accepts only the current complete built artifact cohort", async () => {
   await expect(readBuilt(root)).rejects.toThrow(
     `Built graph manifest version ${GRAPH_VERSION - 1} is unsupported; expected ${GRAPH_VERSION}. Rebuild with \`relkit build\`.`,
   );
+});
+
+test("a missing build fails with the build-missing code and the relative path", async () => {
+  const root = await mkdtemp(join(process.cwd(), ".relkit-built-missing-"));
+  roots.push(root);
+  await expect(readBuilt(root)).rejects.toMatchObject({
+    code: "RELKIT_START_BUILD_MISSING",
+    message: expect.stringContaining(`No build found in ${relative(process.cwd(), root)}`),
+  });
+
+  await writeBuiltCohort(root);
+  await rm(join(root, "manifest.json"));
+  await expect(readBuilt(root)).rejects.toMatchObject({
+    code: "RELKIT_START_BUILD_MISSING",
+    message: expect.stringContaining("manifest.json is missing"),
+  });
 });
 
 afterEach(async () => {
