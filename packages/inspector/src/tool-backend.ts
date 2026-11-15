@@ -168,12 +168,16 @@ function backendStatus(
         error: historyError(current),
         applicationError:
           current.error && !historyFailure(current.error) ? current.error : undefined,
-        incomplete: current.incomplete,
+        // A record this run of the tool could not store keeps history incomplete for the run.
+        incomplete: current.incomplete || (current.historyLost ?? 0) > 0,
         recordsLostBeforeHistory: {
           // Records the application's producer could not hand to its inspection buffer.
           byApplicationProducer: current.producerDropped ?? 0,
           // Records the application's inspection buffer evicted before the Inspector stored them.
           byInspectionBuffer: current.droppedRecords,
+          // Records the Inspector collected that its history did not store: refused by the
+          // store, or still unstored when their session ended. Counted over the tool's run.
+          byHistoryStore: current.historyLost ?? 0,
         },
         // Invalidations the tool's stream dropped for a slow interface; no record is lost.
         missedLiveUpdates: stream.counters().subscriberDropped,

@@ -94,6 +94,7 @@ it.effect("records lost by the producer and by the inspection buffer are named a
     expect(body.recordsLostBeforeHistory).toEqual({
       byApplicationProducer: 3,
       byInspectionBuffer: 5,
+      byHistoryStore: 0,
     });
     expect(body.missedLiveUpdates).toBe(0);
     expect(body.producerFailed).toBe(1);
@@ -112,6 +113,7 @@ it.effect("an interface stream that overflows misses live updates but loses no r
     expect(body.recordsLostBeforeHistory).toEqual({
       byApplicationProducer: 3,
       byInspectionBuffer: 5,
+      byHistoryStore: 0,
     });
   }).pipe(Effect.scoped),
 );
