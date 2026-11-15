@@ -22,12 +22,18 @@ export interface DoctorOptions {
   readonly commandRunner?: DoctorCommandRunner;
   readonly portProbe?: (port: number) => Promise<boolean>;
 }
+/** What a doctor command reported: its exit status and, when known, its standard error and output. */
+export interface DoctorCommandResult {
+  readonly exitCode: number;
+  readonly output?: string;
+}
+
 /** Native command compatibility boundary; signal-aware implementations cancel promptly. */
 export type DoctorCommandRunner = (
   command: readonly string[],
   cwd: string,
   signal?: AbortSignal,
-) => Promise<{ readonly exitCode: number }>;
+) => Promise<DoctorCommandResult>;
 
 /** Pure parser result whose absence preserves invocation defaults. */
 export type ParsedDoctorArgs = Pick<
