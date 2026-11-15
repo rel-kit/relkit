@@ -123,7 +123,7 @@ async function assertDocuments(app: ReturnType<typeof createApp>, graph: Applica
     ],
   });
   expect(generateClient(graph)).toContain(
-    'export { createClient, ORPCError } from "@relkit/client";',
+    'export { api, createApi, createClient, ORPCError } from "@relkit/client";',
   );
   expect((await app.request(API_REFERENCE_PATH)).status).toBe(200);
 }

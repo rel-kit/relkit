@@ -27,7 +27,7 @@ test("a route with auth required and an access rule declares the session require
     unauthorized: operation?.responses["401"],
     forbidden: operation?.responses["403"]?.description,
     relkit: { auth: operation?.["x-relkit"].auth, access: operation?.["x-relkit"].access },
-    components: document.components,
+    components: document.components?.securitySchemes,
   }).toMatchSnapshot();
 });
 
@@ -44,5 +44,5 @@ test("a public route declares no security", () => {
   const operation = document.paths["/orders/{id}"]?.get;
   expect(operation).not.toHaveProperty("security");
   expect(operation?.responses).not.toHaveProperty("401");
-  expect(document).not.toHaveProperty("components");
+  expect(document.components).not.toHaveProperty("securitySchemes");
 });

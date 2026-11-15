@@ -172,5 +172,5 @@ test("request and response projections retain defaults for sparse metadata", () 
   expect(responses["400"]?.content?.["application/problem+json"]?.schema).toMatchObject({
     properties: { code: { const: "error" } },
   });
-  expect(Object.keys(Effect.runSync(buildResponsesEffect(null, target)))).toEqual(["422"]);
+  expect(Effect.runSync(buildResponsesEffect(null, target))).toEqual({});
 });

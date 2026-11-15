@@ -154,7 +154,7 @@ test("request mapping covers nested wrappers, inferred parameters, media types a
   expect(Effect.runSync(buildRequestEffect(null, null, "/")).body).toBeUndefined();
 });
 
-test("response projection merges statuses, omits no-content schema and adds validation", () => {
+test("response projection merges statuses and omits no-content schema; the validation fallback is not its job", () => {
   const responses = Effect.runSync(
     buildResponsesEffect(
       [
@@ -170,7 +170,7 @@ test("response projection merges statuses, omits no-content schema and adds vali
     oneOf: [{ type: "string" }, { type: "number" }],
   });
   expect(responses["204"]?.content).toBeUndefined();
-  expect(responses["422"]?.description).toBe("Validation error");
+  expect(responses).not.toHaveProperty("422");
   expect(responses["400"]?.content?.["application/problem+json"]?.schema).toMatchObject({
     properties: { type: { const: "/errors/other" }, code: { const: "other" } },
   });

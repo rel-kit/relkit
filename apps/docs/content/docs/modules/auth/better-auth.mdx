@@ -191,6 +191,27 @@ Better Auth writes through the native adapter, bypassing RelKit portable CRUD, g
 and operation overrides. Do not use a table override as an auth policy or expose credential/session
 tables through generic CRUD routes. See [Database integration](/docs/modules/database/better-auth).
 
+## Read the authentication operations in the API reference
+
+The served document at `/_relkit/v1/openapi.json` and the API reference include the mounted Better
+Auth operations under the Authentication tag. Better Auth generates them, and RelKit corrects what
+it can verify from Better Auth's source: `nullable: true` becomes OpenAPI 3.1 nullability, so a new
+user's `image` validates as `null`. The corrections also fix the success answers of
+`organization/delete`, `organization/has-permission`, `organization/check-slug`,
+`organization/list-invitations` and `organization/list-members`. Every operation that takes a body
+also declares 413 and 415.
+
+These differences between the reference and the server remain:
+
+- State-changing operations, such as `POST /api/auth/organization/set-active`, answer 403 with
+  `application/problem+json` (code `origin-denied` or `csrf-denied`) when the request comes from
+  another origin and transport security is on. RelKit sends that answer before Better Auth runs, so
+  the reference lists only Better Auth's own JSON 403.
+- Some operations declare no success answer, such as `organization/leave`,
+  `organization/cancel-invitation` and `organization/get-active-member-role`.
+- A failed `organization/set-active` for an unknown organization clears the active organization;
+  this is Better Auth's behavior.
+
 Run `bun run check` and `bun run typecheck`, then verify a real sign-up and protected request using
 [Your first auth flow](/guides/auth/email-password-sign-in). Continue with [Customization](/docs/modules/auth/customization)
 before exposing a deployment to users.

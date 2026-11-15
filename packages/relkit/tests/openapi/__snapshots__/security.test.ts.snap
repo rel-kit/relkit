@@ -3,13 +3,11 @@
 exports[`a route with auth required and an access rule declares the session requirement 1`] = `
 {
   "components": {
-    "securitySchemes": {
-      "session": {
-        "description": "Better Auth session cookie set by signing in.",
-        "in": "cookie",
-        "name": "better-auth.session_token",
-        "type": "apiKey",
-      },
+    "session": {
+      "description": "Better Auth session cookie set by signing in.",
+      "in": "cookie",
+      "name": "better-auth.session_token",
+      "type": "apiKey",
     },
   },
   "forbidden": "The caller does not pass the access rule",
@@ -34,39 +32,7 @@ exports[`a route with auth required and an access rule declares the session requ
     "content": {
       "application/problem+json": {
         "schema": {
-          "properties": {
-            "code": {
-              "type": "string",
-            },
-            "detail": {
-              "type": "string",
-            },
-            "requestId": {
-              "type": "string",
-            },
-            "status": {
-              "maximum": 599,
-              "minimum": 100,
-              "type": "integer",
-            },
-            "title": {
-              "type": "string",
-            },
-            "traceId": {
-              "type": "string",
-            },
-            "type": {
-              "type": "string",
-            },
-          },
-          "required": [
-            "type",
-            "title",
-            "status",
-            "code",
-            "detail",
-          ],
-          "type": "object",
+          "$ref": "#/components/schemas/Problem",
         },
       },
     },
