@@ -197,7 +197,7 @@
 
 **Starts after groups 8, 9 and 13 are merged.** **Owns:** `scripts/node-creation-smoke*.ts`, the Node acceptance job in `.github/workflows/checks.yml`.
 
-- [ ] 19.1 Extend the Node creation acceptance run (npm, no Bun) to add a database, migrate it from `.env`, run `check`, add and start the Inspector until it listens, and run `start` without a build expecting the coded diagnostic; verify the run locally from packed archives.
+- [x] 19.1 Extend the Node creation acceptance run (npm, no Bun) to add a database, migrate it from `.env`, run `check`, add and start the Inspector until it listens, and run `start` without a build expecting the coded diagnostic; verify the run locally from packed archives.
 
 ## 20. The audited application
 
