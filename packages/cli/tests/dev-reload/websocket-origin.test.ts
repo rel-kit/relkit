@@ -91,7 +91,8 @@ for (const host of ["node", "bun"] as const) {
       expect(same, dev.output().slice(-3_000)).toBe(101);
       expect(await opens(dev, dev.origin)).toBe(true);
       const cross = await handshake(dev, { Origin: CROSS_ORIGIN });
-      expect(cross).not.toBe(101);
+      // The worker's refusal, not a 502 from the development proxy (finding 7b).
+      expect(cross).toBe(403);
       expect(await opens(dev, CROSS_ORIGIN)).toBe(false);
       // Client-sent forwarding headers neither admit a foreign origin nor deny the real one.
       expect(await handshake(dev, { Origin: CROSS_ORIGIN, ...SPOOFED })).toBe(cross);

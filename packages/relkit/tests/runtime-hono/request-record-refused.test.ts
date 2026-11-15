@@ -83,6 +83,17 @@ test("an unmatched path, a wrong method and an oversize body are refused", async
   ).toMatchObject({ status: 413, outcome: "refused" });
 });
 
+test("a call to an RPC procedure the endpoint does not serve is refused", async () => {
+  expect(
+    await completed({
+      path: "/_relkit/v1/rpc/no.such.procedure",
+      method: "POST",
+      body: JSON.stringify({ json: {} }),
+      headers: { "content-type": "application/json" },
+    }),
+  ).toMatchObject({ status: 404, outcome: "refused", routeId: "relkit.rpc" });
+});
+
 test("a routed request keeps the outcome its route produced", async () => {
   expect(
     await completed({

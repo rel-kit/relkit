@@ -59,7 +59,9 @@ The client should treat the channel as unavailable until its authoritative route
 
 ## Browser transport requirements
 
-Cookie-authenticated WebSocket connections require an exact allowed `Origin`; missing, wildcard, `null`, malformed, and disallowed origins are rejected before subscription. Credentialed cross-origin deployments must name allowed origins explicitly. CORS headers do not replace authentication or channel authorization.
+A browser sends `Origin` on every WebSocket upgrade. RelKit accepts the upgrade when that origin is the application's own or one named in `RELKIT_ALLOWED_ORIGINS`. A wildcard, `null`, malformed or other origin is refused with `403` and the `origin-denied` Problem before any channel is opened, as an HTTP request from that origin is. Credentialed cross-origin deployments must name allowed origins explicitly. CORS headers do not replace authentication or channel authorization.
+
+An upgrade without `Origin` comes from a client that is not a browser, such as a server, a CLI or the `ws` package. In production it is refused in the same way. In development (any environment other than production, as under `relkit dev`) it is treated as a service call and accepted, as an HTTP call without `Origin` is. Either way, every subscribe call on an accepted connection still passes the session check and the channel's guard.
 
 State-changing HTTP operations that lead to channel publication still use the route's CSRF protection. A channel guard cannot make an unsafe mutation safe after it has already executed.
 

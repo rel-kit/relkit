@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { WebSocket as NodeWebSocket } from "ws";
+import { keepUpstreamRefusal } from "./proxy-websocket-refusal.js";
 import type { ProxyDownstream } from "./proxy-websocket.types.js";
 
 /** Awaits native acceptance and unregisters handshake listeners on interruption.
@@ -105,6 +106,8 @@ export function openUpstream(
   socket.binaryType = "arraybuffer";
   // An emitter `error` without a listener throws; the tunnel's listeners come and go with it.
   socket.on("error", () => undefined);
+  // A refused handshake keeps the worker's answer, which the proxy repeats downstream.
+  keepUpstreamRefusal(socket);
   // `ws` implements the WebSocket event surface the tunnel uses (listeners, `readyState`,
   // `send`, `close`, `terminate`), with the same ready-state values.
   return socket as unknown as WebSocket;

@@ -13,6 +13,7 @@ import {
   openUpstream,
   terminateUpstream,
 } from "./proxy-websocket-native.js";
+import { refusedUpgrade } from "./proxy-websocket-refusal.js";
 
 export type { ProxySocketData } from "./proxy-websocket.types.js";
 
@@ -175,7 +176,7 @@ export const upgradeProxyWebSocket = Effect.fn("SupervisorProxy.websocket")(func
             if (Exit.isFailure(exit))
               yield* Deferred.succeed(
                 headers,
-                new Response("WebSocket upgrade failed.", { status: 502 }),
+                yield* Effect.promise(() => refusedUpgrade(request, upstream)),
               );
             yield* Scope.close(scope, exit);
           }),
