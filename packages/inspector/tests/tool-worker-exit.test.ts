@@ -76,8 +76,22 @@ it.effect("a stopped worker is reported at once and replaced", () =>
           ),
         ).pipe(Effect.provide(native)),
       );
+      // Opening ends with a real file write (the owner record), so wait for it in real time.
+      const held = (count: number) =>
+        Effect.gen(function* () {
+          for (let tries = 0; tries < 200; tries++) {
+            const value = yield* Ref.get(current);
+            if (
+              failures.length >= count &&
+              value.history?.failure?.() === undefined &&
+              value.history
+            )
+              return;
+            yield* Effect.promise(() => new Promise((done) => setTimeout(done, 10)));
+          }
+        });
       yield* Deferred.await(opened);
-      yield* TestClock.adjust(50);
+      yield* held(1);
       expect(yield* status(current, events)).toMatchObject({
         state: "ready",
         collection: "waiting-for-application",
@@ -91,6 +105,7 @@ it.effect("a stopped worker is reported at once and replaced", () =>
       });
 
       yield* TestClock.adjust(2000);
+      yield* held(2);
       expect(failures).toHaveLength(2);
       const after = yield* status(current, events);
       expect(after).toMatchObject({ state: "ready", collection: "waiting-for-application" });
