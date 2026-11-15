@@ -13,7 +13,7 @@ describe("what an event action says before it runs", () => {
       "Publishes a new event; its reactions will run.",
     );
     expect(confirmation("replay", "pub-1").description).toBe(
-      "Publishes this event's payload again as a new event.",
+      "Delivers this publication again to the functions that react to it, with its stored payload. Nothing new is published.",
     );
     expect(confirmation("retry", "d-1").description).toBe(
       "Runs this delivery again from the start.",
@@ -47,15 +47,14 @@ describe("what an event action says afterwards", () => {
     });
   });
 
-  test("a replay names the publication it was replayed from and the new one", () => {
-    expect(
-      eventActionSuccess("replay", "pub-1", {
-        result: { replayOf: "pub-1", eventId: "orders.created", version: 1, instanceId: "pub-10" },
-      }),
-    ).toEqual({
-      text: "Published the payload of pub-1 again as publication pub-10.",
-      publicationId: "pub-10",
+  test("a replay says the same publication was delivered again, not published anew", () => {
+    const sent = eventActionSuccess("replay", "pub-1", {
+      result: { replayOf: "pub-1", eventId: "orders.created", version: 1, instanceId: "pub-1" },
     });
+    expect(sent).toEqual({
+      text: "Delivered publication pub-1 again to its reactions. Nothing new was published.",
+    });
+    expect(sent.text).toBe(eventActionSuccess("replay", "pub-1", {}).text);
   });
 
   test("retry and cancel name the delivery", () => {
@@ -86,7 +85,7 @@ describe("what a refusal by the provider says", () => {
     expect(unsupportedText("retry")).toBe("This provider cannot retry a delivery.");
     expect(unsupportedText("cancel")).toBe("This provider cannot cancel a delivery.");
     expect(unsupportedText("replay")).toBe(
-      "This provider keeps no payload for this publication, so it cannot be published again.",
+      "This provider keeps no payload for this publication, so it cannot be delivered again.",
     );
     expect(unsupportedText("publish")).toBe(
       "The application has no schema for this event, so the Inspector cannot publish it.",

@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  historyIncomplete,
   historyStatusMessage,
   missedLiveUpdatesNote,
   recordsLost,
@@ -72,4 +73,47 @@ test("storage failure recovery names the tool and preserves data", () => {
     "Restart the Inspector",
   );
   expect(historyStatusMessage(undefined)).toContain("unavailable");
+});
+
+describe("nothing is missing when no record was lost (NF-9, NF-11)", () => {
+  const none = { byApplicationProducer: 0, byInspectionBuffer: 0 };
+
+  test("a zero loss says nothing is missing, whatever the flag", () => {
+    for (const connection of ["connected", "disconnected", "ambiguous"]) {
+      const message = historyStatusMessage({
+        state: "ready",
+        connection,
+        incomplete: true,
+        recordsLostBeforeHistory: none,
+      });
+      expect(message).not.toMatch(/missing|incomplete|could not hand|cannot be reconstructed/i);
+    }
+    expect(historyIncomplete({ incomplete: true, recordsLostBeforeHistory: none })).toBe(false);
+  });
+
+  test("an incomplete history with no counts, or with a loss, is still incomplete", () => {
+    expect(historyIncomplete({ incomplete: true })).toBe(true);
+    expect(
+      historyIncomplete({
+        incomplete: true,
+        recordsLostBeforeHistory: { byApplicationProducer: 0, byInspectionBuffer: 4 },
+      }),
+    ).toBe(true);
+    expect(historyIncomplete({ incomplete: false })).toBe(false);
+    expect(historyIncomplete(undefined)).toBe(false);
+  });
+
+  test("a part that lost nothing is not named as a failure", () => {
+    const sentence = recordsLostSentence({
+      total: 4,
+      byApplicationProducer: 0,
+      byInspectionBuffer: 4,
+    });
+    expect(sentence).toBe(
+      "Some requests, logs or spans from this session are missing from history: the buffer dropped 4 before the Inspector stored them.",
+    );
+    expect(recordsLostSentence({ total: 5, byApplicationProducer: 5, byInspectionBuffer: 0 })).toBe(
+      "Some requests, logs or spans from this session are missing from history: the application could not hand 5 records to its inspection buffer.",
+    );
+  });
 });

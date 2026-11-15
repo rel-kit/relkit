@@ -1,4 +1,5 @@
 import { InspectorApiError } from "./api-types";
+import { BARE_FORBIDDEN_TEXT, ORIGIN_DENIED, ORIGIN_DENIED_TEXT } from "./origin-denied";
 import { issueProblem, type ValidationIssue } from "./request-failure";
 
 /** The application's answer to a refused action, under `cause` in the rejected action body. */
@@ -81,6 +82,11 @@ export function actionAnswer(
 ): ActionAnswer {
   const cause = actionCause(error);
   if (cause !== undefined) return fromCause(cause, subject);
+  // The application's own problem answer, such as its origin check, is not an Inspector envelope.
+  if (error instanceof InspectorApiError && error.body?.code === ORIGIN_DENIED)
+    return { text: ORIGIN_DENIED_TEXT, noSession: false };
+  if (error instanceof InspectorApiError && error.code === "HTTP_403" && error.body === undefined)
+    return { text: BARE_FORBIDDEN_TEXT, noSession: false };
   return { text: inspectorReason(error, options), noSession: false };
 }
 
@@ -92,6 +98,8 @@ function fromCause(cause: ActionCause, subject: ActionSubject): ActionAnswer {
     ...rest,
   });
   switch (cause.code) {
+    case ORIGIN_DENIED:
+      return answer(ORIGIN_DENIED_TEXT);
     case "unauthenticated":
       return answer(NO_SESSION, { noSession: true });
     case "access-denied":

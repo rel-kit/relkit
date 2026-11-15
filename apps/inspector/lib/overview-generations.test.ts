@@ -89,4 +89,63 @@ describe("generation history (IN-28)", () => {
     );
     expect(generationHistory(items, 8)[0]!.entries).toHaveLength(8);
   });
+
+  describe("what counts as the current session (NF-5)", () => {
+    const earlier = [
+      log(1, "dev.generation.active", { version: 0, initial: true, runId: "old", reason: "start" }),
+      log(2, "dev.generation.swapped", {
+        version: 1,
+        changedFiles: 1,
+        runId: "old",
+        reason: "reload",
+      }),
+    ];
+
+    test("an old session is not current when the connected session left no record", () => {
+      const groups = generationHistory(earlier, 12, {
+        state: "connected",
+        since: "2026-11-15T10:30:00.000Z",
+      });
+      expect(groups.flatMap((group) => group.entries).some((entry) => entry.current)).toBe(false);
+      const [first, second] = groups;
+      expect(first).toMatchObject({ current: true, startRetained: false, entries: [] });
+      expect(second).toMatchObject({ runId: "old", current: false });
+    });
+
+    test("a session with events since it connected is current, and shows whether its start is kept", () => {
+      const groups = generationHistory(
+        [
+          ...earlier,
+          log(
+            31,
+            "dev.generation.swapped",
+            { changedFiles: 2, runId: "new", reason: "reload" },
+            31,
+          ),
+        ],
+        12,
+        { state: "connected", since: "2026-11-15T10:30:00.000Z" },
+      );
+      expect(groups.map((group) => [group.runId, group.current, group.startRetained])).toEqual([
+        ["new", true, false],
+        ["old", false, true],
+      ]);
+      expect(groups[0]!.entries[0]!.current).toBe(true);
+      expect(groups[1]!.entries.some((entry) => entry.current)).toBe(false);
+    });
+
+    test("nothing is current while the application is not connected", () => {
+      for (const state of ["unreachable", "waiting", "checking", "ambiguous"] as const) {
+        const groups = generationHistory(earlier, 12, { state, since: "2026-11-15T09:00:00.000Z" });
+        expect(groups).toHaveLength(1);
+        expect(groups[0]!.current).toBe(false);
+        expect(groups[0]!.entries.some((entry) => entry.current)).toBe(false);
+      }
+    });
+
+    test("without a known connection time the newest session is current", () => {
+      const groups = generationHistory(earlier, 12, { state: "connected" });
+      expect(groups[0]).toMatchObject({ runId: "old", current: true, startRetained: true });
+    });
+  });
 });

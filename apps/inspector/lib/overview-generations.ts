@@ -22,15 +22,36 @@ export interface GenerationGroup {
   readonly runId?: string;
   /** When the run's first generation started, when it is in the list. */
   readonly startedAt?: string;
+  /** This run is the session the Inspector is connected to now. */
+  readonly current: boolean;
+  /** The run's start record is in the list. */
+  readonly startRetained: boolean;
   readonly entries: readonly GenerationEntry[];
+}
+
+/** What the Inspector reports about its session with the application. */
+export interface GenerationSession {
+  readonly state: string;
+  /** When the Inspector began to report this session. */
+  readonly since?: string | undefined;
 }
 
 const PREFIX = "dev.generation.";
 const CAUSE_LINES = 3;
 
+/**
+ * @param items - `dev.generation.*` supervisor logs.
+ * @param limit - How many of the newest events to keep.
+ * @param session - The Inspector's session with the application. Only a connected session can be
+ * current, and the newest run is it when it logged something since the Inspector began to report
+ * that session (a run's id is not the session's id, so no stronger match exists). A connected
+ * session with no such run is shown as an empty current group, whose start is not retained, and
+ * no older run is called current. Without `session`, the newest run is current.
+ */
 export function generationHistory(
   items: readonly InspectorObject[],
   limit = 12,
+  session?: GenerationSession,
 ): readonly GenerationGroup[] {
   const events = items
     .flatMap((item) => {
@@ -39,6 +60,7 @@ export function generationHistory(
     })
     .sort((left, right) => order(right.item) - order(left.item))
     .slice(0, limit);
+  const currentKey = currentRun(events[0]?.item, session);
   let currentSeen = false;
   const groups = new Map<
     string,
@@ -48,7 +70,7 @@ export function generationHistory(
     const fields = record(item.fields) ?? {};
     const runId = text(fields.runId);
     const active = kind === "active" || kind === "swapped";
-    const current = active && !currentSeen;
+    const current = active && !currentSeen && (runId ?? "") === currentKey;
     if (current) currentSeen = true;
     const entry = describe(item, kind, fields, index, current);
     const key = runId ?? "";
@@ -58,7 +80,32 @@ export function generationHistory(
       group.startedAt = entry.at;
     groups.set(key, group);
   });
-  return [...groups.values()];
+  const result = [...groups.values()].map((group) => ({
+    ...group,
+    current: (group.runId ?? "") === currentKey,
+    startRetained: group.startedAt !== undefined,
+  }));
+  // The connected session left no record in the list: say so rather than call an old one current.
+  if (session?.state === "connected" && currentKey === undefined)
+    return [{ current: true, startRetained: false, entries: [] }, ...result];
+  return result;
+}
+
+/**
+ * The run key (`""` for runs without an id) of the connected session, or undefined when no run
+ * in the list can be shown as it. `newest` is the newest event.
+ */
+function currentRun(
+  newest: InspectorObject | undefined,
+  session: GenerationSession | undefined,
+): string | undefined {
+  if (newest === undefined) return undefined;
+  const key = text(record(newest.fields)?.runId) ?? "";
+  if (session === undefined) return key;
+  if (session.state !== "connected") return undefined;
+  const since = session.since === undefined ? undefined : Date.parse(session.since);
+  if (since !== undefined && Number.isFinite(since) && order(newest) < since) return undefined;
+  return key;
 }
 
 function describe(

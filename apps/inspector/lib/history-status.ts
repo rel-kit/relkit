@@ -12,10 +12,19 @@ export function historyStatusMessage(value: InspectorObject | undefined): string
     value.connection === "ambiguous" || value.connection === "disconnected"
       ? "Retained history remains readable; new records arrive when the application connects."
       : "History collection connected; app buffering and retention are bounded.";
-  if (value.incomplete !== true) return collection;
+  if (!historyIncomplete(value)) return collection;
   const lost = recordsLost(value);
   const sentence = lost === undefined ? undefined : recordsLostSentence(lost);
   return `${collection} ${sentence ?? "Some records from this session are missing from history."} Missing records cannot be reconstructed.`;
+}
+
+/**
+ * Whether records are missing from history. The tool's `incomplete` flag also covers a session
+ * that has not been collected yet; when it reports that no record was lost, nothing is missing.
+ */
+export function historyIncomplete(value: InspectorObject | undefined): boolean {
+  if (value?.incomplete !== true) return false;
+  return recordsLost(value)?.total !== 0;
 }
 
 /** Records that never reached history (IN-17), in the two places they can be lost. */
@@ -41,7 +50,17 @@ export function recordsLost(value: InspectorObject | undefined): RecordsLost | u
 
 export function recordsLostSentence(lost: RecordsLost): string | undefined {
   if (lost.total === 0) return undefined;
-  return `Some requests, logs or spans from this session are missing from history: the application could not hand ${number(lost.byApplicationProducer)} records to its inspection buffer, and the buffer dropped ${number(lost.byInspectionBuffer)} before the Inspector stored them.`;
+  const parts = [
+    ...(lost.byApplicationProducer === 0
+      ? []
+      : [
+          `the application could not hand ${number(lost.byApplicationProducer)} records to its inspection buffer`,
+        ]),
+    ...(lost.byInspectionBuffer === 0
+      ? []
+      : [`the buffer dropped ${number(lost.byInspectionBuffer)} before the Inspector stored them`]),
+  ];
+  return `Some requests, logs or spans from this session are missing from history: ${parts.join(", and ")}.`;
 }
 
 /** Gaps in the live stream only delay the page, which then refreshes; nothing is lost. */

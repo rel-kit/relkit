@@ -6,7 +6,9 @@ import {
   deliveryTraceId,
   mergeEventRuntime,
   payloadPreview,
+  publicationRequestId,
   publicationTime,
+  publicationTraceId,
   stateCounts,
 } from "./event-rows";
 
@@ -100,10 +102,29 @@ describe("what a row shows about a record", () => {
     expect(deliveryTime({})).toBe("");
   });
 
+  test("the API sends the time of a record as epoch milliseconds", () => {
+    const at = Date.UTC(2026, 10, 15, 8, 30, 0);
+    expect(deliveryTime({ deliveryId: "d1", timestamp: at })).toBe("2026-11-15T08:30:00.000Z");
+    expect(publicationTime({ instanceId: "p1", timestamp: at })).toBe("2026-11-15T08:30:00.000Z");
+    expect(deliveryTime({ timestamp: Number.NaN })).toBe("");
+    expect(deliveryTime({ timestamp: 0 })).toBe("");
+  });
+
+  test("a publication names its trace by the trace id or the producer's trace id", () => {
+    expect(publicationTraceId({ traceId: "t1" })).toBe("t1");
+    expect(publicationTraceId({ producerTraceId: "t2" })).toBe("t2");
+    expect(publicationTraceId({ instanceId: "p1" })).toBeUndefined();
+    expect(publicationRequestId({ originRequestId: "r1" })).toBe("r1");
+    expect(publicationRequestId({})).toBeUndefined();
+  });
+
   test("a delivery links to the trace of the publication it belongs to", () => {
     const publications = [{ instanceId: "p1", traceId: "t1" }, { instanceId: "p2" }];
     expect(deliveryTraceId({ eventInstanceId: "p1" }, publications)).toBe("t1");
     expect(deliveryTraceId({ eventInstanceId: "p2" }, publications)).toBeUndefined();
     expect(deliveryTraceId({}, publications)).toBeUndefined();
+    expect(
+      deliveryTraceId({ eventInstanceId: "p3" }, [{ instanceId: "p3", producerTraceId: "t3" }]),
+    ).toBe("t3");
   });
 });

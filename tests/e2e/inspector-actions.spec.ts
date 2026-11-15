@@ -77,7 +77,7 @@ test("a refused invocation shows the application's answer and says no session is
   await page.goto("/functions/orders.get");
   await expect(page.getByText("This function has an access rule.")).toBeVisible();
   // The field with a default is optional, as the route form already says.
-  await expect(page.getByText("(integer) · optional")).toBeVisible();
+  await expect(page.getByText("(integer) · optional · default 10")).toBeVisible();
   await expect(page.getByText("(string) · required")).toBeVisible();
   await expect(page.getByText("seen 12 times")).toBeVisible();
 
@@ -240,10 +240,12 @@ test("event publish checks the payload, asks first and answers beside the contro
 
   await page.getByRole("button", { name: "Replay publication event-instance-1" }).click();
   const replay = page.getByRole("dialog", { name: "Replay publication event-instance-1?" });
-  await expect(replay).toContainText("Publishes this event's payload again as a new event.");
+  await expect(replay).toContainText("Nothing new is published.");
   await replay.getByRole("button", { name: "Replay" }).click();
   const row = page.locator("#publication-event-instance-1");
-  await expect(row.getByRole("status")).toContainText("Published the payload of event-instance-1");
+  await expect(row.getByRole("status")).toContainText(
+    "Delivered publication event-instance-1 again to its reactions. Nothing new was published.",
+  );
 
   // The row says when it happened and links to its trace.
   await expect(row.locator("time")).toBeVisible();

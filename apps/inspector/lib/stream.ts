@@ -143,7 +143,8 @@ export class InspectorStreamClient {
     const previous = this.current.cursor === undefined ? 0 : Number(this.current.cursor);
     const next = Number(event.cursor);
     if (next <= previous) return;
-    const gap = Math.max(0, next - previous - 1);
+    // Without a cursor this is the first event this page sees, so nothing before it was missed.
+    const gap = this.current.cursor === undefined ? 0 : Math.max(0, next - previous - 1);
     this.persistCursor(event.cursor);
     this.setState({
       cursor: event.cursor,

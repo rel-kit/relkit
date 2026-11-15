@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { InspectorObject } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { recentQuery } from "../../lib/recent-signals";
 import { invokeFunction, type FunctionInvocationResult } from "../../lib/function-invocation";
 import { Radio } from "lucide-react";
 import { Section } from "../../components/blocks/section";
@@ -37,8 +38,8 @@ export function FunctionDetailClient() {
     if (id === "") return;
     const api = createInspectorClient();
     void Promise.all([
-      api.query<InspectorObject>("logs", { functionId: id, limit: 10 }),
-      api.query<InspectorObject>("traces", { functionId: id, limit: 10 }),
+      api.query<InspectorObject>("logs", recentQuery({ functionId: id })),
+      api.query<InspectorObject>("traces", recentQuery({ functionId: id })),
     ])
       .then(([logPage, tracePage]) => {
         setLogs(logPage.items);
@@ -57,10 +58,10 @@ export function FunctionDetailClient() {
     void Promise.all([
       api.detail<InspectorObject>("functions", id),
       api
-        .query<InspectorObject>("logs", { functionId: id, limit: 10 })
+        .query<InspectorObject>("logs", recentQuery({ functionId: id }))
         .catch(() => ({ items: [] as readonly InspectorObject[] })),
       api
-        .query<InspectorObject>("traces", { functionId: id, limit: 10 })
+        .query<InspectorObject>("traces", recentQuery({ functionId: id }))
         .catch(() => ({ items: [] as readonly InspectorObject[] })),
     ])
       .then(([detail, logPage, tracePage]) => {

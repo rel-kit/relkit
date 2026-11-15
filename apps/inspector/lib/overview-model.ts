@@ -1,5 +1,6 @@
 /** Pure projections behind the Overview dashboard: request volume, generation history, health. */
 import type { InspectorObject } from "./api-types";
+import { historyIncomplete } from "./history-status";
 import { requestLabel } from "./observability-model";
 
 /** Same words as the shared StatusBadge tones, kept local so this module stays UI-free. */
@@ -118,7 +119,7 @@ export function storageHealth(value: InspectorObject | undefined): StorageHealth
   if (value.error === "history.writer-conflict")
     return { tone: "danger", label: "writer conflict" };
   if (value.state === "degraded") return { tone: "danger", label: "degraded" };
-  if (value.incomplete === true) return { tone: "warning", label: "incomplete" };
+  if (historyIncomplete(value)) return { tone: "warning", label: "incomplete" };
   // The application session is reported on its own; history stays readable without it.
   return { tone: "success", label: "ready" };
 }

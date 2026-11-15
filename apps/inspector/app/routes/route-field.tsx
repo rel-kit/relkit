@@ -33,7 +33,12 @@ export function RouteFieldInput({
       htmlFor={id}
       data-source={field.source}
     >
-      <FieldLabel name={field.key} hint={field.source} required={field.required} />
+      <FieldLabel
+        name={field.key}
+        hint={field.source}
+        required={field.required}
+        defaultValue={field.defaultValue}
+      />
       {json ? (
         <textarea
           ref={inputRef}

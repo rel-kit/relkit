@@ -115,6 +115,9 @@ function firstText(item: InspectorObject, keys: readonly string[]): string {
   for (const key of keys) {
     const value = item[key];
     if (typeof value === "string" && value !== "") return value;
+    // The events API stamps records with epoch milliseconds.
+    if (typeof value === "number" && Number.isFinite(value) && value > 0)
+      return new Date(value).toISOString();
   }
   return "";
 }
@@ -129,6 +132,24 @@ export function deliveryTime(item: InspectorObject): string {
   return firstText(item, ["updatedAt", "timestamp", "availableAt", "createdAt"]);
 }
 
+function idOf(item: InspectorObject, keys: readonly string[]): string | undefined {
+  for (const key of keys) {
+    const value = item[key];
+    if (typeof value === "string" && value !== "") return value;
+  }
+  return undefined;
+}
+
+/** The trace a publication was made in, when the API reports one. */
+export function publicationTraceId(item: InspectorObject): string | undefined {
+  return idOf(item, ["traceId", "producerTraceId"]);
+}
+
+/** The request a publication was made in, when the API reports one. */
+export function publicationRequestId(item: InspectorObject): string | undefined {
+  return idOf(item, ["originRequestId"]);
+}
+
 /** The trace of the publication a delivery belongs to, when the publication recorded one. */
 export function deliveryTraceId(
   delivery: InspectorObject,
@@ -136,6 +157,6 @@ export function deliveryTraceId(
 ): string | undefined {
   const instance = delivery.eventInstanceId;
   if (typeof instance !== "string") return undefined;
-  const traceId = publications.find((item) => item.instanceId === instance)?.traceId;
-  return typeof traceId === "string" && traceId !== "" ? traceId : undefined;
+  const publication = publications.find((item) => item.instanceId === instance);
+  return publication === undefined ? undefined : publicationTraceId(publication);
 }

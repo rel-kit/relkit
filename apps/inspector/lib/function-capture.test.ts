@@ -96,4 +96,31 @@ describe("the invocation's captured input and result", () => {
     expect(view?.functionId).toBe("orders.create");
     expect(view?.input.state).toBe("off");
   });
+
+  test("reads the invocation span, not the HTTP route span that also carries the function id", () => {
+    const route = {
+      signal: "span",
+      spanId: "route",
+      name: "HTTP POST /orders",
+      functionId: "orders.create",
+      startedAt: "2025-12-31T23:59:59.000Z",
+    };
+    const view = functionCaptures(request, [
+      route,
+      invocation({
+        inputCapture: { mode: "development-redacted", bytes: 9, truncated: false, content: "in" },
+      }),
+    ]);
+    expect(view?.input).toEqual({ state: "captured", content: "in", bytes: 9 });
+  });
+
+  test("a route span without an invocation span means no function ran", () => {
+    const route = {
+      signal: "span",
+      spanId: "route",
+      name: "HTTP POST /orders",
+      functionId: "orders.create",
+    };
+    expect(functionCaptures(request, [route])).toBeUndefined();
+  });
 });

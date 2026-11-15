@@ -22,13 +22,13 @@ function domain(members: readonly GraphNode[]): DomainGroup {
   };
 }
 
-test("a domain card lists the buckets and caches it owns (IN-45)", () => {
+test("a domain card lists the caches it owns, and leaves buckets to their own card (IN-45)", () => {
   const card = domainCard(
     domain([node("fleet.photos", "bucket"), node("fleet.prices", "cache"), node("fleet.x", "x")]),
   );
-  expect(card.counts).toContainEqual({ label: "bucket", value: 1 });
+  expect(card.counts?.some((count) => count.label.startsWith("bucket"))).toBe(false);
   expect(card.counts).toContainEqual({ label: "cache", value: 1 });
-  expect(card.resources).toEqual(["bucket photos", "cache prices"]);
+  expect(card.resources).toEqual(["cache prices"]);
 });
 
 test("a domain without resources lists none", () => {

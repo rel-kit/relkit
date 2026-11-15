@@ -63,7 +63,8 @@ export function routeGroupCard(group: GraphNode, hierarchy: AppHierarchy): ViewN
   };
 }
 
-const RESOURCE_KINDS: readonly string[] = ["bucket", "cache"];
+// Buckets have a card of their own on the map; caches are listed on their domain's card.
+const RESOURCE_KINDS: readonly string[] = ["cache"];
 
 export function domainCard(domain: DomainGroup): ViewNode {
   const counts = [
@@ -74,7 +75,7 @@ export function domainCard(domain: DomainGroup): ViewNode {
   ].filter((count) => count.value > 0);
   if (domain.agents.length > 0) counts.push({ label: "agents", value: domain.agents.length });
   if (domain.jobs.length > 0) counts.push({ label: "jobs", value: domain.jobs.length });
-  // Owned buckets and caches have no card of their own on the map (IN-45): list them here.
+  // Owned caches have no card of their own on the map (IN-45): list them here.
   const resources = domain.members.filter((node) => RESOURCE_KINDS.includes(node.kind));
   for (const kind of RESOURCE_KINDS) {
     const value = resources.filter((node) => node.kind === kind).length;

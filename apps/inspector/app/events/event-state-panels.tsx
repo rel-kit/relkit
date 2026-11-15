@@ -5,7 +5,7 @@ import { HistoryList, type HistoryEntry } from "../../components/neon/history-li
 import { StatusBadge, statusTone } from "../../components/neon/status-badge";
 import { Badge } from "../../components/ui/badge";
 import type { EventView } from "../../lib/events-model";
-import { countLabel, stateCounts, type DeliveryPage } from "../../lib/event-rows";
+import { countLabel, deliveryTime, stateCounts, type DeliveryPage } from "../../lib/event-rows";
 import { Button } from "../../components/ui/button";
 import { Count, EntityList, Quiet } from "../domains/catalog-kit";
 
@@ -191,10 +191,6 @@ export function EventDeliveryPanel({
       ) : null}
     </Section>
   );
-}
-
-function deliveryTime(item: InspectorObject): string {
-  return text(item.updatedAt) || text(item.availableAt) || text(item.createdAt);
 }
 
 function retrySummary(value: unknown): string {

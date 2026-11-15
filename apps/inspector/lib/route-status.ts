@@ -1,3 +1,5 @@
+import { ORIGIN_DENIED, ORIGIN_DENIED_TEXT } from "./origin-denied";
+
 export interface RouteOutcome {
   readonly tone: "success" | "danger" | "neutral";
   /** One sentence for the status line. */
@@ -27,6 +29,8 @@ export function routeOutcome(result: {
       tone: "danger",
       text: `The application refused this request (401): no user session is attached. ${SESSION_HINT}`,
     };
+  if (status === 403 && problemCode(result.body) === ORIGIN_DENIED)
+    return { tone: "danger", text: ORIGIN_DENIED_TEXT };
   if (status === 403)
     return {
       tone: "danger",

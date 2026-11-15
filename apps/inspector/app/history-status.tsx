@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import type { InspectorObject } from "../lib/api-types";
 import { createInspectorClient } from "../lib/client";
-import { historyStatusMessage } from "../lib/history-status";
+import { historyIncomplete, historyStatusMessage } from "../lib/history-status";
 import { cn } from "../lib/utils";
 
 /** Shares the tool-owned collection status across historical views. */
 export function HistoryStatus({ value }: { readonly value: InspectorObject | undefined }) {
-  const alert = value?.incomplete === true || value?.state === "degraded";
+  const alert = historyIncomplete(value) || value?.state === "degraded";
   const tone = historyTone(value, alert);
   return (
     <div
