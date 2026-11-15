@@ -19,6 +19,7 @@ import {
   type InspectorActiveGeneration,
 } from "../../packages/relkit/src/inspector-api/index.ts";
 import { createAgentApplicationFixture } from "./fixture-agent-runtime.ts";
+import { installApplicationFixture } from "./fixture-application.ts";
 import { failureFixtures } from "./fixture-failures.ts";
 import { historyCounts, requestsPage, seedHistoryRequests } from "./fixture-history.ts";
 
@@ -634,6 +635,7 @@ export function createInspectorFixture(): InspectorFixture {
     query: makeQuery(() => ({ requests, logs, traces })),
     stream,
   });
+  installApplicationFixture(app, stream, FIXTURE_GENERATION_ID);
   app.post("/orders", async (context) => {
     const body = await context.req.json<Record<string, unknown>>();
     const id = `request-live-${String(++requestSequence).padStart(4, "0")}`;

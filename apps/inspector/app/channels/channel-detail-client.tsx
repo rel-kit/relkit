@@ -1,5 +1,6 @@
 "use client";
 
+import { NeedsApplication } from "../application-state";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -107,7 +108,9 @@ export function ChannelDetailClient() {
         </Section>
       }
     >
-      <ChannelLiveConsole channel={channel} />
+      <NeedsApplication>
+        <ChannelLiveConsole channel={channel} />
+      </NeedsApplication>
       <SchemaPanel title="Event schemas" value={channel.events} />
       <div className={replay ? "grid min-w-0 gap-4 2xl:grid-cols-2" : "grid min-w-0 gap-4"}>
         <SchemaPanel title="Partition params" value={channel.params} />

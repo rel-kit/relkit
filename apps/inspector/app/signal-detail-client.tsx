@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import type { InspectorObject } from "../lib/api-types";
 import { createInspectorBackendStream, createInspectorClient } from "../lib/client";
+import { useLiveUpdates } from "../lib/stream-application-store";
 import { requestDetail, traceDetail } from "../lib/observability-api";
 import { eventRecord, records, text } from "../lib/observability-model";
 import { SignalDetailView } from "./signal-detail-view";
@@ -30,6 +31,7 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
   const [data, setData] = useState<SignalDetailData>();
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [liveState, setLiveState] = useState("connecting");
+  const live = useLiveUpdates(liveState);
   const [paging, setPaging] = useState("ready");
   const loadMore = async () => {
     if (!data?.nextCursor) return;
@@ -126,7 +128,7 @@ export function SignalDetailClient({ kind }: { readonly kind: "requests" | "trac
       kind={kind}
       id={id}
       {...data}
-      liveState={liveState}
+      liveState={live}
       notice={
         data.nextCursor ? (
           <div

@@ -13,6 +13,7 @@ import { DetailLayout } from "../detail-layout";
 import { SourceLink } from "../source-link";
 import { DetailPending, ExposureBadge, GraphAction, MetaItem } from "../domains/catalog-kit";
 import { FunctionContract, FunctionFacts } from "./function-contract";
+import { NeedsApplication } from "../application-state";
 import { FunctionInvocation } from "./function-invocation";
 import { FunctionSignals } from "./function-signals";
 
@@ -139,15 +140,17 @@ export function FunctionDetailClient() {
           </p>
         </Section>
       ) : (
-        <FunctionInvocation
-          functionId={id}
-          generationId={snapshot.generationId}
-          graphHash={snapshot.graphHash}
-          inputSchema={node.input}
-          hasAccessRule={record(node.access) !== undefined}
-          invoke={(input) => invokeFunction(api, input)}
-          onComplete={(_result: FunctionInvocationResult) => loadSignals()}
-        />
+        <NeedsApplication>
+          <FunctionInvocation
+            functionId={id}
+            generationId={snapshot.generationId}
+            graphHash={snapshot.graphHash}
+            inputSchema={node.input}
+            hasAccessRule={record(node.access) !== undefined}
+            invoke={(input) => invokeFunction(api, input)}
+            onComplete={(_result: FunctionInvocationResult) => loadSignals()}
+          />
+        </NeedsApplication>
       )}
       <FunctionSignals logs={logs} traces={traces} />
       <FunctionContract {...snapshot} />

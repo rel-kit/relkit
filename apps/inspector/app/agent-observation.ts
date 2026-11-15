@@ -58,16 +58,19 @@ function applyEvent(
 ): readonly BrowserMessage[] {
   if (event.kind === "message-updated") return upsertMessage(messages, event.message);
   if (event.kind === "progress" && event.messageId !== undefined) {
-    return upsertPart(messages, event.messageId, event.runId, event.createdAt, {
-      partId: event.progressId,
-      kind: "progress",
-      scope: event.scope,
-      ...(event.toolCallId === undefined ? {} : { toolCallId: event.toolCallId }),
-      ...(event.toolId === undefined ? {} : { toolId: event.toolId }),
-      value: event.value,
-    });
+    const base = { partId: event.progressId, kind: "progress" as const, value: event.value };
+    return upsertPart(
+      messages,
+      event.messageId,
+      event.runId,
+      event.createdAt,
+      event.scope === "tool"
+        ? { ...base, scope: "tool", toolCallId: event.toolCallId, toolId: event.toolId }
+        : { ...base, scope: "run" },
+    );
   }
-  if (!("toolCallId" in event)) return messages;
+  // Progress without a message has no part to update; a tool-scoped one also has a toolCallId.
+  if (event.kind === "progress" || !("toolCallId" in event)) return messages;
   const previous = toolPart(messages, event.messageId, event.toolCallId);
   return upsertPart(messages, event.messageId, event.runId, event.createdAt, {
     partId: event.partId,
@@ -93,7 +96,10 @@ const toolState = {
   "tool-succeeded": "succeeded",
   "tool-failed": "failed",
   "tool-denied": "denied",
-} satisfies Record<Extract<AgentClientEvent, { toolCallId: string }>["kind"], ToolPartState>;
+} satisfies Record<
+  Exclude<Extract<AgentClientEvent, { toolCallId: string }>["kind"], "progress">,
+  ToolPartState
+>;
 
 function upsertMessage(
   messages: readonly BrowserMessage[],

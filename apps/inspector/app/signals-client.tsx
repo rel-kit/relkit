@@ -26,6 +26,7 @@ import { RuntimeStatus } from "./runtime-status";
 import { SignalRows } from "./signal-rows";
 import { SignalsFilters } from "./signals-filters";
 import { useRequestHistory } from "./use-request-history";
+import { useLiveUpdates } from "../lib/stream-application-store";
 
 const REJECTED =
   "The Inspector did not accept these filters. Check the status, method and path values, then apply them again.";
@@ -48,6 +49,7 @@ export function SignalsClient() {
     return JSON.stringify(rest);
   }, [filters, limit]);
   const history = useRequestHistory(query, filterKey);
+  const live = useLiveUpdates(history.liveState);
   const trail = useRef<PageTrail | undefined>(undefined);
   const problems = useMemo(() => filterProblems(draft), [draft]);
   const [submitted, setSubmitted] = useState(false);
@@ -104,8 +106,8 @@ export function SignalsClient() {
         actions={
           <div className="flex items-center gap-2" role="status" aria-live="polite">
             <StatusBadge
-              tone={history.liveState === "connected" ? "live" : statusTone(history.liveState)}
-              label={`Live: ${history.liveState}`}
+              tone={live === "connected" ? "live" : statusTone(live)}
+              label={`Live: ${live}`}
             />
             <span className="sr-only">{announcement}</span>
           </div>

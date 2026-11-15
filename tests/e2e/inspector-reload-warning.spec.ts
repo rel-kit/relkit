@@ -1,5 +1,13 @@
 /** Exercises compact reload diagnostics against the inspector UI without editing an application. */
 import { expect, test, type Page } from "@playwright/test";
+import { playwrightSelection } from "../../scripts/playwright-selection.js";
+
+const { backend } = playwrightSelection("inspector");
+
+/** The shell re-reads reload status on stream events, not on a timer: publish one. */
+async function announce(page: Page) {
+  await page.request.post(`${backend}/__fixture__/candidate`, { data: { invalid: false } });
+}
 
 /** Supplies reload logs while the fixture continues serving its unchanged active graph. */
 async function reloadLogs(page: Page, state: { value: string }) {
@@ -57,9 +65,11 @@ for (const width of [1280, 390]) {
     await page.keyboard.press("Space");
     await expect(details).not.toHaveAttribute("open");
     state.value = "unavailable";
+    await announce(page);
     await expect(warning).toContainText("Build status unavailable", { timeout: 20_000 });
     await expect(warning).toContainText("commerce-generation-1");
     state.value = "active";
+    await announce(page);
     await expect(warning).not.toBeVisible({ timeout: 10_000 });
     await expect(page.locator(".generation-bar")).toContainText("commerce-generation-1");
   });

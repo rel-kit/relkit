@@ -19,12 +19,15 @@ test("agent observation resumes after a transport close without losing its check
     agentId: "orders.support",
     threadId: "thread-1",
     identity: {
+      protocol: "relkit.client-identity",
+      version: 1,
+      issuedAt: "2026-09-08T00:00:00.000Z",
       applicationId: "commerce",
       identityScope: "visitor",
       sessionEpoch: "session",
       publicFingerprint: "fingerprint",
     },
-    after: { sequence: "0" },
+    after: checkpoint("0"),
     signal: controller.signal,
     onObservation: (observation) => {
       received.push(observation);
@@ -42,12 +45,24 @@ async function* events(attempt: number): AsyncIterable<AgentObservation> {
     kind: "event",
     event: {
       eventId: `event-${attempt}`,
+      recordId: `record-${attempt}`,
       runId: "run-1",
-      checkpoint: { sequence: String(attempt) },
+      checkpoint: checkpoint(String(attempt)),
       createdAt: "2026-09-08T00:00:00.000Z",
       kind: "run-finished",
       value: {},
     },
   };
   if (attempt === 1) throw new Error("network error");
+}
+
+function checkpoint(sequence: string) {
+  return {
+    applicationId: "commerce",
+    environment: "development",
+    profile: "default",
+    providerEpoch: "epoch-1",
+    threadId: "thread-1",
+    sequence,
+  };
 }

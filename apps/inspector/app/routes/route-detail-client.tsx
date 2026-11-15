@@ -1,6 +1,7 @@
 "use client";
 
 /** Keeps route metadata and composer calls on one observed browser generation across rerenders. */
+import { NeedsApplication } from "../application-state";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -148,16 +149,18 @@ export function RouteDetailClient() {
           </p>
         </Section>
       ) : (
-        <RouteComposer
-          route={route}
-          target={target}
-          invoke={(input) => api.invokeRoute(input)}
-          {...streamInvocation(route, api)}
-          onComplete={(next) => {
-            setResult(next);
-            loadRequests();
-          }}
-        />
+        <NeedsApplication>
+          <RouteComposer
+            route={route}
+            target={target}
+            invoke={(input) => api.invokeRoute(input)}
+            {...streamInvocation(route, api)}
+            onComplete={(next) => {
+              setResult(next);
+              loadRequests();
+            }}
+          />
+        </NeedsApplication>
       )}
       {result !== undefined && <InvocationResult result={result} />}
       <RecentRequests requests={requests} />

@@ -1,3 +1,4 @@
+import { NeedsApplication } from "./application-state";
 import { Database, HardDrive } from "lucide-react";
 import { CodeBlock } from "../components/blocks/code-block";
 import { DetailList } from "../components/blocks/details";
@@ -61,7 +62,9 @@ export function ResourceDetailView({ view }: { readonly view: ResourceView }) {
           ]}
         />
       </Section>
-      <ResourceExplorer kind={view.kind} id={view.id} />
+      <NeedsApplication>
+        <ResourceExplorer kind={view.kind} id={view.id} />
+      </NeedsApplication>
       <PolicyPanel view={view} />
     </DetailLayout>
   );

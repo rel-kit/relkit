@@ -63,10 +63,12 @@ test("retries a dead-lettered local job", async ({ page }) => {
   await page.goto("/events");
   await page.getByRole("link", { name: "Jobs" }).click();
   await page.getByRole("link", { name: "Open job" }).first().click();
-  await page.getByRole("button", { name: "Retry dead letter" }).click();
-  await expect(page.getByRole("dialog", { name: "Retry dead-lettered job?" })).toBeVisible();
-  await page.getByRole("dialog").getByRole("button", { name: "Retry job" }).click();
-  await expect(page.getByText(/available/).first()).toBeVisible();
+  // The job page retries a run from that run's own actions.
+  await page
+    .getByRole("group", { name: "Actions for run receipts-job-dead-letter-1" })
+    .getByRole("button", { name: "Retry" })
+    .click();
+  await expect(page.getByText("receipts-job-dead-letter-1-retry").first()).toBeVisible();
 });
 
 test("shows candidate diagnostics beside the active generation", async ({ page }) => {

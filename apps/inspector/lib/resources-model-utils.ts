@@ -1,3 +1,4 @@
+import { optional } from "./optional";
 import type { InspectorObject } from "./api-types";
 import type {
   OperationStatus,
@@ -35,20 +36,16 @@ export function descriptor(kind: ResourceKind, node: InspectorObject): ResourceD
     return {
       ...(source === undefined ? {} : { source }),
       ...(typeof node.visibility === "string" ? { visibility: node.visibility } : {}),
-      ...(number(node.maxObjectBytes) === undefined
-        ? {}
-        : { maxObjectBytes: number(node.maxObjectBytes) }),
-      ...(stringList(node.allowedContentTypes) === undefined
-        ? {}
-        : { allowedContentTypes: stringList(node.allowedContentTypes) }),
+      ...optional("maxObjectBytes", number(node.maxObjectBytes)),
+      ...optional("allowedContentTypes", stringList(node.allowedContentTypes)),
     };
   }
   return {
     ...(source === undefined ? {} : { source }),
     ...(node.key === undefined ? {} : { keySchema: node.key }),
     ...(node.value === undefined ? {} : { valueSchema: node.value }),
-    ...(number(node.defaultTtlMs) === undefined ? {} : { defaultTtlMs: number(node.defaultTtlMs) }),
-    ...(number(node.maxTtlMs) === undefined ? {} : { maxTtlMs: number(node.maxTtlMs) }),
+    ...optional("defaultTtlMs", number(node.defaultTtlMs)),
+    ...optional("maxTtlMs", number(node.maxTtlMs)),
   };
 }
 

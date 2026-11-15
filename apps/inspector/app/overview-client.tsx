@@ -5,19 +5,24 @@ import { OverviewShell, type OverviewSnapshot } from "./overview-shell";
 import { navigationCounts } from "../lib/graph-index";
 import { summarizeGraph } from "../lib/graph-model";
 import { useInspectorGraph } from "../lib/use-graph";
+import { useInspectorState } from "../lib/stream-application-store";
 import { RuntimeStatus } from "./runtime-status";
 import { useOverviewSignals } from "./overview/use-overview-signals";
+import { useRequestCounts } from "./overview/use-request-counts";
 
 export function OverviewClient() {
   const state = useInspectorGraph();
+  const inspector = useInspectorState();
   const graph = state.graph;
   const signals = useOverviewSignals(graph?.generationId);
+  const requestCounts = useRequestCounts();
   const counts = useMemo(
     () => (graph === undefined ? undefined : navigationCounts(graph)),
     [graph],
   );
   const snapshot = {
-    connection: state.connection,
+    connection: inspector.stream,
+    application: inspector.application,
     droppedEvents: state.droppedEvents,
     ...(graph === undefined
       ? {}
@@ -34,7 +39,7 @@ export function OverviewClient() {
   return (
     <OverviewShell
       snapshot={snapshot}
-      signals={signals}
+      signals={{ ...signals, storage: inspector.status, requestCounts }}
       runtime={<RuntimeStatus history={false} />}
     />
   );

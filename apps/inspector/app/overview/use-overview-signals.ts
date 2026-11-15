@@ -18,30 +18,29 @@ export interface SampleState {
 export interface OverviewSignals {
   readonly requests: SampleState;
   readonly generations: SampleState;
-  /** History storage status from `/_relkit/v1/storage`; `{ state: "unavailable" }` on failure. */
-  readonly storage: InspectorObject | undefined;
 }
 
 const initialSample: SampleState = { items: [], truncated: false, state: "loading" };
 const REQUEST_SAMPLE = 100;
 const REFRESH_THROTTLE_MS = 2_000;
+const LOG_REFRESH_MS = 5_000;
 
 /**
  * Bounded, read-only samples behind the Overview dashboard: the latest requests (refreshed from
  * the live stream, throttled), dev generation logs (refreshed when the active generation or its
- * diagnostics change), and history storage status (polled like the shared history notice).
+ * diagnostics change). History status comes from the shell's shared Inspector state.
  * @param generationId - Active generation; a change reloads the generation history.
  */
 export function useOverviewSignals(generationId: string | undefined): OverviewSignals {
   const [requests, setRequests] = useState<SampleState>(initialSample);
   const [generations, setGenerations] = useState<SampleState>(initialSample);
-  const [storage, setStorage] = useState<InspectorObject>();
   const reloadGenerations = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     let disposed = false;
     const client = createInspectorClient();
     let requestTimer: ReturnType<typeof setTimeout> | undefined;
+    let logTimer: ReturnType<typeof setTimeout> | undefined;
     const loadRequests = async (): Promise<void> => {
       try {
         const page = await client.query<InspectorObject>("requests", {
@@ -94,6 +93,12 @@ export function useOverviewSignals(generationId: string | undefined): OverviewSi
       onInvalidate: (tags) => {
         if (tags.includes("requests")) scheduleRequests();
         if (tags.includes("diagnostics")) void loadGenerations();
+        // A failed reload is only a supervisor log; re-read on new logs, at most every 5 s.
+        else if (tags.includes("logs") && logTimer === undefined)
+          logTimer = setTimeout(() => {
+            logTimer = undefined;
+            void loadGenerations();
+          }, LOG_REFRESH_MS);
       },
     });
     void loadRequests();
@@ -103,6 +108,7 @@ export function useOverviewSignals(generationId: string | undefined): OverviewSi
       disposed = true;
       reloadGenerations.current = () => undefined;
       if (requestTimer !== undefined) clearTimeout(requestTimer);
+      if (logTimer !== undefined) clearTimeout(logTimer);
       window.removeEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, reconnect);
       stream.stop();
     };
@@ -112,33 +118,5 @@ export function useOverviewSignals(generationId: string | undefined): OverviewSi
     reloadGenerations.current();
   }, [generationId]);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    const client = createInspectorClient();
-    let pending = false;
-    const read = async (): Promise<void> => {
-      if (pending) return;
-      pending = true;
-      try {
-        const next = await client.request<InspectorObject>("/_relkit/v1/storage", {
-          cache: "no-store",
-          signal: controller.signal,
-          responseProtocols: ["relkit.observability.query"],
-        });
-        if (!controller.signal.aborted) setStorage(next);
-      } catch {
-        if (!controller.signal.aborted) setStorage({ state: "unavailable" });
-      } finally {
-        pending = false;
-      }
-    };
-    void read();
-    const timer = setInterval(() => void read(), 10_000);
-    return () => {
-      controller.abort();
-      clearInterval(timer);
-    };
-  }, []);
-
-  return { requests, generations, storage };
+  return { requests, generations };
 }

@@ -33,7 +33,11 @@ test("preserves bounded mutation bytes and rejects oversized declared or streame
   });
   await expect(
     readInspectorProxyBody(
-      new Request("http://ui/_relkit/backend/rpc", { method: "POST", body, duplex: "half" }),
+      new Request("http://ui/_relkit/backend/rpc", {
+        method: "POST",
+        body,
+        duplex: "half",
+      } as RequestInit & { readonly duplex: "half" }),
     ),
   ).rejects.toThrow();
   expect(canceled).toBe(true);
@@ -45,7 +49,7 @@ test("streams application uploads without consuming or applying a control limit"
     body: new Uint8Array(1_100_000),
   });
   const body = await readInspectorProxyBody(request);
-  expect(body).toBe(request.body);
+  expect(body).toBe(request.body ?? undefined);
   expect(request.bodyUsed).toBe(false);
   expect((await new Response(body).arrayBuffer()).byteLength).toBe(1_100_000);
 });

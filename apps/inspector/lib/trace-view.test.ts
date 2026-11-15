@@ -129,7 +129,7 @@ describe("trace view", () => {
   });
 
   test("a handler recorded as a sibling of the transport span still joins the lifecycle", () => {
-    const sibling = { ...handler, parentId: undefined };
+    const { parentId: _parent, ...sibling } = handler;
     expect(lifecyclePhases([route, sibling]).map((phase) => phase.label)).toContain(
       "orders.create",
     );

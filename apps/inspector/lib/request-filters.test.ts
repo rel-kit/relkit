@@ -59,7 +59,9 @@ describe("request filter validation", () => {
       "cancelled",
       "defect",
     ]);
-    expect(REQUEST_OUTCOME_OPTIONS.every((option) => option.label !== option.value)).toBe(true);
+    expect(
+      REQUEST_OUTCOME_OPTIONS.every((option) => (option.label as string) !== option.value),
+    ).toBe(true);
   });
 });
 

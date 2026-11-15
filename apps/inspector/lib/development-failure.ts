@@ -1,5 +1,6 @@
 import type { InspectorApiClient } from "./api";
 import type { InspectorObject } from "./api-types";
+import type { StreamEventType } from "./stream-protocol";
 
 export interface DevelopmentFailure {
   readonly cursor: string;
@@ -8,6 +9,17 @@ export interface DevelopmentFailure {
   readonly detailsUnavailable: boolean;
   readonly suggestion: string;
   readonly logsHref: string;
+}
+
+/**
+ * When a live event should re-read the reload status: soon when the generation changes, later
+ * (coalesced) when logs or diagnostics arrive, since the supervisor reports a failed
+ * reload only as a `dev.generation.failed` log and the stream does not say which log arrived.
+ */
+export function failureRefresh(type: StreamEventType): "now" | "later" | undefined {
+  if (type === "generation.changed") return "now";
+  if (type === "log.emitted" || type === "diagnostic.changed") return "later";
+  return undefined;
 }
 
 /** Reads supervisor failures from the retained development logs, including failed startup output. */
@@ -25,7 +37,10 @@ export async function loadDevelopmentFailure(
     (item) =>
       item.origin === "relkit" &&
       item.component === "cli.dev" &&
-      (item.message === "dev.generation.failed" || item.message === "dev.generation.active"),
+      // A restart activates a generation; a successful in-process reload swaps it.
+      (item.message === "dev.generation.failed" ||
+        item.message === "dev.generation.active" ||
+        item.message === "dev.generation.swapped"),
   );
   if (latest?.message !== "dev.generation.failed") return undefined;
   if (previous !== undefined && latest.cursor === previous.cursor && !previous.detailsUnavailable)
@@ -33,13 +48,20 @@ export async function loadDevelopmentFailure(
   const fields = record(latest.fields);
   const message = text(fields?.message) ?? "The latest application version could not start.";
   const to = timestamp(latest.timestamp);
-  const details = to === undefined ? [] : await startupFailures(client, to).catch(() => undefined);
+  // The redacted cause (a compile error or the failed process's last lines) comes first.
+  const cause = (text(fields?.cause) ?? "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line !== "")
+    .slice(0, 3);
+  const startup = to === undefined ? [] : await startupFailures(client, to).catch(() => undefined);
+  const details = startup === undefined ? undefined : [...new Set([...cause, ...startup])];
   const logs = new URLSearchParams({ source: "all", range: "custom", severity: "error" });
   if (to !== undefined) logs.set("to", to);
   return {
     cursor: text(latest.cursor) ?? to ?? message,
     message,
-    details: details ?? [],
+    details: details ?? cause,
     detailsUnavailable: details === undefined,
     suggestion: /docker/i.test(message)
       ? "Start Docker Desktop or your Docker daemon and check that docker ps succeeds. Then save a source file to retry the reload."

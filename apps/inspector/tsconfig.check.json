@@ -1,0 +1,17 @@
+{
+  "//": "Type-checks the application for `bun run check`. tsconfig.json stays the root build's empty project reference.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "types": ["bun", "next", "next/image-types/global"],
+    "paths": { "@/*": ["./*"] }
+  },
+  "include": ["app", "lib", "components", "hooks", "*.ts"],
+  "exclude": ["node_modules", ".next", ".relkit", "next-env.d.ts"]
+}

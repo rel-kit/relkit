@@ -1,9 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createInspectorClient, INSPECTOR_BACKEND_CONNECTED_EVENT } from "./client";
-import { loadDevelopmentFailure, type DevelopmentFailure } from "./development-failure";
+import { createInspectorBackendStream, createInspectorClient } from "./client";
+import {
+  failureRefresh,
+  loadDevelopmentFailure,
+  type DevelopmentFailure,
+} from "./development-failure";
 
+/** Coalesces log-driven re-reads: a busy application reads at most once per interval. */
+const LOG_REFRESH_MS = 3_000;
+/** Settles a burst of generation or diagnostic events into one read. */
+const BURST_MS = 1_500;
+
+/**
+ * Reads the latest reload failure once on mount and again only when the live stream reports a
+ * change (IN-43): no timer runs while the application is idle.
+ */
 export function useDevelopmentFailure() {
   const [failure, setFailure] = useState<DevelopmentFailure>();
   const [unavailable, setUnavailable] = useState(false);
@@ -11,10 +24,16 @@ export function useDevelopmentFailure() {
   useEffect(() => {
     let disposed = false;
     let loading = false;
+    let again = false;
+    let later: ReturnType<typeof setTimeout> | undefined;
+    let connected: boolean | undefined;
     let current: DevelopmentFailure | undefined;
     const client = createInspectorClient();
     const refresh = async (): Promise<void> => {
-      if (loading || document.visibilityState === "hidden") return;
+      if (loading) {
+        again = true;
+        return;
+      }
       loading = true;
       client.invalidate(["logs", "signals"]);
       try {
@@ -27,17 +46,37 @@ export function useDevelopmentFailure() {
         if (!disposed) setUnavailable(true);
       } finally {
         loading = false;
+        if (again && !disposed) {
+          again = false;
+          void refresh();
+        }
       }
     };
+    const stream = createInspectorBackendStream({
+      onStateChange: (snapshot) => {
+        const now = snapshot.state === "connected";
+        // A reconnect may have missed a failure; the first connection follows the mount read.
+        if (now && connected === false) void refresh();
+        if (connected !== undefined || now) connected = now;
+      },
+      onEvent: (event) => {
+        const when = failureRefresh(event.type);
+        if (when === undefined) return;
+        // A burst of events reads once: soon for a generation change, later for new logs.
+        const delay = when === "now" ? BURST_MS : LOG_REFRESH_MS;
+        if (later !== undefined) return;
+        later = setTimeout(() => {
+          later = undefined;
+          void refresh();
+        }, delay);
+      },
+    });
     void refresh();
-    const timer = setInterval(() => void refresh(), 3_000);
-    window.addEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, refresh);
-    document.addEventListener("visibilitychange", refresh);
+    stream.start();
     return () => {
       disposed = true;
-      clearInterval(timer);
-      window.removeEventListener(INSPECTOR_BACKEND_CONNECTED_EVENT, refresh);
-      document.removeEventListener("visibilitychange", refresh);
+      if (later !== undefined) clearTimeout(later);
+      stream.stop();
     };
   }, []);
 

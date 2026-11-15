@@ -1,5 +1,6 @@
 /** Pure projections behind the Overview dashboard: request volume, generation history, health. */
 import type { InspectorObject } from "./api-types";
+import { requestLabel } from "./observability-model";
 
 /** Same words as the shared StatusBadge tones, kept local so this module stays UI-free. */
 export type OverviewTone = "success" | "warning" | "danger" | "info" | "neutral" | "live";
@@ -105,58 +106,6 @@ export function formatRate(rate: number | undefined): string {
   return percent < 10 ? `${percent.toFixed(1)}%` : `${Math.round(percent)}%`;
 }
 
-export interface GenerationEvent {
-  readonly id: string;
-  /** The word after `dev.generation.`, e.g. "active" or "failed". */
-  readonly state: string;
-  readonly version?: number;
-  readonly at?: string;
-  readonly durationMs?: number;
-  readonly changedFiles?: number;
-  readonly initial: boolean;
-  /** True for the newest activation: the generation the workspace is showing. */
-  readonly current: boolean;
-  readonly message?: string;
-}
-
-const GENERATION_PREFIX = "dev.generation.";
-
-/** Projects `dev.generation.*` supervisor logs newest first; the newest activation is current. */
-export function generationEvents(
-  items: readonly InspectorObject[],
-  limit = 12,
-): readonly GenerationEvent[] {
-  const events = items
-    .flatMap((item) => {
-      const message = text(item.message);
-      if (!message?.startsWith(GENERATION_PREFIX)) return [];
-      return [{ item, state: message.slice(GENERATION_PREFIX.length) || "unknown" }];
-    })
-    .sort((left, right) => order(right.item) - order(left.item));
-  let currentSeen = false;
-  return events.slice(0, limit).map(({ item, state }, index) => {
-    const fields = record(item.fields);
-    const current = !currentSeen && state === "active";
-    if (current) currentSeen = true;
-    const version = integer(fields?.version);
-    const at = timestamp(item.timestamp);
-    const durationMs = finite(fields?.durationMs);
-    const changedFiles = integer(fields?.changedFiles);
-    const message = firstLine(text(fields?.message));
-    return {
-      id: text(item.cursor) ?? `${state}-${at ?? index}`,
-      state,
-      initial: fields?.initial === true,
-      current,
-      ...(version === undefined ? {} : { version }),
-      ...(at === undefined ? {} : { at }),
-      ...(durationMs === undefined ? {} : { durationMs }),
-      ...(changedFiles === undefined ? {} : { changedFiles }),
-      ...(message === undefined ? {} : { message }),
-    };
-  });
-}
-
 export interface StorageHealth {
   readonly tone: OverviewTone;
   readonly label: string;
@@ -170,35 +119,13 @@ export function storageHealth(value: InspectorObject | undefined): StorageHealth
     return { tone: "danger", label: "writer conflict" };
   if (value.state === "degraded") return { tone: "danger", label: "degraded" };
   if (value.incomplete === true) return { tone: "warning", label: "incomplete" };
-  if (value.connection === "disconnected") return { tone: "warning", label: "disconnected" };
-  if (value.connection === "ambiguous") return { tone: "warning", label: "ambiguous" };
-  return { tone: "success", label: text(value.connection) ?? text(value.state) ?? "ready" };
+  // The application session is reported on its own; history stays readable without it.
+  return { tone: "success", label: "ready" };
 }
 
+/** The requests page's label, so live and loaded rows read the same (IN-36). */
 function pathOf(item: InspectorObject): string {
-  const route = text(item.normalizedRoute);
-  if (route !== undefined && route !== "unknown") return route;
-  return text(item.rawPath) ?? text(item.routeId) ?? "request";
-}
-
-function order(item: InspectorObject): number {
-  const at = timestamp(item.timestamp);
-  if (at !== undefined) return Date.parse(at);
-  const cursor = Number(text(item.cursor));
-  return Number.isFinite(cursor) ? cursor : 0;
-}
-
-function firstLine(value: string | undefined): string | undefined {
-  const line = value?.split("\n").find((part) => part.trim() !== "");
-  if (line === undefined) return undefined;
-  const trimmed = line.trim();
-  return trimmed.length <= 160 ? trimmed : `${trimmed.slice(0, 159)}…`;
-}
-
-function record(value: unknown): InspectorObject | undefined {
-  return value !== null && typeof value === "object" && !Array.isArray(value)
-    ? (value as InspectorObject)
-    : undefined;
+  return requestLabel(item).title || "request";
 }
 
 function text(value: unknown): string | undefined {

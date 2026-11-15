@@ -69,6 +69,10 @@ export function spanView(value: InspectorObject): SpanView | undefined {
           ? "tool"
           : "agent";
   const attributes = record(value.attributes);
+  const step = number(value.step) ?? number(attributes?.["relkit.agent.step"]);
+  const durationMs = number(value.durationMs);
+  const inputBytes = number(value.inputBytes);
+  const outputBytes = number(value.outputBytes);
   return {
     kind,
     spanId,
@@ -87,16 +91,14 @@ export function spanView(value: InspectorObject): SpanView | undefined {
     ...(text(value.profile) || text(attributes?.["relkit.model.profile"])
       ? { profile: text(value.profile) || text(attributes?.["relkit.model.profile"]) }
       : {}),
-    ...(number(value.step) === undefined && number(attributes?.["relkit.agent.step"]) === undefined
-      ? {}
-      : { step: number(value.step) ?? number(attributes?.["relkit.agent.step"]) }),
+    ...(step === undefined ? {} : { step }),
     ...(text(value.status) ? { status: text(value.status) } : {}),
     ...(text(value.outcome) ? { outcome: text(value.outcome) } : {}),
     ...(text(value.startedAt) ? { startedAt: text(value.startedAt) } : {}),
     ...(text(value.completedAt) ? { completedAt: text(value.completedAt) } : {}),
-    ...(number(value.durationMs) === undefined ? {} : { durationMs: number(value.durationMs) }),
-    ...(number(value.inputBytes) === undefined ? {} : { inputBytes: number(value.inputBytes) }),
-    ...(number(value.outputBytes) === undefined ? {} : { outputBytes: number(value.outputBytes) }),
+    ...(durationMs === undefined ? {} : { durationMs }),
+    ...(inputBytes === undefined ? {} : { inputBytes }),
+    ...(outputBytes === undefined ? {} : { outputBytes }),
   };
 }
 
