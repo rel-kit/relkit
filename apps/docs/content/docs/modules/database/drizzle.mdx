@@ -28,6 +28,8 @@ Export `defineDrizzleService(...)` from `src/services/database/service.ts`:
   /_snippets/source/examples/data-model/src/services/database/service.ts
 </include>
 
+The example opens SQLite with `bun:sqlite`, so it runs on Bun. To run the same service on Node.js, open the database with `openSqliteDatabase` from `@relkit/drizzle/sqlite`; see [Runtimes](/docs/modules/deployment/runtimes).
+
 The factory connects to the database. It does not require handwritten table-creation statements.
 Define the tables in TypeScript and apply their changes through [Drizzle Kit migrations](/docs/modules/database/migrations)
 before starting the application.

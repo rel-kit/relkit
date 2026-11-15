@@ -69,6 +69,22 @@ Docker starts Redis with a persistent `/data` volume and waits for `redis-cli PI
 project-local credentials, persists `/data`, waits for its readiness endpoint, and initializes the `relkit`
 bucket. Both publish random loopback ports instead of claiming fixed host ports.
 
+## Fix RELKIT_PROVIDER_RELEASE_SOURCE_REQUIRED
+
+`docker(s3())` and `docker(redis())` work only on your machine: they have no connection values a
+release build could use. `relkit dev` accepts them, but `relkit build` stops with
+`RELKIT_PROVIDER_RELEASE_SOURCE_REQUIRED` and points at the binding in your configuration. Change
+that binding in one of two ways:
+
+- Give the adapter inside `docker(…)` its binding values, for example
+  `docker(s3({ endpoint: env.url("S3_ENDPOINT"), … }))`, so development uses Docker and release
+  builds read the values from the environment.
+
+- Select an infrastructure source, such as `aws(s3())` from `@relkit/aws`, which creates or
+  connects the resource for the deployment.
+
+Run `relkit build` again. See [Deployment](/docs/modules/deployment) for choosing a source.
+
 ## Optional file-backed events and jobs
 
 The filesystem event and job profiles do not use Docker. `localEvent()` and `localJob()` from `@relkit/local` register

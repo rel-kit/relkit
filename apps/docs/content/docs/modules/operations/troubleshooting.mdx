@@ -19,7 +19,10 @@ bun run relkit --json doctor
 bun run relkit --json check
 ```
 
-`--json` is a global option and appears before the command. `check` also writes
+`--json` is a global option and appears before the command. `check --json` lists each generated
+file's path, hash and size; add `--include-outputs` to include the files' text. An unknown command
+fails with `RELKIT_UNKNOWN_COMMAND` and exit status `2`; `relkit --help` lists the commands. `check`
+also writes
 `.relkit/generated/diagnostics.json` with stable codes, severity, source locations, descriptor IDs, and suggested
 repairs. Review output before sharing it; external tools can still print values RelKit did not create.
 

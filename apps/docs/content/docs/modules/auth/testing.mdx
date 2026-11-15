@@ -107,14 +107,18 @@ so the call is anonymous. A session from `context.auth.getSession` carries the s
 permissions. To test a rule with roles or permissions directly, pass the caller as `principal`:
 
 ```ts
-await invokeFunction(createVehicle, { plate: "AB-123" }, {
-  principal: async () => ({
-    kind: "user",
-    session,
-    roles: ["owner"],
-    hasPermission: async (permission) => permission === "vehicle:create",
-  }),
-});
+await invokeFunction(
+  createVehicle,
+  { plate: "AB-123" },
+  {
+    principal: async () => ({
+      kind: "user",
+      session,
+      roles: ["owner"],
+      hasPermission: async (permission) => permission === "vehicle:create",
+    }),
+  },
+);
 ```
 
 Do not let a fake “authenticated” result bypass ownership or membership checks. If the operation is

@@ -35,10 +35,13 @@ Add this application-root configuration, adjusting the schema path for your app:
 The configuration deliberately requires an explicit persistent file path. A separate process cannot
 migrate the in-memory connection later opened by your application.
 
-The example's package scripts use `bun --bun drizzle-kit generate` and
-`relkit db migrate`. Shared migration execution lives in installed RelKit tooling;
-SQLite uses the Bun-native driver without a copied runner. PostgreSQL/MySQL
-delegate to the application's installed Drizzle Kit under Bun.
+The package scripts `db:generate` (Drizzle Kit's `generate`) and `db:migrate`
+(`relkit db migrate`) work under npm, pnpm, Yarn and Bun. Run Drizzle Kit as `drizzle-kit generate`
+or `bun x drizzle-kit generate`, without `--bun`: Drizzle Kit is a Node.js tool and
+scaffolded projects run it that way. Shared migration
+execution lives in installed RelKit tooling. SQLite uses `bun:sqlite` on Bun and `node:sqlite` on
+Node.js without a copied runner. PostgreSQL and MySQL delegate to the application's installed
+Drizzle Kit.
 
 Keep SQL and required metadata tracked in `src/services/database/migrations`, beside
 the owning service and schema. Auth and business tables share this one ordered
@@ -53,7 +56,7 @@ For a new app and a new local file, run these commands from the application root
 
 ```sh
 export DATABASE_PATH=./data-model.sqlite
-bun --bun drizzle-kit generate --name=initial
+bun x drizzle-kit generate --name=initial
 bun run db:migrate
 bun run check
 bun run typecheck
@@ -68,8 +71,9 @@ configs/database.ts`; the default is root `drizzle.config.ts`. Its connection, o
 and supported log settings are authoritative. Relative database/output paths still
 use the application root even for nested or absolute config selections.
 
-Bun loads the application's normal dotenv files, with inherited variables taking
-precedence; `.env.example` is never loaded. Keep PostgreSQL/MySQL configuration
+On Bun and on Node.js, `relkit db migrate` loads the application's normal dotenv files, with
+variables already set in the process taking precedence (`relkit dev` is the other way round; see
+[Environment](/docs/learn/concepts/environment)); `.env.example` is never loaded. Keep PostgreSQL/MySQL configuration
 deterministic because delegated Kit loads it again. Missing tooling is an explicit
 installation error; the migration command never downloads packages implicitly.
 
@@ -93,7 +97,7 @@ Edit the relevant Drizzle table, then generate a new named migration:
 
 ```sh
 export DATABASE_PATH=./data-model.sqlite
-bun --bun drizzle-kit generate --name=users-change
+bun x drizzle-kit generate --name=users-change
 ```
 
 Review the diff and test it on an isolated copy of the old schema with representative data. After

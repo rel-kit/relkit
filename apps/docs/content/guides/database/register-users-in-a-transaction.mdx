@@ -31,7 +31,7 @@ table, migration configuration, environment contract, ignore rules, dependencies
 bun run relkit add database --orm drizzle --dialect sqlite
 ```
 
-Use `postgresql` or `mysql` for the other Bun-native Drizzle clients. The command installs packages and
+Use `postgresql` or `mysql` for the other dialects. The command installs packages and
 runs `relkit check`, but deliberately does not create or apply a migration. Run the reported
 `db:generate` and `db:migrate` next steps only after reviewing the schema and setting `DATABASE_PATH` or
 `DATABASE_URL`. To follow the richer Users tutorial below, replace the generated `items` placeholder with
@@ -42,8 +42,9 @@ The scaffold also registers the application-owned Drizzle declaration patch. If 
 has not verified the project. The separate [manual setup](/docs/modules/database/define) is for apps
 where you are creating the service yourself; it is not an extra prerequisite after this scaffold.
 
-SQLite is the headless default and uses `bun:sqlite`; PostgreSQL and MySQL use
-`drizzle-orm/bun-sql`. `--orm` accepts only `drizzle`. Database is a singleton under
+SQLite is the headless default. The generated service opens the database with
+`openSqliteDatabase`, `openPostgresDatabase` or `openMysqlDatabase` from `@relkit/drizzle`, which
+load the driver of the runtime that runs them (see [Runtimes](/docs/modules/deployment/runtimes)). `--orm` accepts only `drizzle`. Database is a singleton under
 the detected service root: `src/services/database` in grouped apps or `src/database` in existing flat
 apps. `--service` and `--create-service` do not select its location.
 
@@ -119,6 +120,8 @@ Create or merge `src/services/database/service.ts`:
   /_snippets/source/examples/data-model/src/services/database/service.ts
 </include>
 
+The example opens SQLite with `bun:sqlite`, so it runs on Bun. To run the same service on Node.js, open the database with `openSqliteDatabase` from `@relkit/drizzle/sqlite`; see [Runtimes](/docs/modules/deployment/runtimes).
+
 This connects the schema and model, adds an inactive-user override for `findOne`, and closes SQLite on
 disposal. It does not create tables. The `findOne` override is not a global soft-delete policy.
 
@@ -137,7 +140,7 @@ From your application's root, generate the migration from the table definitions 
 
 ```sh
 export DATABASE_PATH=./data-model.sqlite
-bun --bun drizzle-kit generate --name=initial
+bun x drizzle-kit generate --name=initial
 bun run relkit db migrate
 ```
 
