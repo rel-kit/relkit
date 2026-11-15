@@ -4,6 +4,7 @@ import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Schema } from "effect";
+import { packageManagerCommands, projectPackageManager } from "create-relkit/package-manager";
 import { configLoadMessage } from "./migration-diagnostics.js";
 import { MigrationConfig, MigrationFailure } from "./migration.schemas.js";
 
@@ -68,7 +69,7 @@ export async function consumerPath(root: string, specifier: string): Promise<str
     throw new MigrationFailure({
       code: "RELKIT_DB_DEPENDENCY",
       exitCode: 2,
-      message: `Install ${name === "drizzle-kit" ? "drizzle-kit" : "drizzle-orm"} in this application with bun add before migrating.`,
+      message: `Install ${name === "drizzle-kit" ? "drizzle-kit" : "drizzle-orm"} in this application with ${packageManagerCommands(projectPackageManager(root)).add} before migrating.`,
     });
   }
 }

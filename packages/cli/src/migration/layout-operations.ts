@@ -49,7 +49,7 @@ export const rollbackLayoutMigration = Effect.fn("Migration.rollback")(
   function* (root: string, path: string) {
     const record = yield* readLayoutReceipt(resolve(root), path);
     yield* restoreLayoutEdits(record.path, record.receipt, record.receipt.status !== "committed");
-    return rollbackMigrationResult(record.receipt, record.path);
+    return rollbackMigrationResult(resolve(root), record.receipt, record.path);
   },
   (effect) => observeCli("migration.rollback", effect),
 );
