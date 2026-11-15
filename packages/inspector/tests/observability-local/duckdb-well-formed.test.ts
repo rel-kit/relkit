@@ -49,7 +49,11 @@ test("a record with an unpaired surrogate is stored, and the rest of its batch w
       await Effect.runPromise(initializeDuckdbSchema(connection));
       const storage = makeDuckdbStorage(connection, Semaphore.makeUnsafe(1), {});
       const stored = await Effect.runPromise(
-        storage.append([record("before", "plain"), record("lone", "a\ud800b"), record("after", "x")]),
+        storage.append([
+          record("before", "plain"),
+          record("lone", "a\ud800b"),
+          record("after", "x"),
+        ]),
       );
       expect(stored).toHaveLength(3);
       const rows = (

@@ -7,10 +7,7 @@ import { expect, test } from "vitest";
 import { Effect } from "effect";
 import type { InspectionConnectionFile } from "relkit/inspector-api/connection";
 import { CLIENT_IDENTITY_PATH as APPLICATION_IDENTITY_PATH } from "relkit/runtime-hono";
-import {
-  CLIENT_IDENTITY_PATH,
-  makeApplicationIdentityJar,
-} from "../src/application-identity.js";
+import { CLIENT_IDENTITY_PATH, makeApplicationIdentityJar } from "../src/application-identity.js";
 import { forwardBackend } from "../src/backend-forward.js";
 import type { InspectorRemoteOperations } from "../src/remote.types.js";
 

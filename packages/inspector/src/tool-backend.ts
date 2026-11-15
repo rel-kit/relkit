@@ -130,13 +130,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
         : "Inspector disconnected",
       503,
     );
-  return yield* forwardBackend(
-    remote,
-    current.selection.connection,
-    request,
-    options.target,
-    jar,
-  );
+  return yield* forwardBackend(remote, current.selection.connection, request, options.target, jar);
 });
 
 /**
@@ -204,7 +198,9 @@ function backendStatus(
       { state: current.selection.state },
       {
         status:
-          current.selection.state === "connected" && historyReadable(current) && current.error === undefined
+          current.selection.state === "connected" &&
+          historyReadable(current) &&
+          current.error === undefined
             ? 200
             : 503,
       },

@@ -60,7 +60,10 @@ function application() {
       Effect.sync(() => {
         const session = connection.descriptor.sessionId;
         if (path === "/_relkit/bridge/v1/ack") {
-          acknowledged.push({ session, ...(JSON.parse(String(init?.body)) as { through: number }) });
+          acknowledged.push({
+            session,
+            ...(JSON.parse(String(init?.body)) as { through: number }),
+          });
           return Response.json({});
         }
         const after = Number(new URL(path, "http://x").searchParams.get("after"));
@@ -83,7 +86,9 @@ const failure = (reason: "response" | "worker") =>
   });
 
 /** History that stores everything except what `refuse` says, and keeps what it stored. */
-function history(refuse: (records: readonly LocalRecord[]) => InspectionConnectionError | undefined) {
+function history(
+  refuse: (records: readonly LocalRecord[]) => InspectionConnectionError | undefined,
+) {
   const stored: LocalRecord[] = [];
   return {
     stored,
@@ -128,7 +133,11 @@ const opened = (operations: ReturnType<typeof history>["operations"]) =>
   });
 
 /** @returns The tool's status endpoint body. */
-const status = (state: InspectorToolStateRef, remote: InspectorRemoteOperations, events: ObservabilityStream) =>
+const status = (
+  state: InspectorToolStateRef,
+  remote: InspectorRemoteOperations,
+  events: ObservabilityStream,
+) =>
   Effect.promise(async () => {
     const handler = inspectorBackend(state, remote, "t", options, events);
     const request = new Request("http://localhost/_relkit/v1/storage", {

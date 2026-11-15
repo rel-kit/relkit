@@ -20,7 +20,10 @@ export function historySurvivalFailures(result: HistorySurvivalResult): string[]
   );
   check(result.poisonStored, "the request with an unpaired surrogate is not in history");
   check(same(result.afterPoison.recordsLostBeforeHistory, NO_LOSS), "records were lost");
-  check(result.secondStatus.state === "degraded", "the second Inspector did not say it has no history");
+  check(
+    result.secondStatus.state === "degraded",
+    "the second Inspector did not say it has no history",
+  );
   check(result.workerBeforeSecond.length === 1, "the first Inspector had no single worker");
   check(
     same(result.workerAfterSecond, result.workerBeforeSecond),

@@ -44,7 +44,10 @@ export const collectCurrent = Effect.fn("Inspector.collectCurrent")(function* (
     current.lossKey,
     sessionId === current.sessionId ? current.droppedRecords : 0,
     (records, through) =>
-      Ref.update(state, (value) => ({ ...value, unstored: { sessionId, after, through, records } })),
+      Ref.update(state, (value) => ({
+        ...value,
+        unstored: { sessionId, after, through, records },
+      })),
   );
   publishCollection(stream, batch.changes);
   yield* Ref.update(state, (value) => ({

@@ -65,7 +65,12 @@ export async function runHistorySurvival(): Promise<HistorySurvivalResult> {
   try {
     const first = await launchTool(fixture.projectRoot);
     tools.push(first);
-    const wait = <T>(read: () => Promise<T>, done: (value: T) => boolean, ms: number, what: string) =>
+    const wait = <T>(
+      read: () => Promise<T>,
+      done: (value: T) => boolean,
+      ms: number,
+      what: string,
+    ) =>
       until(read, done, ms, what).catch((cause: Error) => {
         throw new Error(`${cause.message}\n${first.output().slice(-4000)}`);
       });
@@ -74,7 +79,12 @@ export async function runHistorySurvival(): Promise<HistorySurvivalResult> {
     // 1. A record DuckDB's JSON column would refuse, then an ordinary request after it.
     const poison = await send("/items", '{"name":"a\\ud800b"}');
     const after = await send("/hello?name=after-poison");
-    await wait(() => stored(first, after), Boolean, 15_000, "request after the refused record stored");
+    await wait(
+      () => stored(first, after),
+      Boolean,
+      15_000,
+      "request after the refused record stored",
+    );
     const afterPoison = await storage(first);
     const poisonStored = await stored(first, poison);
 
@@ -93,7 +103,12 @@ export async function runHistorySurvival(): Promise<HistorySurvivalResult> {
     // Let it retry its opening a few times.
     await new Promise((done) => setTimeout(done, 4000));
     const during = await send("/hello?name=second-running");
-    const collectedWhileSecondRan = await wait(() => stored(first, during), Boolean, 15_000, "collected");
+    const collectedWhileSecondRan = await wait(
+      () => stored(first, during),
+      Boolean,
+      15_000,
+      "collected",
+    );
     await second.close();
     const afterSecond = await send("/hello?name=second-stopped");
     const collectedAfterSecondStopped = await wait(

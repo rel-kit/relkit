@@ -112,6 +112,8 @@ export function historyWorkers(tool: ToolProcess): number[] {
   return listing
     .split("\n")
     .map((line) => /^\s*(\d+)\s+(\d+)\s+(.*)$/.exec(line))
-    .filter((match) => match !== null && Number(match[2]) === tool.pid && /duckdb-worker/.test(match[3]!))
+    .filter(
+      (match) => match !== null && Number(match[2]) === tool.pid && /duckdb-worker/.test(match[3]!),
+    )
     .map((match) => Number(match![1]));
 }

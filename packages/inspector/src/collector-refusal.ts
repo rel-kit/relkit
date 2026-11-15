@@ -58,7 +58,8 @@ export const appendCollected = Effect.fn("Inspector.appendCollected")(function* 
 /** A diagnostic naming the refused records by signal; a replayed batch reuses its key. */
 function refusalDiagnostic(sessionId: string, refused: readonly LocalRecord[]): LocalRecord {
   const signals = new Map<string, number>();
-  for (const { record } of refused) signals.set(record.signal, (signals.get(record.signal) ?? 0) + 1);
+  for (const { record } of refused)
+    signals.set(record.signal, (signals.get(record.signal) ?? 0) + 1);
   const named = [...signals].map(([signal, count]) => `${count} ${signal}`).join(", ");
   return {
     key: `${sessionId}:refused:${refused[0]!.key}`,
