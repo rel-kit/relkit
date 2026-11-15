@@ -1,24 +1,42 @@
 /** Owns a real generated backend, memory-only CLI capture and separate tool child. */
 import { mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { generateProject, CREATE_OPTION_DEFAULTS } from "create-relkit";
 import { Effect, Exit, Scope } from "effect";
-import {
-  CliDevCapture,
-  devCaptureLayer,
-} from "../../../packages/cli/src/commands/dev-capture.service.js";
-import { startDev } from "../../../packages/cli/src/commands/dev.js";
-import { createDevLocalCompiler } from "../../../packages/cli/src/commands/dev-local.js";
+
+type DevCaptureModule = typeof import("../../../packages/cli/src/commands/dev-capture.service.js");
+type DevModule = typeof import("../../../packages/cli/src/commands/dev.js");
+type DevLocalModule = typeof import("../../../packages/cli/src/commands/dev-local.js");
+
+/** Bun runs the CLI's sources; Node cannot run their compiler worker, so it runs the built CLI. */
+async function cliModules() {
+  const directory = process.versions.bun === undefined ? "dist" : "src";
+  const at = (name: string) => `../../../packages/cli/${directory}/commands/${name}.js`;
+  const [capture, dev, local] = await Promise.all([
+    import(at("dev-capture.service")) as Promise<DevCaptureModule>,
+    import(at("dev")) as Promise<DevModule>,
+    import(at("dev-local")) as Promise<DevLocalModule>,
+  ]);
+  return { ...capture, ...dev, ...local };
+}
+
+/** Template and extra project files of a generated fixture; defaults to the minimal template. */
+export interface GeneratedAppOptions {
+  readonly template?: (typeof CREATE_OPTION_DEFAULTS)["template"];
+  /** Paths relative to the project root, written after generation. */
+  readonly files?: Readonly<Record<string, string>>;
+}
 
 /** Links only the prebuilt workspace fixture; packed acceptance independently verifies external installs. */
-async function generatedProject(root: string, inspected: boolean) {
+async function generatedProject(root: string, inspected: boolean, options: GeneratedAppOptions) {
   const projectRoot = join(root, "example");
   const repository = resolve(import.meta.dirname, "../../..");
   const { jobs, ...defaults } = CREATE_OPTION_DEFAULTS;
   await generateProject(
     {
       ...defaults,
+      ...(options.template === undefined ? {} : { template: options.template }),
       ...(jobs === undefined ? {} : { jobs }),
       name: "example",
       directory: projectRoot,
@@ -60,15 +78,20 @@ async function generatedProject(root: string, inspected: boolean) {
       path,
       config.replace("defineApp({", "defineApp({ inspector: { enabled: true },"),
     );
+  for (const [file, text] of Object.entries(options.files ?? {})) {
+    await mkdir(dirname(join(projectRoot, file)), { recursive: true });
+    await writeFile(join(projectRoot, file), text);
+  }
   return projectRoot;
 }
 
 /** Session cleanup precedes capture/fixture release even when native compilation fails. */
-export async function generatedAppFixture(inspected = true) {
+export async function generatedAppFixture(inspected = true, options: GeneratedAppOptions = {}) {
   const root = await mkdtemp(join(tmpdir(), "relkit-tool-generated-"));
   const scope = Effect.runSync(Scope.make());
-  let compiler: ReturnType<typeof createDevLocalCompiler> | undefined;
-  let session: Awaited<ReturnType<typeof startDev>> | undefined;
+  const { CliDevCapture, devCaptureLayer, startDev, createDevLocalCompiler } = await cliModules();
+  let compiler: ReturnType<DevLocalModule["createDevLocalCompiler"]> | undefined;
+  let session: Awaited<ReturnType<DevModule["startDev"]>> | undefined;
   const close = async () => {
     try {
       try {
@@ -85,7 +108,7 @@ export async function generatedAppFixture(inspected = true) {
     }
   };
   try {
-    const projectRoot = await generatedProject(root, inspected);
+    const projectRoot = await generatedProject(root, inspected, options);
     compiler = createDevLocalCompiler(projectRoot, false);
     const capture = await Effect.runPromise(
       CliDevCapture.use((service) => service.acquire(inspected, {})).pipe(
