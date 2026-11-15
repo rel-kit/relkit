@@ -22,7 +22,7 @@ exports[`creation errors 1`] = `
 {
   "code": 2,
   "stderr": "RELKIT_CREATE_UNTESTED: template=minimal/jobs=none/cloud=aws/deploy=pulumi/examples=on has not been tested with <versions>, and --strict refuses untested combinations. Tested: <combinations>. See https://relkit.dev/docs/modules/cli/relkit-create-untested
-  next: Pick a tested combination listed in the message, or continue without \`--strict\` and check the new project with \`bun run check\`.",
+  next: Pick a tested combination listed in the message, or continue without \`--strict\` and run the new project's \`check\` script.",
 }
 `;
 
