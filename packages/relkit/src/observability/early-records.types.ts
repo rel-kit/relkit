@@ -23,7 +23,16 @@ export interface EarlyRetainedRecord {
   readonly bytes: number;
   readonly record: RedactedObservabilityRecord;
   readonly identity?: EarlyRecordIdentity;
+  /** What losing the record costs; computed from the record when absent. */
+  readonly kind?: EarlyLossKind;
 }
+
+/**
+ * What a full buffer gave up, lowest value first: framework success logs, other logs, unfinished
+ * span revisions, other records (completed spans, invocations, events), request starts, request ends.
+ */
+export type EarlyLossKind =
+  "frameworkLogs" | "logs" | "spans" | "other" | "requestStarts" | "requestEnds";
 
 /** Preserved producer identity allows idempotent persistence after a lost acknowledgement. */
 export interface EarlyRecordIdentity {
@@ -39,6 +48,8 @@ export interface EarlyRetentionStatus {
   readonly bufferedBytes: number;
   readonly droppedRecords: number;
   readonly droppedBytes: number;
+  /** Lost records by kind; the counts add up to `droppedRecords`. */
+  readonly droppedByKind: Readonly<Record<EarlyLossKind, number>>;
   readonly incomplete: boolean;
 }
 
@@ -50,6 +61,7 @@ export interface EarlyRetentionState {
   readonly acknowledged: number;
   readonly droppedRecords: number;
   readonly droppedBytes: number;
+  readonly droppedByKind: Readonly<Record<EarlyLossKind, number>>;
   readonly reportedRecords: number;
   readonly reportedBytes: number;
 }

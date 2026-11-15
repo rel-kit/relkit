@@ -56,6 +56,14 @@ it.effect("rejects empty and oversized keys without consuming memory or reportin
       bufferedBytes: 0,
       droppedRecords: 0,
       droppedBytes: 0,
+      droppedByKind: {
+        frameworkLogs: 0,
+        logs: 0,
+        spans: 0,
+        other: 0,
+        requestStarts: 0,
+        requestEnds: 0,
+      },
       incomplete: false,
     });
     expect(yield* buffer.overflow()).toBeUndefined();
