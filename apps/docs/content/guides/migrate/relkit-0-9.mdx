@@ -348,7 +348,20 @@ export const account = pgTable("account", {
 });
 ```
 
-Then run `db:generate` and `db:migrate`. An index callback that is not a plain list of entries is listed instead of changed. [Remove the account issuer column](/docs/modules/auth/better-auth#remove-the-account-issuer-column) has the hand-written steps and the SQL.
+Before you migrate, check that no two accounts share a provider and account ID, which Better Auth 1.7.3 and later reject. On PostgreSQL:
+
+```sql
+SELECT "providerId", "accountId", count(*) FROM account GROUP BY 1, 2 HAVING count(*) > 1;
+```
+
+Then run `db:generate` and `db:migrate`. The generated migration drops the index before the column:
+
+```sql title="migration.sql"
+DROP INDEX "account_issuer_account_id";--> statement-breakpoint
+ALTER TABLE "account" DROP COLUMN "issuer";
+```
+
+An index callback that is not a plain list of entries is listed instead of changed. [Remove the account issuer column](/docs/modules/auth/better-auth#remove-the-account-issuer-column) has the hand-written steps.
 
 ## Related tasks
 

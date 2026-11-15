@@ -213,11 +213,8 @@ columns stay as they are. To upgrade a project:
 1. Install `better-auth@1.7.7` together with the RelKit packages that require it. RelKit checks the
    installed version and names it when it differs.
 2. Check that no two accounts share a provider and account ID, which Better Auth 1.7.3 and later
-   reject. On PostgreSQL:
-
-   ```sql
-   SELECT "providerId", "accountId", count(*) FROM account GROUP BY 1, 2 HAVING count(*) > 1;
-   ```
+   reject. The [migration guide](/guides/migrate/relkit-0-9#better-auth-account-issuer) has the
+   query.
 
 3. Change the schema file. `relkit migrate` previews the change and `relkit migrate --write` applies
    it; to edit by hand, remove the column, the index and the imports only the index used. In
@@ -245,12 +242,7 @@ columns stay as they are. To upgrade a project:
    use it. SQLite and MySQL schemas change the same way.
 
 4. Generate the migration with `bun run db:generate` (`npm run db:generate` on npm) and review it.
-   Drizzle drops the index before the column:
-
-   ```sql title="migration.sql"
-   DROP INDEX "account_issuer_account_id";--> statement-breakpoint
-   ALTER TABLE "account" DROP COLUMN "issuer";
-   ```
+   Drizzle drops the `account_issuer_account_id` index first and the `issuer` column second.
 
 5. Apply it with `bun run db:migrate` (`relkit db migrate`) in every environment before the new
    release serves requests, then sign up a new user and sign in with an existing one.
