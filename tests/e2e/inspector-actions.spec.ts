@@ -291,27 +291,20 @@ function deliveries(count: number, from = 0) {
   }));
 }
 
-test("an event with several pages of deliveries loads them all and lists the newest first", async ({
-  page,
-}) => {
+test("an event with several pages of deliveries lists the newest first", async ({ page }) => {
   await patch(page, /\/_relkit\/v1\/runtime\/events\?/, (payload, route) => {
     const more = new URL(route.request().url()).searchParams.get("cursor") === "100";
     const items = more ? deliveries(20, 100) : deliveries(100);
-    Object.assign(payload, {
-      items,
-      deliveries: items,
-      deadLetters: [],
-      ...(more ? { nextCursor: undefined } : { nextCursor: "100" }),
-    });
+    Object.assign(payload, { items, deliveries: items, deadLetters: [] });
+    payload.nextCursor = more ? undefined : "100";
   });
   await page.goto("/events/orders.created");
   await expect(page.getByRole("heading", { name: /newest first/ })).toBeVisible();
   await expect(page.getByLabel("120 deliveries")).toBeVisible();
   await expect(page.getByRole("button", { name: "Load more deliveries" })).toHaveCount(0);
-  // The API lists the oldest first; the last page holds the newest, and it is on top.
-  await expect(
-    page.getByRole("list", { name: "Delivery attempts" }).getByRole("listitem").first(),
-  ).toContainText("delivery-119");
+  // The last page holds the newest; it is on top.
+  const rows = page.getByRole("list", { name: "Delivery attempts" }).getByRole("listitem");
+  await expect(rows.first()).toContainText("delivery-119");
 });
 
 test("an event whose provider reports a total shows the real total and counts", async ({
