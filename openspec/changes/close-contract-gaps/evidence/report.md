@@ -1,6 +1,6 @@
 # Report: contract gaps closed and proved on the application
 
-The application is the logistics backend of the audit (25 routes, Better Auth 1.7.7 with the organization plugin), on its branch for RelKit 0.9.1. The packages under test were packed from this change, served from a local registry and installed into a separate worktree of the application with an empty cache: once with npm, once with Bun. In both installs 13,953 files of 11 first-party packages were compared with the archives and 0 differ.
+The application is the logistics backend of the audit (25 routes, Better Auth 1.7.7 with the organization plugin), at its commit for RelKit 0.9.1. The packages under test were packed from this change, served from a local registry and installed with an empty cache into a plain folder copy of the application's committed files, outside both repositories: once with npm, once with Bun. In both installs 14,009 files of 11 first-party packages were compared with the archives and 0 differ. The copy had its own environment file, its own database and its own port.
 
 ## Result by gap
 
@@ -107,16 +107,16 @@ POST /api/auth/organization/set-active   Origin: https://evil.example
 **`x-request-id` on the live update stream.**
 
 ```text
-GET /_relkit/v1/client/contract-events -> 200 text/event-stream  x-request-id: request-c3b05848-6dca-4e29-8633-6ffc0af0aaf3
-GET /_relkit/v1/client/contract-events -> 200 text/event-stream  x-request-id: request-136eb7f1-b35f-4410-aa70-103874f5353c
+GET /_relkit/v1/client/contract-events -> 200 text/event-stream  x-request-id: request-6dc1a7fc-e3f0-4fa7-a9c0-c39404060cd0
+GET /_relkit/v1/client/contract-events -> 200 text/event-stream  x-request-id: request-eb3fb61f-375a-4b28-a15f-eb437d6e8b63
 ```
 
 **431, `GET /hello` with a 20 KB header.**
 
 ```text
-relkit dev front, Node:   HTTP/1.1 431 Request Header Fields Too Large\r\nx-request-id: request-eed5c78e-79ed-408a-b64e-8f57bc4e3a7e\r\nConnection: close\r\n\r\n
+relkit dev front, Node:   HTTP/1.1 431 Request Header Fields Too Large\r\nx-request-id: request-49812726-90d4-487c-b794-272a28bf475d\r\nConnection: close\r\n\r\n
 relkit dev front, Bun:    HTTP/1.1 431 Request Header Fields Too Large\r\nConnection: close\r\n\r\n
-runtime adapter, Node:    HTTP/1.1 431 Request Header Fields Too Large\r\nx-request-id: request-31083e04-5e68-4779-b545-84a14c8867c3\r\nConnection: close\r\n\r\n
+runtime adapter, Node:    HTTP/1.1 431 Request Header Fields Too Large\r\nx-request-id: request-bb4a36d8-59bb-450c-a4cc-bf2c7c33f1d7\r\nConnection: close\r\n\r\n
 runtime adapter, Bun:     HTTP/1.1 431 Request Header Fields Too Large\r\nConnection: close\r\n\r\n
 ```
 
@@ -146,7 +146,9 @@ The methods listed in the document are `delete`, `get`, `patch`, `post` and `put
 - The Inspector page walk. This change does not touch the Inspector; `bun run test:inspector` covers it in the repository.
 - Linux. Every run was on macOS.
 
-## Observed, not part of this change
+## Observed in an earlier run, not part of this change
 
-- The first `relkit dev` in a fresh worktree stopped after 20 seconds with `The new version exited with code 143 before it was ready` while the bucket's container was created for the first time; the second start was ready in 6 seconds.
-- Under heavy machine load a start failed with `RELKIT_EVALUATOR_TIMEOUT` (10 s). It did not recur at normal load.
+An earlier run of this proof, later repeated from the start, saw two things the repeated run did not:
+
+- The first `relkit dev` in a fresh folder stopped after 20 seconds with `The new version exited with code 143 before it was ready` while the bucket's container was created for the first time; the second start was ready in 6 seconds. In the repeated run the first start was ready in 4 seconds.
+- Under heavy machine load a start failed with `RELKIT_EVALUATOR_TIMEOUT` (10 s). It did not recur.
