@@ -25,7 +25,7 @@ function tab(initial = "generation-1") {
   });
   const scheduled: (() => void)[] = [];
   const store = new GraphStore({
-    fetch: (fresh) => {
+    read: (fresh) => {
       if (fresh) client.invalidate(["graph"]);
       return client.graph();
     },

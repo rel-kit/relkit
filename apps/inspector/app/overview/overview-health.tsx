@@ -129,6 +129,9 @@ export function HealthStrip({
                   <span className="text-[11px] text-muted-foreground">
                     {lost.byApplicationProducer.toLocaleString("en-US")} by the application ·{" "}
                     {lost.byInspectionBuffer.toLocaleString("en-US")} by its buffer
+                    {lost.byHistoryStore === undefined
+                      ? null
+                      : ` · ${lost.byHistoryStore.toLocaleString("en-US")} by the history store`}
                   </span>
                 ) : null}
               </span>

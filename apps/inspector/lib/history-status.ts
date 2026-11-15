@@ -66,13 +66,15 @@ export function historyIncomplete(value: InspectorObject | undefined): boolean {
   return recordsLost(value)?.total !== 0;
 }
 
-/** Records that never reached history (IN-17), in the two places they can be lost. */
+/** Records that never reached history (IN-17), by the place they were lost. */
 export interface RecordsLost {
   readonly total: number;
   /** The application's producer could not hand them to its inspection buffer. */
   readonly byApplicationProducer: number;
   /** The inspection buffer evicted them before the Inspector stored them. */
   readonly byInspectionBuffer: number;
+  /** The Inspector collected them, but its history did not store them; absent when none. */
+  readonly byHistoryStore?: number;
 }
 
 /** Reads `recordsLostBeforeHistory`, or the deprecated counters of an older Inspector. */
@@ -84,7 +86,13 @@ export function recordsLost(value: InspectorObject | undefined): RecordsLost | u
   if (byApplicationProducer === undefined && byInspectionBuffer === undefined) return undefined;
   const producer = byApplicationProducer ?? 0;
   const buffer = byInspectionBuffer ?? 0;
-  return { total: producer + buffer, byApplicationProducer: producer, byInspectionBuffer: buffer };
+  const store = count(named?.byHistoryStore) ?? 0;
+  return {
+    total: producer + buffer + store,
+    byApplicationProducer: producer,
+    byInspectionBuffer: buffer,
+    ...(store === 0 ? {} : { byHistoryStore: store }),
+  };
 }
 
 export function recordsLostSentence(lost: RecordsLost): string | undefined {
@@ -98,6 +106,9 @@ export function recordsLostSentence(lost: RecordsLost): string | undefined {
     ...(lost.byInspectionBuffer === 0
       ? []
       : [`the buffer dropped ${number(lost.byInspectionBuffer)} before the Inspector stored them`]),
+    ...(lost.byHistoryStore === undefined || lost.byHistoryStore === 0
+      ? []
+      : [`the Inspector's history did not store ${number(lost.byHistoryStore)} it had collected`]),
   ];
   return `Some requests, logs or spans from this session are missing from history: ${parts.join(", and ")}.`;
 }

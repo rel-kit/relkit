@@ -163,6 +163,28 @@ describe("nothing is missing when no record was lost (NF-9, NF-11)", () => {
     expect(historyIncomplete(undefined)).toBe(false);
   });
 
+  test("records the history store did not keep count as lost and are named", () => {
+    const status = {
+      incomplete: true,
+      recordsLostBeforeHistory: {
+        byApplicationProducer: 0,
+        byInspectionBuffer: 0,
+        byHistoryStore: 2,
+      },
+    };
+    const lost = recordsLost(status);
+    expect(lost).toEqual({
+      total: 2,
+      byApplicationProducer: 0,
+      byInspectionBuffer: 0,
+      byHistoryStore: 2,
+    });
+    expect(historyIncomplete(status)).toBe(true);
+    expect(recordsLostSentence(lost!)).toBe(
+      "Some requests, logs or spans from this session are missing from history: the Inspector's history did not store 2 it had collected.",
+    );
+  });
+
   test("a part that lost nothing is not named as a failure", () => {
     const sentence = recordsLostSentence({
       total: 4,

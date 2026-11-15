@@ -53,7 +53,7 @@ let store: GraphStore | undefined;
 /** The tab's graph: one read per generation, shared by every component that shows it. */
 export function sharedGraphStore(): GraphStore {
   store ??= new GraphStore({
-    fetch: (fresh) => {
+    read: (fresh) => {
       const api = createInspectorClient();
       if (fresh) api.invalidate(["graph"]);
       return api.graph();

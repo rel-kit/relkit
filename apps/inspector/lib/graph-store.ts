@@ -13,7 +13,7 @@ export interface GenerationHint {
 
 export interface GraphStoreOptions {
   /** Reads the graph from the network; `fresh` drops what the client cached first. */
-  readonly fetch: (fresh: boolean) => Promise<InspectorGraph>;
+  readonly read: (fresh: boolean) => Promise<InspectorGraph>;
   /** How long a burst of changes is gathered before the graph is read again. */
   readonly settleMs?: number;
   readonly schedule?: (run: () => void, ms: number) => unknown;
@@ -78,7 +78,7 @@ export class GraphStore {
   private read(fresh: boolean): Promise<InspectorGraph> {
     // A read under way when a change arrives may predate it, so a fresh one never joins it.
     if (this.inflight !== undefined && !fresh) return this.inflight;
-    const started = this.options.fetch(fresh).then(
+    const started = this.options.read(fresh).then(
       (graph) => {
         if (this.inflight === started) this.inflight = undefined;
         const unchanged =
