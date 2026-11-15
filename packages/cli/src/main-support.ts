@@ -158,9 +158,14 @@ export function toFailure(error: unknown, signal: AbortSignal): CliFailure {
       ? signal.reason
       : fail("RELKIT_INTERRUPTED", "Operation interrupted.", 130);
   if (isFailure(error)) return error;
-  if (error instanceof Error && "code" in error && typeof error.code === "string") {
+  // Only RelKit codes are public; a native code such as ENOENT stays in the message.
+  if (
+    error instanceof Error &&
+    "code" in error &&
+    typeof error.code === "string" &&
+    error.code.startsWith("RELKIT_")
+  )
     return fail(error.code, error.message);
-  }
   return fail("RELKIT_INTERNAL_ERROR", errorMessage(error));
 }
 /**

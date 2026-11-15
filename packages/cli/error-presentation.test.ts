@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, expect, test } from "vitest";
 import { createDiagnostic, formatDiagnostic } from "relkit/diagnostics";
-import { errorLines, runCli } from "./src/main.js";
+import { errorLines, runCli, toFailure } from "./src/main.js";
 
 const empty = await mkdtemp(join(tmpdir(), "relkit-error-presentation-"));
 afterAll(() => rm(empty, { recursive: true, force: true }));
@@ -86,4 +86,34 @@ test("every RelKit code gets a docs link, known codes also get the next step", (
     ).at(-1),
   ).toMatch(/^ {2}next: /u);
   expect(errorLines("EACCES", "Permission denied")).toEqual(["EACCES: Permission denied"]);
+});
+
+test("start without a build names the missing build and `relkit build`", async () => {
+  const result = await failure(["start", "--project-root", empty]);
+  expect(result.code).toBe(1);
+  expect(result.stdout).toEqual([]);
+  expect(result.stderr).toBe(
+    [
+      "RELKIT_START_BUILD_MISSING: No build found in <empty>/.relkit/build",
+      "  next: Run `relkit build` in the project and wait for it to succeed, then run `relkit start` again.",
+      "  docs: https://relkit.dev/docs/errors/relkit-start-build-missing",
+    ].join("\n"),
+  );
+  expect(result.stderr).not.toContain("ENOENT");
+});
+
+test("native error codes are never printed as RelKit codes", () => {
+  const native = Object.assign(new Error("EACCES: permission denied, open 'x'"), {
+    code: "EACCES",
+  });
+  expect(toFailure(native, new AbortController().signal)).toMatchObject({
+    code: "RELKIT_INTERNAL_ERROR",
+    message: "EACCES: permission denied, open 'x'",
+    exitCode: 1,
+  });
+  const coded = Object.assign(new Error("Port is invalid."), { code: "RELKIT_DEV_USAGE" });
+  expect(toFailure(coded, new AbortController().signal)).toMatchObject({
+    code: "RELKIT_DEV_USAGE",
+    message: "Port is invalid.",
+  });
 });

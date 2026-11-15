@@ -242,8 +242,8 @@ export const cliCodes = [
   },
   {
     code: "RELKIT_COMMAND_UNAVAILABLE",
-    title: "Unknown relkit command",
-    happened: "`relkit` does not have a command with the name you typed.",
+    title: "Command is not implemented",
+    happened: "`relkit` knows this command, but the installed `@relkit/cli` has no implementation.",
     fix: "Run `relkit --help` to see the available commands, and check that `@relkit/cli` is up to date.",
   },
   {
