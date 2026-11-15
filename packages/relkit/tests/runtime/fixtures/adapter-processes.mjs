@@ -42,6 +42,38 @@ try {
   missing = error.code ?? "thrown";
 }
 
+// A child started with `processGroup` leads a group: a signal to the negative pid reaches its
+// own children too, and a child started without the option does not lead one.
+const grouped = runtime.processes.spawn(["sh", "-c", "sleep 30 & echo $!; wait"], {
+  processGroup: true,
+});
+const reader = grouped.stdout.getReader();
+const grandchild = Number.parseInt(new TextDecoder().decode((await reader.read()).value), 10);
+const leads = (pid) => {
+  try {
+    process.kill(-pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+};
+const plain = runtime.processes.spawn(["sleep", "30"], { stdout: "ignore", stderr: "ignore" });
+const plainLeads = leads(plain.pid);
+plain.kill("SIGTERM");
+await plain.exited;
+const groupLeads = leads(grouped.pid);
+process.kill(-grouped.pid, "SIGTERM");
+await grouped.exited;
+let grandchildGone = false;
+for (let waited = 0; waited < 2_000 && !grandchildGone; waited += 25) {
+  try {
+    process.kill(grandchild, 0);
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  } catch {
+    grandchildGone = true;
+  }
+}
+
 process.stdout.write(
   JSON.stringify({
     name: runtime.name,
@@ -49,6 +81,7 @@ process.stdout.write(
     reply,
     killed: { exited: killed, signalCode: sleeper.signalCode },
     missing,
+    group: { plainLeads, groupLeads, grandchildGone },
     which: runtime.processes.which("sh") !== null,
     whichMissing: runtime.processes.which("relkit-no-such-executable"),
     resolved: runtime.modules.resolve("hono", here).endsWith(".js"),
