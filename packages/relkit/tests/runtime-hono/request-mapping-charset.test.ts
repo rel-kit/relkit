@@ -13,7 +13,7 @@ function map(body: Uint8Array | string, contentType = "application/json") {
   const request = new Request("http://localhost/orders", {
     method: "POST",
     headers: { "content-type": contentType },
-    body,
+    body: body as BodyInit,
   });
   return mapRequest({ request, params: {}, query: {}, headers: {} }, mapping);
 }
