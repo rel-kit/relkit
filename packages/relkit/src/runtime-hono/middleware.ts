@@ -68,9 +68,11 @@ export { limitsMiddleware } from "./middleware-limits.js";
 export function requestIdMiddleware(options: HttpMiddlewareOptions = {}): MiddlewareHandler {
   return async (context, next) => {
     if (isRelkitControlPlanePath(context.req.path)) {
-      const requestId = readId(undefined, options.requestId, "request", toRequestId);
+      // Stored so a Problem built downstream names this ID too, not one of its own (27.1 e).
+      const state = createFallbackState(context, options);
+      setRequestState(context, state);
       await next();
-      setResponseHeader(context, options.requestIdHeader ?? REQUEST_ID_HEADER, requestId);
+      setResponseHeader(context, options.requestIdHeader ?? REQUEST_ID_HEADER, state.requestId);
       return;
     }
     const outer = outerHttpState(context.req.raw);
