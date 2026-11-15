@@ -21,6 +21,18 @@ app.get(
     },
   })),
 );
+// Reports whether the handler received a body, and the framing headers it saw (RK-41).
+app.all("/body", async (context) => {
+  const request = context.req.raw;
+  const bodyNull = request.body === null;
+  return context.json({
+    method: request.method,
+    bodyNull,
+    contentLength: request.headers.get("content-length"),
+    transferEncoding: request.headers.get("transfer-encoding"),
+    text: bodyNull ? null : await request.text(),
+  });
+});
 installStaticFiles(app, { root: process.env.RELKIT_FIXTURE_ROOT, files: runtime.files });
 const server = await runtime.serve({
   hostname: "127.0.0.1",

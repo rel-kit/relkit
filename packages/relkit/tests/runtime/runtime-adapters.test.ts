@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { connect } from "node:net";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
@@ -52,7 +53,75 @@ describe.each([
       await server.stop();
     }
   }, 30_000);
+
+  // RK-41: a request whose client declared no body reaches the handler without one.
+  test("delivers a request without a body when the client sent none", async () => {
+    const server = await start(executable, runtime);
+    try {
+      const seen = (framing: string, method = "POST") =>
+        rawExchange(server.port, `${method} /body HTTP/1.1\r\n${framing}`);
+      const none = { bodyNull: true, transferEncoding: null, text: null };
+      expect(await seen("")).toMatchObject({ method: "POST", contentLength: null, ...none });
+      expect(await seen("Content-Length: 0\r\n")).toMatchObject({ contentLength: "0", ...none });
+      expect(await seen("", "DELETE")).toMatchObject({ method: "DELETE", ...none });
+      expect(await seen("Content-Length: 5\r\n", "PATCH")).toMatchObject({
+        method: "PATCH",
+        bodyNull: false,
+        contentLength: "5",
+        text: "hello",
+      });
+      expect(await seen("Transfer-Encoding: chunked\r\n")).toMatchObject({
+        bodyNull: false,
+        transferEncoding: "chunked",
+        text: "hello",
+      });
+    } finally {
+      await server.stop();
+    }
+  }, 30_000);
 });
+
+/**
+ * Sends one raw request, framed exactly as given, on its own connection.
+ * @param port - Server port.
+ * @param head - Request line and framing headers, each ending in CRLF.
+ * @returns The decoded JSON answer.
+ */
+async function rawExchange(port: number, head: string): Promise<Record<string, unknown>> {
+  const body = head.includes("Content-Length: 5")
+    ? "hello"
+    : head.includes("chunked")
+      ? "5\r\nhello\r\n0\r\n\r\n"
+      : "";
+  const socket = connect(port, "127.0.0.1");
+  let raw = "";
+  socket.on("data", (chunk: Buffer) => (raw += chunk.toString()));
+  socket.write(`${head}Host: 127.0.0.1:${port}\r\nConnection: close\r\n\r\n${body}`);
+  await new Promise<void>((resolve, reject) => {
+    socket.once("close", () => resolve());
+    socket.once("error", reject);
+  });
+  const text = raw.slice(raw.indexOf("\r\n\r\n") + 4);
+  return JSON.parse(text.startsWith("{") ? text : decodeChunked(text)) as Record<string, unknown>;
+}
+
+/**
+ * Decodes a chunked response body.
+ * @param text - Raw chunked body.
+ * @returns The joined chunk data.
+ */
+function decodeChunked(text: string): string {
+  let rest = text;
+  let out = "";
+  while (rest.length > 0) {
+    const line = rest.indexOf("\r\n");
+    const size = Number.parseInt(rest.slice(0, line), 16);
+    if (!(size > 0)) break;
+    out += rest.slice(line + 2, line + 2 + size);
+    rest = rest.slice(line + 4 + size);
+  }
+  return out;
+}
 
 /**
  * Sends one WebSocket message and resolves with the first reply.
