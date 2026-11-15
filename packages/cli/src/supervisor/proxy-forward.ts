@@ -1,7 +1,5 @@
-import { request as httpRequest } from "node:http";
-import { Readable } from "node:stream";
-import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 import type { SupervisorDrainLease } from "./drain.types.js";
+import { hostPreservingFetch } from "./proxy-node-client.js";
 import type { ActiveSupervisorProxyTarget } from "./proxy.types.js";
 
 // `content-length` is kept: the worker then applies its body limit from the header, as in production.
@@ -106,75 +104,6 @@ function forwardedHeaders(request: Request): Headers {
   // the worker trusts no client-supplied forwarding header for the authority.
   headers.set("host", new URL(request.url).host);
   return headers;
-}
-
-/** Bodiless response statuses, whose stream must stay null for `Response`. */
-const NULL_BODY_STATUSES = new Set([101, 103, 204, 205, 304]);
-
-/**
- * Sends one upstream request over `node:http`, which keeps the `Host` header it is given.
- * Node's `fetch` (undici) drops `Host` as a forbidden header and names the private port instead,
- * so the worker would judge `Origin` against its own loopback address (RK-39). Like Node's
- * `fetch`, it settles once the request body was sent: a worker that answered early has drained it.
- * @param input - Upstream URL. @param init - Method, headers, optional body and signal.
- * @returns The upstream status, headers and unbuffered, undecoded body.
- */
-export function hostPreservingFetch(
-  input: URL | string,
-  init: RequestInit = {},
-): Promise<Response> {
-  const url = new URL(input);
-  const method = init.method ?? "GET";
-  return new Promise<Response>((resolve, reject) => {
-    const headers = new Headers(init.headers);
-    // Keep-alive lets the worker drain a body it answered early instead of resetting the socket;
-    // the private agent still closes the connection after this one exchange.
-    headers.set("connection", "keep-alive");
-    const outgoing = httpRequest({
-      hostname: url.hostname,
-      port: url.port,
-      path: `${url.pathname}${url.search}`,
-      method,
-      headers: Object.fromEntries(headers),
-      agent: false,
-      signal: init.signal ?? undefined,
-    });
-    let answer: Response | undefined;
-    let sent = false;
-    /** Resolves once both the answer arrived and the request body was sent or abandoned. */
-    const settle = (): void => {
-      if (answer !== undefined && sent) resolve(answer);
-    };
-    outgoing.once("finish", () => {
-      sent = true;
-      settle();
-    });
-    // Kept after the answer too: a later abort or reset errors the answer's body stream instead.
-    outgoing.on("error", (error) => {
-      if (answer === undefined) return reject(error);
-      sent = true;
-      settle();
-    });
-    outgoing.once("response", (incoming) => {
-      const received = new Headers();
-      for (let index = 0; index + 1 < incoming.rawHeaders.length; index += 2)
-        received.append(incoming.rawHeaders[index]!, incoming.rawHeaders[index + 1]!);
-      const status = incoming.statusCode ?? 502;
-      const empty = method === "HEAD" || NULL_BODY_STATUSES.has(status);
-      if (empty) incoming.resume();
-      const body = empty ? null : (Readable.toWeb(incoming) as ReadableStream<Uint8Array>);
-      const statusText = incoming.statusMessage ?? "";
-      answer = new Response(body, { status, statusText, headers: received });
-      settle();
-    });
-    const body =
-      init.body === undefined || init.body === null ? null : new Response(init.body).body;
-    if (body === null) outgoing.end();
-    else
-      Readable.fromWeb(body as NodeReadableStream<Uint8Array>)
-        .once("error", (error) => outgoing.destroy(error))
-        .pipe(outgoing);
-  });
 }
 
 /** The upstream client for this runtime: Bun's `fetch` keeps `Host`; Node's does not. */

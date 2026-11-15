@@ -3,8 +3,10 @@
  * through the same fetch handler, so WebSocket routes behave as they do on Bun.
  */
 import { createAdaptorServer, type WebSocketServerLike } from "@hono/node-server";
+import type { Server } from "node:http";
 import { WebSocketServer } from "ws";
 import type { RuntimeServeOptions, RuntimeServer } from "../runtime-adapter.types.js";
+import { lingerOnClose } from "./lingering-close.js";
 
 /**
  * Gives a request whose client declared no body a null body, as Bun does. Hono's Node server
@@ -44,6 +46,8 @@ export async function serve(options: RuntimeServeOptions): Promise<RuntimeServer
     // `ws` types `options.noServer` as optional; the server is created with it set.
     websocket: { server: sockets as unknown as WebSocketServerLike },
   });
+  // Hono's Node server is an HTTP/1 `node:http` server here: no TLS or HTTP/2 option is passed.
+  lingerOnClose(server as Server);
   await new Promise<void>((resolve, reject) => {
     server.once("error", reject);
     server.listen(options.port, options.hostname, () => {

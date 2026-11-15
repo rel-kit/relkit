@@ -6,7 +6,7 @@
 import { nodeRuntime } from "relkit/runtime/node";
 import type { RuntimeServer } from "relkit/runtime";
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { hostPreservingFetch } from "../../../src/supervisor/proxy-forward.js";
+import { hostPreservingFetch } from "../../../src/supervisor/proxy-node-client.js";
 import { createSupervisorProxy, type SupervisorProxy } from "../../../src/supervisor/proxy.js";
 
 let upstream: RuntimeServer;
