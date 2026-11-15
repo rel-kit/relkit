@@ -17,24 +17,36 @@ export const devLogOptions = [
  * @param name - Command or subcommand name.
  * @param description - Human-readable purpose.
  * @param usage - Complete invocation syntax, including positional placeholders.
- * @param values - Optional child commands, flags, and positional arguments.
- * @returns A pure node with an example derived from its usage prefix.
+ * @param values - Optional child commands, flags, positional arguments and examples.
+ * @returns A pure node; without declared examples it shows one derived from its usage prefix.
  */
 export function command(
   name: string,
   description: string,
   usage: string,
-  values: Partial<Pick<CliHelpCommand, "options" | "arguments" | "commands">> = {},
+  values: Partial<Pick<CliHelpCommand, "options" | "arguments" | "commands" | "examples">> = {},
 ): CliHelpCommand {
   return {
     name,
     description,
     usage,
-    examples: [{ command: usage.replace(/[<[].*$/, "").trim(), description }],
+    examples: values.examples ?? [{ command: usage.replace(/[<[].*$/, "").trim(), description }],
     options: values.options ?? [],
     arguments: values.arguments ?? [],
     commands: values.commands ?? [],
   };
+}
+
+/** Declares one help example.
+ * @param commandLine - Complete invocation, starting with `relkit`.
+ * @param description - What running it does, beyond what the command line says.
+ * @returns The static example record.
+ */
+export function example(
+  commandLine: string,
+  description: string,
+): CliHelpCommand["examples"][number] {
+  return { command: commandLine, description };
 }
 
 /** Builds flag metadata without parsing or validating a user value.

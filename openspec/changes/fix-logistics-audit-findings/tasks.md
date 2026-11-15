@@ -109,7 +109,7 @@
 - [x] 11.1 RK-16: fail `relkit start` without a build with a new `RELKIT_*` code that names `relkit build`, and stop native error codes from being printed as RelKit codes (`start-built-workflow.ts:46-51`, `main-support.ts:161-162`); verify the message and exit status.
 - [x] 11.2 RK-30: on an interrupt or termination signal print one neutral line in human output and keep the exit status and the JSON output (`main.ts:63-73`); verify with `packages/cli/tests/invocation/signals.test.ts`.
 - [x] 11.3 RK-33: report an unknown command as unknown with the available commands (`cli-effect-runtime.ts:132-139`); verify the text and that suggestions still appear for near misses.
-- [ ] 11.4 RK-34: give each command real examples, the `--runtime` default, the build prerequisite of `start`; add `--include-outputs` to `check --json` and omit generated file bodies without it only if no consumer in this repository reads them, otherwise leave the shape and record why; verify the help snapshots and the generated CLI reference.
+- [x] 11.4 RK-34: give each command real examples, the `--runtime` default, the build prerequisite of `start`; add `--include-outputs` to `check --json` and omit generated file bodies without it only if no consumer in this repository reads them, otherwise leave the shape and record why; verify the help snapshots and the generated CLI reference.
 
 ## 12. Reload after a compile failure
 
