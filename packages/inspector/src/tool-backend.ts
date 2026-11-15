@@ -15,7 +15,7 @@ import { forwardBackend } from "./backend-forward.js";
 import { ExecutionSuccessLogs } from "relkit/contracts/operation";
 import { publishSelectionState } from "./live-events.js";
 import { crossSiteRefusal } from "./browser-boundary.js";
-import { collectionState, historyFailure, historyReadable } from "./history-state.js";
+import { collectionState, historyError, historyFailure, historyReadable } from "./history-state.js";
 
 /**
  * The Inspector's session with the application, apart from the UI's own stream to the Inspector.
@@ -165,7 +165,7 @@ function backendStatus(
         connection: current.selection.state,
         application: applicationStatus(current),
         // Pages read any `error` as a history failure, so an application's failure is apart.
-        error: current.error && historyFailure(current.error) ? current.error : undefined,
+        error: historyError(current),
         applicationError:
           current.error && !historyFailure(current.error) ? current.error : undefined,
         incomplete: current.incomplete,
@@ -190,7 +190,7 @@ function backendStatus(
       { state: current.selection.state },
       {
         status:
-          current.selection.state === "connected" && current.history && current.error === undefined
+          current.selection.state === "connected" && historyReadable(current) && current.error === undefined
             ? 200
             : 503,
       },

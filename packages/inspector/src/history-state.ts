@@ -20,7 +20,19 @@ export function historyFailure(error: string): boolean {
  * @returns True when history is open and the last failure, if any, was the application's.
  */
 export function historyReadable(current: InspectorToolState): boolean {
-  return current.history !== undefined && !(current.error && historyFailure(current.error));
+  return current.history !== undefined && historyError(current) === undefined;
+}
+
+/**
+ * Names what is wrong with history itself.
+ * @param current - Tool state.
+ * @returns The stopped worker's reason, else the last failure when it was history's own, such as
+ *   `history.worker-exited` or `history.writer-conflict`; undefined when history has no failure.
+ */
+export function historyError(current: InspectorToolState): string | undefined {
+  const stopped = current.history?.failure?.();
+  if (stopped !== undefined) return stopped;
+  return current.error !== undefined && historyFailure(current.error) ? current.error : undefined;
 }
 
 /** Where collection into history stands; see {@link collectionState}. */

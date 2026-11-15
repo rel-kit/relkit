@@ -8,6 +8,11 @@ export interface InspectorHistoryOwner {
   readonly projectId: string;
   readonly scope: Scope.Closeable;
   readonly operations: InspectorHistoryOperations;
+  /**
+   * Why the worker stopped on its own, such as `history.worker-exited`, or undefined while it
+   * runs. Read on every status request, so a lost worker is reported before the next command.
+   */
+  readonly failure?: () => string | undefined;
 }
 
 /** Collection state contains only one finite batch at a time; no pending write queue. */

@@ -11,10 +11,11 @@ export class InspectorHistory extends Context.Service<
   InspectorHistory,
   InspectorHistoryOperations
 >()("relkit/inspector/History", {
-  make: (root: string, projectId: string) =>
+  /** `onFailure` is told once when the worker stops or fails without being closed. */
+  make: (root: string, projectId: string, onFailure?: (error: Error) => void) =>
     Effect.gen(function* () {
       const native = yield* InspectorHistoryNative;
-      const worker = yield* native.acquire(root, projectId);
+      const worker = yield* native.acquire(root, projectId, onFailure);
       return {
         call: (command) =>
           observeExecution(
