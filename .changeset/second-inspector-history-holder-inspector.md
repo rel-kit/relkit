@@ -1,5 +1,0 @@
----
-"@relkit/inspector": patch
----
-
-A second Inspector for a project whose history another Inspector already holds says so once, in plain words, and stops repeating errors. It prints `Another Inspector already holds this project's history (PID 4242, listening at http://127.0.0.1:3210). This Inspector runs without history. Stop the other one, or pass --history-directory` and, after the third try, that it checks again every 30 seconds. Before, it printed a warning and two `Execution operation failed` error blocks every second or two. The Inspector that opens a history now records its process and address in `.inspector-owner.json` beside it (readable only by you, and removed when it stops), which is how the second one knows where the first listens; without a live record the notice names only the holding process. The second Inspector keeps running without history, because DuckDB lets only one process open the file, even to read it, and it opens the history when the other Inspector stops. Any other history failure is named once with its code, and starting the interface no longer prints `Execution operation completed` blocks.
