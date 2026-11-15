@@ -20,7 +20,13 @@ export interface FunctionCaptures {
 }
 
 /**
- * The captured input and result of the invocation behind a request, read from its function
+ * Spans named `relkit.invoke.<functionId>` carry the capture. The HTTP route span also carries
+ * the function id but never a capture, so it must not stand in for the invocation.
+ */
+const INVOCATION_SPAN = "relkit.invoke.";
+
+/**
+ * The captured input and result of the invocation behind a request, read from its invocation
  * span. Undefined when no function ran: the authentication mount, system routes and early
  * rejections have none. Spans arrive as one record per revision, so they are merged first.
  */
@@ -30,7 +36,7 @@ export function functionCaptures(
 ): FunctionCaptures | undefined {
   const own = text(request.functionId);
   const candidates = traceLifecycle(spans)
-    .filter((span) => text(span.functionId) !== "")
+    .filter((span) => text(span.functionId) !== "" && text(span.name).startsWith(INVOCATION_SPAN))
     .sort((left, right) => rank(left, own) - rank(right, own));
   const span = candidates[0];
   if (span === undefined) return undefined;
