@@ -56,6 +56,9 @@ const startDevUi = Effect.fn("InspectorDev.startUi")(function* (
               RELKIT_BACKEND_URL: backend,
               RELKIT_INSPECTOR_API_TOKEN: token,
               RELKIT_INSPECTOR_DIST_DIR: ".next-dev",
+              // The proxy route accepts only requests addressed to the Inspector's own address.
+              HOSTNAME: options.hostname,
+              PORT: String(options.port),
             },
           },
         ),
