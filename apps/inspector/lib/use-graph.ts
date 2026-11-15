@@ -28,6 +28,25 @@ const initialState: InspectorGraphState = {
   error: false,
 };
 
+/**
+ * Reads one graph response into hook state. A response without a graph (an application that
+ * serves only the identity probe) is the not-available state, never an error thrown in render.
+ */
+export function graphLoaded(
+  payload: InspectorGraph,
+): Pick<InspectorGraphState, "source" | "graph" | "loading" | "error"> {
+  try {
+    return {
+      source: payload,
+      graph: normalizeGraphResponse(payload),
+      loading: false,
+      error: false,
+    };
+  } catch {
+    return { source: undefined, graph: undefined, loading: false, error: true };
+  }
+}
+
 export function useInspectorGraph(): InspectorGraphState {
   const [state, setState] = useState(initialState);
 
@@ -40,14 +59,9 @@ export function useInspectorGraph(): InspectorGraphState {
         .graph()
         .then((payload) => {
           if (disposed) return;
-          setState((current) => ({
-            ...current,
-            source: payload,
-            graph: normalizeGraphResponse(payload),
-            loading: false,
-            error: false,
-          }));
-          window.dispatchEvent(new Event(INSPECTOR_BACKEND_CONNECTED_EVENT));
+          const loaded = graphLoaded(payload);
+          setState((current) => ({ ...current, ...loaded }));
+          if (!loaded.error) window.dispatchEvent(new Event(INSPECTOR_BACKEND_CONNECTED_EVENT));
         })
         .catch(() => {
           if (!disposed) setState((current) => ({ ...current, loading: false, error: true }));

@@ -5,6 +5,7 @@
  */
 import { GENERATOR_VERSION, GRAPH_VERSION, MANIFEST_VERSION } from "relkit/contracts";
 import type { ServerSourceConfiguration } from "./build-server.types.js";
+import { inspectionGraphSource } from "./build-server-deferred-inspector.js";
 
 /** Emits the complete application configuration without evaluating declarations.
  * @param configuration - Checked server and inspector settings.
@@ -142,7 +143,7 @@ ${configuration.runtime === "workers" ? STATIC_FILES_FROM_PLATFORM : STATIC_FILE
       graphContractVersion: ${GRAPH_VERSION},
       manifestContractVersion: ${MANIFEST_VERSION},
       manifestGeneratorVersion: ${GENERATOR_VERSION},
-    },
+    },${inspectionGraphSource(configuration)}
     ...(process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN === undefined
       ? {}
       : { bearerToken: process.env.RELKIT_INTERNAL_ENDPOINT_TOKEN }),

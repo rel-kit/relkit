@@ -28,8 +28,9 @@ export function ProviderDetail() {
   useEffect(() => {
     if (id === "") return;
     const client = createInspectorClient();
-    void Promise.all([client.detail<InspectorObject>("providers", id), client.graph()]).then(
-      ([detail, graph]) => {
+    // One handler for both: a graph without data shows the failed state, not an endless load.
+    void Promise.all([client.detail<InspectorObject>("providers", id), client.graph()])
+      .then(([detail, graph]) => {
         const node = record(detail.node) ?? record(detail.descriptor);
         if (node === undefined) throw new Error("Provider unavailable");
         const adapter = record(node.adapter);
@@ -45,9 +46,8 @@ export function ProviderDetail() {
             ? {}
             : { packageLabel: `${integration.packageName}@${integration.packageVersion}` }),
         });
-      },
-      () => setFailed(true),
-    );
+      })
+      .catch(() => setFailed(true));
   }, [id]);
   if (state === undefined)
     return failed ? (
