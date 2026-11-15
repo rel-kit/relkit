@@ -11,3 +11,4 @@ The `relkit dev` front, on Bun and on Node:
 - A client that disconnects before reading the body no longer prints `Error: aborted` in the terminal.
 
 When the new version stops before it is ready after reporting a coded startup failure (such as `RELKIT_PROVIDER_CONFIGURATION_INVALID` with `--local off` and a local-only binding), `relkit dev` now ends with that code, its message and its next step instead of `RELKIT_INTERNAL_ERROR` and a request to report a bug.
+- A new version that exits with status 0 before it is ready ends `relkit dev` with a failing exit status (1), with or without a coded diagnostic of its own.

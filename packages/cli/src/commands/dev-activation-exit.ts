@@ -27,8 +27,12 @@ export class CandidateExitedError extends Data.TaggedError("CandidateExitedError
   readonly message: string;
   /** The `RELKIT_*` code the process reported before it exited, when it reported one. */
   readonly code?: string;
-  /** Native exit code of the candidate process. */
-  readonly exitCode: number;
+  /**
+   * Native exit code of the candidate process. Not named `exitCode`: the command line reads that
+   * field of a failure as its own exit status, and a candidate that exits with 0 would end
+   * `relkit dev` as a success.
+   */
+  readonly candidateExitCode: number;
   /** The end of what the process wrote to standard error, project paths made relative. */
   readonly output: string;
 }> {}
@@ -111,7 +115,7 @@ export const failOnCandidateExit = Effect.fn("Dev.activation.exit")(function* (
         message:
           diagnostic?.detail ?? `The new version exited with code ${exitCode} before it was ready.`,
         ...(diagnostic === undefined ? {} : { code: diagnostic.code }),
-        exitCode,
+        candidateExitCode: exitCode,
         output: causeText(stderr, attempt.session.projectRoot),
       }),
     ),

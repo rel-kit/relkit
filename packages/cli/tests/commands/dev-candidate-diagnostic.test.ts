@@ -35,6 +35,17 @@ const RECORD = `\u001e${JSON.stringify({
  * @returns The terminal error lines.
  */
 async function finalLines(stdout: string, streamed: readonly string[] = []): Promise<string[]> {
+  const failure = await finalFailure(stdout, streamed);
+  return errorLines(failure.code, failure.message);
+}
+
+/**
+ * Runs the exit watch for a process that exited with code 0.
+ * @param stdout - What the process retained on standard output.
+ * @param streamed - Output blocks logged while it ran, before the exit.
+ * @returns The failure the command line reports and exits with.
+ */
+async function finalFailure(stdout: string, streamed: readonly string[] = []) {
   const output = createHeldOutput(true);
   for (const block of streamed)
     logCandidateEvent(output, () => undefined, {
@@ -53,8 +64,7 @@ async function finalLines(stdout: string, streamed: readonly string[] = []): Pro
   } as unknown as StartedCandidate;
   const exit = await Effect.runPromiseExit(failOnCandidateExit(attempt, candidate));
   if (!Exit.isFailure(exit)) throw new Error("The exit watch did not fail.");
-  const failure = toFailure(Cause.squash(exit.cause), new AbortController().signal);
-  return errorLines(failure.code, failure.message);
+  return toFailure(Cause.squash(exit.cause), new AbortController().signal);
 }
 
 test("ends with the worker's own coded diagnostic and its next step", async () => {
@@ -74,4 +84,9 @@ test("keeps RELKIT_INTERNAL_ERROR for an exit without a coded diagnostic", async
   expect(lines[0]).toBe(
     "RELKIT_INTERNAL_ERROR: The new version exited with code 0 before it was ready.",
   );
+});
+
+test("a version that exits with code 0 before it is ready still fails the command", async () => {
+  expect((await finalFailure(`starting\n${RECORD}`)).exitCode).toBe(1);
+  expect((await finalFailure("starting\n")).exitCode).toBe(1);
 });
