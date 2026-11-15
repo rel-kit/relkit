@@ -177,12 +177,16 @@ function table(first: string, rows: readonly (readonly string[])[]): string {
   return `| ${first} | Value | Description |\n| --- | --- | --- |\n${rows.map((row) => `| ${row.map(escapeCell).join(" | ")} |`).join("\n")}`;
 }
 
-/** Protects help strings from breaking their Markdown table cell.
+/** Protects help strings from breaking their Markdown table cell or being read as JSX.
  * @param value - Literal help text.
- * @returns Pipe-escaped single-line text.
+ * @returns Single-line text with pipes, angle brackets and braces escaped.
  */
 function escapeCell(value: string): string {
-  return value.replaceAll("|", "\\|").replaceAll("\n", " ");
+  return value
+    .replaceAll("|", "\\|")
+    .replaceAll("\n", " ")
+    .replaceAll("<", "&lt;")
+    .replaceAll("{", "&#123;");
 }
 
 /** Formats and writes one owned artifact, or fails on any stale checked bytes.
