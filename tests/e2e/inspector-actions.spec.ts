@@ -291,23 +291,20 @@ function deliveries(count: number, from = 0) {
   }));
 }
 
-test("an event with more deliveries than one page says so and loads more", async ({ page }) => {
+test("an event with several pages of deliveries lists the newest first", async ({ page }) => {
   await patch(page, /\/_relkit\/v1\/runtime\/events\?/, (payload, route) => {
     const more = new URL(route.request().url()).searchParams.get("cursor") === "100";
     const items = more ? deliveries(20, 100) : deliveries(100);
-    Object.assign(payload, {
-      items,
-      deliveries: items,
-      deadLetters: [],
-      ...(more ? { nextCursor: undefined } : { nextCursor: "100" }),
-    });
+    Object.assign(payload, { items, deliveries: items, deadLetters: [] });
+    payload.nextCursor = more ? undefined : "100";
   });
   await page.goto("/events/orders.created");
-  await expect(page.getByLabel("100+ deliveries")).toBeVisible();
-  await expect(page.getByText(/counts cover the 100 deliveries loaded so far/)).toBeVisible();
-  await page.getByRole("button", { name: "Load more deliveries" }).click();
+  await expect(page.getByRole("heading", { name: /newest first/ })).toBeVisible();
   await expect(page.getByLabel("120 deliveries")).toBeVisible();
   await expect(page.getByRole("button", { name: "Load more deliveries" })).toHaveCount(0);
+  // The last page holds the newest; it is on top.
+  const rows = page.getByRole("list", { name: "Delivery attempts" }).getByRole("listitem");
+  await expect(rows.first()).toContainText("delivery-119");
 });
 
 test("an event whose provider reports a total shows the real total and counts", async ({

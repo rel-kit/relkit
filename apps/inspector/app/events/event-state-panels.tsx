@@ -5,7 +5,13 @@ import { HistoryList, type HistoryEntry } from "../../components/neon/history-li
 import { StatusBadge, statusTone } from "../../components/neon/status-badge";
 import { Badge } from "../../components/ui/badge";
 import type { EventView } from "../../lib/events-model";
-import { countLabel, deliveryTime, stateCounts, type DeliveryPage } from "../../lib/event-rows";
+import {
+  countLabel,
+  deliveryTime,
+  newestFirst,
+  stateCounts,
+  type DeliveryPage,
+} from "../../lib/event-rows";
 import { Button } from "../../components/ui/button";
 import { Count, EntityList, Quiet } from "../domains/catalog-kit";
 
@@ -99,7 +105,7 @@ export function EventDeliveryPanel({
     reported: page.counts,
     hasMore: page.hasMore,
   });
-  const entries: HistoryEntry[] = deliveries.map((item, index) => {
+  const entries: HistoryEntry[] = newestFirst(deliveries).map((item, index) => {
     const failure = record(item.failure);
     const state = text(item.state) || "state unavailable";
     return {
@@ -124,7 +130,7 @@ export function EventDeliveryPanel({
     <Section
       id="event-delivery"
       aria-labelledby="event-delivery-heading"
-      title={<span id="event-delivery-heading">Deliveries and dead letters</span>}
+      title={<span id="event-delivery-heading">Deliveries and dead letters, newest first</span>}
       description={`${
         page.hasMore
           ? `${publications.length} publications loaded`
@@ -177,7 +183,7 @@ export function EventDeliveryPanel({
       )}
       {entries.length === 0 ? (
         <p className="m-0 px-4 py-3 text-xs text-muted-foreground">
-          No delivery attempts are retained. Ordering is shown only when the API advertises it.
+          No delivery attempts are retained.
         </p>
       ) : (
         <HistoryList label="Delivery attempts" entries={entries} showDurationBars={false} />
@@ -187,6 +193,9 @@ export function EventDeliveryPanel({
           <Button variant="secondary" size="sm" isDisabled={loadingMore} onPress={onLoadMore}>
             {loadingMore ? "Loading…" : "Load more deliveries"}
           </Button>
+          <p className="m-0 mt-2 max-w-none text-xs text-muted-foreground">
+            Showing the oldest {deliveries.length} deliveries. Load more adds newer ones to the top.
+          </p>
         </div>
       ) : null}
     </Section>

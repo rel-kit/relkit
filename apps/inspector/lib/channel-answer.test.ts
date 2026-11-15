@@ -22,6 +22,15 @@ describe("a refused channel connection", () => {
     expect(channelFailure(new RpcError("UNAUTHORIZED", "x"))).toContain("no session");
   });
 
+  test("explains a bare Conflict as a reload since the page loaded (NF-16)", () => {
+    expect(channelFailure(new RpcError("CONFLICT", "Conflict"))).toBe(
+      "The application reloaded since this page loaded. Try again.",
+    );
+    expect(channelFailure(new RpcError("CONFLICT", "The client identity changed."))).toBe(
+      "The client identity changed.",
+    );
+  });
+
   test("keeps the application's message for any other failure", () => {
     expect(channelFailure(new RpcError("INTERNAL", "Channel crashed."))).toBe("Channel crashed.");
     expect(channelFailure("odd")).toBe("Channel operation failed.");

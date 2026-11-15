@@ -1,5 +1,21 @@
 /** Projects collection status without treating memory acceptance as durable history. */
-import type { InspectorObject } from "./api-types";
+import { InspectorApiError, type InspectorObject } from "./api-types";
+
+/** What a page shows where history content would be while history cannot be read. */
+export const HISTORY_UNAVAILABLE_TEXT = "History is unavailable; restart the Inspector.";
+
+/**
+ * Whether a failed request failed because history cannot be read (the tool answers a history
+ * query with 503 `History unavailable`). It stays unavailable until the Inspector restarts, so
+ * asking again only keeps a page waiting.
+ */
+export function isHistoryUnavailable(error: unknown): boolean {
+  return (
+    error instanceof InspectorApiError &&
+    error.status === 503 &&
+    /^history[ .]unavailable$/i.test(error.code)
+  );
+}
 
 export function historyStatusMessage(value: InspectorObject | undefined): string {
   if (!value || value.state === "unavailable") return "History status unavailable.";

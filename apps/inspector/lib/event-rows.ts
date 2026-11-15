@@ -160,3 +160,43 @@ export function deliveryTraceId(
   const publication = publications.find((item) => item.instanceId === instance);
   return publication === undefined ? undefined : publicationTraceId(publication);
 }
+
+/**
+ * Deliveries newest first. The API pages them ascending by cursor and takes no order, so the
+ * order is made here: by the time a delivery last changed, and for records without a time by
+ * reversing the API's order.
+ * @param deliveries - Deliveries in the API's order, oldest first.
+ * @returns A new list, newest first.
+ */
+export function newestFirst(deliveries: readonly InspectorObject[]): InspectorObject[] {
+  const timed = [...deliveries].reverse().map((item) => {
+    const at = Date.parse(deliveryTime(item));
+    return { item, at: Number.isFinite(at) ? at : undefined };
+  });
+  // `sort` is stable: equal or missing times keep the reversed (newest first) API order.
+  return timed
+    .sort((left, right) => (right.at ?? -Infinity) - (left.at ?? -Infinity))
+    .map(({ item }) => item);
+}
+
+/** Pages fetched on open, so the newest deliveries, which come last, are among those shown. */
+export const DELIVERY_PAGE_LIMIT = 10;
+
+/**
+ * Loads an event's runtime pages until none is left or `limit` pages are loaded, because the
+ * newest deliveries are on the last page.
+ * @param first - The first page.
+ * @param fetchNext - Loads the page after a cursor.
+ * @param limit - How many pages at most, the first included.
+ * @returns The pages merged into one runtime, with the continuation when pages remain.
+ */
+export async function loadDeliveryPages(
+  first: InspectorEventRuntime,
+  fetchNext: (cursor: string) => Promise<InspectorEventRuntime>,
+  limit = DELIVERY_PAGE_LIMIT,
+): Promise<InspectorEventRuntime> {
+  let merged = first;
+  for (let pages = 1; pages < limit && merged.nextCursor !== undefined; pages += 1)
+    merged = mergeEventRuntime(merged, await fetchNext(merged.nextCursor));
+  return merged;
+}

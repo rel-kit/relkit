@@ -101,18 +101,17 @@ describe("generation history (IN-28)", () => {
       }),
     ];
 
-    test("an old session is not current when the connected session left no record", () => {
+    test("the newest run is current although it began before the Inspector connected", () => {
       const groups = generationHistory(earlier, 12, {
         state: "connected",
         since: "2026-11-15T10:30:00.000Z",
-      });
-      expect(groups.flatMap((group) => group.entries).some((entry) => entry.current)).toBe(false);
-      const [first, second] = groups;
-      expect(first).toMatchObject({ current: true, startRetained: false, entries: [] });
-      expect(second).toMatchObject({ runId: "old", current: false });
+      } as never);
+      expect(groups).toHaveLength(1);
+      expect(groups[0]).toMatchObject({ runId: "old", current: true, startRetained: true });
+      expect(groups[0]!.entries.filter((entry) => entry.current)).toHaveLength(1);
     });
 
-    test("a session with events since it connected is current, and shows whether its start is kept", () => {
+    test("a session started after the Inspector connected is current, and an older run is not", () => {
       const groups = generationHistory(
         [
           ...earlier,
@@ -124,7 +123,7 @@ describe("generation history (IN-28)", () => {
           ),
         ],
         12,
-        { state: "connected", since: "2026-11-15T10:30:00.000Z" },
+        { state: "connected" },
       );
       expect(groups.map((group) => [group.runId, group.current, group.startRetained])).toEqual([
         ["new", true, false],
@@ -134,9 +133,33 @@ describe("generation history (IN-28)", () => {
       expect(groups[1]!.entries.some((entry) => entry.current)).toBe(false);
     });
 
+    test("a start is the current session's when the history keeps it", () => {
+      const groups = generationHistory(
+        [
+          ...earlier,
+          log(
+            31,
+            "dev.generation.active",
+            { version: 0, initial: true, runId: "new", reason: "start" },
+            31,
+          ),
+        ],
+        12,
+        { state: "connected" },
+      );
+      expect(groups[0]).toMatchObject({ runId: "new", current: true, startRetained: true });
+    });
+
+    test("start not retained appears only when history holds no generation event", () => {
+      const groups = generationHistory([log(1, "http.request", { runId: "x" })], 12, {
+        state: "connected",
+      });
+      expect(groups).toEqual([{ current: true, startRetained: false, entries: [] }]);
+    });
+
     test("nothing is current while the application is not connected", () => {
       for (const state of ["unreachable", "waiting", "checking", "ambiguous"] as const) {
-        const groups = generationHistory(earlier, 12, { state, since: "2026-11-15T09:00:00.000Z" });
+        const groups = generationHistory(earlier, 12, { state });
         expect(groups).toHaveLength(1);
         expect(groups[0]!.current).toBe(false);
         expect(groups[0]!.entries.some((entry) => entry.current)).toBe(false);

@@ -34,6 +34,8 @@ export interface InspectorFetchOptions {
 
 export interface InspectorRequestOptions extends RequestInit {
   readonly cacheTags?: readonly string[];
+  /** How long a GET answer is reused, when longer than the client's default (never when caching is off). */
+  readonly cacheTtlMs?: number;
   readonly responseProtocols?: readonly InspectorResponseProtocol[];
 }
 

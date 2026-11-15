@@ -39,7 +39,7 @@ function AccessSection({
   const open = !isProtected(access);
   const checked = access.session || access.role;
   return (
-    <Section title="Access" hint={open ? "public" : "protected"}>
+    <Section title="Access" hint={open ? "no access rule reported" : "protected"}>
       <Facts
         items={[
           ["Session", access.session ? "Required (401 without one)" : "Not required"],

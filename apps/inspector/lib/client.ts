@@ -9,8 +9,20 @@ export function inspectorBackendUrl(): string {
   return configuredBackendUrl() ?? INSPECTOR_BACKEND_PROXY;
 }
 
+const clients = new Map<string, ReturnType<typeof createInspectorApiClient>>();
+
+/**
+ * The tab's client for the Inspector backend. Every component asks for it, so they share one
+ * cache and one set of requests under way: a page that needs the graph asks the network once.
+ */
 export function createInspectorClient() {
-  return createInspectorApiClient({ baseUrl: inspectorBackendUrl() });
+  const baseUrl = inspectorBackendUrl();
+  let client = clients.get(baseUrl);
+  if (client === undefined) {
+    client = createInspectorApiClient({ baseUrl });
+    clients.set(baseUrl, client);
+  }
+  return client;
 }
 
 let shared: SharedInspectorStream | undefined;

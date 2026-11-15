@@ -9,6 +9,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import type { InspectorObject } from "./api-types";
 import { createInspectorBackendStream, createInspectorClient } from "./client";
 import {
+  historyAvailability,
   INITIAL_INSPECTOR_STATE,
   reduceInspectorState,
   type InspectorState,
@@ -106,6 +107,11 @@ export function useInspectorState(): InspectorState {
     () => state,
     () => INITIAL_INSPECTOR_STATE,
   );
+}
+
+/** Whether history cannot be read, as the tool's storage status says; pages show it, not a skeleton. */
+export function useHistoryFailed(): boolean {
+  return historyAvailability(useInspectorState()) === "degraded";
 }
 
 /** A history-backed page's live-update word: "paused" while the application is away. */

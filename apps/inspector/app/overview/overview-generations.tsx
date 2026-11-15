@@ -24,7 +24,6 @@ export function GenerationHistory({
 }) {
   const groups = generationHistory(generations.items, 8, {
     state: application.state,
-    since: application.since,
   });
   return (
     <Section

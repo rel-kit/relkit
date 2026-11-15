@@ -190,15 +190,17 @@ export function FunctionInvocation({
             {answer.sent ? <SessionNote /> : null}
           </>
         )}
-        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {status}
-        </p>
         <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
           <Button type="submit" isDisabled={pending}>
             <Play aria-hidden="true" />
             {pending ? "Invoking…" : "Invoke locally"}
           </Button>
-          <span className="ml-auto font-mono text-[11px] text-muted-foreground" aria-hidden="true">
+          <span
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="ml-auto font-mono text-[11px] text-muted-foreground"
+          >
             {status}
           </span>
         </div>

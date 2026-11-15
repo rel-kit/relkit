@@ -1,5 +1,6 @@
-import { INSPECTOR_API_BASE, type InspectorObject } from "./api-types";
+import { INSPECTOR_API_BASE, InspectorApiError, type InspectorObject } from "./api-types";
 import type { InspectorApiClient } from "./api";
+import { STALE_GENERATION } from "./api-generation";
 
 /** Generation identity every action names, so a stale page cannot act on a newer generation. */
 export interface ActionIdentity {
@@ -15,6 +16,39 @@ export type StartActionPath =
   | `events/${string}/cancel`
   | `jobs/${string}/trigger`;
 
+/** Whether an action was refused because the application reloaded after the page loaded. */
+export function isStaleGeneration(error: unknown): boolean {
+  return (
+    error instanceof InspectorApiError &&
+    error.status === 409 &&
+    (error.code === STALE_GENERATION || error.code === "RELKIT_INSPECTOR_GENERATION_NOT_ACTIVE")
+  );
+}
+
+/**
+ * Runs an action; when the application reloaded since the page loaded (a refusal before the
+ * application is reached, so nothing ran), reads the current generation and runs it once more.
+ * @param client - Inspector API client.
+ * @param identity - Generation the page was loaded from.
+ * @param run - Sends the action under the given identity.
+ * @returns The action's answer; a second refusal is thrown as it came.
+ */
+export async function retryOnStaleGeneration<T>(
+  client: Pick<InspectorApiClient, "graph" | "invalidate">,
+  identity: ActionIdentity,
+  run: (identity: ActionIdentity) => Promise<T>,
+): Promise<T> {
+  try {
+    return await run(identity);
+  } catch (error) {
+    if (!isStaleGeneration(error)) throw error;
+    client.invalidate(["graph"]);
+    const { generationId, graphHash } = await client.graph();
+    if (generationId === undefined || graphHash === undefined) throw error;
+    return run({ generationId, graphHash });
+  }
+}
+
 /**
  * Posts one Inspector action with a fresh idempotency key.
  * @param client - Inspector API client.
@@ -24,18 +58,20 @@ export type StartActionPath =
  * @returns The action's JSON receipt.
  */
 export function postInspectorAction(
-  client: Pick<InspectorApiClient, "request">,
+  client: Pick<InspectorApiClient, "request" | "graph" | "invalidate">,
   path: StartActionPath,
   identity: ActionIdentity,
   body: Readonly<Record<string, unknown>> = {},
 ): Promise<InspectorObject> {
   const idempotencyKey = crypto.randomUUID();
-  return client.request<InspectorObject>(`${INSPECTOR_API_BASE}/actions/${path}`, {
-    method: "POST",
-    headers: { "content-type": "application/json", "idempotency-key": idempotencyKey },
-    body: JSON.stringify({ ...identity, idempotencyKey, ...body }),
-    cacheTags: ["events", "jobs", "runtime"],
-  });
+  const send = (current: ActionIdentity) =>
+    client.request<InspectorObject>(`${INSPECTOR_API_BASE}/actions/${path}`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "idempotency-key": idempotencyKey },
+      body: JSON.stringify({ ...current, idempotencyKey, ...body }),
+      cacheTags: ["events", "jobs", "runtime"],
+    });
+  return retryOnStaleGeneration(client, identity, send);
 }
 
 /**

@@ -12,7 +12,7 @@ import { DropdownMenu } from "../components/ui/dropdown-menu";
 import { Tooltip } from "../components/ui/tooltip";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
 import { useInspectorState } from "../lib/stream-application-store";
-import { applicationLabel } from "../lib/stream-application-text";
+import { sidebarStatus } from "../lib/sidebar-status";
 import { ApplicationBanner, InspectorStatus } from "./application-state";
 import { CopyButton } from "../components/blocks/copy-button";
 import { useInspectorGraph } from "../lib/use-graph";
@@ -64,15 +64,7 @@ export function InspectorShell({ children }: { readonly children: ReactNode }) {
     applyInspectorTheme(next);
   };
   const inspector = useInspectorState();
-  // The sidebar's one word: the stream when it is down, otherwise the application session.
-  const status =
-    inspector.stream !== "connected"
-      ? inspector.stream
-      : inspector.application.state === "connected" || inspector.application.state === "checking"
-        ? graph.error
-          ? "offline"
-          : "connected"
-        : applicationLabel(inspector.application.state);
+  const status = sidebarStatus(inspector, graph.error);
   const generationId = graph.graph?.generationId;
   const graphHash = graph.graph?.graphHash;
 
