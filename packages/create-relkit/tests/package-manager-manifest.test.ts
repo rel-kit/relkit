@@ -45,7 +45,7 @@ async function create(manager: "bun" | "npm" | "pnpm", drizzle: boolean) {
     },
   );
   const manifest = JSON.parse(await readFile(join(result.destination, "package.json"), "utf8"));
-  return { root: result.destination, manifest, progress };
+  return { root: result.destination, manifest, progress, warnings: result.warnings };
 }
 
 /**
@@ -63,7 +63,11 @@ async function optional(path: string) {
 for (const drizzle of [false, true]) {
   test(`npm projects get allowScripts and no patch declaration (drizzle=${drizzle})`, async () => {
     const patch = await readDrizzlePatch();
-    const { root, manifest, progress } = await create("npm", drizzle);
+    const { root, manifest, progress, warnings } = await create("npm", drizzle);
+    // The result carries the notice, so non-interactive and JSON output show it too.
+    expect(warnings.filter((warning) => warning.code === "dependency-patch-skipped")).toEqual(
+      drizzle ? [{ code: "dependency-patch-skipped", message: SKIPPED_PATCH }] : [],
+    );
     expect(manifest.allowScripts).toEqual({ esbuild: true });
     expect(manifest.patchedDependencies).toBeUndefined();
     expect(await optional(join(root, patch.path))).toBeUndefined();
@@ -73,7 +77,8 @@ for (const drizzle of [false, true]) {
 
   test(`pnpm projects declare the patch in pnpm-workspace.yaml (drizzle=${drizzle})`, async () => {
     const patch = await readDrizzlePatch();
-    const { root, manifest } = await create("pnpm", drizzle);
+    const { root, manifest, warnings } = await create("pnpm", drizzle);
+    expect(warnings.map((warning) => warning.code)).not.toContain("dependency-patch-skipped");
     expect(manifest.allowScripts).toBeUndefined();
     expect(manifest.patchedDependencies).toBeUndefined();
     const workspace = await optional(join(root, "pnpm-workspace.yaml"));
@@ -85,7 +90,8 @@ for (const drizzle of [false, true]) {
 
   test(`Bun projects declare the patch in package.json (drizzle=${drizzle})`, async () => {
     const patch = await readDrizzlePatch();
-    const { root, manifest } = await create("bun", drizzle);
+    const { root, manifest, warnings } = await create("bun", drizzle);
+    expect(warnings.map((warning) => warning.code)).not.toContain("dependency-patch-skipped");
     expect(manifest.allowScripts).toBeUndefined();
     expect(manifest.patchedDependencies).toEqual(drizzle ? { [patch.key]: patch.path } : undefined);
     expect(await optional(join(root, "pnpm-workspace.yaml"))).toBeUndefined();

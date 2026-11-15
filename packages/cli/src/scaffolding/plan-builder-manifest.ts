@@ -6,9 +6,11 @@ import { ADD_FAILURE_CODES, AddScaffoldError } from "create-relkit/add-types";
 import { domainError, domainTry } from "create-relkit/generator-errors";
 import { mergeScaffoldManifest, scaffoldManifestDependencies } from "./plan-manifest.js";
 import {
+  patchManager,
   planDependencyPatchEffect,
   readDrizzlePatchEffect,
 } from "create-relkit/dependency-patches";
+import { withAllowedInstallScript } from "create-relkit/package-manager";
 import { resolveProjectDependenciesEffect } from "./project-catalog.js";
 import type { PlanBuilderEffects } from "./plan-builder-effects.js";
 import type { PlanBuilderState } from "./plan-builder.types.js";
@@ -61,7 +63,20 @@ export const finalizeManifestEffect = Effect.fn("PlanBuilder.finalizeManifest")(
       content = patched.content;
       if (patched.operation !== undefined && planned === undefined)
         yield* builder.createEffect(patched.operation.path, patched.operation.content);
+      const workspace = patched.workspace;
+      if (workspace !== undefined && !state.files.has(workspace.path))
+        yield* workspace.action === "create"
+          ? builder.createEffect(workspace.path, workspace.content)
+          : builder.updateEffect(workspace.path, () => workspace.content);
+      if (patched.notice !== undefined)
+        yield* builder.warningEffect("dependency-patch-skipped", patched.notice);
     }
+    // drizzle-kit depends on esbuild, whose install script npm will not run without approval.
+    if (
+      state.dependencies.has("drizzle-kit") &&
+      patchManager(builder.discovery.projectRoot) === "npm"
+    )
+      content = withAllowedInstallScript(content, "esbuild");
     yield* builder.updateEffect("package.json", () => content);
     return result.added;
   },

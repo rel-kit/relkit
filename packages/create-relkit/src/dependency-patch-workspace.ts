@@ -13,7 +13,7 @@ import { domainError } from "./generator-errors.js";
  * file has none. An existing section is left to its author unless it already names this patch.
  * @param projectRoot - Absolute project root.
  * @param patch - Verified release-owned repair.
- * @returns The create or update operation for `pnpm-workspace.yaml`.
+ * @returns The create or update operation for `pnpm-workspace.yaml`, or undefined when it already names the patch.
  */
 export const pnpmWorkspacePatchEffect = Effect.fn("DependencyPatch.pnpmWorkspace")(
   function* (projectRoot: string, patch: DependencyPatch) {
@@ -24,7 +24,7 @@ export const pnpmWorkspacePatchEffect = Effect.fn("DependencyPatch.pnpmWorkspace
       (yield* fs.metadata(join(projectRoot, path)))?.kind === "file"
         ? yield* fs.readText(join(projectRoot, path))
         : undefined;
-    if (current?.includes(entry)) return { path, action: "update", content: current } as const;
+    if (current?.includes(entry)) return undefined;
     if (current !== undefined && /^patchedDependencies:/mu.test(current))
       return yield* Effect.fail(
         domainError(

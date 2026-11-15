@@ -17,6 +17,8 @@ export const dependencyPatchNeedsInstallEffect = Effect.fn("DependencyPatch.need
     const manifestOperation = plan.operations.find(
       (operation) => operation.path === "package.json",
     );
+    // pnpm reads the patch from its workspace file, which this plan changes only to register it.
+    if (plan.operations.some((operation) => operation.path === "pnpm-workspace.yaml")) return true;
     if (
       manifestOperation === undefined &&
       !plan.operations.some((operation) => operation.path.startsWith("patches/drizzle-orm@"))

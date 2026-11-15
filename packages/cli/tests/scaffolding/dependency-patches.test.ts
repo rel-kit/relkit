@@ -13,6 +13,14 @@ import {
   caseManifestOnlyPatchRegistrationAlsoInstallsAn,
 } from "./dependency-patches-selection.cases.js";
 import {
+  caseBunKeepsThePackageJsonPatchEntry,
+  caseNpmMergesIntoAnExistingAllowScripts,
+  caseNpmShowsTheSkippedRepairAndApprovesEsbuild,
+  caseNpmWithoutEsbuildPackageGetsNoAllowScripts,
+  casePnpmExtendsAnExistingWorkspaceFile,
+  casePnpmWritesThePatchToTheWorkspaceFile,
+} from "./dependency-patches-manager.cases.js";
+import {
   caseAssetOnlyRepairSnapshotsALockCreated,
   caseRollsBackManifestTextAndBinaryLocks,
   caseNoInstallPatchOnlyPlansDeferChecks,
@@ -23,7 +31,30 @@ describe("portable dependency patches", () => {
   assetCases();
   selectionCases();
   rollbackCases();
+  managerCases();
 });
+
+/** Registers per-package-manager repair planning of the `relkit add` path. */
+function managerCases(): void {
+  test(
+    "npm shows the skipped repair as a warning and approves esbuild's install script",
+    caseNpmShowsTheSkippedRepairAndApprovesEsbuild,
+  );
+  test("npm merges esbuild into an existing allowScripts", caseNpmMergesIntoAnExistingAllowScripts);
+  test(
+    "npm adds no allowScripts when no package needs esbuild",
+    caseNpmWithoutEsbuildPackageGetsNoAllowScripts,
+  );
+  test("Bun keeps the package.json patch entry", caseBunKeepsThePackageJsonPatchEntry);
+  test(
+    "pnpm writes the patch entry to pnpm-workspace.yaml",
+    casePnpmWritesThePatchToTheWorkspaceFile,
+  );
+  test(
+    "pnpm extends an existing workspace file and leaves a delivered entry alone",
+    casePnpmExtendsAnExistingWorkspaceFile,
+  );
+}
 
 /** Registers asset identity and collision cases before an installer can mutate files. */
 function assetCases(): void {

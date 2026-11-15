@@ -143,3 +143,19 @@ export function projectPackageManager(
   if (existsSync(join(root, "package-lock.json"))) return "npm";
   return creationPackageManager(undefined, agent);
 }
+
+/**
+ * Approves one package's install script for npm 11, which lists unapproved install scripts on
+ * every install (and later releases block them): the `allowScripts` field `npm approve-scripts`
+ * writes. An entry the author already wrote, allowing or denying the script, stays as it is.
+ * @param content - `package.json` text.
+ * @param name - Package whose install script runs, for any version.
+ * @returns The manifest text with `allowScripts[name]` set unless it already has a value.
+ */
+export function withAllowedInstallScript(content: string, name: string): string {
+  const manifest = JSON.parse(content) as Record<string, unknown>;
+  const allowed = manifest["allowScripts"];
+  const current = typeof allowed === "object" && allowed !== null ? allowed : {};
+  manifest["allowScripts"] = name in current ? current : { ...current, [name]: true };
+  return `${JSON.stringify(manifest, null, 2)}\n`;
+}
