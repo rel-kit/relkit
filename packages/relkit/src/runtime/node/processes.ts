@@ -35,6 +35,7 @@ function spawn(command: readonly string[], options: RuntimeSpawnOptions = {}): R
     ...(options.cwd === undefined ? {} : { cwd: options.cwd }),
     ...(options.env === undefined ? {} : { env: { ...options.env } }),
     ...(options.ipc === undefined ? {} : { serialization: "advanced" as const }),
+    ...(options.processGroup === true && process.platform !== "win32" ? { detached: true } : {}),
     ...(options.signal === undefined ? {} : { signal: options.signal, killSignal: "SIGKILL" }),
   });
   let failure: Error | undefined;

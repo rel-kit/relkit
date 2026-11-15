@@ -27,6 +27,10 @@ export interface ServedRevision {
 
 /** A running `relkit dev`. */
 export interface DevProcess {
+  /** Process ID of the `relkit dev` CLI, for tests that signal it alone. */
+  readonly pid: number;
+  /** Resolves with the CLI's exit status once it exits. */
+  readonly exited: Promise<number>;
   /** Public origin of the development front, such as `http://127.0.0.1:51234`. */
   readonly origin: string;
   /**

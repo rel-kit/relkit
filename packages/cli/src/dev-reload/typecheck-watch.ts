@@ -7,7 +7,9 @@
  * project compiler as `relkit check` (`tsgo` when installed, else the `typescript` package's
  * `tsc`, 5.9 or 7), and reports
  * `dev.typecheck.unavailable` when neither or no `tsconfig.json` is present. It runs at a
- * lower scheduling priority than the reload path. The Scope that acquired it stops the process.
+ * lower scheduling priority than the reload path. The Scope that acquired it stops the process
+ * and everything it started (the project's native compiler runs behind a JavaScript launcher
+ * that does not forward signals), and releases the output reader; see `watch-process.ts`.
  */
 import { existsSync } from "node:fs";
 import { setPriority } from "node:os";
@@ -18,8 +20,8 @@ import { cliTry } from "../cli-errors.js";
 import { parseTypecheckLine } from "./typecheck-output.js";
 import type { DevLog } from "../commands/dev.types.js";
 import type { TypecheckDiagnostic } from "./typecheck-output.types.js";
-import { runtime } from "../runtime/index.js";
 import { projectCompilerCommand } from "../compiler/typescript-compiler.js";
+import { spawnWatchProcess, stopWatchProcess } from "./watch-process.js";
 
 /** Diagnostics included in one log record; the count is always complete. */
 const REPORTED_DIAGNOSTICS = 20;
@@ -41,12 +43,10 @@ export const acquireTypecheckWatch = Effect.fn("Dev.typecheckWatch")(function* (
   }
   yield* Effect.acquireRelease(
     cliTry("dev.typecheck.spawn", () => startWatch(projectRoot, command, log)),
-    (child) =>
+    (watch) =>
       cleanupEffect(
         "dev.typecheck.stop",
-        cliTry("dev.typecheck.kill", () => child.kill("SIGTERM")).pipe(
-          Effect.andThen(Effect.promise(() => child.exited)),
-        ),
+        Effect.promise(() => stopWatchProcess(watch)),
       ),
   );
 });
@@ -78,23 +78,24 @@ function typecheckCommand(projectRoot: string): readonly string[] | undefined {
  * @param projectRoot - Working directory.
  * @param command - Checker command line.
  * @param log - Session log.
- * @returns The running process.
+ * @returns The running process and its output reader.
  */
 function startWatch(projectRoot: string, command: readonly string[], log: DevLog) {
-  const child = runtime.processes.spawn(command, {
+  const watch = spawnWatchProcess(command, {
     cwd: projectRoot,
     stdin: "ignore",
-    stdout: "pipe",
     stderr: "ignore",
     env: { ...process.env, NO_COLOR: "1" },
   });
-  yieldToReloads(child.pid);
+  yieldToReloads(watch.child.pid);
   let pass: TypecheckDiagnostic[] = [];
   let buffer = "";
   const decoder = new TextDecoder();
   void (async () => {
-    for await (const chunk of child.stdout) {
-      buffer += decoder.decode(chunk);
+    for (;;) {
+      const { done, value } = await watch.reader.read();
+      if (done || value === undefined) break;
+      buffer += decoder.decode(value, { stream: true });
       const lines = buffer.split("\n");
       buffer = lines.pop() ?? "";
       for (const line of lines) {
@@ -108,7 +109,7 @@ function startWatch(projectRoot: string, command: readonly string[], log: DevLog
       }
     }
   })().catch(() => undefined);
-  return child;
+  return watch;
 }
 
 /**

@@ -26,6 +26,7 @@ function spawn(command: readonly string[], options: RuntimeSpawnOptions = {}): R
     stdout: options.stdout ?? "pipe",
     stderr: options.stderr ?? "pipe",
     ...(ipc === undefined ? {} : { ipc: (message: unknown) => ipc(message) }),
+    ...(options.processGroup === true && process.platform !== "win32" ? { detached: true } : {}),
     ...(options.signal === undefined ? {} : { signal: options.signal }),
   });
   const sink = child.stdin;
