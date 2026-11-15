@@ -5,6 +5,7 @@
  */
 import { describe, expect, test } from "bun:test";
 import { API_BASE_PATH } from "relkit/contracts";
+import { projectNode } from "../../../src/inspector-api/graph-utils.ts";
 import { json, makeApp } from "./contracts-fixtures.ts";
 
 describe("graph projection of declared fields", () => {
@@ -35,5 +36,17 @@ describe("graph projection of declared fields", () => {
       modelSource: "native",
       instructions: "Answer order questions.",
     });
+  });
+
+  test("a function keeps its access rule, so a guarded route does not read as public", () => {
+    const node = projectNode({
+      kind: "function",
+      id: "fleet.list-vehicles",
+      access: { permissions: ["vehicle:read"], predicate: true },
+    });
+    expect(node).toMatchObject({
+      access: { permissions: ["vehicle:read"], predicate: true },
+    });
+    expect(projectNode({ kind: "function", id: "hello.greet" })).not.toHaveProperty("access");
   });
 });

@@ -42,8 +42,9 @@ export function routeGroupCard(group: GraphNode, hierarchy: AppHierarchy): ViewN
     for (const name of routeNames) if (!names.includes(name)) names.push(name);
   }
   const total = routes.length;
-  // The graph has no marker for "public": a route that declares nothing, and a route whose
-  // function's access rule the API does not report, look the same, so "public" is never claimed.
+  // The graph has no marker for "public". The API reports a function's access rule; an application
+  // on an older RelKit does not, and its guarded routes look like routes that declare nothing, so
+  // "public" is never claimed.
   const access =
     protectedCount === 0
       ? "no access rule reported"
