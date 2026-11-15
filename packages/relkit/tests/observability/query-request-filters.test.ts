@@ -57,13 +57,19 @@ afterAll(async () => {
 });
 
 describe("request filters of the in-memory query", () => {
-  test.each(FILTER_CASES)("$name selects exactly the matching requests", async ({ query: filter, accept }) => {
-    const expected = seed.map(({ request }) => request).filter(accept);
-    const found = await allRequests({ ...filter, count: true });
-    expect(found.items.map((item) => item.requestId)).toEqual(expected.map((item) => item.requestId));
-    expect(found.total).toBe(expected.length);
-    expect(expected.length).toBeGreaterThan(0);
-  }, 60_000);
+  test.each(FILTER_CASES)(
+    "$name selects exactly the matching requests",
+    async ({ query: filter, accept }) => {
+      const expected = seed.map(({ request }) => request).filter(accept);
+      const found = await allRequests({ ...filter, count: true });
+      expect(found.items.map((item) => item.requestId)).toEqual(
+        expected.map((item) => item.requestId),
+      );
+      expect(found.total).toBe(expected.length);
+      expect(expected.length).toBeGreaterThan(0);
+    },
+    60_000,
+  );
 
   test("total counts every match while a page holds only its limit", async () => {
     const page = await query.requests({ status: "5xx", limit: 10, count: "true" });

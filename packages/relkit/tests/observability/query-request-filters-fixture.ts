@@ -8,7 +8,10 @@ import type { RequestRecord, SpanRecord, LogRecord } from "../../src/observabili
 const methods = ["GET", "POST", "DELETE"] as const;
 const paths = ["/orders", "/orders/items", "/shipments", "/api/auth/session"] as const;
 const statuses = [200, 201, 404, 409, 422, 500, 503] as const;
-const errors: Partial<Record<number, string>> = { 409: "orders.conflict", 500: "orders.unavailable" };
+const errors: Partial<Record<number, string>> = {
+  409: "orders.conflict",
+  500: "orders.unavailable",
+};
 
 /** Number of seeded requests. */
 export const SEEDED_REQUESTS = Number(process.env.SEEDED_REQUESTS ?? 1_000);
@@ -82,10 +85,22 @@ export const FILTER_CASES: readonly {
   readonly accept: (request: RequestRecord) => boolean;
 }[] = [
   { name: "exact status", query: { status: 500 }, accept: (r) => r.status === 500 },
-  { name: "status class", query: { status: "4xx" }, accept: (r) => r.status! >= 400 && r.status! < 500 },
+  {
+    name: "status class",
+    query: { status: "4xx" },
+    accept: (r) => r.status! >= 400 && r.status! < 500,
+  },
   { name: "method", query: { method: "post" }, accept: (r) => r.method === "POST" },
-  { name: "path prefix", query: { path: "/orders" }, accept: (r) => r.rawPath.startsWith("/orders") },
-  { name: "declared error", query: { errorId: "orders.conflict" }, accept: (r) => r.errorId === "orders.conflict" },
+  {
+    name: "path prefix",
+    query: { path: "/orders" },
+    accept: (r) => r.rawPath.startsWith("/orders"),
+  },
+  {
+    name: "declared error",
+    query: { errorId: "orders.conflict" },
+    accept: (r) => r.errorId === "orders.conflict",
+  },
   {
     name: "combined with search",
     query: { status: "5xx", method: "GET", path: "/orders/items", search: "request-1" },

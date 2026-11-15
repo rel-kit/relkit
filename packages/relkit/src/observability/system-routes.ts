@@ -67,7 +67,11 @@ export function systemRouteForPath(path: string): SystemRoute | undefined {
 export function systemRouteNodes(graph: {
   readonly nodes: readonly unknown[];
 }): readonly SystemRouteNode[] {
-  const routes = [...mountedAuthBasePaths(graph.nodes).map(authSystemRoute), HEALTH_ROUTE, RPC_ROUTE];
+  const routes = [
+    ...mountedAuthBasePaths(graph.nodes).map(authSystemRoute),
+    HEALTH_ROUTE,
+    RPC_ROUTE,
+  ];
   return Object.freeze(routes.map(routeNode));
 }
 
@@ -110,5 +114,7 @@ function mountedAuthBasePaths(nodes: readonly unknown[]): string[] {
  * @returns The property value, or undefined when `value` is not an object.
  */
 function field(value: unknown, key: string): unknown {
-  return typeof value === "object" && value !== null ? (value as Record<string, unknown>)[key] : undefined;
+  return typeof value === "object" && value !== null
+    ? (value as Record<string, unknown>)[key]
+    : undefined;
 }

@@ -41,7 +41,9 @@ export function withApplicationSuccessLogs(
     // A handler reads the policy from the current fiber before its first await and from the
     // native store after it, so the handler starts in its own fiber holding the restored policy.
     const exit = await Effect.runPromiseExitWith(context)(
-      Effect.promise(() => withNativeEffectContext(context, () => binding.invoke(envelope, options))),
+      Effect.promise(() =>
+        withNativeEffectContext(context, () => binding.invoke(envelope, options)),
+      ),
     );
     if (Exit.isSuccess(exit)) return exit.value;
     // A rejection is a defect of this adapter fiber; squash returns the handler's own error.

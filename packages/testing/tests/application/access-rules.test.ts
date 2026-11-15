@@ -18,7 +18,10 @@ beforeAll(async () => {
   root = await mkdtemp(join(tmpdir(), "relkit-testing-access-"));
   const files = [
     ["src/auth/service.ts", `export { auth } from ${JSON.stringify(resource)};`],
-    ["src/routes/vehicles/route.ts", `export { vehicleRoute as POST } from ${JSON.stringify(resource)};`],
+    [
+      "src/routes/vehicles/route.ts",
+      `export { vehicleRoute as POST } from ${JSON.stringify(resource)};`,
+    ],
   ] as const;
   for (const [file, source] of files) {
     await mkdir(join(root, file, ".."), { recursive: true });

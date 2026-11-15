@@ -113,7 +113,12 @@ function authPlan(): RegistrationPlan {
         id: "auth",
         source,
         functions: [],
-        capability: { kind: "better-auth", basePath: "/api/auth", databaseServiceId: "", mount: true },
+        capability: {
+          kind: "better-auth",
+          basePath: "/api/auth",
+          databaseServiceId: "",
+          mount: true,
+        },
       },
     ],
   } as unknown as RegistrationPlan;

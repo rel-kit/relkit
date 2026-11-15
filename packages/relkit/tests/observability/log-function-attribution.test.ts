@@ -17,7 +17,10 @@ function providerLog(records: LogRecord[], message: string): void {
   Effect.runSync(
     Effect.logInfo(message).pipe(
       Effect.provide(
-        createLoggerLayer({ minimumLevel: "info", json: { write: (record) => records.push(record) } }),
+        createLoggerLayer({
+          minimumLevel: "info",
+          json: { write: (record) => records.push(record) },
+        }),
       ),
     ),
   );

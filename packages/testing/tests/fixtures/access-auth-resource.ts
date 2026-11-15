@@ -7,11 +7,7 @@ import { betterAuth } from "better-auth";
 import { memoryAdapter } from "better-auth/adapters/memory";
 import { organization } from "better-auth/plugins";
 import { createAccessControl } from "better-auth/plugins/access";
-import {
-  defaultStatements,
-  memberAc,
-  ownerAc,
-} from "better-auth/plugins/organization/access";
+import { defaultStatements, memberAc, ownerAc } from "better-auth/plugins/organization/access";
 import { defineFunction } from "relkit/functions";
 import { defineRoute } from "relkit/routes";
 import { z } from "relkit/schema";

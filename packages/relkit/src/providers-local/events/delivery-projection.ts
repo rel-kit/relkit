@@ -88,7 +88,9 @@ export function ledgerFrom(
     raw
       .filter((record) => queued.has(normalizeId(record.instanceId)))
       .filter((record) => record.kind !== "event-delivery-accepted")
-      .map((record) => ledgerRecord(record, triggerId, queued.get(normalizeId(record.instanceId))!)),
+      .map((record) =>
+        ledgerRecord(record, triggerId, queued.get(normalizeId(record.instanceId))!),
+      ),
   );
 }
 

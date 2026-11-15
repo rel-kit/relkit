@@ -24,15 +24,18 @@ afterEach(async () => {
 describe("local event provider housekeeping", () => {
   test("an idle provider with stored deliveries records no success logs", async () => {
     const logs: string[] = [];
-    await withProvider(logs, async () => "sent", (events) =>
-      Effect.gen(function* () {
-        yield* publishAll(events, 20);
-        yield* waitForCompleted(events, 20);
-        logs.length = 0;
-        yield* Effect.sleep("1 second");
-        // Ten idle polls per second used to log every queue read of every stored delivery.
-        expect(completions(logs)).toEqual([]);
-      }),
+    await withProvider(
+      logs,
+      async () => "sent",
+      (events) =>
+        Effect.gen(function* () {
+          yield* publishAll(events, 20);
+          yield* waitForCompleted(events, 20);
+          logs.length = 0;
+          yield* Effect.sleep("1 second");
+          // Ten idle polls per second used to log every queue read of every stored delivery.
+          expect(completions(logs)).toEqual([]);
+        }),
     );
   }, 30_000);
 
@@ -59,20 +62,23 @@ describe("local event provider housekeeping", () => {
 
   test("a query performs the same bounded number of operations for 10 and 100 deliveries", async () => {
     const logs: string[] = [];
-    await withProvider(logs, async () => "sent", (events) =>
-      Effect.gen(function* () {
-        yield* publishAll(events, 10);
-        yield* waitForCompleted(events, 10);
-        const few = yield* measuredQuery(events, 10);
-        yield* publishAll(events, 90);
-        yield* waitForCompleted(events, 100);
-        logs.length = 0;
-        const many = yield* measuredQuery(events, 100);
-        // The ledger used to read the queue once per stored record: 811 operations at 100.
-        expect(many).toBe(few);
-        expect(many).toBeLessThanOrEqual(10);
-        expect(completions(logs)).toEqual([]);
-      }),
+    await withProvider(
+      logs,
+      async () => "sent",
+      (events) =>
+        Effect.gen(function* () {
+          yield* publishAll(events, 10);
+          yield* waitForCompleted(events, 10);
+          const few = yield* measuredQuery(events, 10);
+          yield* publishAll(events, 90);
+          yield* waitForCompleted(events, 100);
+          logs.length = 0;
+          const many = yield* measuredQuery(events, 100);
+          // The ledger used to read the queue once per stored record: 811 operations at 100.
+          expect(many).toBe(few);
+          expect(many).toBeLessThanOrEqual(10);
+          expect(completions(logs)).toEqual([]);
+        }),
     );
   }, 60_000);
 });

@@ -112,7 +112,11 @@ const scanMatches = Effect.fn("ObservabilityQuery.scan")(function* (
       if (!(yield* inQueryTimeRangeEffect(entry.timestamp, query)) || entry.cursor === cursor)
         continue;
       const record = yield* safeReadEffect(entry, scan.redaction);
-      if (record === undefined || !scan.accept(record) || !(yield* matchesQueryEffect(record, query)))
+      if (
+        record === undefined ||
+        !scan.accept(record) ||
+        !(yield* matchesQueryEffect(record, query))
+      )
         continue;
       if (!visit(record, entry.cursor)) return;
     }

@@ -102,7 +102,9 @@ async function createRemoteObservabilityRuntime(
     exportRecord === undefined
       ? undefined
       : await Effect.runPromise(
-          makeDirectExportEffect(exportRecord, (error) => countDirectExportFailure(counters, error)),
+          makeDirectExportEffect(exportRecord, (error) =>
+            countDirectExportFailure(counters, error),
+          ),
         );
   const publish = (record: ReturnType<typeof collector.collect>, external = true) => {
     if (!record) return record;

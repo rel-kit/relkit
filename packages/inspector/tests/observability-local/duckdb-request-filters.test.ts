@@ -10,14 +10,23 @@ import type { ObservabilityQueryRequest } from "relkit/observability";
 import { openDuckdbDatabase } from "../../src/observability-local/local/duckdb-database.js";
 
 type Database = Awaited<ReturnType<typeof openDuckdbDatabase>>;
-type RequestItem = { readonly requestId: string; readonly status: number; readonly method: string; readonly rawPath: string; readonly errorId?: string };
+type RequestItem = {
+  readonly requestId: string;
+  readonly status: number;
+  readonly method: string;
+  readonly rawPath: string;
+  readonly errorId?: string;
+};
 
 const SEEDED = 3_000;
 const seededAt = Date.now();
 const methods = ["GET", "POST", "DELETE"] as const;
 const paths = ["/orders", "/orders/items", "/shipments", "/api/auth/session"] as const;
 const statuses = [200, 201, 404, 409, 422, 500, 503] as const;
-const errors: Partial<Record<number, string>> = { 409: "orders.conflict", 500: "orders.unavailable" };
+const errors: Partial<Record<number, string>> = {
+  409: "orders.conflict",
+  500: "orders.unavailable",
+};
 const requests: RequestItem[] = Array.from({ length: SEEDED }, (_, index) => {
   const status = statuses[index % statuses.length]!;
   const errorId = errors[status];
@@ -93,7 +102,11 @@ describe("request filters of the DuckDB store", () => {
   });
 
   test("a declared error also finds the traces whose span carries it", async () => {
-    const page = await database.list("traces", { errorId: "orders.unavailable", limit: 5, count: true });
+    const page = await database.list("traces", {
+      errorId: "orders.unavailable",
+      limit: 5,
+      count: true,
+    });
     expect(page.total).toBe(requests.filter((r) => r.errorId === "orders.unavailable").length);
   });
 

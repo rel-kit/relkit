@@ -99,7 +99,14 @@ function artifacts() {
     deploymentRoles: [],
   };
   const bucket = (id: string, limits: object): GraphNode =>
-    ({ kind: "bucket", id, source, profile: "media", visibility: "private", ...limits }) as GraphNode;
+    ({
+      kind: "bucket",
+      id,
+      source,
+      profile: "media",
+      visibility: "private",
+      ...limits,
+    }) as GraphNode;
   const graph: ApplicationGraph = {
     contractVersion: GRAPH_VERSION,
     appId: "testing-bucket-limits",
