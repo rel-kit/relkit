@@ -117,13 +117,13 @@ export function limitsMiddleware(options: HttpMiddlewareOptions = {}): Middlewar
       current.requestRecord?.add({
         kind: "mapping",
         status: response.status,
-        outcome: "validation-error",
+        outcome: "refused",
       });
-      current.requestRecord?.setOutcome("validation-error");
+      current.requestRecord?.setOutcome("refused");
       setRequestState(context, Object.freeze({ ...current, signal: context.req.raw.signal }));
       context.res = response;
       if (!controlPlane) {
-        finishRequestRecord(context, current, options, "validation-error");
+        finishRequestRecord(context, current, options, "refused");
         await emitLifecycle(
           options,
           lifecycleEvent(context, current, "request.started"),

@@ -149,7 +149,7 @@ export const makeRequestRecordBuilderEffect = Effect.fn("ObservabilityRequestRec
           ...(validBytes(finishOptions.responseBytes)
             ? { responseBytes: finishOptions.responseBytes }
             : {}),
-          outcome: requestOutcome,
+          outcome: refusedOutcome(requestOutcome, routeId, finishOptions.status),
           ...(errorId === undefined ? {} : { errorId }),
         });
         return finished;
@@ -170,6 +170,15 @@ export const makeRequestRecordBuilderEffect = Effect.fn("ObservabilityRequestRec
   },
   (effect) => observe("create", effect),
 );
+/**
+ * Names the framework's own refusals: a 404 or 405 that no route answered is not a declared
+ * error, and a body over the limit (413, declared or streamed) is not a validation error.
+ */
+function refusedOutcome(outcome: RequestOutcome, routeId: string, status: number): RequestOutcome {
+  if (outcome === "declared-error" && routeId === "unknown" && (status === 404 || status === 405))
+    return "refused";
+  return outcome === "validation-error" && status === 413 ? "refused" : outcome;
+}
 function text(value: string | undefined): string | undefined {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 }
