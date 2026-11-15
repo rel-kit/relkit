@@ -42,9 +42,11 @@ export function routeGroupCard(group: GraphNode, hierarchy: AppHierarchy): ViewN
     for (const name of routeNames) if (!names.includes(name)) names.push(name);
   }
   const total = routes.length;
+  // The graph has no marker for "public": a route that declares nothing, and a route whose
+  // function's access rule the API does not report, look the same, so "public" is never claimed.
   const access =
     protectedCount === 0
-      ? "all public"
+      ? "no access rule reported"
       : protectedCount === total
         ? "all protected"
         : `${protectedCount} protected`;
