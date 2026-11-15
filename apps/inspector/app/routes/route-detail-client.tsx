@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { InspectorObject, ObservabilityPage } from "../../lib/api-types";
 import { createInspectorClient } from "../../lib/client";
+import { recentQuery } from "../../lib/recent-signals";
 import { CodeBlock } from "../../components/blocks/code-block";
 import { Section } from "../../components/blocks/section";
 import { StatusBadge } from "../../components/neon/status-badge";
@@ -41,7 +42,7 @@ export function RouteDetailClient() {
   const loadRequests = () => {
     if (id === "") return;
     void createInspectorClient()
-      .query<InspectorObject>("requests", { routeId: id, limit: 10 })
+      .query<InspectorObject>("requests", recentQuery({ routeId: id }))
       .then((page: ObservabilityPage<InspectorObject>) => setRequests(page.items))
       .catch(() => setRequests([]));
   };
@@ -51,7 +52,7 @@ export function RouteDetailClient() {
     void Promise.all([
       api.detail<InspectorObject>("routes", id),
       api
-        .query<InspectorObject>("requests", { routeId: id, limit: 10 })
+        .query<InspectorObject>("requests", recentQuery({ routeId: id }))
         .catch(() => ({ items: [] as readonly InspectorObject[] })),
     ])
       .then(async ([routePayload, requestPayload]) => {
