@@ -60,7 +60,6 @@ export const defineAppProbes: readonly Probe[] = [
     'bucket: "uploads", cache',
     "bucket: |, cache",
     ["uploads", "archive"],
-    { verdict: "nothing", cause: "typing" },
   ),
   suggest(
     "defineApp",
@@ -69,7 +68,6 @@ export const defineAppProbes: readonly Probe[] = [
     'bucket: "uploads", cache',
     'bucket: "|", cache',
     ["uploads", "archive"],
-    { verdict: "nothing", cause: "typing" },
   ),
   suggest(
     "defineApp",
@@ -78,7 +76,6 @@ export const defineAppProbes: readonly Probe[] = [
     'cache: "default", event',
     'cache: "|", event',
     ["default"],
-    { verdict: "nothing", cause: "typing" },
   ),
   suggest(
     "defineApp",
@@ -87,7 +84,6 @@ export const defineAppProbes: readonly Probe[] = [
     'jobs: "background" }',
     'jobs: "|" }',
     ["background"],
-    { verdict: "nothing", cause: "typing" },
   ),
   wrong(
     "defineApp",
@@ -96,7 +92,6 @@ export const defineAppProbes: readonly Probe[] = [
     'bucket: "uploads", cache',
     'bucket: "wrong", cache',
     ["uploads", "archive"],
-    { verdict: "misleading", cause: "typing" },
   ),
   wrong(
     "defineApp",
@@ -105,7 +100,6 @@ export const defineAppProbes: readonly Probe[] = [
     'cache: "default", event',
     'cache: "wrong", event',
     ["default"],
-    { verdict: "misleading", cause: "typing" },
   ),
   wrong(
     "defineApp",
@@ -114,7 +108,6 @@ export const defineAppProbes: readonly Probe[] = [
     'jobs: "background" }',
     'jobs: "background", model: "fast" }',
     ['NoProviderConfigured<"model">'],
-    { verdict: "misleading", cause: "typing" },
   ),
   wrong(
     "defineApp",
@@ -123,7 +116,6 @@ export const defineAppProbes: readonly Probe[] = [
     "  inspector: { enabled: true },",
     "  inspector: { enabled: true },\n  caches: {},",
     ["caches", "does not exist"],
-    { verdict: "nothing", cause: "typing" },
   ),
   suggest(
     "defineApp",

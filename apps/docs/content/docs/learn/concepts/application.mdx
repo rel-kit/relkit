@@ -29,6 +29,26 @@ its own install/enable/run procedure. Cloud and deployment remain unselected, an
 creation combination is currently unavailable. Add only explicitly [selected integration packages](/docs/modules/integrations)
 and their native SDKs before importing their constructors into this config.
 
+## Name default profiles
+
+A capability such as `bucket` or `cache` takes one adapter, or a map of named profiles. `defaults`
+names the profile a descriptor uses when it sets no `profile` of its own:
+
+```ts title="relkit.config.ts"
+defineApp({
+  env,
+  bucket: { uploads: docker(s3()), archive: docker(s3()) },
+  cache: docker(redis()),
+  defaults: { bucket: "uploads", cache: "default" },
+});
+```
+
+In your editor, ask for suggestions at the value of a default. It lists the profile names of that
+capability, and `"default"` when the capability has a single adapter. A name that is not a profile
+is a type error on that entry, and the error lists the valid names. A default for a capability
+without a provider is a type error that names the capability, such as
+`NoProviderConfigured<"model">`.
+
 ## Import Platform fragments explicitly
 
 Keep domain-independent configuration under `src/platform/` when the root configuration

@@ -20,19 +20,48 @@ type CapabilityInput<Capability extends AppProviderCapability> = ProviderInput<
  * @example const providers: AppProviderInputs = { cache: redisAdapter };
  */
 export interface AppProviderInputs {
+  /** Object storage for buckets: one adapter, or a map of named profiles. */
   readonly bucket?: CapabilityInput<"bucket">;
+  /** Key-value storage for caches: one adapter, or a map of named profiles. */
   readonly cache?: CapabilityInput<"cache">;
+  /** The backend that runs jobs and tasks: one adapter, or a map of named profiles. */
   readonly jobs?: CapabilityInput<"job">;
+  /** The transport that delivers events: one adapter, or a map of named profiles. */
   readonly event?: CapabilityInput<"event">;
+  /** Language models for agents: one adapter, or a map of named profiles. */
   readonly model?: CapabilityInput<"model">;
+  /** The transport of realtime channels: one adapter, or a map of named profiles. */
   readonly realtime?: CapabilityInput<"realtime">;
+  /** Storage for agent threads and runs: one adapter, or a map of named profiles. */
   readonly "agent-state"?: CapabilityInput<"agent-state">;
+}
+
+/** Provider bindings as one `defineApp` call infers them: a capability the call leaves out is
+ * `undefined`, which is how a default for it is told apart from a default for a bound one.
+ * @example const bindings: AppProviderBindings = { cache: redisAdapter, bucket: undefined };
+ */
+export type AppProviderBindings = {
+  readonly [Key in keyof AppProviderInputs]?: AppProviderInputs[Key] | undefined;
+};
+
+/** The type a `defaults` entry has when the application binds no provider to its capability, so
+ * the type error on that entry names the capability.
+ * @example const missing: NoProviderConfigured<"cache"> = { capability: "cache" };
+ */
+export interface NoProviderConfigured<Capability extends string> {
+  readonly capability: Capability;
 }
 
 type Profile<Input> = Input extends ProviderSourceInput ? "default" : Extract<keyof Input, string>;
 
+type BindingOf<Providers, Key> = Key extends keyof Providers ? Providers[Key] : undefined;
+
+type DefaultProfile<Input, Key extends string> = [Input] extends [undefined]
+  ? NoProviderConfigured<Key>
+  : Profile<NonNullable<Input>>;
+
 type ProviderInputFor<
-  Providers extends AppProviderInputs,
+  Providers extends AppProviderBindings,
   Capability extends AppProviderCapability,
 > = Capability extends "job"
   ? "jobs" extends keyof Providers
@@ -42,34 +71,42 @@ type ProviderInputFor<
     ? NonNullable<Providers[Capability]>
     : never;
 
-type ProfileFor<Providers extends AppProviderInputs, Capability extends AppProviderCapability> = [
+type ProfileFor<Providers extends AppProviderBindings, Capability extends AppProviderCapability> = [
   ProviderInputFor<Providers, Capability>,
 ] extends [never]
   ? never
   : Profile<ProviderInputFor<Providers, Capability>>;
 
-/** Public default-profile spellings; normalized descriptors use `job`.
+/** The provider options of `defineApp`, one property per capability so that each binding is
+ * inferred from its own property.
+ * @example const options: AppProviderOptions<{ cache: typeof redisAdapter }> = { cache: redisAdapter };
+ */
+export type AppProviderOptions<Providers extends AppProviderBindings> = {
+  readonly [Key in keyof AppProviderInputs]?: BindingOf<Providers, Key>;
+};
+
+/** Default profile per capability, named as the options are (`jobs`, not `job`). Each entry
+ * accepts the profile names of that capability's binding, or `"default"` for a single adapter.
  * @example const defaults: AppProviderDefaults<typeof providers> = { cache: "default" };
  */
-export type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
-  [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
-}> & {
-  readonly jobs?: ProfileFor<Providers, "job">;
-  /** Removed: the jobs default is spelled `jobs`. */
-  readonly job?: never;
+export type AppProviderDefaults<Providers extends AppProviderBindings> = {
+  // NoInfer: a default never decides what a binding is; it is only checked against it.
+  readonly [Key in keyof AppProviderInputs]?: NoInfer<
+    DefaultProfile<BindingOf<Providers, Key>, Key>
+  >;
 };
 
 /** Validated default profiles keyed by normalized capability names.
  * @example const defaults: NormalizedAppProviderDefaults<typeof providers> = { cache: "default" };
  */
-export type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
+export type NormalizedAppProviderDefaults<Providers extends AppProviderBindings> = Readonly<{
   [Capability in AppProviderCapability]?: ProfileFor<Providers, Capability>;
 }>;
 
 /** Provider profiles inferred from the authored provider bindings.
  * @example type Profiles = NormalizedProviders<typeof providers>;
  */
-export type NormalizedProviders<Providers extends AppProviderInputs> = {
+export type NormalizedProviders<Providers extends AppProviderBindings> = {
   readonly [
     Capability in AppProviderCapability as [ProviderInputFor<Providers, Capability>] extends [never]
       ? never

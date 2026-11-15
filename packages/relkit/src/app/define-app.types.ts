@@ -3,17 +3,21 @@ import type { DescriptorBase, DescriptorMetadata, JsonValue } from "../contracts
 import type { TelemetryConfiguration, TelemetryExporterMap } from "../observability/telemetry.js";
 import type { InspectorConfig, ServerConfig } from "./app-config.types.js";
 import type {
+  AppProviderBindings,
   AppProviderDefaults,
-  AppProviderInputs,
+  AppProviderOptions,
   NormalizedAppProviderDefaults,
   NormalizedProviders,
 } from "./app-provider.types.js";
 
 export type { ApiDocsConfig, ServerConfig, InspectorConfig } from "./app-config.types.js";
 export type {
+  AppProviderBindings,
   AppProviderCapability,
   AppProviderInputs,
   AppProviderDefaults,
+  AppProviderOptions,
+  NoProviderConfigured,
   NormalizedAppProviderDefaults,
 } from "./app-provider.types.js";
 
@@ -41,26 +45,55 @@ export interface AppCheckConfig {
  */
 export type DefineAppOptions<
   Shape extends EnvShape,
-  Providers extends AppProviderInputs,
+  Providers extends AppProviderBindings,
   Exporters extends TelemetryExporterMap = TelemetryExporterMap,
 > = DescriptorMetadata &
-  Providers & {
+  AppProviderOptions<Providers> & {
+    /** Stable name of the application in graphs, telemetry and deployment. */
     readonly id?: string;
+    /** The environment contract from `defineEnv`; handlers read it as `context.env`. */
     readonly env: EnvDefinition<Shape>;
+    /** The profile a descriptor uses when it names none, per capability. */
     readonly defaults?: AppProviderDefaults<Providers>;
+    /** Redaction, local retention, sampling and exporters of telemetry. */
     readonly telemetry?: AppTelemetryConfig<Exporters>;
+    /** The HTTP server: port, body limit, API reference, MCP and startup hook. */
     readonly server?: ServerConfig;
+    /** The development Inspector's bridge; off unless `enabled` is `true`. */
     readonly inspector?: InspectorConfig;
+    /** JSON metadata for the deployment engine, such as `{ engine: "pulumi" }`. */
     readonly deployment?: AppDeploymentConfig;
+    /** Opt-in rules of `relkit check`. */
     readonly check?: AppCheckConfig;
   };
+
+/** The bindings of one `defineApp` call, from its one type parameter per capability.
+ * @example type Bindings = DefineAppBindings<typeof s3Adapter>;
+ */
+export interface DefineAppBindings<
+  Bucket = undefined,
+  Cache = undefined,
+  Jobs = undefined,
+  Event = undefined,
+  Model = undefined,
+  Realtime = undefined,
+  AgentState = undefined,
+> {
+  readonly bucket: Bucket;
+  readonly cache: Cache;
+  readonly jobs: Jobs;
+  readonly event: Event;
+  readonly model: Model;
+  readonly realtime: Realtime;
+  readonly "agent-state": AgentState;
+}
 
 /** Immutable normalized application descriptor returned by `defineApp`.
  * @example const descriptor: ApplicationDescriptor = defineApp({ env: defineEnv({}) });
  */
 export type ApplicationDescriptor<
   Shape extends EnvShape = EnvShape,
-  Providers extends AppProviderInputs = AppProviderInputs,
+  Providers extends AppProviderBindings = AppProviderBindings,
   Exporters extends TelemetryExporterMap = TelemetryExporterMap,
 > = DescriptorBase<"app", string> &
   NormalizedProviders<Providers> & {

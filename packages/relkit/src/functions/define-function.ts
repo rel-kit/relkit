@@ -91,7 +91,8 @@ const defineFunctionOperation = Effect.fn("functions.function.define")(
  * @returns Descriptor or tagged validation failure.
  * @example Effect.runSync(defineFunctionEffect({ input, output, handler }));
  */
-export const defineFunctionEffect: DefineFunctionEffect = defineFunctionOperation;
+// The public signature infers schemas and context; the implementation reads plain options.
+export const defineFunctionEffect = defineFunctionOperation as DefineFunctionEffect;
 
 /**
  * Defines the graph-visible executable unit shared by HTTP, background, tool, and agent calls.
@@ -129,5 +130,5 @@ export const defineFunctionEffect: DefineFunctionEffect = defineFunctionOperatio
  * @category Functions
  * @since 0.1.0
  */
-export const defineFunction: DefineFunction = (options: FunctionImplementationOptions) =>
-  runFunctionSync(defineFunctionOperation(options));
+export const defineFunction = ((options: FunctionImplementationOptions) =>
+  runFunctionSync(defineFunctionOperation(options))) as DefineFunction;

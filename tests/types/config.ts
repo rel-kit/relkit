@@ -107,6 +107,48 @@ defineApp({
   defaults: { cache: "missing" },
 });
 
+// A single adapter is the profile `default`.
+const single = defineApp({
+  env: defineEnv({}),
+  cache: redis({ url: namedUrl }),
+  defaults: { cache: "default" },
+});
+const singleDefault: "default" | undefined = single.defaults.cache;
+void singleDefault;
+
+defineApp({
+  env: defineEnv({}),
+  cache: redis({ url: namedUrl }),
+  // @ts-expect-error a single adapter has no profile other than default
+  defaults: { cache: "requests" },
+});
+
+defineApp({
+  env: defineEnv({}),
+  cache: { requests: redis({ url: namedUrl }) },
+  // @ts-expect-error a default needs a provider for its capability
+  defaults: { bucket: "assets" },
+});
+
+// One wrong default does not make the correct ones errors.
+defineApp({
+  env: defineEnv({}),
+  cache: { requests: redis({ url: namedUrl }) },
+  bucket: assets,
+  defaults: {
+    bucket: "default",
+    // @ts-expect-error only this entry names a profile that does not exist
+    cache: "missing",
+  },
+});
+
+defineApp({
+  env: defineEnv({}),
+  cache: { requests: redis({ url: namedUrl }) },
+  // @ts-expect-error an unknown option is rejected beside a real provider
+  caches: {},
+});
+
 defineApp({
   env: defineEnv({}),
   // @ts-expect-error plural capability keys were removed

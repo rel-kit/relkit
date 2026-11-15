@@ -2,6 +2,9 @@
 type RelkitApplicationEnv = import("relkit/config").ResolvedEnv<
   (typeof import("./relkit.config.js"))["default"]["env"]["shape"]
 >;
+type RelkitApplicationAccess = import("@relkit/better-auth").InferBetterAuthAccess<
+  (typeof import("./auth.js"))["default"]["handler"]
+>;
 
 declare global {
   namespace Relkit {
@@ -16,6 +19,7 @@ declare global {
         >
       >;
     }
+    interface ApplicationAccess extends RelkitApplicationAccess {}
     interface TaskRegistry {
       readonly "orders.export": (typeof import("./export.task.js"))["default"];
     }

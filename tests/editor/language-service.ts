@@ -105,8 +105,11 @@ export function createLanguageServiceDriver(options: DriverOptions): EditorDrive
         includeCompletionsForModuleExports: false,
         includeCompletionsWithInsertText: true,
       });
+      // An editor orders by `sortText` and, where that is equal, by name.
+      const key = (entry: TypeScript.CompletionEntry): string =>
+        `${entry.sortText}\u0000${entry.name}`;
       const entries = [...(result?.entries ?? [])].sort((left, right) =>
-        left.sortText.localeCompare(right.sortText),
+        key(left) < key(right) ? -1 : 1,
       );
       return {
         names: entries.map((entry) => entry.name.replace(/^["']|["']$/gu, "")),

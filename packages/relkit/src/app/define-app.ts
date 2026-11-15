@@ -18,7 +18,8 @@ import { normalizeAppRuntimeMetadataEffect } from "./app-runtime-metadata.js";
 import { AppValidationFailure, isEnvDefinitionEffect } from "./app-validation.js";
 import type {
   ApplicationDescriptor,
-  AppProviderInputs,
+  AppProviderBindings,
+  DefineAppBindings,
   DefineAppOptions,
 } from "./define-app.types.js";
 
@@ -49,10 +50,20 @@ const OPTION_KEYS = new Set([
 export const defineAppEffect = Effect.fn("App.defineApp")(
   <
     const Shape extends EnvShape,
-    const Providers extends AppProviderInputs,
+    const Bucket extends AppProviderBindings["bucket"] = undefined,
+    const Cache extends AppProviderBindings["cache"] = undefined,
+    const Jobs extends AppProviderBindings["jobs"] = undefined,
+    const Event extends AppProviderBindings["event"] = undefined,
+    const Model extends AppProviderBindings["model"] = undefined,
+    const Realtime extends AppProviderBindings["realtime"] = undefined,
+    const AgentState extends AppProviderBindings["agent-state"] = undefined,
     const Exporters extends TelemetryExporterMap = TelemetryExporterMap,
   >(
-    options: DefineAppOptions<Shape, Providers, Exporters>,
+    options: DefineAppOptions<
+      Shape,
+      DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+      Exporters
+    >,
   ) =>
     observeApp(
       "define",
@@ -89,7 +100,11 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
           ...(inspector === undefined ? {} : { inspector }),
           ...(deployment === undefined ? {} : { deployment }),
           ...(check === undefined ? {} : { check }),
-        }) as ApplicationDescriptor<Shape, Providers, Exporters>;
+        }) as ApplicationDescriptor<
+          Shape,
+          DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+          Exporters
+        >;
       }),
     ),
 );
@@ -109,11 +124,25 @@ export const defineAppEffect = Effect.fn("App.defineApp")(
  */
 export function defineApp<
   const Shape extends EnvShape,
-  const Providers extends AppProviderInputs,
+  const Bucket extends AppProviderBindings["bucket"] = undefined,
+  const Cache extends AppProviderBindings["cache"] = undefined,
+  const Jobs extends AppProviderBindings["jobs"] = undefined,
+  const Event extends AppProviderBindings["event"] = undefined,
+  const Model extends AppProviderBindings["model"] = undefined,
+  const Realtime extends AppProviderBindings["realtime"] = undefined,
+  const AgentState extends AppProviderBindings["agent-state"] = undefined,
   const Exporters extends TelemetryExporterMap = TelemetryExporterMap,
 >(
-  options: DefineAppOptions<Shape, Providers, Exporters>,
-): ApplicationDescriptor<Shape, Providers, Exporters> {
+  options: DefineAppOptions<
+    Shape,
+    DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+    Exporters
+  >,
+): ApplicationDescriptor<
+  Shape,
+  DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+  Exporters
+> {
   const result = Effect.runSync(Effect.result(defineAppEffect(options)));
   if (Result.isFailure(result)) throw result.failure.cause;
   return result.success;

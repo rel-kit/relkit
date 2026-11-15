@@ -31,6 +31,9 @@ export type FunctionCallOptions<
 > & {
   /** Removed: declare each event under `dependencies.events` instead. */
   readonly publishes?: never;
+  // Repeats the constraint so an editor lists the dependency kinds while the object is being
+  // typed: inference from the object is blocked then, and `Dependencies` alone has no members.
+  readonly dependencies?: FunctionDependencies;
   readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, ProgressSchema>;
   readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, ProgressSchema>;
   readonly handler: (

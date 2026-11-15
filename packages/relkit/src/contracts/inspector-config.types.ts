@@ -12,8 +12,11 @@ export interface InspectorConnection {
 
 /** Optional application input; installation of the standalone tool is independent. */
 export interface InspectorConfigurationInput {
+  /** Starts the bridge the Inspector connects to. Defaults to `false`. */
   readonly enabled?: boolean;
+  /** Address the bridge listens on; port `0` takes a free port. */
   readonly connection?: { readonly host?: string; readonly port?: number };
+  /** Largest payload preview the bridge returns, in bytes. Defaults to 1,048,576. */
   readonly maxPreviewBytes?: number;
 }
 

@@ -853,7 +853,8 @@ declare const acquireApplicationAuth: (
             name: string;
             image?: string | null | undefined;
           };
-        }
+        },
+        BetterAuthAccess<string, string>
       >
     | undefined,
   database: DrizzleActivation<DrizzleServiceDescriptor<any, any, any, any>> | undefined,

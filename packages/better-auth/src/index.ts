@@ -2,6 +2,7 @@
 import { createDescriptorBase } from "relkit/contracts";
 import { deprecated } from "relkit/diagnostics";
 import { createUnboundIdentity } from "relkit/invocation";
+import type { BetterAuthAccessOf } from "./access.types.js";
 import type {
   BetterAuthHandler,
   BetterAuthDeclarationRuntime,
@@ -13,12 +14,14 @@ import type {
 import { BETTER_AUTH_HANDLER, BETTER_AUTH_RUNTIME } from "./symbols.js";
 
 export { BETTER_AUTH_HANDLER };
+export type { BetterAuthAccess, BetterAuthAccessOf } from "./access.types.js";
 export type {
   BetterAuthInstance,
   BetterAuthInstanceServiceOptions,
   BetterAuthServiceOptions,
   BetterAuthRegistration,
   BetterAuthHandler,
+  InferBetterAuthAccess,
   InferBetterAuthSession,
   BetterAuthServiceDescriptor,
 } from "./declaration.types.js";
@@ -28,7 +31,8 @@ const DEFAULT_BASE_PATH = "/api/auth";
 
 /**
  * Defines the authentication service from the application's own Better Auth instance.
- * @typeParam Instance - The instance; its options type the session.
+ * @typeParam Instance - The instance; its options type the session and the names of its access
+ * control, which function access rules accept.
  * @param options - The instance, and `mount: false` to skip mounting its handler.
  * @returns A frozen declaration and stable handler; inactive handlers return 503.
  * @remarks Write `export const auth = betterAuth({...})` in a Better Auth file and pass it here.
@@ -48,7 +52,11 @@ const DEFAULT_BASE_PATH = "/api/auth";
  */
 export function defineBetterAuthService<const Instance extends BetterAuthInstance>(
   options: BetterAuthInstanceServiceOptions<Instance>,
-): BetterAuthServiceDescriptor<BetterAuthServiceOptions, Instance["$Infer"]["Session"]>;
+): BetterAuthServiceDescriptor<
+  BetterAuthServiceOptions,
+  Instance["$Infer"]["Session"],
+  BetterAuthAccessOf<Instance["options"]>
+>;
 /**
  * Defines lazy authentication from Better Auth options, using the application's Drizzle database.
  * @deprecated Write a Better Auth file and pass its instance as `defineBetterAuthService({ auth })`.

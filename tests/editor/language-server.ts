@@ -128,9 +128,9 @@ export async function createLanguageServerDriver(options: {
       position: positionAt(text, offset),
     });
     const list = Array.isArray(result) ? result : (result?.items ?? []);
-    return [...list].sort((left, right) =>
-      (left.sortText ?? left.label).localeCompare(right.sortText ?? right.label),
-    );
+    // An editor orders by `sortText` and, where that is equal, by label.
+    const key = (item: Item): string => `${item.sortText ?? item.label}\u0000${item.label}`;
+    return [...list].sort((left, right) => (key(left) < key(right) ? -1 : 1));
   };
   const name = (label: string): string => label.replace(/\?$/u, "").replace(/^["']|["']$/gu, "");
   return {

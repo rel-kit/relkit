@@ -40,16 +40,30 @@ const app = defineApp({ env: defineEnv({}), server: { port: 3000 } });
 ```ts
 declare const defineApp: <
   const Shape extends EnvShape,
-  const Providers extends AppProviderInputs,
+  const Bucket extends AppProviderBindings["bucket"] = undefined,
+  const Cache extends AppProviderBindings["cache"] = undefined,
+  const Jobs extends AppProviderBindings["jobs"] = undefined,
+  const Event extends AppProviderBindings["event"] = undefined,
+  const Model extends AppProviderBindings["model"] = undefined,
+  const Realtime extends AppProviderBindings["realtime"] = undefined,
+  const AgentState extends AppProviderBindings["agent-state"] = undefined,
   const Exporters extends TelemetryExporterMap = Readonly<
     Record<string, TelemetryExporterDescriptor<string, string, object>>
   >,
 >(
-  options: DefineAppOptions<Shape, Providers, Exporters>,
-) => ApplicationDescriptor<Shape, Providers, Exporters>;
+  options: DefineAppOptions<
+    Shape,
+    DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+    Exporters
+  >,
+) => ApplicationDescriptor<
+  Shape,
+  DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+  Exporters
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L125)
 
 Since v0.2.0
 
@@ -93,7 +107,9 @@ const docs: ApiDocsConfig = { enabledInProduction: false };
 export interface ApiDocsConfig {
   /** Explicitly selects Scalar; omitted/false keeps JSON OpenAPI only. */
   readonly ui?: "scalar" | false;
+  /** Serves the OpenAPI document and the reference in production too. Defaults to `false`. */
   readonly enabledInProduction?: boolean;
+  /** Services left out of the served document; their routes still answer. */
   readonly excludeDomains?: readonly string[];
 }
 ```
@@ -116,7 +132,7 @@ const inspector: InspectorConfig = { enabled: true };
 export interface InspectorConfig extends InspectorConfigurationInput {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L45)
 
 ### ServerConfig (interface)
 
@@ -132,9 +148,13 @@ const server: ServerConfig = { port: 3000, apiDocs: { enabledInProduction: false
 
 ```ts
 export interface ServerConfig {
+  /** Port the HTTP server listens on. */
   readonly port?: number;
+  /** Largest request body in bytes; a larger one is answered `413`. A route can set its own. */
   readonly maxBodyBytes?: number;
+  /** The served OpenAPI document and its reference page. */
   readonly apiDocs?: ApiDocsConfig;
+  /** Serves the contract that the generated client reads. */
   readonly clientContract?: boolean;
   /** Enables the MCP endpoint; `{ auth: "required" }` limits it to signed-in callers. */
   readonly mcp?: boolean | { readonly auth?: "required" };
@@ -148,7 +168,7 @@ export interface ServerConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L22)
 
 ## `app-observability.ts`
 
@@ -329,7 +349,7 @@ Effect.runSync(normalizeDefaultsEffect({}, undefined));
 **Signature**
 
 ```ts
-declare const normalizeDefaultsEffect: <Providers extends AppProviderInputs>(
+declare const normalizeDefaultsEffect: <Providers extends AppProviderBindings>(
   providers: Partial<
     Record<
       "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state",
@@ -368,7 +388,7 @@ Effect.runSync(normalizeProvidersEffect({}));
 
 ```ts
 declare const normalizeProvidersEffect: (
-  options: AppProviderInputs,
+  options: AppProviderBindings,
 ) => Effect.Effect<
   Partial<
     Record<
@@ -384,6 +404,27 @@ declare const normalizeProvidersEffect: (
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider-normalization.ts#L19)
 
 ## `app-provider.types.ts`
+
+### AppProviderBindings (type alias)
+
+Provider bindings as one `defineApp` call infers them: a capability the call leaves out is
+`undefined`, which is how a default for it is told apart from a default for a bound one.
+
+**Example**
+
+```ts
+const bindings: AppProviderBindings = { cache: redisAdapter, bucket: undefined };
+```
+
+**Signature**
+
+```ts
+type AppProviderBindings = {
+  readonly [Key in keyof AppProviderInputs]?: AppProviderInputs[Key] | undefined;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L43)
 
 ### AppProviderCapability (type alias)
 
@@ -405,7 +446,8 @@ type AppProviderCapability = (typeof APP_PROVIDER_CAPABILITIES)[number];
 
 ### AppProviderDefaults (type alias)
 
-Public default-profile spellings; normalized descriptors use `job`.
+Default profile per capability, named as the options are (`jobs`, not `job`). Each entry
+accepts the profile names of that capability's binding, or `"default"` for a single adapter.
 
 **Example**
 
@@ -416,16 +458,15 @@ const defaults: AppProviderDefaults<typeof providers> = { cache: "default" };
 **Signature**
 
 ```ts
-type AppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
-  [Capability in Exclude<AppProviderCapability, "job">]?: ProfileFor<Providers, Capability>;
-}> & {
-  readonly jobs?: ProfileFor<Providers, "job">;
-  /** Removed: the jobs default is spelled `jobs`. */
-  readonly job?: never;
+type AppProviderDefaults<Providers extends AppProviderBindings> = {
+  // NoInfer: a default never decides what a binding is; it is only checked against it.
+  readonly [Key in keyof AppProviderInputs]?: NoInfer<
+    DefaultProfile<BindingOf<Providers, Key>, Key>
+  >;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L92)
 
 ### AppProviderInputs (interface)
 
@@ -441,17 +482,66 @@ const providers: AppProviderInputs = { cache: redisAdapter };
 
 ```ts
 export interface AppProviderInputs {
+  /** Object storage for buckets: one adapter, or a map of named profiles. */
   readonly bucket?: CapabilityInput<"bucket">;
+  /** Key-value storage for caches: one adapter, or a map of named profiles. */
   readonly cache?: CapabilityInput<"cache">;
+  /** The backend that runs jobs and tasks: one adapter, or a map of named profiles. */
   readonly jobs?: CapabilityInput<"job">;
+  /** The transport that delivers events: one adapter, or a map of named profiles. */
   readonly event?: CapabilityInput<"event">;
+  /** Language models for agents: one adapter, or a map of named profiles. */
   readonly model?: CapabilityInput<"model">;
+  /** The transport of realtime channels: one adapter, or a map of named profiles. */
   readonly realtime?: CapabilityInput<"realtime">;
+  /** Storage for agent threads and runs: one adapter, or a map of named profiles. */
   readonly "agent-state"?: CapabilityInput<"agent-state">;
 }
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L22)
+
+### AppProviderOptions (type alias)
+
+The provider options of `defineApp`, one property per capability so that each binding is
+inferred from its own property.
+
+**Example**
+
+```ts
+const options: AppProviderOptions<{ cache: typeof redisAdapter }> = { cache: redisAdapter };
+```
+
+**Signature**
+
+```ts
+type AppProviderOptions<Providers extends AppProviderBindings> = {
+  readonly [Key in keyof AppProviderInputs]?: BindingOf<Providers, Key>;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L84)
+
+### NoProviderConfigured (interface)
+
+The type a `defaults` entry has when the application binds no provider to its capability, so
+the type error on that entry names the capability.
+
+**Example**
+
+```ts
+const missing: NoProviderConfigured<"cache"> = { capability: "cache" };
+```
+
+**Signature**
+
+```ts
+export interface NoProviderConfigured<Capability extends string> {
+  readonly capability: Capability;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L51)
 
 ### NormalizedAppProviderDefaults (type alias)
 
@@ -466,12 +556,12 @@ const defaults: NormalizedAppProviderDefaults<typeof providers> = { cache: "defa
 **Signature**
 
 ```ts
-type NormalizedAppProviderDefaults<Providers extends AppProviderInputs> = Readonly<{
+type NormalizedAppProviderDefaults<Providers extends AppProviderBindings> = Readonly<{
   [Capability in AppProviderCapability]?: ProfileFor<Providers, Capability>;
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L102)
 
 ### NormalizedProviders (type alias)
 
@@ -486,7 +576,7 @@ type Profiles = NormalizedProviders<typeof providers>;
 **Signature**
 
 ```ts
-type NormalizedProviders<Providers extends AppProviderInputs> = {
+type NormalizedProviders<Providers extends AppProviderBindings> = {
   readonly [
     Capability in AppProviderCapability as [ProviderInputFor<Providers, Capability>] extends [never]
       ? never
@@ -495,7 +585,7 @@ type NormalizedProviders<Providers extends AppProviderInputs> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L109)
 
 ## `app-runtime-metadata.ts`
 
@@ -1353,7 +1443,7 @@ Re-exports all named exports from the "./define-app.types.js" module.
 export * from "./define-app.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L26)
 
 ### APP_PROVIDER_CAPABILITIES
 
@@ -1371,7 +1461,7 @@ declare const APP_PROVIDER_CAPABILITIES: readonly [
 ];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L27)
 
 ### defineAppEffect
 
@@ -1388,16 +1478,34 @@ Effect.runSync(defineAppEffect({ env: defineEnv({}) }));
 ```ts
 declare const defineAppEffect: <
   const Shape extends EnvShape,
-  const Providers extends AppProviderInputs,
+  const Bucket extends AppProviderBindings["bucket"] = undefined,
+  const Cache extends AppProviderBindings["cache"] = undefined,
+  const Jobs extends AppProviderBindings["jobs"] = undefined,
+  const Event extends AppProviderBindings["event"] = undefined,
+  const Model extends AppProviderBindings["model"] = undefined,
+  const Realtime extends AppProviderBindings["realtime"] = undefined,
+  const AgentState extends AppProviderBindings["agent-state"] = undefined,
   const Exporters extends TelemetryExporterMap = Readonly<
     Record<string, TelemetryExporterDescriptor<string, string, object>>
   >,
 >(
-  options: DefineAppOptions<Shape, Providers, Exporters>,
-) => Effect.Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
+  options: DefineAppOptions<
+    Shape,
+    DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+    Exporters
+  >,
+) => Effect.Effect<
+  ApplicationDescriptor<
+    Shape,
+    DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+    Exporters
+  >,
+  AppValidationFailure,
+  never
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.ts#L50)
 
 ## `define-app.types.ts`
 
@@ -1409,7 +1517,7 @@ declare const defineAppEffect: <
 declare const ApiDocsConfig: ApiDocsConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
 
 ### AppCheckConfig (interface)
 
@@ -1430,7 +1538,7 @@ export interface AppCheckConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L38)
 
 ### AppDeploymentConfig (type alias)
 
@@ -1448,7 +1556,17 @@ const deployment: AppDeploymentConfig = { engine: "pulumi" };
 type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L33)
+
+### AppProviderBindings
+
+**Signature**
+
+```ts
+declare const AppProviderBindings: AppProviderBindings;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L15)
 
 ### AppProviderCapability
 
@@ -1459,7 +1577,7 @@ declare const AppProviderCapability:
   "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L16)
 
 ### AppProviderDefaults
 
@@ -1469,7 +1587,7 @@ declare const AppProviderCapability:
 declare const AppProviderDefaults: AppProviderDefaults<Providers>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L18)
 
 ### AppProviderInputs
 
@@ -1479,7 +1597,17 @@ declare const AppProviderDefaults: AppProviderDefaults<Providers>;
 declare const AppProviderInputs: AppProviderInputs;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L17)
+
+### AppProviderOptions
+
+**Signature**
+
+```ts
+declare const AppProviderOptions: AppProviderOptions<Providers>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L19)
 
 ### AppTelemetryConfig (type alias)
 
@@ -1498,7 +1626,7 @@ type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExport
   TelemetryConfiguration<Exporters>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L27)
 
 ### ApplicationDescriptor (type alias)
 
@@ -1515,7 +1643,7 @@ const descriptor: ApplicationDescriptor = defineApp({ env: defineEnv({}) });
 ```ts
 type ApplicationDescriptor<
   Shape extends EnvShape = EnvShape,
-  Providers extends AppProviderInputs = AppProviderInputs,
+  Providers extends AppProviderBindings = AppProviderBindings,
   Exporters extends TelemetryExporterMap = TelemetryExporterMap,
 > = DescriptorBase<"app", string> &
   NormalizedProviders<Providers> & {
@@ -1529,7 +1657,41 @@ type ApplicationDescriptor<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L94)
+
+### DefineAppBindings (interface)
+
+The bindings of one `defineApp` call, from its one type parameter per capability.
+
+**Example**
+
+```ts
+type Bindings = DefineAppBindings<typeof s3Adapter>;
+```
+
+**Signature**
+
+```ts
+export interface DefineAppBindings<
+  Bucket = undefined,
+  Cache = undefined,
+  Jobs = undefined,
+  Event = undefined,
+  Model = undefined,
+  Realtime = undefined,
+  AgentState = undefined,
+> {
+  readonly bucket: Bucket;
+  readonly cache: Cache;
+  readonly jobs: Jobs;
+  readonly event: Event;
+  readonly model: Model;
+  readonly realtime: Realtime;
+  readonly "agent-state": AgentState;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L73)
 
 ### DefineAppOptions (type alias)
 
@@ -1546,22 +1708,30 @@ const options: DefineAppOptions<{}, {}> = { env: defineEnv({}) };
 ```ts
 type DefineAppOptions<
   Shape extends EnvShape,
-  Providers extends AppProviderInputs,
+  Providers extends AppProviderBindings,
   Exporters extends TelemetryExporterMap = TelemetryExporterMap,
 > = DescriptorMetadata &
-  Providers & {
+  AppProviderOptions<Providers> & {
+    /** Stable name of the application in graphs, telemetry and deployment. */
     readonly id?: string;
+    /** The environment contract from `defineEnv`; handlers read it as `context.env`. */
     readonly env: EnvDefinition<Shape>;
+    /** The profile a descriptor uses when it names none, per capability. */
     readonly defaults?: AppProviderDefaults<Providers>;
+    /** Redaction, local retention, sampling and exporters of telemetry. */
     readonly telemetry?: AppTelemetryConfig<Exporters>;
+    /** The HTTP server: port, body limit, API reference, MCP and startup hook. */
     readonly server?: ServerConfig;
+    /** The development Inspector's bridge; off unless `enabled` is `true`. */
     readonly inspector?: InspectorConfig;
+    /** JSON metadata for the deployment engine, such as `{ engine: "pulumi" }`. */
     readonly deployment?: AppDeploymentConfig;
+    /** Opt-in rules of `relkit check`. */
     readonly check?: AppCheckConfig;
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L46)
 
 ### InspectorConfig
 
@@ -1571,7 +1741,17 @@ type DefineAppOptions<
 declare const InspectorConfig: InspectorConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
+
+### NoProviderConfigured
+
+**Signature**
+
+```ts
+declare const NoProviderConfigured: NoProviderConfigured<Capability>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L20)
 
 ### NormalizedAppProviderDefaults
 
@@ -1589,7 +1769,7 @@ declare const NormalizedAppProviderDefaults: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L21)
 
 ### ServerConfig
 
@@ -1599,7 +1779,7 @@ declare const NormalizedAppProviderDefaults: Readonly<{
 declare const ServerConfig: ServerConfig;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
 
 ## `dev-handler-table.ts`
 
@@ -2039,13 +2219,31 @@ declare const defineAgentEffect: <
 ```ts
 declare const defineAppEffect: <
   const Shape extends EnvShape,
-  const Providers extends AppProviderInputs,
+  const Bucket extends AppProviderBindings["bucket"] = undefined,
+  const Cache extends AppProviderBindings["cache"] = undefined,
+  const Jobs extends AppProviderBindings["jobs"] = undefined,
+  const Event extends AppProviderBindings["event"] = undefined,
+  const Model extends AppProviderBindings["model"] = undefined,
+  const Realtime extends AppProviderBindings["realtime"] = undefined,
+  const AgentState extends AppProviderBindings["agent-state"] = undefined,
   const Exporters extends TelemetryExporterMap = Readonly<
     Record<string, TelemetryExporterDescriptor<string, string, object>>
   >,
 >(
-  options: DefineAppOptions<Shape, Providers, Exporters>,
-) => Effect<ApplicationDescriptor<Shape, Providers, Exporters>, AppValidationFailure, never>;
+  options: DefineAppOptions<
+    Shape,
+    DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+    Exporters
+  >,
+) => Effect<
+  ApplicationDescriptor<
+    Shape,
+    DefineAppBindings<Bucket, Cache, Jobs, Event, Model, Realtime, AgentState>,
+    Exporters
+  >,
+  AppValidationFailure,
+  never
+>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L6)

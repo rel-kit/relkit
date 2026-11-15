@@ -242,11 +242,46 @@ defaults.bucket: "wrong"       3 errors on line 17, one per property:
 access.permissions: [""]       no suggestion (`vehicleModel:create`, `vehicle:read` are missing)
 ```
 
+## After this change
+
+Measured again on the change's last commit, with the same probes.
+
+|                                 | Positions | Works | Partly | Nothing | Misleading error |
+| ------------------------------- | --------- | ----- | ------ | ------- | ---------------- |
+| TypeScript 5.9 language service | 115       | 105   | 1      | 8       | 1                |
+| TypeScript 7 language server    | 115       | 106   | 0      | 8       | 1                |
+
+Thirteen positions changed from not working to working, and one error got shorter. The text is what TypeScript 5.9 shows; TypeScript 7 shows the same lists and errors, with the names of a union in alphabetical order.
+
+| Position                                      | Before                                                                            | After                                                                                                                                                              |
+| --------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `defaults.bucket`, empty value                | 239 suggestions, the whole scope; no profile name                                 | `archive` and `uploads` first, then the scope                                                                                                                      |
+| `defaults.bucket`, inside quotes              | no suggestions                                                                    | `archive`, `uploads`                                                                                                                                               |
+| `defaults.cache` (one adapter), inside quotes | no suggestions                                                                    | `default`                                                                                                                                                          |
+| `defaults.jobs`, inside quotes                | no suggestions                                                                    | `background`                                                                                                                                                       |
+| `defaults.bucket: "wrong"`                    | 4 errors, one per entry of `defaults`: `Type … is not assignable to type 'never'` | 1 error on `bucket`: `Type '"wrong"' is not assignable to type '"uploads" \| "archive" \| undefined'`                                                              |
+| `defaults.cache: "wrong"` (one adapter)       | 4 errors, as above                                                                | 1 error on `cache`: `Type '"wrong"' is not assignable to type '"default"'`                                                                                         |
+| `defaults.model` without a model provider     | 5 errors, as above                                                                | 1 error on `model`: `Type 'string' is not assignable to type 'NoProviderConfigured<"model">'`                                                                      |
+| Unknown option `caches` beside providers      | no error                                                                          | 1 error on `caches`: `Object literal may only specify known properties, but 'caches' does not exist in type 'DefineAppOptions<…>'. Did you mean to write 'cache'?` |
+| Keys of `defaults`                            | the removed `job` is suggested                                                    | `job` is not suggested; writing it says `Did you mean to write 'jobs'?`                                                                                            |
+| `access.roles`, inside quotes                 | no suggestions                                                                    | `clerk`, `owner`                                                                                                                                                   |
+| `access.permissions`, inside quotes           | no suggestions                                                                    | the 18 `resource:action` pairs of the statements                                                                                                                   |
+| `access.permissions: ["order:creat"]`         | no error                                                                          | 1 error on the entry: `Type '"order:creat"' is not assignable to type '"organization:update" \| … \| "order:create" \| …'. Did you mean '"order:create"'?`         |
+| `access.roles: ["ownr"]`                      | no error                                                                          | 1 error on the entry: `Type '"ownr"' is not assignable to type '"owner" \| "clerk"'. Did you mean '"owner"'?`                                                      |
+| Kinds of `dependencies` in `defineFunction`   | 236 suggestions, the whole scope                                                  | `agents`, `databases`, `functions`, `jobs`, `tasks` (the kinds not yet written)                                                                                    |
+| Removed option `publishes`                    | 5 errors: "No overload matches this call" and four in the handler                 | 1 error on `publishes`: `… is not assignable to type 'never'` (still does not say what to use)                                                                     |
+
+The last three rows come from one more typing change that the survey led to: `defineFunction` was two overloads and is one signature now. With two overloads, any mistake in the options of a function that has dependencies was reported on TypeScript 5.9 as "No overload matches this call", and the handler's `context` lost its dependency types, which added one error per dependency used. A misspelled permission would have shown five errors there. With one signature it is one error on the misspelled name.
+
+Descriptions: all 44 options of `defineApp`, `server`, `server.apiDocs`, `inspector`, `telemetry`, `defaults` and `check` have one, and `title`, `description` and `tags` have one on every surface. 134 of 242 options are still without a description (209 of 243 before; `defaults` lost the removed key `job`).
+
+Positions that still do not work (10 on TypeScript 5.9, 9 on TypeScript 7): the misspelled and the removed `defineFunction` option (2), profile names in `defineBucket`, `defineCache` and `defineEvent` (5), path parameter names (1), keys of `http.input()` (1), and `execution` in `defineTask` on TypeScript 5.9 (1).
+
 ## Proposed, not done in this change
 
 1. **Profile names in descriptors.** Generate the application's profile names into the context registry (`typeof import("relkit.config.js")` already types them) and type `profile` in `defineBucket`, `defineCache`, `defineEvent` and `defineChannel` from it, as this change does for `access`. It needs a generator change and new tracked output in every example and template, and a decision on what `profile` accepts in a library that has no application.
-2. **Unknown `defineFunction` options.** Add a mapped type over the keys of `Options` that are not options, so an extra key is an error on that key. The error text needs a decision (`never` reads badly; a named type as in `NoProviderConfigured` reads better), and `defineEventFunction`, `defineTask` and `defineJob` share the pattern.
-3. **`dependencies` kinds.** Make `dependencies` required in the overload that has it and put that overload first, or merge the two overloads with a default of `{}`. Either changes which overload TypeScript reports for every wrong call, so the 25 files of `tests/types/` have to be read again.
-4. **Descriptions.** 209 options have none. This change adds them for `defineApp`. The same one-line descriptions for `defineFunction`, the routes, events, channels, buckets, caches, tasks, jobs and the test application are text work in the types; the API pages then show them too.
+2. **Unknown `defineFunction` options.** Add a mapped type over the keys of `Options` that are not options, so an extra key is an error on that key, and give `publishes` a type whose name says what to use, as `NoProviderConfigured` does. The error text needs a decision, and `defineEventFunction`, `defineTask` and `defineJob` share the pattern.
+3. **One signature for the other overloaded APIs.** `defineTask` has an overload per `execution`; on TypeScript 5.9 the editor suggests one value. The change made to `defineFunction` here may apply, but the two forms differ in the handler's context, so it needs its own type tests.
+4. **Descriptions.** 134 options have none. The same one-line descriptions for `defineFunction`, the routes, events, channels, buckets, caches, tasks, jobs and the test application are text work in the types; the API pages then show them too.
 5. **API pages.** Print the members of `ServerConfig`, `InspectorConfig` and the telemetry options instead of `declare const`, and show the provider options in the `defineApp` block.
 6. **Path parameters and `http.input()` keys.** Both would need the route's folder name or the target's input type at a position TypeScript cannot give it to. `relkit check` reports both; the documentation could say so where `http.path()` is described.

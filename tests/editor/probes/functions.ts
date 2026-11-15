@@ -61,7 +61,6 @@ export const functionsProbes: readonly Probe[] = [
     'roles: ["owner"]',
     'roles: ["|"]',
     ["owner", "clerk"],
-    { verdict: "nothing", cause: "access-names" },
   ),
   suggest(
     "defineFunction",
@@ -70,7 +69,6 @@ export const functionsProbes: readonly Probe[] = [
     'permissions: ["order:create"]',
     'permissions: ["|"]',
     ["order:create", "order:refund", "report:read"],
-    { verdict: "nothing", cause: "access-names" },
   ),
   wrong(
     "defineFunction",
@@ -79,7 +77,6 @@ export const functionsProbes: readonly Probe[] = [
     'permissions: ["order:create"]',
     'permissions: ["order:creat"]',
     ["order:create"],
-    { verdict: "nothing", cause: "access-names" },
   ),
   wrong(
     "defineFunction",
@@ -88,7 +85,6 @@ export const functionsProbes: readonly Probe[] = [
     'roles: ["owner"]',
     'roles: ["ownr"]',
     ["owner"],
-    { verdict: "nothing", cause: "access-names" },
   ),
   suggest(
     "defineFunction",
@@ -97,7 +93,6 @@ export const functionsProbes: readonly Probe[] = [
     "    events: { orderPlaced },",
     "    events: { orderPlaced },\n    |",
     ["functions", "databases", "tasks", "jobs", "agents"],
-    { verdict: "nothing", cause: "overloads" },
   ),
   wrong(
     "defineFunction",

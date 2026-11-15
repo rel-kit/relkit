@@ -32,3 +32,17 @@ An option that `defineApp` does not accept SHALL be a type error, whether or not
 
 - **WHEN** a `defineApp` call that configures providers also has an option `defineApp` does not accept
 - **THEN** type-checking reports the unknown option
+
+### Requirement: A mistake in a function's options is reported where it is
+
+`defineFunction` SHALL be one call signature, so that a value of the wrong type in its options is one type error on that value, on every supported compiler, whether or not the function declares dependencies. While the `dependencies` object is being typed, an editor SHALL suggest the dependency kinds.
+
+#### Scenario: A wrong value in a function with dependencies
+
+- **WHEN** a function that declares dependencies has one option value of the wrong type
+- **THEN** type-checking reports one error, on that value, and none in the handler
+
+#### Scenario: Dependency kinds are suggested
+
+- **WHEN** a developer asks for suggestions for a property name inside `dependencies`
+- **THEN** the editor offers the kinds that are not yet written

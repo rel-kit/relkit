@@ -44,14 +44,18 @@ export default defineBetterAuthService({ auth });
 declare const defineBetterAuthService: {
   <const Instance extends BetterAuthInstance>(
     options: BetterAuthInstanceServiceOptions<Instance>,
-  ): BetterAuthServiceDescriptor<BetterAuthServiceOptions, Instance["$Infer"]["Session"]>;
+  ): BetterAuthServiceDescriptor<
+    BetterAuthServiceOptions,
+    Instance["$Infer"]["Session"],
+    BetterAuthAccessOf<Instance["options"]>
+  >;
   <const Options extends BetterAuthServiceOptions>(
     options: Options,
   ): BetterAuthServiceDescriptor<Options>;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L73)
 
 Since v0.9.0
 
@@ -107,6 +111,76 @@ declare const resolveBetterAuthAccess: (auth: Auth<any>, session: unknown) => Pr
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/access.ts#L27)
+
+## `access.types.ts`
+
+Role and permission names of a Better Auth instance, as types. They are read from the options
+of the organization plugin and reach function access rules through the generated context
+registry, so an editor suggests them and a misspelled name is a type error.
+
+### BetterAuthAccess (interface)
+
+The role and permission names an access rule may use; `string` where they are not known.
+
+**Example**
+
+```ts
+type Names = BetterAuthAccess<"owner" | "member", "order:create">;
+```
+
+**Signature**
+
+```ts
+export interface BetterAuthAccess<
+  Roles extends string = string,
+  Permissions extends string = string,
+> {
+  readonly roles: Roles;
+  readonly permissions: Permissions;
+}
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/access.types.ts#L11)
+
+### BetterAuthAccessOf (type alias)
+
+The names of a Better Auth instance's access control, from the type of its options.
+Without the organization plugin both are `string`: roles then come from `user.role` and no
+permission is granted. With `dynamicAccessControl` roles are created at run time and are
+`string`. The two unions are written inline so that a type error lists the names.
+
+**Example**
+
+```ts
+type Names = BetterAuthAccessOf<typeof auth.options>;
+```
+
+**Signature**
+
+```ts
+type BetterAuthAccessOf<Options> = [OrganizationOf<Options>] extends [never]
+  ? BetterAuthAccess
+  : OrganizationOf<Options> extends infer Organization
+    ? StatementsOf<Organization> extends infer Statements
+      ? BetterAuthAccess<
+          Organization extends { readonly dynamicAccessControl: { readonly enabled: true } }
+            ? string
+            : Organization extends { readonly roles: infer Roles extends object }
+              ? Extract<keyof Roles, string>
+              : "owner" | "admin" | "member",
+          {
+            [
+              Resource in keyof Statements & string
+            ]: Statements[Resource] extends readonly (infer Action extends string)[]
+              ? `${Resource}:${Action}`
+              : never;
+          }[keyof Statements & string]
+        >
+      : never
+    : never;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/access.types.ts#L42)
 
 ## `activation.ts`
 
@@ -541,7 +615,7 @@ export interface AuthServiceInterface {
 **Signature**
 
 ```ts
-declare const BetterAuthHandler: BetterAuthHandler<Session>;
+declare const BetterAuthHandler: BetterAuthHandler<Session, Access>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L16)
@@ -577,7 +651,7 @@ export interface BetterAuthRuntime<Options extends BetterAuthServiceOptions> {
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session>;
+declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session, Access>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L18)
@@ -625,22 +699,23 @@ export interface BetterAuthDeclarationRuntime<Options extends BetterAuthServiceO
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L75)
 
 ### BetterAuthHandler (type alias)
 
-Native route handler retaining inferred session and user types.
+Native route handler retaining the session type and the access control's names.
 
 **Signature**
 
 ```ts
-type BetterAuthHandler<Session = unknown> = RawHttpHandler & {
+type BetterAuthHandler<Session = unknown, Access = BetterAuthAccess> = RawHttpHandler & {
   readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
   readonly __session?: Session;
+  readonly __access?: Access;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L36)
 
 ### BetterAuthInstance (interface)
 
@@ -656,7 +731,7 @@ export interface BetterAuthInstance {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L15)
 
 ### BetterAuthInstanceServiceOptions (interface)
 
@@ -673,7 +748,7 @@ export interface BetterAuthInstanceServiceOptions<Instance extends BetterAuthIns
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L22)
 
 ### BetterAuthRegistration (interface)
 
@@ -688,7 +763,7 @@ export interface BetterAuthRegistration {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L30)
 
 ### BetterAuthServiceDescriptor (interface)
 
@@ -700,6 +775,7 @@ Lazy authoring declaration whose identity survives isolated activation.
 export interface BetterAuthServiceDescriptor<
   Options extends BetterAuthServiceOptions,
   Session = Auth<Options>["$Infer"]["Session"],
+  Access = BetterAuthAccessOf<Options>,
 > extends ReturnType<typeof createDescriptorBase<"service", string>> {
   readonly capability: {
     readonly kind: "better-auth";
@@ -710,11 +786,11 @@ export interface BetterAuthServiceDescriptor<
     /** `custom` when the instance brings its own database instead of the Drizzle service. */
     readonly database?: "drizzle" | "custom";
   };
-  readonly handler: BetterAuthHandler<Session>;
+  readonly handler: BetterAuthHandler<Session, Access>;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L57)
 
 ### BetterAuthServiceOptions (type alias)
 
@@ -729,7 +805,30 @@ type BetterAuthServiceOptions = Omit<BetterAuthOptions, "database" | "basePath">
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L9)
+
+### InferBetterAuthAccess (type alias)
+
+Projects the role and permission names of a handler's access control; the generated context
+registry uses it to type function access rules.
+
+**Example**
+
+```ts
+interface ApplicationAccess extends InferBetterAuthAccess<typeof service.handler> {}
+```
+
+**Signature**
+
+```ts
+type InferBetterAuthAccess<Handler> = Handler extends {
+  readonly __access?: infer Access extends BetterAuthAccess;
+}
+  ? Access
+  : BetterAuthAccess;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L50)
 
 ### InferBetterAuthSession (type alias)
 
@@ -739,10 +838,10 @@ Projects the session inferred by a lazy authentication handler.
 
 ```ts
 type InferBetterAuthSession<Handler> =
-  Handler extends BetterAuthHandler<infer Session> ? Session : never;
+  Handler extends BetterAuthHandler<infer Session, unknown> ? Session : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L43)
 
 ## `dependencies.ts`
 
@@ -849,7 +948,7 @@ declare const BetterAuthActivationOptions: BetterAuthActivationOptions;
 **Signature**
 
 ```ts
-declare const BetterAuthHandler: BetterAuthHandler<Session>;
+declare const BetterAuthHandler: BetterAuthHandler<Session, Access>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L12)
@@ -869,7 +968,7 @@ declare const BetterAuthRegistration: BetterAuthRegistration;
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session>;
+declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session, Access>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L14)
@@ -951,7 +1050,11 @@ declare const authServiceLayer: (
 declare const defineBetterAuthService: {
   <const Instance extends BetterAuthInstance>(
     options: BetterAuthInstanceServiceOptions<Instance>,
-  ): BetterAuthServiceDescriptor<BetterAuthServiceOptions, Instance["$Infer"]["Session"]>;
+  ): BetterAuthServiceDescriptor<
+    BetterAuthServiceOptions,
+    Instance["$Infer"]["Session"],
+    BetterAuthAccessOf<Instance["options"]>
+  >;
   <const Options extends BetterAuthServiceOptions>(
     options: Options,
   ): BetterAuthServiceDescriptor<Options>;
@@ -1022,17 +1125,37 @@ Lazy authentication authoring; select /drizzle for native database activation. @
 declare const BETTER_AUTH_HANDLER: unique symbol;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L16)
+
+### BetterAuthAccess
+
+**Signature**
+
+```ts
+declare const BetterAuthAccess: BetterAuthAccess<Roles, Permissions>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L17)
+
+### BetterAuthAccessOf
+
+**Signature**
+
+```ts
+declare const BetterAuthAccessOf: BetterAuthAccessOf<Options>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L17)
 
 ### BetterAuthHandler
 
 **Signature**
 
 ```ts
-declare const BetterAuthHandler: BetterAuthHandler<Session>;
+declare const BetterAuthHandler: BetterAuthHandler<Session, Access>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L23)
 
 ### BetterAuthInstance
 
@@ -1042,7 +1165,7 @@ declare const BetterAuthHandler: BetterAuthHandler<Session>;
 declare const BetterAuthInstance: BetterAuthInstance;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
 
 ### BetterAuthInstanceServiceOptions
 
@@ -1052,7 +1175,7 @@ declare const BetterAuthInstance: BetterAuthInstance;
 declare const BetterAuthInstanceServiceOptions: BetterAuthInstanceServiceOptions<Instance>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
 
 ### BetterAuthRegistration
 
@@ -1062,17 +1185,17 @@ declare const BetterAuthInstanceServiceOptions: BetterAuthInstanceServiceOptions
 declare const BetterAuthRegistration: BetterAuthRegistration;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L22)
 
 ### BetterAuthServiceDescriptor
 
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session>;
+declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session, Access>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L26)
 
 ### BetterAuthServiceOptions
 
@@ -1082,7 +1205,17 @@ declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, 
 declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
+
+### InferBetterAuthAccess
+
+**Signature**
+
+```ts
+declare const InferBetterAuthAccess: InferBetterAuthAccess<Handler>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L24)
 
 ### InferBetterAuthSession
 
@@ -1092,7 +1225,7 @@ declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
 declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L25)
 
 ## `openapi-errors.ts`
 

@@ -5,7 +5,9 @@ import { relative, resolve } from "node:path";
 import { normalizeSourcePath } from "relkit/contracts";
 import type { ExtractedDescriptor } from "./discovery/extract.js";
 import type { ContextRegistryGenerationOptions } from "./context-registry.types.js";
+import { identityKey } from "./context-registry-identities.js";
 export type { ContextRegistryGenerationOptions } from "./context-registry.types.js";
+export { identityKey, resolvedIdentities } from "./context-registry-identities.js";
 
 export const CONTEXT_REGISTRY_FILE = "context-registry.d.ts";
 
@@ -52,8 +54,14 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
         ? []
         : [
             `type RelkitApplicationEnv = import("relkit/config").ResolvedEnv<${importType(application, output, root)}["env"]["shape"]>;`,
-            "",
           ]),
+      // The names of the access control, so function access rules accept only names it declares.
+      ...(auth === undefined
+        ? []
+        : [
+            `type RelkitApplicationAccess = import("@relkit/better-auth").InferBetterAuthAccess<${importType(auth, output, root)}["handler"]>;`,
+          ]),
+      ...(application === undefined && auth === undefined ? [] : [""]),
       "declare global {",
       "  namespace Relkit {",
       ...(application === undefined
@@ -62,6 +70,9 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
       "    interface ApplicationContextRegistry {",
       ...fields,
       "    }",
+      ...(auth === undefined
+        ? []
+        : ["    interface ApplicationAccess extends RelkitApplicationAccess {}"]),
       "    interface TaskRegistry {",
       ...tasks,
       "    }",
@@ -160,42 +171,6 @@ function handleRegistries(
     ...registryEntries(descriptors, kind, output, root, include, identities),
     "    }",
   ]);
-}
-
-/**
- * Keys a descriptor by its source module and export name.
- * @param module - Authored source module.
- * @param exportName - Export binding.
- * @returns The lookup key used by `identities`.
- */
-export function identityKey(module: string, exportName: string): string {
-  return `${module}\0${exportName}`;
-}
-
-/**
- * Maps each normalized descriptor's source binding to its resolved ID, for `identities`.
- * @param descriptors - Descriptors after normalization resolved their IDs.
- * @returns Resolved IDs keyed by `<module>\0<export name>`.
- */
-export function resolvedIdentities(
-  descriptors: readonly {
-    readonly id: string;
-    readonly exportName: string;
-    readonly reference?: { readonly module: string };
-  }[],
-): ReadonlyMap<string, string> {
-  return new Map(
-    descriptors.flatMap((descriptor) =>
-      descriptor.reference === undefined
-        ? []
-        : [
-            [
-              identityKey(descriptor.reference.module, descriptor.exportName),
-              descriptor.id,
-            ] as const,
-          ],
-    ),
-  );
 }
 
 /**
