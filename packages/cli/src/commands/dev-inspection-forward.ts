@@ -1,6 +1,7 @@
 /** Reuses supervisor request/body ownership so inspection participates in native generation draining. */
 import { Cause, Effect } from "effect";
 import type { Scope } from "effect";
+import { forwardingFetch } from "../supervisor/proxy-forward.js";
 import { proxyRequest } from "../supervisor/proxy-request.js";
 import { InspectionConnectionError } from "relkit/inspector-api/connection";
 import type { InspectionBridgeAuthority } from "relkit/inspector-api/connection";
@@ -47,7 +48,9 @@ export function forwardDevInspection(
               lease,
               scope,
             },
-            fetch,
+            // Node's global fetch drops the listener's Host, so the worker would judge the
+            // trusted Origin against its private port and refuse every action (26.1).
+            forwardingFetch,
           ).pipe(Effect.catchCause((cause) => Effect.failCause(Cause.map(cause, forwardFailure))));
         }),
       );
