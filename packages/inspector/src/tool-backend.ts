@@ -12,6 +12,7 @@ import type { InspectorToolState, InspectorToolStateRef } from "./tool-state.typ
 import type { InspectorOptions } from "./options.types.js";
 import { historyResponse, backendError } from "./backend-history.js";
 import { forwardBackend } from "./backend-forward.js";
+import { makeApplicationIdentityJar, type ApplicationIdentityJar } from "./application-identity.js";
 import { ExecutionSuccessLogs } from "relkit/contracts/operation";
 import { publishSelectionState } from "./live-events.js";
 import { crossSiteRefusal } from "./browser-boundary.js";
@@ -55,8 +56,10 @@ export function inspectorBackend(
   options: InspectorOptions,
   stream: ObservabilityStream,
 ) {
+  // One anonymous identity with the application for every page of this Inspector.
+  const jar = makeApplicationIdentityJar();
   return (request: Request) => {
-    const served = serveBackend(state, remote, token, options, stream, request).pipe(
+    const served = serveBackend(state, remote, token, options, stream, request, jar).pipe(
       Effect.catchTag("InspectionConnectionError", (error) =>
         Effect.succeed(
           backendError(
@@ -90,6 +93,7 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
   options: InspectorOptions,
   stream: ObservabilityStream,
   request: Request,
+  jar: ApplicationIdentityJar,
 ) {
   const expected = Buffer.from(token);
   const received = Buffer.from(request.headers.get("x-relkit-inspector-token") ?? "");
@@ -126,7 +130,13 @@ const serveBackend = Effect.fn("Inspector.backend")(function* (
         : "Inspector disconnected",
       503,
     );
-  return yield* forwardBackend(remote, current.selection.connection, request, options.target);
+  return yield* forwardBackend(
+    remote,
+    current.selection.connection,
+    request,
+    options.target,
+    jar,
+  );
 });
 
 /**

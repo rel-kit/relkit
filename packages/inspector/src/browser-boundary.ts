@@ -32,7 +32,8 @@ const BROWSER_HEADERS = [
   "origin",
   "referer",
   // The browser's cookies for the Inspector's host include the application's, since cookies
-  // ignore the port; actions and route requests run without a user session (D11).
+  // ignore the port; actions and route requests run without a user session (D11). The tool adds
+  // its own anonymous identity cookies instead (`application-identity.ts`).
   "cookie",
   "forwarded",
   "x-real-ip",
