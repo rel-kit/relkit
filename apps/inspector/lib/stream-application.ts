@@ -4,6 +4,7 @@
  * the shell's store and its tests share one reducer.
  */
 import type { InspectorObject } from "./api-types";
+import { historyFailed } from "./history-status";
 import type { StreamConnectionState } from "./stream-protocol";
 
 /**
@@ -151,9 +152,7 @@ export function historyAvailability(
 ): "checking" | "ready" | "degraded" | "unavailable" {
   if (state.statusFailed) return "unavailable";
   if (state.status === undefined) return "checking";
-  return state.status.state === "degraded" || state.status.error !== undefined
-    ? "degraded"
-    : "ready";
+  return historyFailed(state.status) ? "degraded" : "ready";
 }
 
 function rawState(value: unknown): RawState | undefined {
