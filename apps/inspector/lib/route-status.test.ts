@@ -27,6 +27,18 @@ describe("the status line of a sent route request", () => {
     );
   });
 
+  test("a 403 from the origin check says so and does not blame a missing session (IN-26)", () => {
+    const outcome = routeOutcome({
+      status: 403,
+      body: { status: 403, code: "origin-denied", detail: "The request was rejected." },
+    });
+    expect(outcome.tone).toBe("danger");
+    expect(outcome.text).toContain("origin check");
+    expect(outcome.text).toContain("Inspector's own address");
+    expect(outcome.text).not.toContain("signed in");
+    expect(outcome.text).not.toContain("does not have access");
+  });
+
   test("other failures name the status and the problem code from the body", () => {
     expect(
       routeOutcome({ status: 422, body: { status: 422, code: "validation", detail: "x" } }).text,

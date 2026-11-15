@@ -55,6 +55,32 @@ describe("the application's answer to a refused action", () => {
     expect(answer.text).toContain("without a user session");
   });
 
+  test("says the origin check refused the call when the problem code is origin-denied (IN-02)", () => {
+    const bodies = [
+      { code: "origin-denied", status: 403 },
+      { cause: { status: 403, code: "origin-denied" } },
+    ];
+    for (const body of bodies) {
+      const answer = actionAnswer(refused("HTTP_403", 403, body), "function");
+      expect(answer.noSession).toBe(false);
+      expect(answer.text).toContain("origin check");
+      expect(answer.text).toContain("Inspector's own address");
+      expect(answer.text).not.toContain("HTTP_403");
+      expect(answer.text).not.toContain("session");
+    }
+  });
+
+  test("a bare 403 from the application is not reported as the Inspector's own failure", () => {
+    const answer = actionAnswer(
+      new InspectorApiError("HTTP_403", "HTTP_403", 403, "http"),
+      "event",
+    );
+    expect(answer.text).not.toContain("HTTP_403");
+    expect(answer.text).toContain("The application refused this request (403)");
+    expect(answer.text).toContain("origin check");
+    expect(answer.text).toContain("Inspector's own address");
+  });
+
   test("names a declared error so the page can link to its contract", () => {
     const answer = actionAnswer(
       refused("RELKIT_INSPECTOR_ACTION_FAILED", 409, {
