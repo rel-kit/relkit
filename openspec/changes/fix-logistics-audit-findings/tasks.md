@@ -166,6 +166,7 @@
 - [x] 16.3 IN-04: replace the headers and bodies panel with the invocation's captured input and result, and state that HTTP headers and bodies are not recorded (`app/signal-detail-sections.tsx:44-57`); verify with `tests/e2e/inspector-payload.spec.ts`.
 - [x] 16.4 IN-23, IN-35, IN-36: count unique spans, use one time formatter that shows the zone, and one request-label helper for live and loaded rows; verify with `lib/trace-view.test.ts`.
 - [x] 16.5 IN-37: focus the command palette's input when it opens and resolve request and trace identifiers; verify by keyboard in the browser.
+- [ ] 16.6 IN-21: show the server's message for a rejected filter at the field its `parameter` names, and as the list's message otherwise (`apps/inspector/app/use-request-history.ts`, `app/signals-client.tsx`); verify with a unit test of the mapping and the requests spec.
 
 ## 17. Inspector pages: actions and resources
 
