@@ -10,6 +10,8 @@ export interface HeldCandidateOutput {
   events: DevLogEvent[] | undefined;
   /** Set when the process exited and its output went into the failure: later output is dropped. */
   dropped: boolean;
+  /** The last coded failure the process logged, which names the cause should it then exit. */
+  diagnostic?: { readonly code: string; readonly detail: string };
 }
 
 /**

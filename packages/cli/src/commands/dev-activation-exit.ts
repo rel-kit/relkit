@@ -22,8 +22,11 @@ const OUTPUT_GRACE_MS = 1_000;
 
 /** A candidate process ended before its generation was verified. */
 export class CandidateExitedError extends Data.TaggedError("CandidateExitedError")<{
-  /** One-line summary naming the exit code; shown as the failure's first line. */
+  /** One-line summary naming the exit code, or the process's own coded diagnostic; shown as the
+   * failure's first line. */
   readonly message: string;
+  /** The `RELKIT_*` code the process reported before it exited, when it reported one. */
+  readonly code?: string;
   /** Native exit code of the candidate process. */
   readonly exitCode: number;
   /** The end of what the process wrote to standard error, project paths made relative. */
@@ -52,6 +55,12 @@ export function logCandidateEvent(
   event: DevLogEvent,
 ): void {
   if (event.event === "candidate.startup-output" && held.dropped) return;
+  const output = event.fields?.output;
+  const diagnostic =
+    event.event === "candidate.startup-output" && typeof output === "string"
+      ? codedFailure(output)
+      : undefined;
+  if (diagnostic !== undefined) held.diagnostic = diagnostic;
   if (event.event !== "candidate.startup-output" || held.events === undefined) {
     log(event);
     return;
@@ -88,6 +97,9 @@ export const failOnCandidateExit = Effect.fn("Dev.activation.exit")(function* (
     Effect.timeoutOption(OUTPUT_GRACE_MS),
   );
   const stderr = output._tag === "Some" ? (output.value?.stderr ?? "") : "";
+  const diagnostic =
+    attempt.output.diagnostic ??
+    codedFailure(output._tag === "Some" ? (output.value?.stdout ?? "") : "");
   // The cause is in the failure now; the held copy would repeat it as warnings.
   attempt.output.events = undefined;
   attempt.output.dropped = true;
@@ -95,13 +107,50 @@ export const failOnCandidateExit = Effect.fn("Dev.activation.exit")(function* (
     cliAdapterError(
       "dev.candidate.exited",
       new CandidateExitedError({
-        message: `The new version exited with code ${exitCode} before it was ready.`,
+        // The process's own coded diagnostic names the cause and its next step (26.6 a).
+        message:
+          diagnostic?.detail ?? `The new version exited with code ${exitCode} before it was ready.`,
+        ...(diagnostic === undefined ? {} : { code: diagnostic.code }),
         exitCode,
         output: causeText(stderr, attempt.session.projectRoot),
       }),
     ),
   );
 });
+
+/**
+ * Finds the last coded failure the process reported in its development log records.
+ * @param stdout - Standard output: `RELKIT_DEV_LOGS` records, each a record separator followed by
+ * one JSON object, among other lines.
+ * @returns The `RELKIT_*` code and its detail of the last error record carrying one.
+ */
+export function codedFailure(
+  stdout: string,
+): { readonly code: string; readonly detail: string } | undefined {
+  let found: { readonly code: string; readonly detail: string } | undefined;
+  for (const line of stdout.split("\n")) {
+    const start = line.indexOf("\u001e{");
+    if (start === -1) continue;
+    try {
+      const record = JSON.parse(line.slice(start + 1)) as {
+        readonly level?: unknown;
+        readonly fields?: { readonly code?: unknown; readonly detail?: unknown };
+      };
+      const { code, detail } = record.fields ?? {};
+      if (record.level !== "error" || typeof code !== "string" || !code.startsWith("RELKIT_"))
+        continue;
+      // The error's message often starts with its own code, which the terminal line prints first.
+      const message = typeof detail === "string" ? detail : "";
+      const text = (
+        message.startsWith(`${code}: `) ? message.slice(code.length + 2) : message
+      ).trim();
+      found = { code, detail: text === "" ? code : text };
+    } catch {
+      // Not a record: application output.
+    }
+  }
+  return found;
+}
 
 /**
  * Keeps the end of a process's standard error, with the project root removed from paths.
