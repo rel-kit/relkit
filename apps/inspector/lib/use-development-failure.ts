@@ -10,6 +10,8 @@ import {
 
 /** Coalesces log-driven re-reads: a busy application reads at most once per interval. */
 const LOG_REFRESH_MS = 3_000;
+/** Settles a burst of generation or diagnostic events into one read. */
+const BURST_MS = 1_500;
 
 /**
  * Reads the latest reload failure once on mount and again only when the live stream reports a
@@ -59,12 +61,14 @@ export function useDevelopmentFailure() {
       },
       onEvent: (event) => {
         const when = failureRefresh(event.type);
-        if (when === "now") void refresh();
-        else if (when === "later" && later === undefined)
-          later = setTimeout(() => {
-            later = undefined;
-            void refresh();
-          }, LOG_REFRESH_MS);
+        if (when === undefined) return;
+        // A burst of events reads once: soon for a generation change, later for new logs.
+        const delay = when === "now" ? BURST_MS : LOG_REFRESH_MS;
+        if (later !== undefined) return;
+        later = setTimeout(() => {
+          later = undefined;
+          void refresh();
+        }, delay);
       },
     });
     void refresh();

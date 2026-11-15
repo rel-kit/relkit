@@ -1,13 +1,13 @@
 import { expect, test } from "bun:test";
 import { failureRefresh, loadDevelopmentFailure } from "./development-failure";
 
-test("a generation or diagnostic change re-reads the reload status at once", () => {
+test("a generation change re-reads the reload status soon", () => {
   expect(failureRefresh("generation.changed")).toBe("now");
-  expect(failureRefresh("diagnostic.changed")).toBe("now");
 });
 
-test("new logs re-read it later, since a failed reload is only a supervisor log", () => {
+test("new logs and diagnostics re-read it later, coalesced: a failed reload is only a log", () => {
   expect(failureRefresh("log.emitted")).toBe("later");
+  expect(failureRefresh("diagnostic.changed")).toBe("later");
 });
 
 function client(items: readonly Record<string, unknown>[]) {

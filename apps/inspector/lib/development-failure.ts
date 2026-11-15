@@ -12,13 +12,13 @@ export interface DevelopmentFailure {
 }
 
 /**
- * When a live event should re-read the reload status: at once when the generation or its
- * diagnostics change, later (coalesced) when logs arrive, since the supervisor reports a failed
+ * When a live event should re-read the reload status: soon when the generation changes, later
+ * (coalesced) when logs or diagnostics arrive, since the supervisor reports a failed
  * reload only as a `dev.generation.failed` log and the stream does not say which log arrived.
  */
 export function failureRefresh(type: StreamEventType): "now" | "later" | undefined {
-  if (type === "generation.changed" || type === "diagnostic.changed") return "now";
-  if (type === "log.emitted") return "later";
+  if (type === "generation.changed") return "now";
+  if (type === "log.emitted" || type === "diagnostic.changed") return "later";
   return undefined;
 }
 

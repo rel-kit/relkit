@@ -86,7 +86,8 @@ export function InspectorStatus() {
   return (
     <ul
       aria-label="Inspector status"
-      className="health-badge m-0 flex list-none items-center gap-1 p-0"
+      // Hidden on phones like the badge it replaces; the banner still says when the app is away.
+      className="health-badge m-0 hidden list-none items-center gap-1 p-0 min-[761px]:flex"
     >
       {items.map((item) => (
         <li key={item.id}>
