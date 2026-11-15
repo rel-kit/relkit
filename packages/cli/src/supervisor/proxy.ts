@@ -6,6 +6,7 @@ import { createProxyLayer, SupervisorProxyOwner } from "./proxy-service.js";
 import { validateHostname, validatePort } from "./proxy-validation.js";
 import { proxyWebSocketHandler, upgradeProxyWebSocket } from "./proxy-websocket.js";
 import { joinStoppedProxyListener } from "./proxy-listener-native.js";
+import { internalErrorResponse, publicRequest } from "./proxy-target.js";
 import { listenNodeProxy } from "./proxy-listener.node.js";
 import { runtime } from "../runtime/index.js";
 import type { RuntimeServer } from "relkit/runtime";
@@ -84,6 +85,9 @@ export class SupervisorProxy {
     this.server = Bun.serve({
       hostname: this.hostname,
       port: this.configuredPort,
+      // Never Bun's development error page, whatever NODE_ENV says: it shows source and paths.
+      development: false,
+      error: () => internalErrorResponse(),
       websocket: {
         ...proxyWebSocketHandler,
         open: (socket) => {
@@ -115,9 +119,11 @@ export class SupervisorProxy {
     request: Request,
     accept: (data: ProxySocketData) => boolean,
   ): Promise<Response> {
+    const settled = publicRequest(request, this.authority);
+    if (settled instanceof Response) return Promise.resolve(settled);
     const admitted = runExecutionSync(this.owner, this.service.admit);
     if (admitted === undefined) return Promise.resolve(drainResponse());
-    return this.unwrap(upgradeProxyWebSocket(request, accept, admitted));
+    return this.unwrap(upgradeProxyWebSocket(settled, accept, admitted));
   }
 
   /** Atomically selects a newer generation. @param expected - CAS witness. @param next - Next target.
@@ -141,7 +147,14 @@ export class SupervisorProxy {
    * @returns Upstream headers with a body that retains its generation lease until termination.
    */
   handle(request: Request): Promise<Response> {
-    return this.unwrap(this.service.handle(request));
+    const settled = publicRequest(request, this.authority);
+    if (settled instanceof Response) return Promise.resolve(settled);
+    return this.unwrap(this.service.handle(settled));
+  }
+
+  /** The listener's own `host:port`, for a request that named none. */
+  private get authority(): string {
+    return this.url?.host ?? `${this.hostname}:${this.port}`;
   }
 
   /** Stops admission, closes owned requests and sockets, and joins the listener. @returns Shared cleanup. */
