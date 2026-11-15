@@ -4,7 +4,9 @@ import {
   countLabel,
   deliveryTime,
   deliveryTraceId,
+  loadDeliveryPages,
   mergeEventRuntime,
+  newestFirst,
   payloadPreview,
   publicationRequestId,
   publicationTime,
@@ -126,5 +128,67 @@ describe("what a row shows about a record", () => {
     expect(
       deliveryTraceId({ eventInstanceId: "p3" }, [{ instanceId: "p3", producerTraceId: "t3" }]),
     ).toBe("t3");
+  });
+});
+
+describe("deliveries newest first (NF-14)", () => {
+  const delivery = (deliveryId: string, timestamp?: string) => ({
+    deliveryId,
+    ...(timestamp === undefined ? {} : { timestamp }),
+  });
+
+  test("orders by time, newest first", () => {
+    const ids = newestFirst([
+      delivery("old", "2026-01-01T01:00:00.000Z"),
+      delivery("new", "2026-01-01T09:00:00.000Z"),
+      delivery("mid", "2026-01-01T05:00:00.000Z"),
+    ]).map((item) => item.deliveryId);
+    expect(ids).toEqual(["new", "mid", "old"]);
+  });
+
+  test("without times, reverses the ascending order of the API", () => {
+    const ids = newestFirst([delivery("a"), delivery("b"), delivery("c")]).map(
+      (item) => item.deliveryId,
+    );
+    expect(ids).toEqual(["c", "b", "a"]);
+  });
+
+  test("equal times keep the newest cursor first and the input unchanged", () => {
+    const input = [delivery("a", "2026-01-01T00:00:00Z"), delivery("b", "2026-01-01T00:00:00Z")];
+    expect(newestFirst(input).map((item) => item.deliveryId)).toEqual(["b", "a"]);
+    expect(input.map((item) => item.deliveryId)).toEqual(["a", "b"]);
+  });
+
+  test("loads the pages after the first, so the last (newest) page is shown", async () => {
+    const page = (ids: string[], nextCursor?: string) =>
+      runtime({
+        deliveries: ids.map((id) => delivery(id)),
+        items: ids.map((id) => delivery(id)),
+        ...(nextCursor === undefined ? {} : { nextCursor }),
+      });
+    const pages: Record<string, InspectorEventRuntime> = {
+      "2": page(["c"], "3"),
+      "3": page(["d"]),
+    };
+    const asked: string[] = [];
+    const all = await loadDeliveryPages(page(["a", "b"], "2"), async (cursor) => {
+      asked.push(cursor);
+      return pages[cursor]!;
+    });
+    expect(asked).toEqual(["2", "3"]);
+    expect(all.nextCursor).toBeUndefined();
+    expect(newestFirst(all.deliveries).map((item) => item.deliveryId)).toEqual([
+      "d",
+      "c",
+      "b",
+      "a",
+    ]);
+  });
+
+  test("stops at the page limit and keeps the continuation", async () => {
+    const more = runtime({ deliveries: [delivery("x")], nextCursor: "next" });
+    const all = await loadDeliveryPages(more, async () => more, 3);
+    expect(all.nextCursor).toBe("next");
+    expect(all.deliveries).toHaveLength(1);
   });
 });

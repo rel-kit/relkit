@@ -14,7 +14,7 @@ import { DetailPending, ExposureBadge, GraphAction, MetaItem } from "../domains/
 import { EventContract, EventFacts, eventRecord } from "./event-contract";
 import { EventActions } from "./event-actions";
 import type { ActionIdentity } from "../../lib/inspector-actions";
-import { countLabel, mergeEventRuntime } from "../../lib/event-rows";
+import { countLabel, loadDeliveryPages, mergeEventRuntime } from "../../lib/event-rows";
 
 const PAGE_SIZE = 100;
 
@@ -43,10 +43,14 @@ export function EventDetailClient() {
     if (id === "") return;
     const api = createInspectorClient();
     api.invalidate(["events", "runtime"]);
-    const [nextGraph, nextRuntime]: [InspectorGraph, InspectorEventRuntime] = await Promise.all([
+    const [nextGraph, firstPage]: [InspectorGraph, InspectorEventRuntime] = await Promise.all([
       api.graph(),
       api.eventRuntime({ eventId: id, limit: PAGE_SIZE }),
     ]);
+    // The API lists deliveries oldest first, so the newest are on the last page.
+    const nextRuntime = await loadDeliveryPages(firstPage, (cursor) =>
+      api.eventRuntime({ eventId: id, limit: PAGE_SIZE, cursor }),
+    );
     show(nextGraph, nextRuntime);
     if (nextGraph.generationId !== undefined && nextGraph.graphHash !== undefined)
       setIdentity({ generationId: nextGraph.generationId, graphHash: nextGraph.graphHash });
