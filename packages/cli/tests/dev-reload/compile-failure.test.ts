@@ -51,7 +51,14 @@ test(
     await Bun.sleep(1_500);
     const block = failureBlock(dev, from);
     expect(block).toMatch(/^\S+ ERROR build +Reload failed; previous version is still serving/u);
-    expect(block).toContain(`${file}:1:1 - error RELKIT_EVALUATOR_IMPORT_FAILED`);
+    // The parse error's own location and message, without the absolute path Bun's error names.
+    const line = broken("v1").split("\n").indexOf("const broken: = ;") + 1;
+    expect(block).toContain(
+      `${file}:${line}:15 - error RELKIT_EVALUATOR_IMPORT_FAILED: Unexpected =`,
+    );
+    expect(block).toContain(`${line}:17 Unexpected ;`);
+    expect(block).not.toContain(fixture.root);
+    expect(block).not.toContain("errors building");
     expect(block).not.toContain("TIMEOUT");
     const after = dev.output().slice(from);
     expect(after.match(/Reload failed/gu)).toHaveLength(1);

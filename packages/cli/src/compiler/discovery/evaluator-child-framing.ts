@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { observeCompiler } from "../observability.js";
+import { importBuildErrors } from "./evaluator-build-errors.js";
 import {
   EvaluatorFailure as FailureSchema,
   EvaluatorResponse as ResponseSchema,
@@ -67,15 +68,20 @@ export const evaluatorResponse = Effect.fn("Discovery.buildEvaluatorResponse")(
  * @param error - Rejected import or invalid candidate path evidence.
  * @param module - Candidate source identity.
  * @param request - Accepted generation and project root.
- * @returns A lazy effect yielding the import failure with a portable stack when available.
+ * @returns A lazy effect yielding the import failure with a portable stack when available. A
+ * module that does not parse yields its located parse errors and the first one's message, which,
+ * unlike the runtime's summary ("2 errors building <absolute path>"), names no absolute path.
  */
 export const importFailure = Effect.fn("Discovery.frameImportFailure")(
   function* (error: unknown, module: string, request: EvaluatorRequest) {
+    const { errors } = importBuildErrors(error, request.projectRoot);
+    const first = errors[0];
     return FailureSchema.make({
       code: "RELKIT_EVALUATOR_IMPORT_FAILED",
-      message: error instanceof Error ? error.message : String(error),
+      message: first?.message ?? (error instanceof Error ? error.message : String(error)),
       generationId: request.generationId,
       module,
+      ...(first === undefined ? {} : { buildErrors: errors }),
       ...(error instanceof Error && error.stack
         ? { stack: normalizeStack(error.stack, request.projectRoot) }
         : {}),

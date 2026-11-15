@@ -11,6 +11,7 @@ import { relative } from "node:path";
 import { observeCli, runCliEffect } from "../cli-runtime.js";
 import { CliFileSystem, fileSystemLayer } from "../services/filesystem.service.js";
 import { bunRuntimeFailures } from "./check-runtime-imports.js";
+import { buildErrorDiagnostic, rootCauseKey } from "./check-build-errors.js";
 
 /** Projects evaluator evidence into compiler diagnostics with source locations.
  * @param failures - Complete evaluator evidence.
@@ -23,6 +24,12 @@ export function evaluatorDiagnostics(
     readonly message: string;
     readonly module?: string;
     readonly stack?: string;
+    readonly buildErrors?: readonly {
+      readonly file: string;
+      readonly line: number;
+      readonly column: number;
+      readonly message: string;
+    }[];
   }[],
   sources: readonly { readonly fileName: string; readonly text: string }[] = [],
 ): readonly Diagnostic[] {
@@ -33,6 +40,7 @@ export function evaluatorDiagnostics(
     if (runtimeFailure === "covered") return [];
     return [
       runtimeFailure ??
+        buildErrorDiagnostic(failure) ??
         createDiagnostic({
           code: failure.code,
           severity: "error",
@@ -44,23 +52,27 @@ export function evaluatorDiagnostics(
 }
 
 /**
- * Keeps one failure per distinct message. A file that imports a failing file fails with the same
- * error, so the failure kept is the file the message or stack names, else the first one.
+ * Keeps one failure per distinct message (and parse error location). A file that imports a failing
+ * file fails with the same error, so the failure kept is the file the message or stack names, else
+ * the first one.
  * @param failures - Evaluator failures in evaluation order.
  * @returns The failures that are root causes, in their original order.
  */
 function rootCauses<
-  Failure extends { readonly message: string; readonly module?: string; readonly stack?: string },
+  Failure extends Parameters<typeof rootCauseKey>[0] & {
+    readonly module?: string;
+    readonly stack?: string;
+  },
 >(failures: readonly Failure[]): readonly Failure[] {
   const groups = new Map<string, Failure[]>();
   for (const failure of failures)
-    groups.set(failure.message, [...(groups.get(failure.message) ?? []), failure]);
+    groups.set(rootCauseKey(failure), [...(groups.get(rootCauseKey(failure)) ?? []), failure]);
   const named = (group: readonly Failure[], text: (failure: Failure) => string | undefined) =>
     group.find(
       (failure) => failure.module !== undefined && text(failure)?.includes(failure.module),
     );
   return failures.filter((failure) => {
-    const group = groups.get(failure.message)!;
+    const group = groups.get(rootCauseKey(failure))!;
     const kept =
       named(group, (entry) => entry.message) ?? named(group, (entry) => entry.stack) ?? group[0];
     return kept === failure;

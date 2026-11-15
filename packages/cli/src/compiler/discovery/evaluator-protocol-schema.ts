@@ -107,6 +107,17 @@ export const EvaluatorModuleResult = Schema.Struct({
   manifestReferences: Schema.Array(EvaluatorManifestReference),
 });
 
+/**
+ * One error the runtime's parser reported for a module that does not parse, located in the file
+ * that holds it: the project-relative path, one-based line and column, and the parser's message.
+ */
+export const EvaluatorBuildError = Schema.Struct({
+  file: Schema.String,
+  line: Schema.Number,
+  column: Schema.Number,
+  message: Schema.String,
+});
+
 /** Structured failure evidence emitted by the evaluator transport. */
 export const EvaluatorFailure = Schema.Struct({
   code: EvaluatorFailureCode,
@@ -114,6 +125,8 @@ export const EvaluatorFailure = Schema.Struct({
   generationId: Schema.String,
   module: Schema.optionalKey(Schema.String),
   stack: Schema.optionalKey(Schema.String),
+  /** Located parse errors of an import that failed to build, first one first; at most a few. */
+  buildErrors: Schema.optionalKey(Schema.Array(EvaluatorBuildError)),
   sideEffects: Schema.optionalKey(Schema.Array(EvaluatorSideEffect)),
   exitCode: Schema.optionalKey(Schema.Number),
   timedOut: Schema.optionalKey(Schema.Boolean),
