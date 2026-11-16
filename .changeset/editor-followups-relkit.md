@@ -23,3 +23,8 @@ that defaults to every form; a task that leaves `execution` out is durable, as b
 The API reference prints `ServerConfig`, `InspectorConfig` and the telemetry options with their
 members, and the `defineApp` options block lists the seven provider options. `AppTelemetryConfig`
 is an interface that lists its members; it accepts and produces the same values as before.
+
+Every option of the authoring APIs (`defineFunction`, `defineError`, `defineRoute`,
+`defineServiceRoutes`, `defineEvent`, `defineEventFunction`, `defineChannel`, `defineBucket`,
+`defineCache`, `defineTask`, `defineJob`, `defineService` and the environment builders) shows a
+one-line description in your editor and on the API reference pages.

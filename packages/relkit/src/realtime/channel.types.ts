@@ -20,8 +20,16 @@ export type ChannelGuard<Params = unknown, Context = unknown> = (
  * @experimental
  */
 export type ChannelClientPolicy<Guard> =
-  | { readonly public: true; readonly authorize?: never }
-  | { readonly authorize: Guard; readonly public?: never };
+  | {
+      /** Lets any client that can reach the application subscribe. */
+      readonly public: true;
+      readonly authorize?: never;
+    }
+  | {
+      /** Decides on the server whether the caller may subscribe to the given partition. */
+      readonly authorize: Guard;
+      readonly public?: never;
+    };
 /** Describes validated member presence for a protected channel.
  * @example const presence: MemberPresenceDescriptor<typeof schema> = { member: schema, resolve: async () => ({ name: "Ada" }), maxMembers: 10 };
  * @experimental
@@ -31,8 +39,11 @@ export interface MemberPresenceDescriptor<
   Params = unknown,
   Context = unknown,
 > {
+  /** Schema of the public information shown for each connected member. */
   readonly member: MemberSchema;
+  /** Builds that information for a caller from the channel params and the server context. */
   readonly resolve: (params: Params, context: Context) => MaybePromise<InferInput<MemberSchema>>;
+  /** Most members returned in a presence list; it does not limit connections. */
   readonly maxMembers: number;
 }
 /** Count-only or protected member presence.
@@ -46,7 +57,9 @@ export type ChannelPresence<Params = unknown, Context = unknown> =
  * @experimental
  */
 export interface ChannelReplay {
+  /** Longest age of an event that can be replayed, in milliseconds. */
   readonly retentionMs: number;
+  /** Most events kept for one partition of the channel. */
   readonly maxEvents: number;
 }
 /** A typed channel descriptor; functions reach it through `dependencies.channels`.
@@ -101,12 +114,18 @@ export interface DefineChannelOptions<
   Client extends ChannelClientPolicy<ChannelGuard<InferOutput<ParamsSchema>>> | undefined,
   Presence extends ChannelPresence<InferOutput<ParamsSchema>> | undefined,
 > extends DescriptorMetadata {
+  /** Stable channel name used by the backend and the generated client. */
   readonly id: Id;
+  /** Schema of the values that identify one partition of the channel, such as an `orderId`. */
   readonly params: ParamsSchema;
+  /** Event names mapped to the schemas of their payloads. */
   readonly events: Events;
   /** The realtime provider profile that carries the channel; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"realtime">;
+  /** Browser access: omit for backend-only use, or set `public: true` or an `authorize` guard. */
   readonly client?: Client;
+  /** Keeps recent events so that a reconnecting client receives the ones it missed. */
   readonly replay?: ChannelReplay;
+  /** Reports who is connected: `"count"` for a connection count, or a member description. */
   readonly presence?: Presence;
 }

@@ -32,6 +32,7 @@ export type EventFunctionCallOptions<
   DefineEventFunctionOptions<Id, Event, Dependencies, readonly ErrorDescriptorAny[]>,
   "handler"
 > & {
+  /** Handles one delivery: receives the event's data and `context`, returns nothing. */
   readonly handler: (
     input: EventInputByName<Event>,
     context: EventFunctionContext<Event, Dependencies>,

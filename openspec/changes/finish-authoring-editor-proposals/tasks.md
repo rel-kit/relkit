@@ -20,7 +20,7 @@
 
 ## 4. Descriptions
 
-- [ ] 4.1 Add a one-line description to every option without one; verify `bun tests/editor/inventory.ts` reports how many remain and `bun scripts/user-text.ts` passes.
+- [x] 4.1 Add a one-line description to every option without one; verify `bun tests/editor/inventory.ts` reports how many remain and `bun scripts/user-text.ts` passes.
 
 ## 5. API pages
 

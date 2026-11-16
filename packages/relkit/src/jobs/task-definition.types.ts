@@ -68,26 +68,47 @@ export interface DefineTaskOptions<
   Streams extends TaskStreamSchemas = {},
   Execution extends TaskExecution = "durable",
 > extends DescriptorMetadata {
+  /** Stable ID of the task; keep it unchanged when the file moves. */
   readonly id: Id;
+  /** Identifies a compatible definition of the task, not a deployment build. */
   readonly version: Version;
+  /** Schema of the input a run is started with. */
   readonly input: InputSchema;
+  /** Schema that checks the stored input unchanged; needed when `input` transforms its value. */
   readonly inputWire?: StandardSchemaV1<InferOutput<InputSchema>, InferOutput<InputSchema>>;
+  /** Schema of the run's result. */
   readonly output: OutputSchema;
+  /** Declared errors the handler may return or throw. */
   readonly errors?: Errors;
+  /** `durable` (the default) may sleep and resume; `retryable` runs again from the start. */
   readonly execution?: Execution;
+  /** Everything the handler calls, by kind; each entry becomes a client on `context`. */
   readonly dependencies?: ValidTaskDependencies<Dependencies>;
+  /** Schema of the progress values the handler reports through `context.progress`. */
   readonly progress?: ProgressSchema;
+  /** Named streams the handler writes to through `context.streams`, each with its item schema. */
   readonly streams?: Streams;
+  /** Requires progress (`"durable"`) or streams (`"history"`) to be kept, not only sent live. */
   readonly observation?: TaskObservation<Streams, ProgressSchema>;
+  /** Attempts and backoff after a failure. Defaults to 3 attempts, 1 to 30 seconds apart. */
   readonly retry?: TaskRetryPolicy;
+  /** The least CPU and memory a worker needs to run the task. */
   readonly resources?: TaskResources;
+  /** Most runs at once; with `key`, the limit applies per value of that input field. */
   readonly concurrency?: TaskConcurrency<CanonicalInputKey<InputSchema>>;
+  /** Longest active time of one attempt; time asleep or waiting to retry does not count. */
   readonly maxDuration?: DurationInput;
+  /** Longest total time from the acceptance of a run, including delays, sleep and retries. */
   readonly maxElapsed?: DurationInput;
+  /** Log level of the task's runs and the fields to redact from their logs. */
   readonly logging?: TaskLogging;
+  /** Runs before the handler starts, with the validated input. */
   readonly onStart?: TaskStartHook<InputSchema, Dependencies>;
+  /** Runs after the handler returns and its output is validated. */
   readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies>;
+  /** Runs after an attempt fails, with its error; not only after the last attempt. */
   readonly onFailure?: TaskFailureHook<Dependencies>;
+  /** The task's work: receives the validated input and `context`, returns the output. */
   readonly handler: TaskHandler<
     InputSchema,
     OutputSchema,

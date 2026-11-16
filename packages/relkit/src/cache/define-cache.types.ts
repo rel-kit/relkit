@@ -34,11 +34,16 @@ export interface DefineCacheOptions<
   KeySchema extends StandardSchemaV1,
   ValueSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
+  /** Stable, unique name of the cache. */
   readonly id: Id;
   /** The cache provider profile that holds the entries; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"cache">;
+  /** Schema of the key that identifies one entry. */
   readonly key: KeySchema;
+  /** Schema of the stored value. */
   readonly value: ValueSchema;
+  /** Lifetime in milliseconds of an entry whose write does not set one. */
   readonly defaultTtlMs?: number;
+  /** Longest lifetime a write may ask for, in milliseconds; a longer one is rejected. */
   readonly maxTtlMs?: number;
 }

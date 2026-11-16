@@ -33,8 +33,11 @@ export type FunctionCallOptions<
   // Repeats the constraint so an editor lists the dependency kinds while the object is being
   // typed: inference from the object is blocked then, and `Dependencies` alone has no members.
   readonly dependencies?: FunctionDependencies;
+  /** Runs before the handler and may replace the validated input. */
   readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, ProgressSchema>;
+  /** Runs after the handler succeeds and may replace the output before it is validated. */
   readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, ProgressSchema>;
+  /** The function's logic: receives the validated input and `context`, returns the output. */
   readonly handler: (
     input: InferOutput<InputSchema>,
     context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,

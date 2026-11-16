@@ -28,10 +28,14 @@ export type BucketDescriptorAny = BucketDescriptor<string>;
  * @example const options: DefineBucketOptions<"assets"> = { id: "assets", visibility: "private" };
  */
 export interface DefineBucketOptions<Id extends string> extends DescriptorMetadata {
+  /** Stable, unique name of the bucket; keep it when the file moves or is renamed. */
   readonly id: Id;
   /** The bucket provider profile that stores the objects; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"bucket">;
+  /** Whether stored objects are `"private"` or readable by anyone (`"public"`). */
   readonly visibility: BucketVisibility;
+  /** Largest size of one stored object, in bytes. */
   readonly maxObjectBytes?: number;
+  /** Media types the bucket accepts, such as `image/*`; any type when omitted. */
   readonly allowedContentTypes?: readonly string[];
 }

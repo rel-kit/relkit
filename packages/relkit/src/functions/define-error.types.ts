@@ -7,6 +7,7 @@ import type { DeclaredError } from "./define-error.js";
  * @example const http: ErrorHttpMapping = { status: 404 };
  */
 export interface ErrorHttpMapping {
+  /** Status code a route answers with when a function returns the error. */
   readonly status: number;
 }
 
@@ -50,8 +51,12 @@ export interface DefineErrorOptions<
 > extends DescriptorMetadata {
   /** The error's public code; required because it must not change when the file moves. */
   readonly id: Id;
+  /** Schema of the details callers receive with the error. */
   readonly data: DataSchema;
+  /** Text of the error: a string, or a function that builds it from `data`. */
   readonly message: string | ((data: InferOutput<DataSchema>) => string);
+  /** How a route answers with the error; `status` is the HTTP status code. */
   readonly http?: ErrorHttpMapping;
+  /** Whether durable work tries again: `"never"` (default), `"later"` or a minimum delay. */
   readonly retry?: ErrorRetryInput;
 }

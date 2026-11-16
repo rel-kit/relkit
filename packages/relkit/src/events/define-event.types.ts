@@ -61,12 +61,18 @@ export interface DefineEventOptions<
   Version extends number,
   InputSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
+  /** Unique name of the event; publishers and consumers refer to the event by it. */
   readonly id: Id;
+  /** Version of the event's contract, a positive integer. Defaults to `1`. */
   readonly version?: Version;
+  /** Schema of the data sent with the event. */
   readonly input: InputSchema;
   /** The event provider profile that delivers the event; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"event">;
+  /** Names of payload fields that hold sensitive data; the Inspector lists them with the event. */
   readonly sensitiveFields?: readonly string[];
+  /** Not an option of an event: consume the event with `defineEventFunction`. */
   readonly handler?: never;
+  /** Not an option of an event: an event returns nothing to its publisher. */
   readonly output?: never;
 }

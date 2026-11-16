@@ -19,7 +19,10 @@ type ServiceFunction<Service, Name extends ServiceFunctionName<Service>> = Extra
 export type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = Omit<
   FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
   "target"
-> & { readonly member: Name };
+> & {
+  /** Name of the service's public function that this method calls. */
+  readonly member: Name;
+};
 
 /** Member name or options for a service route.
  * @example type Entry = ServiceRouteEntry<typeof service>;
