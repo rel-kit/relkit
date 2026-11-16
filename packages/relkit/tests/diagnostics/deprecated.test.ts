@@ -72,6 +72,7 @@ describe("deprecated", () => {
     expect(codes.map(({ code }) => code)).toEqual([
       "RELKIT_DEPRECATED_APP_PACKAGE",
       "RELKIT_DEPRECATED_BETTER_AUTH_OPTIONS",
+      "RELKIT_DEPRECATED_TASK_LOGGING",
     ]);
     for (const { fix } of codes) expect(fix.length).toBeGreaterThan(0);
   });
