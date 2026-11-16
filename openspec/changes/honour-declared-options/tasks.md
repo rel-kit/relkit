@@ -10,8 +10,8 @@
 
 ## 2. Test application context
 
-- [ ] 2.1 Add a test that `createTestApplication` passes `context` to handlers as `createTestRuntime` does; verify it fails before the fix.
-- [ ] 2.2 Honour the option; verify the testing package's suites.
+- [x] 2.1 Add a test that `createTestApplication` passes `context` to handlers as `createTestRuntime` does; verify it fails before the fix.
+- [x] 2.2 Honour the option; verify the testing package's suites.
 
 ## 3. Sensitive event fields
 

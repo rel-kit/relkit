@@ -105,9 +105,10 @@ export const acquireApplication = Effect.fn("Testing.application.acquire")(
     );
     const http = yield* Effect.acquireRelease(
       Effect.sync(() =>
-        createTestHttpClient(createApplicationRequest(loaded.routes, runtime, services, context), {
-          ...(options.logger === undefined ? {} : { logger: options.logger }),
-        }),
+        createTestHttpClient(
+          createApplicationRequest(loaded.routes, runtime, services, context, options.context),
+          { ...(options.logger === undefined ? {} : { logger: options.logger }) },
+        ),
       ),
       (value, exit) => cleanup(() => value.close(), cleanupFailures, Exit.isFailure(exit)),
     );

@@ -29,7 +29,7 @@ export interface TestRuntimeOptions<S extends EnvShape = EnvShape> {
   readonly startTimeMs?: number;
   /** Time `close` waits for running work, in milliseconds. Defaults to `1000`. */
   readonly closeTimeoutMs?: number;
-  /** Fields that replace the handler context's defaults; `createTestApplication` ignores it. */
+  /** Fields that replace the handler context's defaults, such as `auth` or `database`. */
   readonly context?: Readonly<Record<string, unknown>>;
   /** Replacements for provider profiles, by capability then profile name, such as test fakes. */
   readonly providers?: TestProviderReplacements;

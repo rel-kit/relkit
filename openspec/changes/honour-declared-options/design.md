@@ -16,3 +16,7 @@ Four defects were found while describing every authoring option (`openspec/chang
 - The compiler's diagnostic for a profile that was named and does not exist now names it (`Provider profile "x" does not provide event.`) instead of calling the use unqualified.
 
 The one case whose behaviour changes: an application with an event profile named `default` beside others and `defaults.event` set to another one. An event function without `profile` used `default` and now uses `defaults.event`.
+
+### D2: `context` of `createTestApplication` is applied last
+
+The application built its own context object and wrote the fields of its services into it (`database`, and an `auth` that reads the current request's session), so the option never reached a handler. The option's fields are now written into the same object after the services' fields. That is the meaning the option has in `createTestRuntime`: a field the test passes replaces the default. A test can therefore replace `auth` for every call, or add a field of its own, and a field it does not pass keeps the application's value.
