@@ -99,6 +99,48 @@ export interface DefineTaskOptions<
   >;
 }
 
+/** The form a `defineTask` call selects: the value of `execution`, or `durable` when the call
+ * leaves it out. The call's type parameter is then every form, which is also what an editor reads
+ * for suggestions while the option is being typed.
+ * @example type Form = TaskForm<"retryable">;
+ */
+export type TaskForm<Execution extends TaskExecution> = [TaskExecution] extends [Execution]
+  ? "durable"
+  : Execution;
+
+/** The options of one `defineTask` call. `execution` is declared here, outside
+ * {@link DefineTaskOptions}, so that it alone selects the form the other options are typed by.
+ * @example const options: DefineTaskCallOptions<"send", "1", typeof input, typeof output> = { id: "send", version: "1", input, output, handler };
+ */
+export type DefineTaskCallOptions<
+  Id extends string,
+  Version extends string,
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends TaskDependencies = {},
+  Errors extends readonly ErrorDescriptorAny[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+  Streams extends TaskStreamSchemas = {},
+  Execution extends TaskExecution = TaskExecution,
+> = Omit<
+  DefineTaskOptions<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    ProgressSchema,
+    Streams,
+    TaskForm<Execution>
+  >,
+  "execution"
+> & {
+  /** `durable` (the default) may sleep and resumes after a restart; `retryable` runs again from
+   * the start. */
+  readonly execution?: Execution;
+};
+
 /** Validated task definition with an attached trigger operation. */
 export interface TaskDescriptor<
   Id extends string,

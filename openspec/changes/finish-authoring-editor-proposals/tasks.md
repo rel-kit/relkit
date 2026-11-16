@@ -15,7 +15,7 @@
 
 ## 3. One signature
 
-- [ ] 3.1 Record the wanted verdict for `execution` in `defineTask` on TypeScript 5.9 and add type tests for the context of each form; verify the editor test fails on the position before the change.
+- [x] 3.1 Record the wanted verdict for `execution` in `defineTask` on TypeScript 5.9 and add type tests for the context of each form; verify the editor test fails on the position before the change.
 - [ ] 3.2 Replace the overloads of `defineTask` and of any other authoring API with one signature; verify the editor test and `tests/types/` on both compilers, with every existing `@ts-expect-error` unchanged.
 
 ## 4. Descriptions

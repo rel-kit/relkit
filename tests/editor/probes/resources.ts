@@ -65,7 +65,6 @@ export const resourcesProbes: readonly Probe[] = [
     'execution: "durable"',
     'execution: "|"',
     ["durable", "retryable"],
-    { verdict: "partly", typescript7: "works", cause: "overloads" },
   ),
   suggest(
     "defineTask",
@@ -106,5 +105,21 @@ export const resourcesProbes: readonly Probe[] = [
     'fields: ["status", "output"]',
     'fields: ["status", "|"]',
     ["output", "progress"],
+  ),
+  wrong(
+    "defineTask",
+    "unknown option",
+    "export.task.ts",
+    '  execution: "durable",\n',
+    '  execution: "durable",\n  retries: 3,\n',
+    ["retries"],
+  ),
+  wrong(
+    "defineJob",
+    "unknown option",
+    "export.job.ts",
+    "  task: exportOrders,\n",
+    '  task: exportOrders,\n  schedule: "daily",\n',
+    ["schedule"],
   ),
 ];

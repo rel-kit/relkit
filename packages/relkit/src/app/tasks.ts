@@ -1,5 +1,6 @@
 export { assertTaskDescriptor, defineTask, isTaskDescriptor } from "../jobs/index.js";
 export type {
+  DefineTaskCallOptions,
   DefineTaskOptions,
   JobDescriptorForThisTask,
   NormalizedTaskRetryPolicy,
@@ -16,6 +17,7 @@ export type {
   TaskDescriptorAny,
   TaskExecution,
   TaskFailureHook,
+  TaskForm,
   TaskHandler,
   TaskHandlerResult,
   TaskHookContext,

@@ -15,3 +15,7 @@ that option, such as `Type 'number' is not assignable to type 'UnknownOption<"ti
 it was accepted and the function failed when it was loaded. The removed option `publishes` is no
 longer suggested, and its error names what replaces it:
 `RemovedOption<"publishes", "dependencies.events">`.
+
+Fixed: your editor suggests both values of `execution` in `defineTask` on TypeScript 5.9; before, it
+suggested `durable` only. `defineTask` and `defineTaskEffect` type the option through a parameter
+that defaults to every form; a task that leaves `execution` out is durable, as before.

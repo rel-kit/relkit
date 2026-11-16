@@ -61,3 +61,51 @@ defineTask({
   dependencies: { events: {} },
   handler: (input) => input,
 });
+
+// One signature serves both forms: `execution` alone selects the handler's context and the
+// descriptor's form, and a call that leaves it out is durable.
+const explicitDurable = defineTask({
+  id: "types.explicit-durable-task",
+  version: "1",
+  execution: "durable",
+  input: z.string(),
+  output: z.string(),
+  handler: async (input, context) => {
+    await context.sleep("1 second", { key: "wait" });
+    await context.sleepUntil("2030-01-01T00:00:00Z", { key: "until" });
+    return input;
+  },
+});
+const retryable = defineTask({
+  id: "types.retryable-form-task",
+  version: "1",
+  execution: "retryable",
+  input: z.string(),
+  output: z.string(),
+  progress: z.number(),
+  handler: async (input, context) => {
+    // The context of both forms carries the run and the declared progress.
+    const runId: string = context.run.runId;
+    await context.progress.emit(1);
+    // @ts-expect-error a retryable task cannot sleep until an instant either
+    await context.sleepUntil("2030-01-01T00:00:00Z", { key: "until" });
+    void runId;
+    return input;
+  },
+});
+const defaultForm: "durable" = durable.execution;
+const durableForm: "durable" = explicitDurable.execution;
+const retryableForm: "retryable" = retryable.execution;
+// @ts-expect-error a retryable descriptor is not a durable one
+const wrongForm: "durable" = retryable.execution;
+void [defaultForm, durableForm, retryableForm, wrongForm];
+
+defineTask({
+  id: "types.unknown-form-task",
+  version: "1",
+  // @ts-expect-error execution is durable or retryable
+  execution: "once",
+  input: z.string(),
+  output: z.string(),
+  handler: (input) => input,
+});
