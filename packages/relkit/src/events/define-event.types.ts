@@ -1,4 +1,8 @@
-import type { DescriptorBase, DescriptorMetadata } from "../contracts/index.js";
+import type {
+  DescriptorBase,
+  DescriptorMetadata,
+  ProviderProfileName,
+} from "../contracts/index.js";
 import type { EventPublishResult, EventRef } from "../functions/index.js";
 import type { StandardSchemaV1 } from "../schema/index.js";
 export type { InferOutput, StandardSchemaV1 } from "../schema/index.js";
@@ -60,7 +64,8 @@ export interface DefineEventOptions<
   readonly id: Id;
   readonly version?: Version;
   readonly input: InputSchema;
-  readonly profile?: string;
+  /** The event provider profile that delivers the event; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"event">;
   readonly sensitiveFields?: readonly string[];
   readonly handler?: never;
   readonly output?: never;

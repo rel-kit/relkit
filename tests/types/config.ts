@@ -1,5 +1,6 @@
 import * as appExports from "relkit";
-import { defineApp, defineEnv, env } from "relkit/config";
+import { type ApplicationProfilesOf, defineApp, defineEnv, env } from "relkit/config";
+import type { ProviderProfileName } from "relkit/contracts";
 import { kv, r2 } from "@relkit/cloudflare";
 import { docker } from "@relkit/docker";
 import {
@@ -115,6 +116,17 @@ const single = defineApp({
 });
 const singleDefault: "default" | undefined = single.defaults.cache;
 void singleDefault;
+
+// The generated registry reads the profile names of each capability from the descriptor's type.
+type UnifiedProfiles = ApplicationProfilesOf<typeof unified>;
+const namedProfiles: UnifiedProfiles["cache"][] = ["requests", "timeline"];
+// @ts-expect-error not a profile of the cache capability
+const unknownProfile: UnifiedProfiles["cache"] = "missing";
+const soleProfile: ApplicationProfilesOf<typeof single>["cache"] = "default";
+void [namedProfiles, unknownProfile, soleProfile];
+// Without names in the registry, as in a library, a descriptor's profile is any string.
+const freeProfile: string extends ProviderProfileName<"bucket"> ? true : false = true;
+void freeProfile;
 
 defineApp({
   env: defineEnv({}),

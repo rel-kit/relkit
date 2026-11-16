@@ -3,6 +3,7 @@ import type {
   DescriptorMetadata,
   MaybePromise,
   OperationId,
+  ProviderProfileName,
 } from "../contracts/index.js";
 import type { InferInput, InferOutput, StandardSchemaV1 } from "../schema/index.js";
 import type { CountPresence, MemberPresence, TriggerReceipt } from "./types.js";
@@ -103,7 +104,8 @@ export interface DefineChannelOptions<
   readonly id: Id;
   readonly params: ParamsSchema;
   readonly events: Events;
-  readonly profile?: string;
+  /** The realtime provider profile that carries the channel; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"realtime">;
   readonly client?: Client;
   readonly replay?: ChannelReplay;
   readonly presence?: Presence;

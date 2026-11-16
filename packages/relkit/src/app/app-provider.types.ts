@@ -103,6 +103,17 @@ export type NormalizedAppProviderDefaults<Providers extends AppProviderBindings>
   [Capability in AppProviderCapability]?: ProfileFor<Providers, Capability>;
 }>;
 
+/** The profile names of an application per capability, from the type of its descriptor. The
+ * generated context registry uses it to type `profile` in buckets, caches, events and channels.
+ * A capability without a provider has no names.
+ * @example interface ApplicationProfiles extends ApplicationProfilesOf<typeof app> {}
+ */
+export type ApplicationProfilesOf<Application> = Application extends {
+  readonly defaults: infer Defaults;
+}
+  ? { readonly [Capability in keyof Defaults]-?: NonNullable<Defaults[Capability]> }
+  : {};
+
 /** Provider profiles inferred from the authored provider bindings.
  * @example type Profiles = NormalizedProviders<typeof providers>;
  */

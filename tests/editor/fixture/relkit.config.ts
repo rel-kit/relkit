@@ -1,4 +1,5 @@
 /** Application of the editor fixture: several profiles for one capability, one adapter for another. */
+import { getRelkit } from "relkit";
 import { defineApp, env as binding } from "relkit/config";
 import { docker } from "@relkit/docker";
 import { inngest } from "@relkit/inngest";
@@ -21,6 +22,13 @@ export default defineApp({
     redaction: { mode: "development-redacted", maxBytes: 65_536 },
     exporters: { traces: otlp({ endpoint: binding.url("OTLP_ENDPOINT"), serviceName: "fixture" }) },
   },
-  server: { port: 4000, maxBodyBytes: 1_048_576, apiDocs: { ui: "scalar" } },
+  server: {
+    port: 4000,
+    maxBodyBytes: 1_048_576,
+    apiDocs: { ui: "scalar" },
+    onStart: async () => {
+      await getRelkit().functions.orders.createOrder({ orderId: "0", sku: "a", quantity: 1 });
+    },
+  },
   inspector: { enabled: true },
 });

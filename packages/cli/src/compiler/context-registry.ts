@@ -54,6 +54,8 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
         ? []
         : [
             `type RelkitApplicationEnv = import("relkit/config").ResolvedEnv<${importType(application, output, root)}["env"]["shape"]>;`,
+            // The profile names of each capability, so a descriptor's `profile` accepts only those.
+            `type RelkitApplicationProfiles = import("relkit/config").ApplicationProfilesOf<${importType(application, output, root)}>;`,
           ]),
       // The names of the access control, so function access rules accept only names it declares.
       ...(auth === undefined
@@ -66,7 +68,10 @@ export const generateContextRegistryEffect = Effect.fn("Compiler.generateContext
       "  namespace Relkit {",
       ...(application === undefined
         ? ["    interface ApplicationEnv {}"]
-        : ["    interface ApplicationEnv extends RelkitApplicationEnv {}"]),
+        : [
+            "    interface ApplicationEnv extends RelkitApplicationEnv {}",
+            "    interface ApplicationProfiles extends RelkitApplicationProfiles {}",
+          ]),
       "    interface ApplicationContextRegistry {",
       ...fields,
       "    }",

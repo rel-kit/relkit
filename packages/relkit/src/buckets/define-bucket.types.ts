@@ -1,4 +1,8 @@
-import type { DescriptorBase, DescriptorMetadata } from "../contracts/index.js";
+import type {
+  DescriptorBase,
+  DescriptorMetadata,
+  ProviderProfileName,
+} from "../contracts/index.js";
 
 /** Visibility policy for a bucket.
  * @example const visibility: BucketVisibility = "private";
@@ -25,7 +29,8 @@ export type BucketDescriptorAny = BucketDescriptor<string>;
  */
 export interface DefineBucketOptions<Id extends string> extends DescriptorMetadata {
   readonly id: Id;
-  readonly profile?: string;
+  /** The bucket provider profile that stores the objects; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"bucket">;
   readonly visibility: BucketVisibility;
   readonly maxObjectBytes?: number;
   readonly allowedContentTypes?: readonly string[];

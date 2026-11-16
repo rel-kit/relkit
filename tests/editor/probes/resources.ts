@@ -17,7 +17,6 @@ export const resourcesProbes: readonly Probe[] = [
     'profile: "uploads"',
     'profile: "|"',
     ["uploads", "archive"],
-    { verdict: "nothing", cause: "profile-names" },
   ),
   wrong(
     "defineBucket",
@@ -26,7 +25,6 @@ export const resourcesProbes: readonly Probe[] = [
     'profile: "uploads"',
     'profile: "upload"',
     ["uploads", "archive"],
-    { verdict: "nothing", cause: "profile-names" },
   ),
   suggest(
     "defineBucket",
@@ -51,7 +49,6 @@ export const resourcesProbes: readonly Probe[] = [
     "  defaultTtlMs: 60_000,\n",
     '  defaultTtlMs: 60_000,\n  profile: "|",\n',
     ["default"],
-    { verdict: "nothing", cause: "profile-names" },
   ),
   suggest(
     "defineTask",

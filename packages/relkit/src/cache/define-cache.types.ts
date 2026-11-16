@@ -1,4 +1,8 @@
-import type { DescriptorBase, DescriptorMetadata } from "../contracts/index.js";
+import type {
+  DescriptorBase,
+  DescriptorMetadata,
+  ProviderProfileName,
+} from "../contracts/index.js";
 import type { StandardSchemaV1 } from "../schema/index.js";
 /** Frozen cache descriptor with phantom key and value types.
  * @example const descriptor = defineCache({ id: "prices", key: z.string(), value: z.number() });
@@ -31,7 +35,8 @@ export interface DefineCacheOptions<
   ValueSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
   readonly id: Id;
-  readonly profile?: string;
+  /** The cache provider profile that holds the entries; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"cache">;
   readonly key: KeySchema;
   readonly value: ValueSchema;
   readonly defaultTtlMs?: number;

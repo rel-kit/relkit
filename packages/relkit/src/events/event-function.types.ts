@@ -1,4 +1,9 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "../contracts/index.js";
+import type {
+  DescriptorBase,
+  DescriptorMetadata,
+  MaybePromise,
+  ProviderProfileName,
+} from "../contracts/index.js";
 import type {
   ErrorDescriptorAny,
   FunctionContext,
@@ -80,7 +85,8 @@ export interface DefineEventFunctionOptions<
   readonly id: Id;
   readonly event: Event;
   readonly delivery?: EventDelivery;
-  readonly profile?: string;
+  /** The event provider profile the function consumes from; the event's own when omitted. */
+  readonly profile?: ProviderProfileName<"event">;
   readonly retry?: Partial<EventRetryPolicy>;
   readonly concurrency?: number;
   readonly timeoutMs?: number;

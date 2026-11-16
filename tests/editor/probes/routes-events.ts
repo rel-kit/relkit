@@ -102,7 +102,6 @@ export const routesEventsProbes: readonly Probe[] = [
     'profile: "local"',
     'profile: "|"',
     ["local"],
-    { verdict: "nothing", cause: "profile-names" },
   ),
   wrong(
     "defineEvent",
@@ -111,7 +110,6 @@ export const routesEventsProbes: readonly Probe[] = [
     'profile: "local"',
     'profile: "locl"',
     ["local"],
-    { verdict: "nothing", cause: "profile-names" },
   ),
   suggest(
     "defineEventFunction",
@@ -176,5 +174,21 @@ export const routesEventsProbes: readonly Probe[] = [
     "client: { public: true }",
     "client: { public: true, | }",
     ["authorize"],
+  ),
+  suggest(
+    "defineChannel",
+    "profile value",
+    "order-updates.channel.ts",
+    '  presence: "count",\n',
+    '  presence: "count",\n  profile: "|",\n',
+    ["default"],
+  ),
+  wrong(
+    "defineChannel",
+    "profile misspelled",
+    "order-updates.channel.ts",
+    '  presence: "count",\n',
+    '  presence: "count",\n  profile: "main",\n',
+    ["default"],
   ),
 ];

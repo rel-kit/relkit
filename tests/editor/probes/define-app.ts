@@ -14,9 +14,9 @@ export const defineAppProbes: readonly Probe[] = [
     "defineApp",
     "server option name",
     "relkit.config.ts",
-    "server: { port: 4000,",
-    "server: { |port: 4000,",
-    ["mcp", "onStart", "clientContract"],
+    "    port: 4000,\n",
+    "    |port: 4000,\n",
+    ["mcp", "agUi", "clientContract"],
   ),
   suggest(
     "defineApp",

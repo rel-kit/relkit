@@ -12,6 +12,7 @@ import type {
 
 export type { ApiDocsConfig, ServerConfig, InspectorConfig } from "./app-config.types.js";
 export type {
+  ApplicationProfilesOf,
   AppProviderBindings,
   AppProviderCapability,
   AppProviderInputs,

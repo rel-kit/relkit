@@ -2,6 +2,9 @@
 type RelkitApplicationEnv = import("relkit/config").ResolvedEnv<
   (typeof import("./relkit.config.js"))["default"]["env"]["shape"]
 >;
+type RelkitApplicationProfiles = import("relkit/config").ApplicationProfilesOf<
+  (typeof import("./relkit.config.js"))["default"]
+>;
 type RelkitApplicationAccess = import("@relkit/better-auth").InferBetterAuthAccess<
   (typeof import("./auth.js"))["default"]["handler"]
 >;
@@ -9,6 +12,7 @@ type RelkitApplicationAccess = import("@relkit/better-auth").InferBetterAuthAcce
 declare global {
   namespace Relkit {
     interface ApplicationEnv extends RelkitApplicationEnv {}
+    interface ApplicationProfiles extends RelkitApplicationProfiles {}
     interface ApplicationContextRegistry {
       readonly database: import("@relkit/drizzle").DatabaseContext<
         (typeof import("./database.js"))["default"]
