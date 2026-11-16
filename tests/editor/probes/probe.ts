@@ -31,6 +31,8 @@ export interface Probe {
   readonly absent?: readonly string[];
   /** Texts the single error must contain, such as the valid names. */
   readonly error?: readonly string[];
+  /** Text the error must underline, when the place of the error is what the probe checks. */
+  readonly on?: string;
   /** What the editor does here; the test fails when a measurement differs. */
   readonly verdict: Verdict;
   /** The verdict on TypeScript 7 when it differs from TypeScript 5.9. */
@@ -58,5 +60,5 @@ export const wrong = (
   anchor: string,
   replacement: string,
   error: readonly string[],
-  rest: Partial<Pick<Probe, "verdict" | "typescript7" | "cause">> = {},
+  rest: Partial<Pick<Probe, "verdict" | "typescript7" | "cause" | "on">> = {},
 ): Probe => ({ surface, position, file, anchor, replacement, error, verdict: "works", ...rest });

@@ -79,7 +79,9 @@ export async function measure(
   const verdict: Verdict =
     first === undefined
       ? "nothing"
-      : diagnostics.length === 1 && required.every((part) => first.message.includes(part))
+      : diagnostics.length === 1 &&
+          required.every((part) => first.message.includes(part)) &&
+          first.text.includes(probe.on ?? "")
         ? "works"
         : "misleading";
   return {

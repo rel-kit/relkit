@@ -28,3 +28,8 @@ Every option of the authoring APIs (`defineFunction`, `defineError`, `defineRout
 `defineServiceRoutes`, `defineEvent`, `defineEventFunction`, `defineChannel`, `defineBucket`,
 `defineCache`, `defineTask`, `defineJob`, `defineService` and the environment builders) shows a
 one-line description in your editor and on the API reference pages.
+
+Fixed: `defineRoute` is one signature for a function route and a raw route. A mistake in an option
+is reported on that option; before, TypeScript 5.9 reported "No overload matches this call" on
+`defineRoute` itself. `defineRoute` and `defineRouteEffect` take the type parameters `Id`, `Target`,
+`Request` and `Handler`; calls that pass no type arguments are unaffected.

@@ -120,6 +120,32 @@ export interface RawRouteDescriptor<
   };
 }
 
+/** The options of one `defineRoute` call: those of a function route when the call has a
+ * `target`, those of a raw route otherwise. One signature takes both forms, so a mistake in an
+ * option is reported on that option.
+ * @example type Options = DefineRouteOptions<"orders.get", typeof getOrder, undefined, RawHttpHandler>;
+ */
+export type DefineRouteOptions<
+  Id extends string,
+  Target extends FunctionRefAny | undefined,
+  Request extends HttpRequestMapping | undefined,
+  Handler extends RawHttpHandler,
+> = [Target] extends [undefined]
+  ? RawRouteOptions<Id, Handler>
+  : FunctionRouteOptions<Id, Extract<Target, FunctionRefAny>, Request>;
+
+/** The descriptor a `defineRoute` call returns for its form.
+ * @example type Route = DefinedRoute<"orders.get", typeof getOrder, undefined, RawHttpHandler>;
+ */
+export type DefinedRoute<
+  Id extends string,
+  Target extends FunctionRefAny | undefined,
+  Request extends HttpRequestMapping | undefined,
+  Handler extends RawHttpHandler,
+> = [Target] extends [undefined]
+  ? RawRouteDescriptor<Id, Handler>
+  : FunctionRouteDescriptor<Id, Extract<Target, FunctionRefAny>, Request>;
+
 /** Union of function-backed and raw route descriptors.
  * @example type Route = RouteDescriptor<"orders.get">;
  */

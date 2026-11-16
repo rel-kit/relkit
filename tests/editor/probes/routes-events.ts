@@ -199,4 +199,22 @@ export const routesEventsProbes: readonly Probe[] = [
     '  event: "orders.placed",\n  timeout: 5,\n',
     ["timeout"],
   ),
+  wrong(
+    "routes",
+    "defineRoute option of the wrong type",
+    "route.ts",
+    "successStatus: 200 }",
+    'successStatus: "200" }',
+    ["number"],
+    { on: "successStatus" },
+  ),
+  wrong(
+    "routes",
+    "defineRoute unknown option",
+    "route.ts",
+    "successStatus: 200 }",
+    "successStatus: 200, cache: true }",
+    ["cache"],
+    { on: "cache" },
+  ),
 ];
