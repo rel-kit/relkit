@@ -16,6 +16,13 @@ export const deprecatedCodes = [
       "`defineBetterAuthService` received Better Auth options. RelKit still builds the Better Auth instance from them, but the options form is kept only as a transition.",
     fix: "Write a Better Auth file with `betterAuth({ … })` and pass its instance as `defineBetterAuthService({ auth })`. Run `relkit migrate` to move the options into that file.",
   },
+  {
+    code: "RELKIT_DEPRECATED_TASK_LOGGING",
+    title: "logging of a task is deprecated",
+    happened:
+      "A task sets `logging` in `defineTask`. The option never had an effect: no jobs backend reads its `level` or its `redact` list. It is still accepted, and `relkit check` warns for each task that sets it; the check still passes.",
+    fix: "Remove `logging` from the task. To keep a value out of recorded telemetry, list its key in `telemetry.redaction.redactKeys` of `defineApp`; to log less, set the application's log level.",
+  },
 ] as const satisfies readonly DiagnosticCodeEntry[];
 
 /** The code of a deprecated API, for `deprecated()`. */

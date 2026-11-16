@@ -6,8 +6,11 @@ export interface InngestPolicyMapping {
   readonly concurrency?: number;
 }
 
-/** Task limits this backend does not enforce; `relkit check` and the server's start report them. */
-const REPORTED_LIMITS: ReadonlySet<string> = new Set(["maxElapsed"]);
+/**
+ * Task options this backend does not act on and `relkit check` reports: `maxElapsed`, a limit it
+ * does not enforce, and `logging`, which is deprecated and has no effect on any backend.
+ */
+const REPORTED_LIMITS: ReadonlySet<string> = new Set(["maxElapsed", "logging"]);
 
 /** Maps the task options Inngest has an equivalent for and refuses the ones it cannot map. */
 export function mapInngestPolicy(value: unknown): InngestPolicyMapping {

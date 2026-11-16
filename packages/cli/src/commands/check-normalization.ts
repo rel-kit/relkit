@@ -28,7 +28,7 @@ import { emitCheckResultEffect } from "./check-result.js";
 import { conventionDescriptor, evaluatorWarningDiagnostics } from "./check-support.js";
 import { vercelRealtimeDiagnosticsEffect } from "./check-vercel-realtime.js";
 import { workersProviderDiagnosticsEffect } from "./check-workers-providers.js";
-import { taskOptionDiagnostics } from "./task-option-warnings.js";
+import { deprecatedTaskOptionDiagnostics, taskOptionDiagnostics } from "./task-option-warnings.js";
 import type { evaluateCheckSources } from "./check-evaluation.js";
 import type { CheckOptions } from "./check.types.js";
 
@@ -120,6 +120,7 @@ export const finishCheckEvaluation = Effect.fn("Project.finishCheck")(function* 
     ...(yield* vercelRealtimeDiagnosticsEffect(projectRoot, normalization.outputs.graph)),
     ...(yield* workersProviderDiagnosticsEffect(projectRoot, normalization.outputs.graph)),
     ...taskOptionDiagnostics(normalization.outputs.graph),
+    ...deprecatedTaskOptionDiagnostics(normalization.outputs.graph),
     ...extracted.flatMap((entry) =>
       checkConventions({
         descriptor: conventionDescriptor(entry.descriptor.kind, entry.descriptor.id),

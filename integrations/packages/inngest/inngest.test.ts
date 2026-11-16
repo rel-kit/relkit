@@ -83,9 +83,9 @@ test("maps only certified native policy fields", () => {
     createInngestFunctionConfig({
       functionId: "relkit-job-task-v1-build",
       eventName: "relkit/job/task/v1/build",
-      policy: { logging: { level: "info" } },
+      policy: { priority: 1 },
     }),
-  ).toThrow('does not support the task option "logging"');
+  ).toThrow('does not support the task option "priority"');
 });
 
 test("maps only UTC cron schedules to native Docker triggers", () => {

@@ -100,7 +100,11 @@ export interface DefineTaskOptions<
   readonly maxDuration?: DurationInput;
   /** Longest total time from the acceptance of a run, including delays, sleep and retries. */
   readonly maxElapsed?: DurationInput;
-  /** Log level of the task's runs and the fields to redact from their logs. */
+  /**
+   * Has no effect: no jobs backend reads it. It is still accepted and shown in the graph.
+   * @deprecated The option has no effect and will be removed in a later version. Remove it from
+   *   the task; `relkit check` warns with `RELKIT_DEPRECATED_TASK_LOGGING` while it is set.
+   */
   readonly logging?: TaskLogging;
   /** Runs before the handler starts, with the validated input. */
   readonly onStart?: TaskStartHook<InputSchema, Dependencies>;

@@ -10893,7 +10893,7 @@ type TaskDescriptorAny = DescriptorBase<"task", string> &
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L210)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L214)
 
 ### createJobsRuntime
 
@@ -16172,7 +16172,7 @@ type TaskHandlerResult<Output, Errors extends readonly ErrorDescriptorAny[]> =
 
 ### TaskLogging (interface)
 
-Log level and fields to redact during task execution.
+Value of the deprecated `logging` option of a task; nothing reads it.
 
 **Signature**
 
@@ -16285,7 +16285,7 @@ type DefineTaskCallOptions<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L140)
 
 ### DefineTaskOptions (interface)
 
@@ -16337,7 +16337,11 @@ export interface DefineTaskOptions<
   readonly maxDuration?: DurationInput;
   /** Longest total time from the acceptance of a run, including delays, sleep and retries. */
   readonly maxElapsed?: DurationInput;
-  /** Log level of the task's runs and the fields to redact from their logs. */
+  /**
+   * Has no effect: no jobs backend reads it. It is still accepted and shown in the graph.
+   * @deprecated The option has no effect and will be removed in a later version. Remove it from
+   *   the task; `relkit check` warns with `RELKIT_DEPRECATED_TASK_LOGGING` while it is set.
+   */
   readonly logging?: TaskLogging;
   /** Runs before the handler starts, with the validated input. */
   readonly onStart?: TaskStartHook<InputSchema, Dependencies>;
@@ -16439,7 +16443,7 @@ export interface TaskDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L166)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L170)
 
 ### TaskDescriptorAny (type alias)
 
@@ -16471,7 +16475,7 @@ type TaskDescriptorAny = DescriptorBase<"task", string> &
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L210)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L214)
 
 ### TaskFailureHook
 
@@ -16508,7 +16512,7 @@ type TaskForm<Execution extends TaskExecution> = [TaskExecution] extends [Execut
   : Execution;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L132)
 
 ### TaskHandler
 
@@ -16559,7 +16563,7 @@ type TaskInput<T extends TaskRef> = T extends { readonly input: infer Schema }
 
 ### TaskLogging
 
-Log level and fields to redact during task execution.
+Value of the deprecated `logging` option of a task; nothing reads it.
 
 **Signature**
 

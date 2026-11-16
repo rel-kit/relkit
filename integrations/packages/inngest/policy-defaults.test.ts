@@ -23,8 +23,12 @@ test("a limit Inngest does not enforce is left to the check and start warnings",
   expect(mapInngestPolicy({ maxElapsed: "1 hour" })).toEqual({});
 });
 
+test("the deprecated logging option does not make Inngest refuse a run", () => {
+  expect(mapInngestPolicy({ logging: { level: "info", redact: ["input.token"] } })).toEqual({});
+});
+
 test("an option Inngest cannot map is refused with the backend and the option named", () => {
-  expect(() => mapInngestPolicy({ logging: { level: "info" } })).toThrow(
-    'The inngest jobs backend does not support the task option "logging". Remove it from the task.',
+  expect(() => mapInngestPolicy({ priority: 1 })).toThrow(
+    'The inngest jobs backend does not support the task option "priority". Remove it from the task.',
   );
 });

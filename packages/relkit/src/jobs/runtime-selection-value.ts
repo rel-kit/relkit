@@ -129,7 +129,11 @@ function taskBuildId(taskId: string, manifest: JobsManifestLike | undefined): st
   return manifest?.tasks?.find((task) => task.id === taskId)?.buildId;
 }
 function taskPolicy(taskId: string, manifest: JobsManifestLike | undefined): unknown {
-  return manifest?.tasks?.find((task) => task.id === taskId)?.policy;
+  const policy = manifest?.tasks?.find((task) => task.id === taskId)?.policy;
+  if (!isRecord(policy)) return policy;
+  // `logging` is deprecated and has no effect; a backend never receives it.
+  const { logging: _logging, ...sent } = policy;
+  return sent;
 }
 function taskPolicyFromJob(job: JobDescriptorAny | undefined): unknown {
   const task = job?.task as (TaskRefAny & Record<string, unknown>) | undefined;
@@ -138,7 +142,6 @@ function taskPolicyFromJob(job: JobDescriptorAny | undefined): unknown {
     ...(task.retry === undefined ? {} : { retry: task.retry }),
     ...(task.maxDuration === undefined ? {} : { maxDuration: task.maxDuration }),
     ...(task.maxElapsed === undefined ? {} : { maxElapsed: task.maxElapsed }),
-    ...(task.logging === undefined ? {} : { logging: task.logging }),
   };
 }
 function mergePolicies(taskPolicyValue: unknown, jobPolicy: unknown): unknown {

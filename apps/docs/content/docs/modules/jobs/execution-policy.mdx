@@ -24,8 +24,12 @@ Execution policy belongs to the task because it describes how the durable operat
   /_snippets/source/examples/commerce/src/services/orders/tasks/export-orders.task.ts
 </include>
 
-Use task fields such as `maxDuration`, `maxElapsed`, `resources`, `concurrency`, `logging`, and `retry`.
+Use task fields such as `maxDuration`, `maxElapsed`, `resources`, `concurrency`, and `retry`.
 Jobs keep acceptance checks and client exposure together; they do not override task execution policy.
+
+The task option `logging` is deprecated. It never had an effect, on any jobs backend. A task that
+sets it still compiles and runs, and `relkit check` warns with
+[`RELKIT_DEPRECATED_TASK_LOGGING`](/docs/errors/relkit-deprecated-task-logging). Remove the option.
 
 Acceptance checks run before a durable run is accepted. Keep them fast and deterministic. Authorization belongs at the public boundary; the task must still validate every value it trusts from persisted input.
 

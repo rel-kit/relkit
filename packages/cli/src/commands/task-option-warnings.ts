@@ -15,6 +15,9 @@ const LIMIT_FEATURES = {
   maxElapsed: "task-max-elapsed",
 } as const;
 
+/** Code of the warning for the deprecated `logging` option; documented in the diagnostics catalog. */
+export const TASK_LOGGING_DEPRECATED_CODE = "RELKIT_DEPRECATED_TASK_LOGGING";
+
 /** One limit of one task that its jobs backend does not enforce. */
 export interface UnsupportedTaskOption {
   readonly taskId: string;
@@ -64,6 +67,29 @@ export function taskOptionDiagnostics(graphText: string): readonly Diagnostic[] 
       ...(task.source?.line === undefined ? {} : { line: task.source.line }),
       ...(task.source?.column === undefined ? {} : { column: task.source.column }),
     }),
+  );
+}
+
+/**
+ * Reports each task that sets the deprecated `logging` option, at the task that declares it.
+ * @param graphText - Compiled application graph JSON.
+ * @returns One warning per task, in graph order; the check still passes.
+ */
+export function deprecatedTaskOptionDiagnostics(graphText: string): readonly Diagnostic[] {
+  return parseGraphNodes(graphText).flatMap((task) =>
+    task.kind !== "task" || task.taskId === undefined || task.policy?.logging == null
+      ? []
+      : [
+          createDiagnostic({
+            code: TASK_LOGGING_DEPRECATED_CODE,
+            severity: "warning",
+            message: `Task "${task.taskId}" sets logging, which is deprecated: the option has no effect and will be removed.`,
+            suggestion: "Remove logging from the task.",
+            ...(task.source?.file === undefined ? {} : { file: task.source.file }),
+            ...(task.source?.line === undefined ? {} : { line: task.source.line }),
+            ...(task.source?.column === undefined ? {} : { column: task.source.column }),
+          }),
+        ],
   );
 }
 
