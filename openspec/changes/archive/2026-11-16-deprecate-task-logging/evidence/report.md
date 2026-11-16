@@ -42,3 +42,12 @@ So no finish timeout reaches Inngest and the warning stands. Not run against an 
 
 - `packages/relkit/tests/jobs` (Vitest): 57 files, 182 tests passed. `packages/cli/tests/check-task-options.test.ts`: 6 passed. Inngest policy tests: 17 passed. Editor deprecation test: passed.
 - Type checks of `relkit`, `@relkit/cli` and `@relkit/inngest` with their tests, `bun run lint`, `bun run check`, `generate:check`: passed.
+
+## 6. Final checks
+
+On `a6d690a77`, each to its end:
+
+- `bun run prepush`: exit 0.
+- `bun run test:types`: exit 0 (247 editor tests on TypeScript 5.9 and 7, the deprecation test among them).
+- `bun run test:packages`: exit 0 (Vitest 3,413 passed, 4 skipped; Bun 529 and 443 run, 0 failed). Its first run, one commit earlier, failed on one test: `packages/relkit/tests/diagnostics/deprecated.test.ts` lists every deprecation code and did not have the new one. Added in `a6d690a77`; all four checks were then run again from the start.
+- `openspec validate --specs`: 39 passed, 0 failed.

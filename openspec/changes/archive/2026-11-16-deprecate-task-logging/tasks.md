@@ -11,4 +11,4 @@
 ## 2. Documentation and record
 
 - [x] 2.1 Update the option's description, the guide, the changesets and the generated pages; verify `generate:check` and `bun run changeset status`.
-- [ ] 2.2 Run `bun run prepush`, `bun run test:types`, `bun run test:packages` and `openspec validate --specs`; verify each passes, then archive the change.
+- [x] 2.2 Run `bun run prepush`, `bun run test:types`, `bun run test:packages` and `openspec validate --specs`; verify each passes, then archive the change.
