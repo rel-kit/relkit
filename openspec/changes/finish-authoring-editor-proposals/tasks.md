@@ -28,6 +28,6 @@
 
 ## 6. Proof and archive
 
-- [ ] 6.1 Add the changesets and regenerate the documentation; verify `bun run changeset status` and `generate:check`.
-- [ ] 6.2 Measure `profile` on a plain copy of the logistics application before (0.9.1) and after, and run its `tsc --noEmit`; delete the copy.
+- [x] 6.1 Add the changesets and regenerate the documentation; verify `bun run changeset status` and `generate:check`.
+- [x] 6.2 Measure `profile` on a plain copy of the logistics application before (0.9.1) and after, and run its `tsc --noEmit`; delete the copy.
 - [ ] 6.3 Run `bun run prepush`, `bun run test:types`, `bun run test:packages` and `openspec validate --specs`; verify each passes, then archive the change.

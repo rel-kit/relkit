@@ -7,8 +7,8 @@ The change `authoring-editor-experience` measured 115 editor positions in the au
 ## What Changes
 
 - **Profile names in descriptors.** The generated context registry carries the application's profile names per capability, read from the type of `relkit.config`. `profile` in `defineBucket`, `defineCache`, `defineEvent` and `defineChannel` is typed from it: the editor suggests the names, `"default"` for a capability with one adapter, and a name that is not a profile is a type error. Without names in the registry (a library, or an application that has not generated it again) `profile` stays `string`.
-- **Unknown options are one error on the extra key.** In `defineFunction`, `defineEventFunction`, `defineTask` and `defineJob`, an option the API does not have is typed `UnknownOption<"name">`, so the error is on that key and names it. The removed `publishes` is no longer suggested, and its error names `dependencies.events`.
-- **One signature for `defineTask`,** and for any other authoring API that still has one overload per form, so the editor suggests every value of the option that selects the form and a mistake is reported once.
+- **Unknown options are one error on the extra key.** In `defineFunction` and `defineEventFunction`, an option the API does not have is typed `UnknownOption<"name">`, so the error is on that key and names it. The removed `publishes` is no longer suggested, and its error names `dependencies.events`. `defineTask` and `defineJob` already report an extra key through TypeScript's own check.
+- **One signature.** `defineTask` suggests both values of `execution` on TypeScript 5.9, and `defineRoute` is one signature instead of an overload per form, so a mistake in a route's option is reported on that option.
 - **Descriptions for the remaining options.** Every option an editor lists for an authoring API has a one-line description.
 - **API pages show option members.** `ServerConfig`, `InspectorConfig` and the telemetry options are printed with their members instead of `declare const`, and the provider options are in the `defineApp` block.
 

@@ -28,11 +28,16 @@ The generated context registry SHALL carry the profile names of the application'
 - **WHEN** a function is defined with `timeout` instead of `timeoutMs`
 - **THEN** type-checking reports one error, on `timeout`, that names it
 
-### Requirement: Task forms share one signature
+### Requirement: Task and route forms share one signature
 
-`defineTask` SHALL be one call signature for its durable and retryable forms, so that an editor suggests both values of `execution` and the handler's context follows the chosen form.
+`defineTask` and `defineRoute` SHALL each be one call signature for their forms, so that an editor suggests every value of the option that selects the form, the handler's context follows the chosen form, and an option of the wrong type is one type error on that option on every supported compiler.
 
 #### Scenario: Execution values are suggested
 
 - **WHEN** a developer asks for suggestions inside the quotes of `execution`
 - **THEN** the editor offers `durable` and `retryable` on every supported compiler
+
+#### Scenario: A wrong option in a function route
+
+- **WHEN** a route with a `target` has an option of the wrong type
+- **THEN** type-checking reports one error, on that option

@@ -12,11 +12,17 @@ The names are in `relkit.config.ts`. A descriptor file cannot import the configu
 
 ### D2: An unknown option has a named type
 
-The options object of `defineFunction` and its siblings is a type parameter, because the return type reads the declared errors and tool metadata from it. A key that is not an option is therefore accepted. A mapped type over the keys that are not options gives each the type `UnknownOption<"key">`, and `publishes` the type `RemovedOption<"publishes", "dependencies.events">`, so the error is on the key and its text says what is wrong.
+The options object of `defineFunction` and `defineEventFunction` is a type parameter, because the return type reads the declared errors and tool metadata from it. A key that is not an option is therefore accepted. A mapped type over the keys that are not options gives each the type `UnknownOption<"key">`, and `publishes` the type `RemovedOption<"publishes", "dependencies.events">`, so the error is on the key and its text says what is wrong. `publishes` is no longer declared as an option, so it is not suggested.
+
+`defineTask` and `defineJob` were measured first and do not share the pattern: they take a plain options object, and TypeScript's own check reports an extra key on that key. They are left as they are, with probes that record it.
 
 ### D3: One signature per authoring API
 
-As for `defineFunction`: an overload per form makes the editor read one form for suggestions and makes TypeScript 5.9 report "No overload matches this call". The form becomes a type parameter with a default, and the handler's context depends on it.
+`defineTask` was one signature already. TypeScript 5.9 suggested one `execution` value because the `Execution` parameter defaulted to `"durable"`, and that compiler reads the default while the option is being typed. The parameter defaults to every form now; `TaskForm` resolves a call without `execution` to `durable`, so the handler's context and the descriptor's type do not change. `execution` is declared in `DefineTaskCallOptions`, outside `DefineTaskOptions`, so that it alone is where the parameter is inferred.
+
+`defineRoute` had an overload per form. Its options and its returned descriptor are now conditional on the `Target` parameter, which is `undefined` for a raw route. The handler parameter stays constrained to the handler type, so a raw handler's parameter keeps its type from the context.
+
+`defineMiddleware` and `defineBetterAuthService` stay overloaded: the forms of the first differ in the kind of an argument, and the second form of the other is deprecated.
 
 ### D4: Descriptions are one line in the option's own type
 
