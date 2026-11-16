@@ -112,7 +112,10 @@ export function defineEventFunctionEffect<
           }),
       });
       const delivery = yield* eventDeliveryEffect(options.delivery);
-      const profile = yield* eventProfileEffect(options.profile);
+      // An omitted profile stays omitted: the compiler then selects the application's default
+      // event profile, or its only one, as it does for an event without a profile.
+      const profile =
+        options.profile === undefined ? undefined : yield* eventProfileEffect(options.profile);
       const retry = yield* eventRetryEffect(options.retry);
       return yield* Effect.try({
         try: () =>
@@ -122,7 +125,12 @@ export function defineEventFunctionEffect<
             invocationMode: "event-only",
             input: z.unknown(),
             output: z.void(),
-            descriptorFields: { event, delivery, profile, retry },
+            descriptorFields: {
+              event,
+              delivery,
+              ...(profile === undefined ? {} : { profile }),
+              retry,
+            },
           }) as EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
         catch: (cause) =>
           new EventDefinitionError({
@@ -168,7 +176,10 @@ export const isEventFunctionDescriptorEffect = Effect.fn("Events.isFunctionDescr
           }),
         );
         const delivery = yield* Effect.option(eventDeliveryEffect(value.delivery));
-        const profile = yield* Effect.option(eventProfileEffect(value.profile));
+        const profile =
+          value.profile === undefined
+            ? Option.some(undefined)
+            : yield* Effect.option(eventProfileEffect(value.profile));
         const retry = yield* Effect.option(eventRetryEffect(value.retry));
         return (
           Option.isSome(event) &&

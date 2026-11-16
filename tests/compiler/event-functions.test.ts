@@ -1,6 +1,9 @@
 import { expect, test } from "bun:test";
 import { normalizeCompilation } from "../../packages/cli/src/compiler/index.ts";
+import { defineApp } from "../../packages/relkit/src/app/define-app.ts";
+import { defineEnv } from "relkit/config";
 import { defineEvent, defineEventFunction } from "relkit/events";
+import { localEvent } from "../../integrations/packages/local/src/index.ts";
 import { defineFunction } from "relkit/functions";
 import { z } from "relkit/schema";
 
@@ -114,4 +117,77 @@ test("rejects executable fields on forged event contracts", () => {
   expect(
     result.diagnostics.filter((diagnostic) => diagnostic.code === "RELKIT_DESCRIPTOR_INVALID"),
   ).toHaveLength(2);
+});
+
+/** Compiles with the local integration's package metadata, as an installed application has it. */
+function compileWithLocalEvents(descriptors: readonly unknown[]) {
+  return normalizeCompilation({
+    descriptors: [...descriptors],
+    runtimeIntegrationPackages: [
+      {
+        integrationId: "local",
+        packageName: "@relkit/local",
+        packageVersion: "0.1.0",
+        exportName: "./runtime",
+        registrations: [{ capability: "event", adapterId: "local-event", protocolVersion: 1 }],
+      },
+    ],
+  });
+}
+
+test("an event function without a profile takes the application's default event profile", () => {
+  const application = defineApp({
+    id: "named-event-profiles",
+    env: defineEnv({}),
+    event: { local: localEvent(), audit: localEvent() },
+    defaults: { event: "local" },
+  });
+  const result = compileWithLocalEvents([application, event, consumer]);
+  expect(result.diagnostics).toEqual([]);
+  expect(result.graph?.nodes.find((node) => node.kind === "trigger")?.config).toMatchObject({
+    profile: "local",
+  });
+});
+
+test("an event function without a profile takes the application's only event profile", () => {
+  const application = defineApp({
+    id: "one-named-event-profile",
+    env: defineEnv({}),
+    event: { local: localEvent() },
+  });
+  const result = compileWithLocalEvents([application, event, consumer]);
+  expect(result.diagnostics).toEqual([]);
+  expect(result.graph?.nodes.find((node) => node.kind === "trigger")?.config).toMatchObject({
+    profile: "local",
+  });
+});
+
+test("a profile named on the event function is kept and checked", () => {
+  const application = defineApp({
+    id: "explicit-event-profile",
+    env: defineEnv({}),
+    event: { local: localEvent(), audit: localEvent() },
+    defaults: { event: "local" },
+  });
+  const audited = defineEventFunction({
+    id: "audit_receipt",
+    event: "order_created" as never,
+    profile: "audit",
+    handler: async () => {},
+  });
+  const missing = defineEventFunction({
+    id: "missing_receipt",
+    event: "order_created" as never,
+    profile: "default",
+    handler: async () => {},
+  });
+  const kept = compileWithLocalEvents([application, event, audited]);
+  expect(kept.diagnostics).toEqual([]);
+  expect(kept.graph?.nodes.find((node) => node.kind === "trigger")?.config).toMatchObject({
+    profile: "audit",
+  });
+  const rejected = compileWithLocalEvents([application, event, missing]);
+  expect(rejected.diagnostics.map((diagnostic) => diagnostic.message)).toEqual([
+    expect.stringContaining('"default" does not provide event'),
+  ]);
 });

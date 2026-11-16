@@ -42,17 +42,17 @@ export const passProvidersEffect = Effect.fn("Compiler.passProviders")(
               ? undefined
               : capabilityFor(descriptor.kind);
           if (profileCapability !== undefined) {
-            const selected = selectedProviderProfile(
-              application,
-              profileCapability,
-              requestedProviderProfile(descriptor.kind, value),
-            );
+            const requested = requestedProviderProfile(descriptor.kind, value);
+            const selected = selectedProviderProfile(application, profileCapability, requested);
             if (selected === undefined) {
               add(
                 work,
                 descriptor,
                 NORMALIZE_CODES.providerProfile,
-                `Unqualified ${profileCapability} use requires a default when multiple profiles exist.`,
+                // A named profile that does not exist is not an unqualified use.
+                requested === undefined
+                  ? `Unqualified ${profileCapability} use requires a default when multiple profiles exist.`
+                  : `Provider profile "${requested}" does not provide ${profileCapability}.`,
               );
               return;
             }

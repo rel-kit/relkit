@@ -134,7 +134,8 @@ export interface EventFunctionDescriptor<
   readonly invocationMode: "event-only";
   readonly event: Event;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -153,7 +154,8 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
   readonly invocationMode: "event-only";
   readonly event: string;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
