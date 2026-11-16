@@ -24,7 +24,7 @@
 
 ## 5. API pages
 
-- [ ] 5.1 Print re-exported interfaces with their members and list the provider options in `DefineAppOptions`; verify `app.mdx` shows the members of `ServerConfig`, `InspectorConfig` and the telemetry options, and `generate:check` passes.
+- [x] 5.1 Print re-exported interfaces with their members and list the provider options in `DefineAppOptions`; verify `app.mdx` shows the members of `ServerConfig`, `InspectorConfig` and the telemetry options, and `generate:check` passes.
 
 ## 6. Proof and archive
 

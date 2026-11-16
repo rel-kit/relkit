@@ -601,13 +601,18 @@ Adapts a configured RelKit bucket to the DeepAgents file backend, sharing the in
 
 ### DeepAgentBucketBackendOptions
 
+Configuration for a DeepAgents backend bound to a RelKit bucket.
+
 **Signature**
 
 ```ts
-declare const DeepAgentBucketBackendOptions: DeepAgentBucketBackendOptions;
+export interface DeepAgentBucketBackendOptions {
+  /** Key prefix owned by this backend instance. */
+  readonly prefix?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/deepagent-bucket-backend.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/deepagent-bucket-backend.types.ts#L2)
 
 ### createDeepAgentBucketBackend
 
@@ -2990,13 +2995,17 @@ declare const AgentClientPolicy: AgentClientPolicy<Guard, StateKey, Events>;
 
 ### AgentClientStateKey
 
+Public state keys selected from each middleware schema without erasing tuples. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentClientStateKey: AgentClientStateKey<Middleware>;
+type AgentClientStateKey<Middleware extends readonly AgentMiddleware[]> = MiddlewareStateKey<
+  Middleware[number]
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-native.types.ts#L64)
 
 ### AgentControl
 
@@ -3013,164 +3022,243 @@ declare const AgentControl: AgentControl;
 **Signature**
 
 ```ts
-declare const AgentDescriptor: AgentDescriptor<
-  Id,
+export interface AgentDescriptor<
+  Id extends string,
   Input,
   Output,
-  InputSchema,
-  OutputSchema,
-  Middleware,
-  Tools
->;
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  Middleware extends readonly AgentMiddleware[] = readonly AgentMiddleware[],
+  Tools extends readonly AgentTool[] = readonly AgentTool[],
+>
+  extends
+    DescriptorBase<"agent", Id>,
+    AgentRef<Id, InputSchema, OutputSchema>,
+    DeepAgentCapabilities {
+  readonly model?: AgentModel;
+  /** Adapter that executes the agent; set by `defineAgent` from `relkit`. */
+  readonly runtime?: import("relkit/agent-adapters").AgentRuntimeReference;
+  readonly instructions: AgentInstructions;
+  readonly tools: Tools;
+  readonly middleware: Middleware;
+  readonly limits: AgentLimits;
+  readonly stateProfile?: string;
+  readonly client?: AgentClientPolicy<(...args: any[]) => unknown, AgentClientStateKey<Middleware>>;
+  readonly chat?: AgentChatMapping;
+  readonly controls?: readonly AgentControl[];
+  readonly clientContract: AgentClientContractMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L41)
 
 ### AgentFilesystemBackend
+
+DeepAgents filesystem backend or a state-bound backend factory. @experimental
 
 **Signature**
 
 ```ts
-declare const AgentFilesystemBackend: AgentFilesystemBackend;
+type AgentFilesystemBackend =
+  object | ((context: { readonly state: unknown; readonly store?: unknown }) => object);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-deep.types.ts#L12)
 
 ### AgentInstructions
 
 **Signature**
 
 ```ts
-declare const AgentInstructions: AgentInstructions;
+type AgentInstructions = string | PromptTemplate | PromptInstructions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L31)
 
 ### AgentLimits
 
 **Signature**
 
 ```ts
-declare const AgentLimits: AgentLimits;
+export interface AgentLimits {
+  readonly maxSteps: number;
+  readonly maxToolCalls: number;
+  readonly timeoutMs: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L34)
 
 ### AgentMiddleware
 
+SDK fields RelKit inspects; each descriptor retains its complete inferred middleware tuple, including native hooks, tools and phantom schema data. Runtime validation checks the SDK brand. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentMiddleware: AgentMiddleware;
+type AgentMiddleware = Pick<NativeAgentMiddleware, "name" | "stateSchema">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-native.types.ts#L29)
 
 ### AgentMiddlewareState
 
+Public state composed from middleware state schemas. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentMiddlewareState: AgentMiddlewareState<Middleware>;
+type AgentMiddlewareState<Middleware extends readonly AgentMiddleware[]> =
+  Middleware extends readonly [infer First, ...infer Rest]
+    ? First extends AgentMiddleware
+      ? Rest extends readonly AgentMiddleware[]
+        ? MiddlewareState<First> & AgentMiddlewareState<Rest>
+        : MiddlewareState<First>
+      : {}
+    : {};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-native.types.ts#L32)
 
 ### AgentModel
 
+Model selector, native model, or model factory. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentModel: AgentModel;
+type AgentModel = string | AgentLanguageModel | AgentModelFactory;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-native.types.ts#L20)
 
 ### AgentModelFactory
 
+Environment-bound factory for a native model. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentModelFactory: AgentModelFactory<Environment>;
+type AgentModelFactory<Environment = Readonly<Record<string, unknown>>> = (
+  environment: Environment,
+) => MaybePromise<AgentLanguageModel>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-native.types.ts#L15)
 
 ### AgentSubagent
 
+Agent descriptor nested under a DeepAgent. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentSubagent: AgentSubagent;
+type AgentSubagent = AgentDescriptor<string, unknown, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-deep.types.ts#L9)
 
 ### AgentTool
 
+RelKit reference or native LangChain tool. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentTool: AgentTool;
+type AgentTool = ToolRefAny | NativeAgentTool;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-native.types.ts#L26)
 
 ### DeepAgentCapabilities
 
+Optional capabilities enabled for a DeepAgent. @experimental
+
 **Signature**
 
 ```ts
-declare const DeepAgentCapabilities: DeepAgentCapabilities;
+export interface DeepAgentCapabilities {
+  readonly subagents?: readonly AgentSubagent[];
+  readonly skills?: readonly string[];
+  readonly memory?: readonly string[];
+  readonly backend?: AgentFilesystemBackend;
+  readonly checkpointer?: BaseCheckpointSaver | CheckpointerResource;
+  readonly store?: BaseStore | MemoryResource;
+  readonly interruptOn?: Readonly<Record<string, boolean | InterruptOnConfig>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-deep.types.ts#L16)
 
 ### DefineAgentOptions
 
 **Signature**
 
 ```ts
-declare const DefineAgentOptions: DefineAgentOptions<
-  Id,
-  InputSchema,
-  OutputSchema,
-  Middleware,
-  Tools
->;
+export interface DefineAgentOptions<
+  Id extends string,
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Middleware extends readonly AgentMiddleware[],
+  Tools extends readonly AgentTool[],
+>
+  extends DescriptorMetadata, DeepAgentCapabilities {
+  readonly id?: Id;
+  readonly input: InputSchema;
+  readonly output: OutputSchema;
+  readonly model?: AgentModel;
+  readonly instructions: AgentInstructions;
+  readonly tools: Tools;
+  readonly middleware?: Middleware;
+  readonly limits: AgentLimits;
+  readonly stateProfile?: string;
+  readonly client?: AgentClientPolicy<(...args: any[]) => unknown, AgentClientStateKey<Middleware>>;
+  readonly chat?: AgentChatMapping;
+  readonly controls?: readonly AgentControl[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L69)
 
 ### NativeAgentTool
+
+LangChain client or server tool. @experimental
 
 **Signature**
 
 ```ts
-declare const NativeAgentTool: NativeAgentTool;
+type NativeAgentTool = ClientTool | ServerTool;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent-native.types.ts#L23)
 
 ### PromptInstructions
 
 **Signature**
 
 ```ts
-declare const PromptInstructions: PromptInstructions;
+export interface PromptInstructions {
+  readonly kind: "prompt";
+  readonly id: string;
+  readonly ref: { readonly kind: "prompt"; readonly id: string };
+  readonly value: string | readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L23)
 
 ### PromptTemplate
 
 **Signature**
 
 ```ts
-declare const PromptTemplate: PromptTemplate;
+export interface PromptTemplate {
+  readonly template: string;
+  readonly variables?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/define-agent.types.ts#L17)
 
 ### assertAgentDescriptor
 
@@ -4617,13 +4705,15 @@ Coordinates native graph resume requests with persisted waiting state and the in
 
 ### GraphConfig
 
+LangGraph run configuration with an optional persistent thread identity.
+
 **Signature**
 
 ```ts
-declare const GraphConfig: GraphConfig;
+type GraphConfig = {} | { readonly configurable: { readonly thread_id: string } };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-continuation.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-continuation.types.ts#L6)
 
 ### graphConfig
 
@@ -5371,13 +5461,27 @@ readonly code: "RELKIT_GRAPH_INTERRUPTED"
 
 ### GraphWaitingInterrupt
 
+Pending graph interruption and its public response schema.
+The optional ID is internal and omitted from published waiting requests.
+
+**Example**
+
+```ts
+const interrupt: GraphWaitingInterrupt = { node: "review", response: true };
+```
+
 **Signature**
 
 ```ts
-declare const GraphWaitingInterrupt: GraphWaitingInterrupt;
+export interface GraphWaitingInterrupt {
+  readonly id?: string;
+  readonly node: string;
+  readonly value?: unknown;
+  readonly response: JsonValue;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-interruption.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-interruption.types.ts#L13)
 
 ### GraphWaitingResponseError (class)
 
@@ -6038,23 +6142,33 @@ Acquires native graph checkpointer and store configuration for invocation and su
 
 ### AgentPersistenceDeclaration
 
+Optional checkpointer and store declarations on an agent. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentPersistenceDeclaration: AgentPersistenceDeclaration;
+export interface AgentPersistenceDeclaration {
+  readonly checkpointer?: unknown;
+  readonly store?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-persistence.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-persistence.types.ts#L13)
 
 ### ResolvedGraphPersistence
 
+Resolved handles passed to a compiled graph. @experimental
+
 **Signature**
 
 ```ts
-declare const ResolvedGraphPersistence: ResolvedGraphPersistence;
+export interface ResolvedGraphPersistence {
+  readonly checkpointer?: BaseCheckpointSaver;
+  readonly store?: BaseStore;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-persistence.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-persistence.types.ts#L7)
 
 ### releaseAgentPersistence
 
@@ -6494,13 +6608,16 @@ declare const GraphInvocationIdentityLive: Layer<GraphInvocationIdentity, never,
 
 ### GraphRuntimeOptions
 
+Runtime options for invoking a compiled graph descriptor. @experimental
+
 **Signature**
 
 ```ts
-declare const GraphRuntimeOptions: GraphRuntimeOptions;
+type GraphRuntimeOptions = AgentRuntimeOptions &
+  AgentInvocationOptions & { readonly agent: GraphDescriptor };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-runtime.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/graph-runtime.types.ts#L7)
 
 ### invokeGraph
 
@@ -8558,23 +8675,27 @@ Cancellation remains linked to the caller and the native stream owner.
 
 ### AgentLoopOptions
 
+Runtime and invocation options consumed by the native model loop.
+
 **Signature**
 
 ```ts
-declare const AgentLoopOptions: AgentLoopOptions;
+type AgentLoopOptions = AgentRuntimeOptions & AgentInvocationOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-loop.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-loop.types.ts#L7)
 
 ### NativeModel
 
+Resolved native model or provider selector.
+
 **Signature**
 
 ```ts
-declare const NativeModel: NativeModel;
+type NativeModel = string | LanguageModelLike;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-loop.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-loop.types.ts#L10)
 
 ### runAgentLoop
 
@@ -8708,33 +8829,51 @@ Resolves authored model selectors or native model instances for an invocation wi
 
 ### AgentContentLimits
 
+Validated maximum byte counts for agent input and output.
+
 **Signature**
 
 ```ts
-declare const AgentContentLimits: AgentContentLimits;
+export interface AgentContentLimits {
+  readonly maxInputBytes: number;
+  readonly maxOutputBytes: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-model.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-model.types.ts#L16)
 
 ### ResolvedRuntimeModel
 
+Selected native model and validated content limits.
+
 **Signature**
 
 ```ts
-declare const ResolvedRuntimeModel: ResolvedRuntimeModel;
+export interface ResolvedRuntimeModel extends AgentContentLimits {
+  readonly id: string;
+  readonly model: string | LanguageModelLike;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-model.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-model.types.ts#L22)
 
 ### RuntimeModelOptions
 
+Inputs used to select a native model and content limits.
+
 **Signature**
 
 ```ts
-declare const RuntimeModelOptions: RuntimeModelOptions;
+export interface RuntimeModelOptions {
+  readonly model?: AgentModel;
+  readonly registry: unknown;
+  readonly environment: Readonly<Record<string, unknown>>;
+  readonly maxInputBytes?: number;
+  readonly maxOutputBytes?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-model.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-model.types.ts#L7)
 
 ### resolveAgentContentLimits
 
@@ -9000,13 +9139,22 @@ Owns native agent construction and invocation adaptation, retaining the authored
 
 ### CreateNativeAgentOptions
 
+Inputs required to build one native agent invocation.
+
 **Signature**
 
 ```ts
-declare const CreateNativeAgentOptions: CreateNativeAgentOptions;
+export interface CreateNativeAgentOptions {
+  readonly runtime: NativeAgentRuntimeOptions;
+  readonly model: string | LanguageModelLike;
+  readonly signal: AbortSignal;
+  readonly maxOutputBytes: number;
+  readonly invocationId: string;
+  readonly traceId: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-agent.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-agent.types.ts#L18)
 
 ### NativeAgent
 
@@ -9633,13 +9781,15 @@ Coordinates native state and tool projection for public execution sinks without 
 
 ### NativeExecutionContext
 
+Agent and parent context attached to a public native event.
+
 **Signature**
 
 ```ts
-declare const NativeExecutionContext: NativeExecutionContext;
+type NativeExecutionContext = Pick<AgentExecutionEvent, "agent" | "parent">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-public.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-public.types.ts#L6)
 
 ### nativePublicEvent
 
@@ -9910,13 +10060,21 @@ declare const DeepAgentsLoaderLive: Layer.Layer<DeepAgentsLoader, never, never>;
 
 ### DeepAgentsLoaderService
 
+Replaceable loader for the optional DeepAgents runtime dependency.
+
 **Signature**
 
 ```ts
-declare const DeepAgentsLoaderService: DeepAgentsLoaderService;
+export interface DeepAgentsLoaderService {
+  /** Loads the optional runtime module.
+   * @returns The DeepAgents module.
+   * @example await loader.load();
+   */
+  readonly load: () => Promise<typeof import("deepagents")>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-support.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-support.types.ts#L2)
 
 ### assertAgentRuntimeDependencies
 
@@ -10243,13 +10401,22 @@ declare const NativeToolIdentityLive: Layer<NativeToolIdentity, never, never>;
 
 ### NativeTools
 
+Native tools and public identity mapping for one invocation.
+
 **Signature**
 
 ```ts
-declare const NativeTools: NativeTools;
+export interface NativeTools {
+  readonly values: readonly (
+    ClientTool | ServerTool | ReturnType<typeof import("langchain").tool>
+  )[];
+  readonly publicIds: ReadonlyMap<string, string>;
+  readonly relkitNames: ReadonlySet<string>;
+  readonly failure: () => unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-tools.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-native-tools.types.ts#L7)
 
 ### createNativeTools
 
@@ -10400,13 +10567,20 @@ declare const AgentExecutionLive: Layer.Layer<AgentExecution, never, never>;
 
 ### AgentExecutionService
 
+Substitutable integrations used while invoking an agent. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentExecutionService: AgentExecutionService;
+export interface AgentExecutionService {
+  readonly resolveModel: typeof resolveRuntimeModel;
+  readonly runLoop: typeof runAgentLoop;
+  readonly invokeGraph: typeof invokeGraph;
+  readonly randomUUID: () => string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-service.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-service.types.ts#L8)
 
 ## `runtime-service.types.ts`
 
@@ -10955,13 +11129,19 @@ Builds invocation tool bindings from the selected RelKit registry and native too
 
 ### AgentToolCall
 
+One model requested RelKit tool call.
+
 **Signature**
 
 ```ts
-declare const AgentToolCall: AgentToolCall;
+export interface AgentToolCall {
+  readonly callId: string;
+  readonly toolId: string;
+  readonly input: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-tools.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/runtime-tools.types.ts#L2)
 
 ### findModelTool
 
@@ -12459,53 +12639,80 @@ Publishes the native agent test harness helpers from the explicit integration wh
 
 ### TestAgent
 
+Owned native agent facade preserving schema inference, approvals and trace evidence.
+
 **Signature**
 
 ```ts
-declare const TestAgent: TestAgent<Agent>;
+export interface TestAgent<Agent extends TestAgentDescriptor = TestAgentDescriptor> {
+  readonly model: TestAgentModel;
+  readonly failures: TestFailureControls;
+  readonly approvals: TestAgentApprovals;
+  readonly pending: () => readonly PendingApproval[];
+  readonly trace: TestAgentTrace;
+  readonly script: (turns: readonly TestModelTurn[]) => void;
+  readonly invoke: (
+    input: InferInput<Agent["input"]>,
+    options?: TestAgentInvocationOptions,
+  ) => Promise<InferOutput<Agent["output"]>>;
+  readonly reset: () => void;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L129)
 
 ### TestAgentApproval
 
+Fixed, pending or caller-native approval decision authority. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentApproval: TestAgentApproval;
+type TestAgentApproval = TestAgentApprovalMode | AgentApprovalHandler;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L25)
 
 ### TestAgentApprovalMode
 
+Fixed or pending native approval policy vocabulary. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentApprovalMode: TestAgentApprovalMode;
+type TestAgentApprovalMode = "approved" | "denied" | "pending";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L22)
 
 ### TestAgentApprovals
 
+Synchronous selection controls over owned pending native decisions. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentApprovals: TestAgentApprovals;
+export interface TestAgentApprovals {
+  readonly pending: () => readonly PendingApproval[];
+  readonly approve: (toolCallId?: string) => void;
+  readonly deny: (toolCallId?: string) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L118)
 
 ### TestAgentDescriptor
 
+Native agent descriptor vocabulary retained by public test inference. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentDescriptor: TestAgentDescriptor;
+type TestAgentDescriptor = AgentDescriptor<string, unknown, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L19)
 
 ### TestAgentHarness (class)
 
@@ -12521,93 +12728,167 @@ declare class TestAgentHarness
 
 ### TestAgentInvocationOptions
 
+Invocation-only native overrides excluding owned model and engine dependencies. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentInvocationOptions: TestAgentInvocationOptions;
+type TestAgentInvocationOptions = Omit<AgentInvocationOptions, "input" | "approval" | "hooks">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L92)
 
 ### TestAgentModel
 
+Public model facade owning script mutation, capture and release. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentModel: TestAgentModel;
+export interface TestAgentModel {
+  readonly provider: string;
+  readonly modelId: string;
+  readonly calls: readonly TestAgentModelCall[];
+  readonly script: (turns: readonly TestModelTurn[]) => void;
+  readonly reset: () => void;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L60)
 
 ### TestAgentModelCall
 
+Detached native request and scripted turn evidence captured in order. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentModelCall: TestAgentModelCall;
+export interface TestAgentModelCall {
+  readonly index: number;
+  readonly request: {
+    readonly messages: readonly unknown[];
+    readonly tools: readonly unknown[];
+  };
+  readonly turn: TestModelTurn;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L50)
 
 ### TestAgentModelOptions
 
+Network-free model identity, hanging behavior and explicit logging policy. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentModelOptions: TestAgentModelOptions;
+export interface TestAgentModelOptions {
+  readonly logger?: NonNullable<
+    Parameters<typeof import("@relkit/testing/testing-owner").testingLoggerLayer>[0]
+  >;
+  readonly provider?: string;
+  readonly modelId?: string;
+  readonly hang?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L40)
 
 ### TestAgentOptions
 
+Native agent, tool engine, model script and capture dependencies.
+
 **Signature**
 
 ```ts
-declare const TestAgentOptions: TestAgentOptions<Agent>;
+export interface TestAgentOptions<Agent extends TestAgentDescriptor = TestAgentDescriptor> {
+  readonly logger?: NonNullable<
+    Parameters<typeof import("@relkit/testing/testing-owner").testingLoggerLayer>[0]
+  >;
+  readonly agent: Agent;
+  readonly tools: AgentRuntimeOptions["tools"];
+  readonly engine: AgentRuntimeOptions["engine"];
+  readonly script?: readonly TestModelTurn[];
+  readonly model?: TestAgentModelOptions;
+  readonly maxInputBytes?: number;
+  readonly maxOutputBytes?: number;
+  readonly approval?: TestAgentApproval;
+  readonly failures?: TestFailureControls;
+  readonly hooks?: AgentRuntimeHooks;
+  readonly capture?: AgentCapturePolicy;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L74)
 
 ### TestAgentTrace
 
+Owned trace evidence with explicit read, clear and assertion operations. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentTrace: TestAgentTrace;
+export interface TestAgentTrace extends TestAgentTraceSnapshot {
+  readonly read: () => TestAgentTraceSnapshot;
+  readonly clear: () => void;
+  readonly assert: (expected: TestAgentTraceExpectation) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L104)
 
 ### TestAgentTraceExpectation
 
+Selected span, outcome and tool-edge evidence checked by trace assertions. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentTraceExpectation: TestAgentTraceExpectation;
+export interface TestAgentTraceExpectation {
+  readonly spanKinds?: readonly ReturnType<typeof spanSnapshot>["kind"][];
+  readonly names?: readonly string[];
+  readonly edges?: readonly AgentObservedEdge[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L111)
 
 ### TestAgentTraceSnapshot
 
+Detached observed span and edge evidence for a test invocation. @experimental
+
 **Signature**
 
 ```ts
-declare const TestAgentTraceSnapshot: TestAgentTraceSnapshot;
+export interface TestAgentTraceSnapshot {
+  readonly spans: readonly ReturnType<typeof spanSnapshot>[];
+  readonly edges: readonly AgentObservedEdge[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L98)
 
 ### TestModelTurn
 
+Scripted native model outcome supporting final values, tool calls and failures. @experimental
+
 **Signature**
 
 ```ts
-declare const TestModelTurn: TestModelTurn;
+type TestModelTurn =
+  | {
+      readonly type: "tool-call";
+      readonly callId: string;
+      readonly toolId: string;
+      readonly input: JsonValue;
+    }
+  | { readonly type: "final"; readonly output: JsonValue }
+  | { readonly type: "error"; readonly code: string; readonly message: string }
+  | { readonly type: "cancelled"; readonly reason?: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/langchain/src/testing/agents.types.ts#L28)
 
 ### assertAgentTrace
 

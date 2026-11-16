@@ -64,10 +64,10 @@ export const GET = defineRoute({ target: listOrders })
 **Signature**
 
 ```ts
-declare const defineRoute: { <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>; <const Id extends string, const Target extends FunctionRefAny, const Request extends HttpRequestMapping | undefined = undefined>(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>; }
+declare const defineRoute: <const Id extends string, const Target extends FunctionRefAny | undefined = undefined, const Request extends HttpRequestMapping | undefined = undefined, const Handler extends RawHttpHandler = RawHttpHandler>(options: DefineRouteOptions<Id, Target, Request, Handler>) => DefinedRoute<Id, Target, Request, Handler>
 ````
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L98)
 
 Since v0.1.0
 
@@ -132,63 +132,136 @@ Since v0.1.0
 
 ### MiddlewareContext
 
+Invocation-scoped capabilities provided to middleware.
+
+**Example**
+
+```ts
+const context: MiddlewareContext = relkit;
+```
+
 **Signature**
 
 ```ts
-declare const MiddlewareContext: MiddlewareContext<Provided>;
+export interface MiddlewareContext<Provided = never> {
+  /** Validates data against the middleware's `provides` schema and makes it available to
+   * routes through `http.from(middleware, field)`.
+   * @param data - Data for this request.
+   * @returns After validation; invalid data fails the request with a 500.
+   * @example await relkit.provide({ tenantId: "acme" });
+   */
+  readonly provide: (data: Provided) => Promise<void>;
+  readonly signal: AbortSignal;
+  readonly env: ResolvedApplicationEnv;
+  readonly auth: AuthContext;
+  readonly log: PublicLogger;
+  readonly time: PublicClock;
+  readonly trace: PublicTrace;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L10)
 
 ### MiddlewareDescriptor
 
+Frozen descriptor for one middleware handler.
+
+**Example**
+
+```ts
+const descriptor: MiddlewareDescriptor = defineMiddleware("/orders", handler);
+```
+
 **Signature**
 
 ```ts
-declare const MiddlewareDescriptor: MiddlewareDescriptor<Id, Provided>;
+export interface MiddlewareDescriptor<
+  Id extends string = string,
+  Provided = never,
+> extends DescriptorBase<"middleware", Id> {
+  readonly path: string;
+  readonly handler: MiddlewareHandler<any>;
+  /** Schema of the data the middleware provides to `http.from`. */
+  readonly provides?: StandardSchemaV1;
+  /** Phantom type of the provided data, read by `http.from`. */
+  readonly __provides?: Provided;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L51)
 
 ### MiddlewareHandler
 
+A path-scoped HTTP middleware callback.
+
+**Example**
+
+```ts
+const handler: MiddlewareHandler = async (_context, next) => next();
+```
+
 **Signature**
 
 ```ts
-declare const MiddlewareHandler: MiddlewareHandler<Provided>;
+type MiddlewareHandler<Provided = never> = (
+  context: Context,
+  next: Next,
+  relkit: MiddlewareContext<Provided>,
+) => MaybePromise<Response | void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L34)
 
 ### MiddlewareServices
 
+Request-scoped services a host supplies to middleware; RelKit adds `provide`.
+
+**Example**
+
+```ts
+const services: MiddlewareServices = { signal, env, auth, log, time, trace };
+```
+
 **Signature**
 
 ```ts
-declare const MiddlewareServices: MiddlewareServices;
+type MiddlewareServices = Omit<MiddlewareContext<never>, "provide">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L29)
 
 ### ProvidedData
 
+Provided data type of a schema, for typed middleware descriptors.
+
 **Signature**
 
 ```ts
-declare const ProvidedData: ProvidedData<Schema>;
+type ProvidedData<Schema extends StandardSchemaV1> = InferOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L64)
 
 ### TypedMiddlewareOptions
 
+Typed middleware: a schema for the data it provides and its handler.
+
+**Example**
+
+```ts
+const options: TypedMiddlewareOptions<typeof tenant> = { provides: tenant, handler };
+```
+
 **Signature**
 
 ```ts
-declare const TypedMiddlewareOptions: TypedMiddlewareOptions<Schema>;
+export interface TypedMiddlewareOptions<Schema extends StandardSchemaV1> {
+  readonly provides: Schema;
+  readonly handler: MiddlewareHandler<InferInput<Schema>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-middleware.types.ts#L43)
 
 ### defineMiddlewareEffect
 
@@ -434,7 +507,7 @@ Re-exports all named exports from the "./route.types.js" module.
 export * from "./route.types.js";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L21)
 
 ### defineRouteEffect
 
@@ -449,21 +522,17 @@ Effect.runSync(defineRouteEffect({ target: listOrders }));
 **Signature**
 
 ```ts
-declare const defineRouteEffect: {
-  <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(
-    options: RawRouteOptions<Id, Handler>,
-  ): Effect.Effect<RawRouteDescriptor<Id, Handler>, RouteOperationError>;
-  <
-    const Id extends string,
-    const Target extends FunctionRefAny,
-    const Request extends HttpRequestMapping | undefined = undefined,
-  >(
-    options: FunctionRouteOptions<Id, Target, Request>,
-  ): Effect.Effect<FunctionRouteDescriptor<Id, Target, Request>, RouteOperationError>;
-};
+declare const defineRouteEffect: <
+  const Id extends string,
+  const Target extends FunctionRefAny | undefined = undefined,
+  const Request extends HttpRequestMapping | undefined = undefined,
+  const Handler extends RawHttpHandler = RawHttpHandler,
+>(
+  options: DefineRouteOptions<Id, Target, Request, Handler>,
+) => Effect.Effect<DefinedRoute<Id, Target, Request, Handler>, RouteOperationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-route.ts#L51)
 
 ## `define-service-routes.ts`
 
@@ -487,43 +556,88 @@ declare const SERVICE_ROUTE_METHODS: readonly [
 
 ### ServiceRouteEntry
 
+Member name or options for a service route.
+
+**Example**
+
+```ts
+type Entry = ServiceRouteEntry<typeof service>;
+```
+
 **Signature**
 
 ```ts
-declare const ServiceRouteEntry: ServiceRouteEntry<Service>;
+type ServiceRouteEntry<Service> = {
+  [Name in ServiceFunctionName<Service>]:
+    Name | ServiceRouteOptions<Name, ServiceFunction<Service, Name>>;
+}[ServiceFunctionName<Service>];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L30)
 
 ### ServiceRouteMethod
 
+Explicit HTTP methods supported by a service route table.
+
+**Example**
+
+```ts
+const method: ServiceRouteMethod = "GET";
+```
+
 **Signature**
 
 ```ts
-declare const ServiceRouteMethod: ServiceRouteMethod;
+type ServiceRouteMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "HEAD" | "OPTIONS";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L9)
 
 ### ServiceRouteMethodMarker
 
+Type-only record of the method a service route table created a descriptor for. The
+generated route module checks compare it with the export name, so plain `tsc` rejects
+`export const { GET: POST } = defineServiceRoutes(...)` without the editor plugin.
+
+**Example**
+
+```ts
+type Marker = ServiceRouteMethodMarker<"GET">;
+```
+
 **Signature**
 
 ```ts
-declare const ServiceRouteMethodMarker: ServiceRouteMethodMarker<Method>;
+export interface ServiceRouteMethodMarker<Method> {
+  readonly __relkit_service_route_method?: Method;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L59)
 
 ### ServiceRouteOptions
 
+Expanded options selecting one service function.
+
+**Example**
+
+```ts
+type Options = ServiceRouteOptions<"list", typeof list>;
+```
+
 **Signature**
 
 ```ts
-declare const ServiceRouteOptions: ServiceRouteOptions<Name, Target>;
+type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = Omit<
+  FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
+  "target"
+> & {
+  /** Name of the service's public function that this method calls. */
+  readonly member: Name;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L19)
 
 ### ServiceRoutesOptions
 
@@ -666,7 +780,7 @@ type ServiceRouteEntry<Service> = {
 }[ServiceFunctionName<Service>];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L30)
 
 ### ServiceRouteMethod (type alias)
 
@@ -706,7 +820,7 @@ export interface ServiceRouteMethodMarker<Method> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L59)
 
 ### ServiceRouteOptions (type alias)
 
@@ -724,7 +838,10 @@ type Options = ServiceRouteOptions<"list", typeof list>;
 type ServiceRouteOptions<Name extends string, Target extends FunctionRefAny> = Omit<
   FunctionRouteOptions<string, Target, HttpRequestMapping | undefined>,
   "target"
-> & { readonly member: Name };
+> & {
+  /** Name of the service's public function that this method calls. */
+  readonly member: Name;
+};
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L19)
@@ -747,7 +864,7 @@ type ServiceRoutesOptions<Service> = Partial<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L38)
 
 ### ServiceRoutesResult (type alias)
 
@@ -772,7 +889,7 @@ type ServiceRoutesResult<Service, Options> = Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/define-service-routes.types.ts#L66)
 
 ## `http-dsl-mapping-validation.ts`
 
@@ -3111,13 +3228,22 @@ export * from "./route.types.js";
 
 ### HttpRateLimitKey
 
+Scalar request source used for rate-limit keys.
+
+**Example**
+
+```ts
+const key: HttpRateLimitKey = http.header("x-api-key");
+```
+
 **Signature**
 
 ```ts
-declare const HttpRateLimitKey: HttpRateLimitKey;
+type HttpRateLimitKey =
+  HttpPathMapping | HttpQueryMapping | HttpHeaderMapping | HttpCookieMapping | HttpConstantMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.types.ts#L13)
 
 ### RouteInputError
 
@@ -3131,13 +3257,58 @@ declare const RouteInputError: typeof RouteInputError;
 
 ### RouteOperation
 
+Bounded name for a route authoring operation.
+
+**Example**
+
+```ts
+const operation: RouteOperation = "route.define";
+```
+
 **Signature**
 
 ```ts
-declare const RouteOperation: RouteOperation;
+type RouteOperation =
+  | "middleware.define"
+  | "middleware.is-descriptor"
+  | "middleware.is-path"
+  | "route.define"
+  | "service-routes.define"
+  | "auth.read-registration"
+  | "auth.copy-protected"
+  | "client.copy"
+  | "stream.copy"
+  | "options.copy-rate-limit"
+  | "options.positive"
+  | "options.success-status"
+  | "dsl.define-transform"
+  | "dsl.is-transform-ref"
+  | "dsl.input"
+  | "dsl.nested"
+  | "dsl.source"
+  | "dsl.whole-body"
+  | "dsl.constant"
+  | "dsl.from"
+  | "dsl.optional"
+  | "dsl.default"
+  | "dsl.transform"
+  | "dsl.response"
+  | "dsl.continue"
+  | "dsl.respond"
+  | "validation.is-mapping"
+  | "validation.assert-mapping"
+  | "validation.is-request"
+  | "validation.assert-request"
+  | "validation.is-response"
+  | "validation.assert-response"
+  | "validation.is-decision"
+  | "validation.is-schema"
+  | "validation.assert-schema"
+  | "validation.is-status"
+  | "validation.is-record";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.types.ts#L6)
 
 ### RouteOperationError
 
@@ -3151,13 +3322,30 @@ declare const RouteOperationError: typeof RouteOperationError;
 
 ### RouteRateLimit
 
+Immutable per-route rate-limit policy.
+
+**Example**
+
+```ts
+const policy: RouteRateLimit = { limit: 10, windowMs: 60_000, key: http.header("x-api-key") };
+```
+
 **Signature**
 
 ```ts
-declare const RouteRateLimit: RouteRateLimit;
+export interface RouteRateLimit {
+  /** Requests allowed per key in one window. */
+  readonly limit: number;
+  /** Length of the window in milliseconds. */
+  readonly windowMs: number;
+  /** Request value that separates callers, such as `http.header("x-api-key")`. */
+  readonly key: HttpRateLimitKey;
+  /** Cache that holds the counters; process memory when omitted. Production needs one. */
+  readonly store?: CacheRefAny;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.types.ts#L19)
 
 ### RouteTelemetry
 
@@ -3181,13 +3369,33 @@ declare const RouteTelemetryLive: Layer<RouteTelemetry, never, never>;
 
 ### RouteTelemetryService
 
+Replaceable observer for route operations.
+
+**Example**
+
+```ts
+const telemetry: RouteTelemetryService = { observe: (_operation, effect) => effect };
+```
+
 **Signature**
 
 ```ts
-declare const RouteTelemetryService: RouteTelemetryService;
+export interface RouteTelemetryService {
+  /**
+   * Measures an operation without changing its success or failure channel.
+   * @param operation - Fixed route operation name.
+   * @param effect - Work to observe.
+   * @returns The observed Effect with unchanged channels.
+   * @example telemetry.observe("route.define", Effect.succeed(route));
+   */
+  readonly observe: <A, E, R>(
+    operation: RouteOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.types.ts#L48)
 
 ### applyRouteResponse
 
@@ -3203,13 +3411,27 @@ declare const applyRouteResponse: (response: Response, init: unknown) => Respons
 
 ### BetterAuthRegistration
 
+Better Auth identity attached to a raw handler.
+
+**Example**
+
+```ts
+const registration: BetterAuthRegistration = {
+  kind: "better-auth",
+  service: { ref: { kind: "service", id: "auth" } },
+};
+```
+
 **Signature**
 
 ```ts
-declare const BetterAuthRegistration: BetterAuthRegistration;
+export interface BetterAuthRegistration {
+  readonly kind: "better-auth";
+  readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-auth.types.ts#L4)
 
 ### readBetterAuthRegistration
 
@@ -3535,13 +3757,58 @@ declare class RouteInputError
 
 ### RouteOperation
 
+Bounded name for a route authoring operation.
+
+**Example**
+
+```ts
+const operation: RouteOperation = "route.define";
+```
+
 **Signature**
 
 ```ts
-declare const RouteOperation: RouteOperation;
+type RouteOperation =
+  | "middleware.define"
+  | "middleware.is-descriptor"
+  | "middleware.is-path"
+  | "route.define"
+  | "service-routes.define"
+  | "auth.read-registration"
+  | "auth.copy-protected"
+  | "client.copy"
+  | "stream.copy"
+  | "options.copy-rate-limit"
+  | "options.positive"
+  | "options.success-status"
+  | "dsl.define-transform"
+  | "dsl.is-transform-ref"
+  | "dsl.input"
+  | "dsl.nested"
+  | "dsl.source"
+  | "dsl.whole-body"
+  | "dsl.constant"
+  | "dsl.from"
+  | "dsl.optional"
+  | "dsl.default"
+  | "dsl.transform"
+  | "dsl.response"
+  | "dsl.continue"
+  | "dsl.respond"
+  | "validation.is-mapping"
+  | "validation.assert-mapping"
+  | "validation.is-request"
+  | "validation.assert-request"
+  | "validation.is-response"
+  | "validation.assert-response"
+  | "validation.is-decision"
+  | "validation.is-schema"
+  | "validation.assert-schema"
+  | "validation.is-status"
+  | "validation.is-record";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.types.ts#L6)
 
 ### RouteOperationError (class)
 
@@ -3603,13 +3870,33 @@ declare const RouteTelemetryLive: Layer.Layer<RouteTelemetry, never, never>;
 
 ### RouteTelemetryService
 
+Replaceable observer for route operations.
+
+**Example**
+
+```ts
+const telemetry: RouteTelemetryService = { observe: (_operation, effect) => effect };
+```
+
 **Signature**
 
 ```ts
-declare const RouteTelemetryService: RouteTelemetryService;
+export interface RouteTelemetryService {
+  /**
+   * Measures an operation without changing its success or failure channel.
+   * @param operation - Fixed route operation name.
+   * @param effect - Work to observe.
+   * @returns The observed Effect with unchanged channels.
+   * @example telemetry.observe("route.define", Effect.succeed(route));
+   */
+  readonly observe: <A, E, R>(
+    operation: RouteOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-observability.types.ts#L48)
 
 ### measureRoute
 
@@ -3828,23 +4115,49 @@ export interface RouteTelemetryService {
 
 ### HttpRateLimitKey
 
+Scalar request source used for rate-limit keys.
+
+**Example**
+
+```ts
+const key: HttpRateLimitKey = http.header("x-api-key");
+```
+
 **Signature**
 
 ```ts
-declare const HttpRateLimitKey: HttpRateLimitKey;
+type HttpRateLimitKey =
+  HttpPathMapping | HttpQueryMapping | HttpHeaderMapping | HttpCookieMapping | HttpConstantMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.types.ts#L13)
 
 ### RouteRateLimit
 
+Immutable per-route rate-limit policy.
+
+**Example**
+
+```ts
+const policy: RouteRateLimit = { limit: 10, windowMs: 60_000, key: http.header("x-api-key") };
+```
+
 **Signature**
 
 ```ts
-declare const RouteRateLimit: RouteRateLimit;
+export interface RouteRateLimit {
+  /** Requests allowed per key in one window. */
+  readonly limit: number;
+  /** Length of the window in milliseconds. */
+  readonly windowMs: number;
+  /** Request value that separates callers, such as `http.header("x-api-key")`. */
+  readonly key: HttpRateLimitKey;
+  /** Cache that holds the counters; process memory when omitted. Production needs one. */
+  readonly store?: CacheRefAny;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route-options.types.ts#L19)
 
 ### copyRateLimit
 
@@ -4074,9 +4387,13 @@ const policy: RouteRateLimit = { limit: 10, windowMs: 60_000, key: http.header("
 
 ```ts
 export interface RouteRateLimit {
+  /** Requests allowed per key in one window. */
   readonly limit: number;
+  /** Length of the window in milliseconds. */
   readonly windowMs: number;
+  /** Request value that separates callers, such as `http.header("x-api-key")`. */
   readonly key: HttpRateLimitKey;
+  /** Cache that holds the counters; process memory when omitted. Production needs one. */
   readonly store?: CacheRefAny;
 }
 ```
@@ -4186,6 +4503,58 @@ export * from "./route-response.types.js";
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L11)
 
+### DefineRouteOptions (type alias)
+
+The options of one `defineRoute` call: those of a function route when the call has a
+`target`, those of a raw route otherwise. One signature takes both forms, so a mistake in an
+option is reported on that option.
+
+**Example**
+
+```ts
+type Options = DefineRouteOptions<"orders.get", typeof getOrder, undefined, RawHttpHandler>;
+```
+
+**Signature**
+
+```ts
+type DefineRouteOptions<
+  Id extends string,
+  Target extends FunctionRefAny | undefined,
+  Request extends HttpRequestMapping | undefined,
+  Handler extends RawHttpHandler,
+> = [Target] extends [undefined]
+  ? RawRouteOptions<Id, Handler>
+  : FunctionRouteOptions<Id, Extract<Target, FunctionRefAny>, Request>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L128)
+
+### DefinedRoute (type alias)
+
+The descriptor a `defineRoute` call returns for its form.
+
+**Example**
+
+```ts
+type Route = DefinedRoute<"orders.get", typeof getOrder, undefined, RawHttpHandler>;
+```
+
+**Signature**
+
+```ts
+type DefinedRoute<
+  Id extends string,
+  Target extends FunctionRefAny | undefined,
+  Request extends HttpRequestMapping | undefined,
+  Handler extends RawHttpHandler,
+> = [Target] extends [undefined]
+  ? RawRouteDescriptor<Id, Handler>
+  : FunctionRouteDescriptor<Id, Extract<Target, FunctionRefAny>, Request>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L140)
+
 ### FunctionRouteDescriptor (interface)
 
 Frozen descriptor for a function-backed route.
@@ -4222,7 +4591,7 @@ export interface FunctionRouteDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L83)
 
 ### FunctionRouteOptions (interface)
 
@@ -4242,16 +4611,27 @@ export interface FunctionRouteOptions<
   Target extends FunctionRefAny,
   Request extends HttpRequestMapping | undefined = undefined,
 > extends RouteSharedOptions<Id> {
+  /** The function the route calls with the mapped request. */
   readonly target: Target;
+  /** Not allowed with `target`: a route has a target function or a raw handler, not both. */
   readonly handler?: never;
+  /** Media type of the request body; set `"multipart/form-data"` to receive file uploads. */
   readonly accept?: HttpRequestContentType;
+  /** Explicit mapping from the request to the function's input; replaces the inferred one. */
   readonly request?: Request;
+  /** The complete response contract; replaces the responses inferred from the function. */
   readonly responses?: readonly HttpResponseMapping[];
+  /** Status of a successful response when the inferred one does not fit, such as `201`. */
   readonly successStatus?: number;
+  /** Largest request body in bytes for this route; a larger one is answered `413`. */
   readonly maxBodyBytes?: number;
+  /** Limits requests per key in a time window, before input mapping and the function call. */
   readonly rateLimit?: RouteRateLimit;
+  /** Time limit of the function call in milliseconds for requests to this route. */
   readonly timeoutMs?: number;
+  /** `false` hides the route from the generated client; `operation` sets query or mutation. */
   readonly client?: RouteClientPolicy;
+  /** Sends a `streamOf` output in a native format: `"sse"`, `"text"` or `"bytes"`. */
   readonly stream?: { readonly format: NativeStreamFormat };
   /** Sets the success status, headers and cookies from the function's output. */
   readonly response?: RouteResponseFor<Target>;
@@ -4260,7 +4640,7 @@ export interface FunctionRouteOptions<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L34)
 
 ### NativeStreamFormat (type alias)
 
@@ -4327,7 +4707,7 @@ export interface RawRouteDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L108)
 
 ### RawRouteOptions (interface)
 
@@ -4346,12 +4726,14 @@ export interface RawRouteOptions<
   Id extends string,
   Handler extends RawHttpHandler = RawHttpHandler,
 > extends RouteSharedOptions<Id> {
+  /** Receives the raw `Request` and returns the `Response`; no function is called. */
   readonly handler: Handler;
+  /** Not allowed with `handler`: a route has a raw handler or a target function, not both. */
   readonly target?: never;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L70)
 
 ### RouteClientPolicy (type alias)
 
@@ -4391,4 +4773,4 @@ type RouteDescriptor<
 > = FunctionRouteDescriptor<Id, Target, Request> | RawRouteDescriptor<Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/routes/route.types.ts#L152)

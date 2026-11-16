@@ -1564,23 +1564,50 @@ declare const setCacheEffect: (
 
 ### CacheBridgeOptions
 
+Metadata sent to an invocation bridge.
+
+**Example**
+
+```ts
+const options: CacheBridgeOptions = {
+  name: "cache.get",
+  attributes: {},
+  signal: new AbortController().signal,
+};
+```
+
 **Signature**
 
 ```ts
-declare const CacheBridgeOptions: CacheBridgeOptions;
+export interface CacheBridgeOptions {
+  readonly name: string;
+  readonly attributes: Readonly<Record<string, unknown>>;
+  readonly signal: AbortSignal;
+  readonly input?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.types.ts#L7)
 
 ### CacheCapabilities
 
+Provider-declared feature support.
+
+**Example**
+
+```ts
+const capabilities: CacheCapabilities = { increment: true };
+```
+
 **Signature**
 
 ```ts
-declare const CacheCapabilities: CacheCapabilities;
+export interface CacheCapabilities {
+  readonly increment?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L34)
 
 ### CacheCapability
 
@@ -1804,13 +1831,29 @@ export interface CacheEffectClient<Key, Value> {
 
 ### CacheInvocationBridge
 
+Existing invocation bridge contract.
+
+**Example**
+
+```ts
+const bridge: CacheInvocationBridge = { run: async (operation) => operation() };
+```
+
 **Signature**
 
 ```ts
-declare const CacheInvocationBridge: CacheInvocationBridge;
+export interface CacheInvocationBridge {
+  /** Runs one operation in the existing invocation boundary.
+   * @param operation - Deferred operation callback.
+   * @param options - Span metadata, signal, and input.
+   * @returns Operation value or rejection.
+   * @example bridge.run(() => Promise.resolve(1));
+   */
+  readonly run: <A>(operation: () => MaybePromise<A>, options?: CacheBridgeOptions) => Promise<A>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L162)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-runtime.types.ts#L16)
 
 ### CacheNumericClient (type alias)
 
@@ -1841,33 +1884,65 @@ type CacheNumericClient<Key, Value extends number> = {
 
 ### CacheObservedEdge
 
+A declared dependency edge observed without any cache key or value.
+
+**Example**
+
+```ts
+const edge: CacheObservedEdge = { relationship: "uses-cache", from: "orders", to: "prices" };
+```
+
 **Signature**
 
 ```ts
-declare const CacheObservedEdge: CacheObservedEdge;
+export interface CacheObservedEdge {
+  readonly relationship: "uses-cache";
+  readonly from: string;
+  readonly to: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L163)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.types.ts#L12)
 
 ### CacheOperation
 
+Fixed cache method names used for spans and metrics.
+
+**Example**
+
+```ts
+const operation: CacheOperation = "get";
+```
+
 **Signature**
 
 ```ts
-declare const CacheOperation: CacheOperation;
+type CacheOperation = "get" | "set" | "delete" | "has" | "getOrSet" | "increment";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L7)
 
 ### CacheOperationContext
 
+Cancellation and deadline data passed to a provider call.
+
+**Example**
+
+```ts
+const context: CacheOperationContext = { operation: "get", signal: new AbortController().signal };
+```
+
 **Signature**
 
 ```ts
-declare const CacheOperationContext: CacheOperationContext;
+export interface CacheOperationContext {
+  readonly operation: CacheOperation;
+  readonly signal: AbortSignal;
+  readonly deadlineMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L26)
 
 ### CacheOperationError (type alias)
 
@@ -1899,43 +1974,158 @@ type CacheOperationError =
 
 ### CacheOperationObservation
 
+One operation outcome with bounded, input-free fields.
+
+**Example**
+
+```ts
+const event: CacheOperationObservation = {
+  capability: "cache",
+  operation: "get",
+  ownerId: "orders",
+  cacheId: "prices",
+  outcome: "success",
+};
+```
+
 **Signature**
 
 ```ts
-declare const CacheOperationObservation: CacheOperationObservation;
+export interface CacheOperationObservation {
+  readonly capability: "cache";
+  readonly operation: CacheOperation;
+  readonly ownerId: string;
+  readonly cacheId: string;
+  readonly outcome: CacheOperationOutcome;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L163)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-observability.types.ts#L20)
 
 ### CacheOperationOptions
 
+Optional write or increment TTL in milliseconds.
+
+**Example**
+
+```ts
+const options: CacheOperationOptions = { ttlMs: 1000 };
+```
+
 **Signature**
 
 ```ts
-declare const CacheOperationOptions: CacheOperationOptions;
+export interface CacheOperationOptions {
+  readonly ttlMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L20)
 
 ### CacheOperationOutcome
 
+Stable operation outcomes for RelKit observations.
+
+**Example**
+
+```ts
+const outcome: CacheOperationOutcome = "success";
+```
+
 **Signature**
 
 ```ts
-declare const CacheOperationOutcome: CacheOperationOutcome;
+type CacheOperationOutcome =
+  "success" | "provider-failure" | "cancelled" | "timeout" | "unsupported" | "validation-error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L15)
 
 ### CacheProvider
 
+Optional provider methods; missing methods fail with CacheProviderError.
+
+**Example**
+
+```ts
+const provider: CacheProvider = { get: async () => undefined };
+```
+
 **Signature**
 
 ```ts
-declare const CacheProvider: CacheProvider;
+export interface CacheProvider {
+  readonly capabilities?: CacheCapabilities | readonly CacheCapability[];
+  /** Reads one key.
+   * @param key - Provider key.
+   * @param context - Cancellation and deadline context.
+   * @returns Stored value or undefined.
+   * @example await provider.get?.("sku", context);
+   */
+  readonly get?: (
+    key: unknown,
+    context?: CacheOperationContext,
+  ) => MaybePromise<unknown | undefined>;
+  /** Writes one entry.
+   * @param key - Provider key.
+   * @param value - Validated value.
+   * @param options - Optional TTL.
+   * @param context - Cancellation and deadline context.
+   * @returns Completion.
+   * @example await provider.set?.("sku", 1);
+   */
+  readonly set?: (
+    key: unknown,
+    value: unknown,
+    options?: CacheOperationOptions,
+    context?: CacheOperationContext,
+  ) => MaybePromise<void>;
+  /** Deletes one key.
+   * @param key - Provider key.
+   * @param context - Cancellation and deadline context.
+   * @returns Completion.
+   * @example await provider.delete?.("sku");
+   */
+  readonly delete?: (key: unknown, context?: CacheOperationContext) => MaybePromise<void>;
+  /** Tests key presence.
+   * @param key - Provider key.
+   * @param context - Cancellation and deadline context.
+   * @returns Presence.
+   * @example await provider.has?.("sku");
+   */
+  readonly has?: (key: unknown, context?: CacheOperationContext) => MaybePromise<boolean>;
+  /** Reads or fills a key.
+   * @param key - Provider key.
+   * @param produce - Miss producer.
+   * @param options - Optional TTL.
+   * @param context - Cancellation and deadline context.
+   * @returns Stored or produced value.
+   * @example await provider.getOrSet?.("sku", () => 1);
+   */
+  readonly getOrSet?: (
+    key: unknown,
+    produce: () => MaybePromise<unknown>,
+    options?: CacheOperationOptions,
+    context?: CacheOperationContext,
+  ) => MaybePromise<unknown>;
+  /** Increments a numeric entry.
+   * @param key - Provider key.
+   * @param delta - Finite increment.
+   * @param options - Optional TTL.
+   * @param context - Cancellation and deadline context.
+   * @returns Updated numeric value.
+   * @example await provider.increment?.("sku", 2);
+   */
+  readonly increment?: (
+    key: unknown,
+    delta: number,
+    options?: CacheOperationOptions,
+    context?: CacheOperationContext,
+  ) => MaybePromise<unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/client-operation.types.ts#L40)
 
 ## `define-cache-compat.ts`
 
@@ -1985,23 +2175,53 @@ declare class CacheDescriptorError
 
 ### CacheDescriptor
 
+Frozen cache descriptor with phantom key and value types.
+
+**Example**
+
+```ts
+const descriptor = defineCache({ id: "prices", key: z.string(), value: z.number() });
+```
+
 **Signature**
 
 ```ts
-declare const CacheDescriptor: CacheDescriptor<Id, Key, Value, KeySchema, ValueSchema>;
+export interface CacheDescriptor<
+  Id extends string,
+  Key,
+  Value,
+  KeySchema extends StandardSchemaV1 = StandardSchemaV1,
+  ValueSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends DescriptorBase<"cache", Id> {
+  readonly profile?: string;
+  readonly key: KeySchema;
+  readonly value: ValueSchema;
+  readonly defaultTtlMs?: number;
+  readonly maxTtlMs?: number;
+  readonly __key?: Key;
+  readonly __value?: Value;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L10)
 
 ### CacheDescriptorAny
 
+Any cache descriptor when schema type parameters are not known.
+
+**Example**
+
+```ts
+const value: CacheDescriptorAny = defineCache(options);
+```
+
 **Signature**
 
 ```ts
-declare const CacheDescriptorAny: CacheDescriptorAny;
+type CacheDescriptorAny = CacheDescriptor<string, unknown, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L28)
 
 ### CacheDescriptorError
 
@@ -2015,13 +2235,42 @@ declare const CacheDescriptorError: typeof CacheDescriptorError;
 
 ### DefineCacheOptions
 
+Inputs used to define one typed cache contract.
+
+**Example**
+
+```ts
+const options: DefineCacheOptions<"prices", typeof key, typeof value> = {
+  id: "prices",
+  key,
+  value,
+};
+```
+
 **Signature**
 
 ```ts
-declare const DefineCacheOptions: DefineCacheOptions<Id, KeySchema, ValueSchema>;
+export interface DefineCacheOptions<
+  Id extends string,
+  KeySchema extends StandardSchemaV1,
+  ValueSchema extends StandardSchemaV1,
+> extends DescriptorMetadata {
+  /** Stable, unique name of the cache. */
+  readonly id: Id;
+  /** The cache provider profile that holds the entries; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"cache">;
+  /** Schema of the key that identifies one entry. */
+  readonly key: KeySchema;
+  /** Schema of the stored value. */
+  readonly value: ValueSchema;
+  /** Lifetime in milliseconds of an entry whose write does not set one. */
+  readonly defaultTtlMs?: number;
+  /** Longest lifetime a write may ask for, in milliseconds; a longer one is rejected. */
+  readonly maxTtlMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L32)
 
 ### assertCacheDescriptor
 
@@ -2161,7 +2410,7 @@ export interface CacheDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L10)
 
 ### CacheDescriptorAny (type alias)
 
@@ -2179,7 +2428,7 @@ const value: CacheDescriptorAny = defineCache(options);
 type CacheDescriptorAny = CacheDescriptor<string, unknown, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L28)
 
 ### DefineCacheOptions (interface)
 
@@ -2203,16 +2452,22 @@ export interface DefineCacheOptions<
   KeySchema extends StandardSchemaV1,
   ValueSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
+  /** Stable, unique name of the cache. */
   readonly id: Id;
-  readonly profile?: string;
+  /** The cache provider profile that holds the entries; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"cache">;
+  /** Schema of the key that identifies one entry. */
   readonly key: KeySchema;
+  /** Schema of the stored value. */
   readonly value: ValueSchema;
+  /** Lifetime in milliseconds of an entry whose write does not set one. */
   readonly defaultTtlMs?: number;
+  /** Longest lifetime a write may ask for, in milliseconds; a longer one is rejected. */
   readonly maxTtlMs?: number;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/cache/define-cache.types.ts#L32)
 
 ## `index.ts`
 

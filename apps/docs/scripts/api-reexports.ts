@@ -16,7 +16,8 @@ interface Entry {
 }
 
 const HEADING = /^### (\S+)(?: \(([^)]+)\))?$/u;
-const STUB = /^declare const (\w+): \1(?:<[^;]*>)?;$/u;
+// Docgen prints the stub without a semicolon; the formatter adds one to the emitted page.
+const STUB = /^declare const (\w+): \1(?:<.*>)?;?$/u;
 
 /** Finds the `###` entries of a page, ignoring headings inside code fences. */
 function entries(lines: readonly string[]): Entry[] {

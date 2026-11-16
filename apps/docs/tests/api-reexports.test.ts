@@ -18,13 +18,14 @@ const declaration = [
   "[Source](https://example.test/app-config.types.ts#L20)",
   "",
 ];
-const stub = (name: string): string[] => [
+const stub = (name: string, end = ""): string[] => [
   `### ${name}`,
   "",
   "**Signature**",
   "",
   "```ts",
-  `declare const ${name}: ${name};`,
+  // Docgen writes no semicolon; a formatted page has one.
+  `declare const ${name}: ${name}${end}`,
   "```",
   "",
   "[Source](https://example.test/define-app.types.ts#L13)",
@@ -40,7 +41,9 @@ test("a re-export stub takes the body of the declaration on the same page", () =
   expect(second).toContain("### ServerConfig\n\nHTTP server settings.");
   expect(second).toContain("  readonly port?: number;");
   expect(second).toContain("app-config.types.ts#L20");
-  expect(expanded).not.toContain("declare const ServerConfig: ServerConfig;");
+  expect(expanded).not.toContain("declare const ServerConfig: ServerConfig");
+  const formatted = page.replace("ServerConfig: ServerConfig", "ServerConfig: ServerConfig;");
+  expect(expandReExports(formatted)).not.toContain("declare const ServerConfig");
   // The heading keeps its text, so links to it still work, and the next entry follows.
   expect(second).toContain("### defineApp\n\nDefines the application.");
 });

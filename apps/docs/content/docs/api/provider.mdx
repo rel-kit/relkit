@@ -17,18 +17,29 @@ For configuration and examples, read [provider authoring](/docs/modules/integrat
 
 ### DefineProviderAdapterOptions
 
+Inputs accepted by a provider adapter builder.
+
 **Signature**
 
 ```ts
-declare const DefineProviderAdapterOptions: DefineProviderAdapterOptions<
-  Capability,
-  AdapterId,
-  Connection,
-  Behavior
->;
+export interface DefineProviderAdapterOptions<
+  Capability extends ProviderCapability,
+  AdapterId extends string,
+  Connection extends ProviderConnectionValues,
+  Behavior extends ProviderBehavior,
+> {
+  readonly integration: IntegrationReference;
+  readonly capability: Capability;
+  readonly adapterId: AdapterId;
+  readonly connectionContract: ProviderConnectionContract;
+  readonly connection: Connection;
+  readonly behavior: Behavior;
+  readonly features?: readonly ProviderFeature<Capability["id"]>[];
+  readonly localRecipe?: ProviderLocalRecipeReference;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/adapter-builder.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/adapter-builder.types.ts#L12)
 
 ### defineProviderAdapter
 
@@ -136,13 +147,18 @@ export interface DefineProviderAdapterOptions<
 
 ### NormalizeProviderBindingOptions
 
+Required features for a logical descriptor's selected provider.
+
 **Signature**
 
 ```ts
-declare const NormalizeProviderBindingOptions: NormalizeProviderBindingOptions;
+export interface NormalizeProviderBindingOptions {
+  readonly descriptorId: string;
+  readonly requiredFeatures?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/binding-normalization.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/binding-normalization.types.ts#L2)
 
 ### ProviderFeatureMismatchError
 
@@ -223,13 +239,16 @@ export interface NormalizeProviderBindingOptions {
 
 ### ProviderBindingResolutionCode
 
+Stable codes for connection resolution failures.
+
 **Signature**
 
 ```ts
-declare const ProviderBindingResolutionCode: ProviderBindingResolutionCode;
+type ProviderBindingResolutionCode =
+  "CONFLICTING_CONNECTION_VALUE" | "MISSING_CONNECTION_VALUE" | "UNKNOWN_CONNECTION_OUTPUT";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/binding-resolution.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-errors.types.ts#L5)
 
 ### ProviderBindingResolutionError
 
@@ -243,23 +262,39 @@ declare const ProviderBindingResolutionError: typeof ProviderBindingResolutionEr
 
 ### ProviderConnectionDescriptor
 
+Minimal adapter shape accepted by connection resolution.
+
 **Signature**
 
 ```ts
-declare const ProviderConnectionDescriptor: ProviderConnectionDescriptor;
+export interface ProviderConnectionDescriptor {
+  readonly capability: Readonly<{ readonly id: string }>;
+  readonly connectionContract: Readonly<{
+    readonly fields: Readonly<Record<string, ProviderConnectionField>>;
+  }>;
+  readonly connection: ProviderConnectionValues;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/binding-resolution.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/binding-resolution.types.ts#L14)
 
 ### ResolveProviderConnectionOptions
 
+Inputs for resolving authored, local, infrastructure, and named values.
+
 **Signature**
 
 ```ts
-declare const ResolveProviderConnectionOptions: ResolveProviderConnectionOptions;
+export interface ResolveProviderConnectionOptions {
+  readonly profile: string;
+  readonly bindingId?: string;
+  readonly local?: Readonly<Record<string, JsonValue>>;
+  readonly infrastructure?: Readonly<Record<string, JsonValue>>;
+  readonly values?: Readonly<Record<string, JsonValue>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/binding-resolution.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/binding-resolution.types.ts#L5)
 
 ### resolveProviderConnection
 
@@ -1055,33 +1090,48 @@ declare const normalizeProviderSourceEffect: <const Adapter extends ProviderAdap
 
 ### NormalizedProviderProfiles
 
+Immutable provider sources keyed by normalized profile name.
+
 **Signature**
 
 ```ts
-declare const NormalizedProviderProfiles: NormalizedProviderProfiles<Adapter>;
+export interface NormalizedProviderProfiles<Adapter extends ProviderAdapter = ProviderAdapter> {
+  readonly kind: "normalized-provider-profiles";
+  readonly capability: string;
+  readonly profiles: Readonly<Record<string, NormalizedProviderSource<Adapter>>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.types.ts#L9)
 
 ### ProviderInput
 
+A direct binding or a map of named provider profiles.
+
 **Signature**
 
 ```ts
-declare const ProviderInput: ProviderInput<Binding>;
+type ProviderInput<Binding> = Binding | Readonly<Record<string, Binding>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.types.ts#L7)
 
 ### ProviderProfileSelection
 
+Selected profile with the matching normalized binding.
+
 **Signature**
 
 ```ts
-declare const ProviderProfileSelection: ProviderProfileSelection<Adapter>;
+export interface ProviderProfileSelection<Adapter extends ProviderAdapter = ProviderAdapter> {
+  readonly capability: string;
+  readonly profile: string;
+  readonly source: ProviderProfileSelectionSource;
+  readonly binding: NormalizedProviderSource<Adapter>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.types.ts#L17)
 
 ### ProviderProfileSelectionError
 
@@ -1095,23 +1145,31 @@ declare const ProviderProfileSelectionError: typeof ProviderProfileSelectionErro
 
 ### ProviderProfileSelectionSource
 
+How a profile was selected.
+
 **Signature**
 
 ```ts
-declare const ProviderProfileSelectionSource: ProviderProfileSelectionSource;
+type ProviderProfileSelectionSource = "descriptor" | "default" | "sole";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.types.ts#L15)
 
 ### SelectProviderProfileOptions
 
+Descriptor and optional application-level default profile selection.
+
 **Signature**
 
 ```ts
-declare const SelectProviderProfileOptions: SelectProviderProfileOptions;
+export interface SelectProviderProfileOptions {
+  readonly descriptorId: string;
+  readonly profile?: string;
+  readonly defaultProfile?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/profile-normalization.types.ts#L28)
 
 ### normalizeProviderProfiles
 
@@ -1963,13 +2021,16 @@ readonly reason: string
 
 ### ProviderBindingResolutionCode
 
+Stable codes for connection resolution failures.
+
 **Signature**
 
 ```ts
-declare const ProviderBindingResolutionCode: ProviderBindingResolutionCode;
+type ProviderBindingResolutionCode =
+  "CONFLICTING_CONNECTION_VALUE" | "MISSING_CONNECTION_VALUE" | "UNKNOWN_CONNECTION_OUTPUT";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-errors.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-errors.types.ts#L5)
 
 ### ProviderBindingResolutionFailure (class)
 
@@ -2027,13 +2088,16 @@ declare class ProviderProfileSelectionFailure
 
 ### ProviderValidationCode
 
+Stable validation codes for provider authoring failures.
+
 **Signature**
 
 ```ts
-declare const ProviderValidationCode: ProviderValidationCode;
+type ProviderValidationCode =
+  "INVALID_ID" | "INVALID_DESCRIPTOR" | "INVALID_CONNECTION" | "INVALID_PROFILE";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-errors.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-errors.types.ts#L2)
 
 ### ProviderValidationError (class)
 
@@ -2087,23 +2151,52 @@ type ProviderValidationCode =
 
 ### ProviderError
 
+Expected tagged failures from provider operations.
+
 **Signature**
 
 ```ts
-declare const ProviderError: ProviderError;
+type ProviderError =
+  | ProviderValidationError
+  | ProviderProfileSelectionFailure
+  | ProviderFeatureMismatchFailure
+  | ProviderBindingResolutionFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-observability.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-observability.types.ts#L33)
 
 ### ProviderOperation
 
+Fixed names for provider operations; never derived from user input.
+
 **Signature**
 
 ```ts
-declare const ProviderOperation: ProviderOperation;
+type ProviderOperation =
+  | "dependency.resolve"
+  | "dependency.manager"
+  | "dependency.check"
+  | "dependency.initialize"
+  | "binding-value.create"
+  | "binding-value.is-ref"
+  | "binding.resolve"
+  | "binding.normalize"
+  | "profile.normalize"
+  | "profile.select"
+  | "source.local"
+  | "source.infrastructure"
+  | "source.normalize"
+  | "capability.define"
+  | "feature.define"
+  | "connection.define"
+  | "behavior.define"
+  | "access.define"
+  | "integration.define"
+  | "recipe.define"
+  | "adapter.define";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-observability.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-observability.types.ts#L10)
 
 ### ProviderTelemetry (class)
 
@@ -2143,13 +2236,26 @@ declare const ProviderTelemetryLive: Layer.Layer<ProviderTelemetry, never, never
 
 ### ProviderTelemetryService
 
+Substitutable operation telemetry used by public Effect functions.
+
 **Signature**
 
 ```ts
-declare const ProviderTelemetryService: ProviderTelemetryService;
+export interface ProviderTelemetryService {
+  /** Observe an operation without changing its result or failure.
+   * @param operation - Fixed operation name.
+   * @param effect - Effect to observe.
+   * @returns The same success and error channels.
+   * @example telemetry.observe("capability.define", Effect.succeed("cache"));
+   */
+  readonly observe: <A, E, R>(
+    operation: ProviderOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-observability.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/provider/provider-observability.types.ts#L39)
 
 ### observeProvider
 

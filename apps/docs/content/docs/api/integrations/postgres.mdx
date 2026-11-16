@@ -629,13 +629,21 @@ dead-lettered on its own, so one failing consumer never re-runs another.
 
 ### DeliveryRow
 
+A leased delivery joined with its outbox envelope.
+
 **Signature**
 
 ```ts
-declare const DeliveryRow: DeliveryRow;
+export interface DeliveryRow {
+  readonly instance_id: string;
+  readonly trigger_id: string;
+  /** One-based attempt this lease runs. */
+  readonly attempt: number;
+  readonly envelope: UnknownEventEnvelope;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/events-store.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/events-store.types.ts#L5)
 
 ### leaseDelivery
 
@@ -772,13 +780,20 @@ export * from "./jobs-runtime.types.js";
 
 ### ClaimedOccurrence
 
+One occurrence this pass enqueued (or skipped under `overlap: "skip"`). @experimental
+
 **Signature**
 
 ```ts
-declare const ClaimedOccurrence: ClaimedOccurrence;
+export interface ClaimedOccurrence {
+  readonly scheduleId: string;
+  readonly occurrenceAt: string;
+  /** The enqueued run, or `skipped` when an earlier run of the schedule was still active. */
+  readonly runId: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/schedules-tick.ts#L20)
 
 ### PostgresBackendError
 
@@ -792,13 +807,20 @@ declare const PostgresBackendError: typeof PostgresBackendError;
 
 ### PostgresJobWorker
 
+Pull worker plus a close operation for its heartbeats. @experimental
+
 **Signature**
 
 ```ts
-declare const PostgresJobWorker: PostgresJobWorker;
+export interface PostgresJobWorker extends NativeTaskWorker {
+  /** Stops heartbeats without settling held runs; their leases then expire. */
+  readonly close: () => Promise<void>;
+  /** Runs currently leased by this worker. */
+  readonly active: () => readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-worker.ts#L25)
 
 ### PostgresRunNotFoundError
 
@@ -812,13 +834,15 @@ declare const PostgresRunNotFoundError: typeof PostgresRunNotFoundError;
 
 ### PostgresWorkerRole
 
+Whether this process only serves requests (`api`) or also runs background work (`worker`). @experimental
+
 **Signature**
 
 ```ts
-declare const PostgresWorkerRole: PostgresWorkerRole;
+type PostgresWorkerRole = "api" | "worker";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/integration.ts#L17)
 
 ### createPostgresEventProvider
 
@@ -1266,33 +1290,82 @@ declare const DEAD_LETTER_CODE: "RELKIT_JOB_DEAD_LETTERED";
 
 ### JobRunRow
 
+One row of the job-runs table.
+
 **Signature**
 
 ```ts
-declare const JobRunRow: JobRunRow;
+export interface JobRunRow {
+  readonly run_id: string;
+  readonly service: string;
+  readonly scope: string;
+  readonly job_id: string;
+  readonly task_id: string;
+  readonly task_version: string;
+  readonly build_id: string;
+  /** Stored state: queued, running, completed, failed or cancelled. */
+  readonly status: "queued" | "running" | "completed" | "failed" | "cancelled";
+  /** Attempts started so far; a leased run's current attempt. */
+  readonly attempt: number;
+  readonly input: JobWireEnvelope;
+  readonly request: StoredRequest;
+  readonly dedupe_key: string | null;
+  readonly operation_id: string;
+  readonly retry_of_run_id: string | null;
+  readonly run_at: TimestampValue;
+  readonly accepted_at: TimestampValue;
+  readonly started_at: TimestampValue | null;
+  readonly completed_at: TimestampValue | null;
+  readonly lease_owner: string | null;
+  readonly lease_expires_at: TimestampValue | null;
+  readonly output: JsonValue | null;
+  readonly error: JobErrorEnvelope | null;
+  readonly cancellation: RunCancellationReceipt | null;
+  readonly dead_lettered: boolean;
+  /** Database time when the row was read, used for derived states such as `delayed`. */
+  readonly observed_at: TimestampValue;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-rows.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-rows.types.ts#L30)
 
 ### StoredRequest
 
+Submission metadata kept in the `request` jsonb column; every field is optional.
+
 **Signature**
 
 ```ts
-declare const StoredRequest: StoredRequest;
+export interface StoredRequest {
+  readonly inputHash?: string;
+  readonly inputSchemaHash?: string;
+  readonly acceptanceIdentity?: string;
+  readonly occurrenceIdentity?: string;
+  readonly idempotencyKey?: string;
+  readonly policy?: JsonValue;
+  readonly scheduledFor?: string;
+  readonly scheduleId?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+  readonly parentRunId?: string;
+  readonly propagation?: TracePropagation;
+  readonly serviceGeneration?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-rows.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-rows.types.ts#L13)
 
 ### TimestampValue
 
+A timestamp column as the driver returns it.
+
 **Signature**
 
 ```ts
-declare const TimestampValue: TimestampValue;
+type TimestampValue = Date | string;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-rows.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/runtime/jobs-rows.types.ts#L10)
 
 ### handleOf
 
@@ -2025,23 +2098,49 @@ statements from `postgresBackendSql`. Nothing here opens a connection.
 
 ### PostgresTableOptions
 
+Where the backend's tables live; both names are validated SQL identifiers. @experimental
+
 **Signature**
 
 ```ts
-declare const PostgresTableOptions: PostgresTableOptions;
+export interface PostgresTableOptions {
+  /** Postgres schema holding the tables; defaults to `public`. */
+  readonly schema?: string;
+  /** Prefix for every table name; defaults to `relkit`. */
+  readonly tablePrefix?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/schema.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/schema.types.ts#L4)
 
 ### PostgresTables
 
+Fully qualified, quoted table names for one backend namespace. @experimental
+
 **Signature**
 
 ```ts
-declare const PostgresTables: PostgresTables;
+export interface PostgresTables {
+  /** Quoted schema name. */
+  readonly schema: string;
+  /** Job runs, leased with `FOR UPDATE SKIP LOCKED`. */
+  readonly jobRuns: string;
+  /** Persisted schedule definitions keyed by service and schedule ID. */
+  readonly schedules: string;
+  /** One row per claimed schedule occurrence, unique on (service, schedule, occurrence). */
+  readonly scheduleOccurrences: string;
+  /** Event outbox written by publishers, inside the caller's transaction when given one. */
+  readonly eventOutbox: string;
+  /** Registered event consumers that publication fans out to. */
+  readonly eventConsumers: string;
+  /** One delivery per (event instance, consumer), retried independently. */
+  readonly eventDeliveries: string;
+  /** Advisory-lock key that serializes schema creation across instances. */
+  readonly lockKey: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/schema.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/postgres/src/schema.types.ts#L12)
 
 ### postgresBackendSql
 

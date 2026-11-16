@@ -59,9 +59,9 @@ declare const defineTask: <
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
-  const Execution extends TaskExecution = "durable",
+  const Execution extends TaskExecution = TaskExecution,
 >(
-  options: DefineTaskOptions<
+  options: DefineTaskCallOptions<
     Id,
     Version,
     InputSchema,
@@ -81,11 +81,11 @@ declare const defineTask: <
   Errors,
   ProgressSchema,
   Streams,
-  Execution
+  TaskForm<Execution>
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L91)
 
 Since v0.4.1
 
@@ -364,13 +364,38 @@ declare const JOBS_ADAPTER_PROTOCOL_VERSION: 1;
 
 ### JobsAdapterRuntime
 
+Provider protocol for submitting, reading, controlling, and observing jobs.
+
 **Signature**
 
 ```ts
-declare const JobsAdapterRuntime: JobsAdapterRuntime;
+export interface JobsAdapterRuntime {
+  readonly kind: "jobs-adapter-runtime";
+  readonly protocolVersion: typeof JOBS_PROTOCOL_VERSION;
+  readonly capabilities: JobsCapabilityReport;
+  readonly submit: (request: NativeSubmission, context: OperationContext) => Promise<NativeReceipt>;
+  readonly get: (locator: NativeLocator, context: OperationContext) => Promise<NativeRun>;
+  readonly list: (query: NativeRunQuery, context: OperationContext) => Promise<NativeRunPage>;
+  readonly observe: (
+    request: NativeWatchRequest,
+    context: OperationContext,
+  ) => AsyncIterable<NativeObservation>;
+  readonly cancel: (
+    request: NativeCancelRequest,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
+  readonly retry?: (
+    request: NativeRetryRequest,
+    context: OperationContext,
+  ) => Promise<NativeControlReceipt>;
+  readonly close: () => Promise<void>;
+  readonly worker?: NativeTaskWorker;
+  readonly schedules?: NativeScheduleOperations;
+  readonly streams?: Readonly<Record<string, unknown>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L93)
 
 ### JobsAdapterValidationError (class)
 
@@ -402,43 +427,66 @@ declare const JobsCapabilityError: typeof JobsCapabilityError;
 
 ### JobsCapabilityReport
 
+Provider capabilities validated at the jobs boundary.
+
 **Signature**
 
 ```ts
-declare const JobsCapabilityReport: JobsCapabilityReport;
+export interface JobsCapabilityReport {
+  readonly service: string;
+  readonly provider?: string;
+  readonly adapterId?: string;
+  readonly protocolVersion?: 1;
+  readonly features: Readonly<Record<string, boolean>>;
+  readonly capabilities?: Readonly<Record<string, JobsCapability>>;
+  readonly limits?: Readonly<Record<string, number>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.types.ts#L10)
 
 ### NativeCancelRequest
 
+Provider-facing cancel request contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeCancelRequest: NativeCancelRequest;
+export interface NativeCancelRequest {
+  readonly runId: string;
+  readonly operationId: string;
+  readonly reason?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter-requests.types.ts#L66)
 
 ### NativeControlReceipt
 
+Provider acknowledgement for a run control operation.
+
 **Signature**
 
 ```ts
-declare const NativeControlReceipt: NativeControlReceipt;
+type NativeControlReceipt = RunCancellationReceipt | RunRetryReceipt | JobUnknownOutcome;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter-requests.types.ts#L57)
 
 ### NativeDurableSleep
 
+Provider-facing durable sleep contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeDurableSleep: NativeDurableSleep;
+export interface NativeDurableSleep {
+  readonly sleep: (key: string, durationMs: number) => Promise<void>;
+  readonly sleepUntil?: (key: string, instant: string) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L60)
 
 ### NativeLocator
 
@@ -452,63 +500,98 @@ declare const NativeLocator: string;
 
 ### NativeObservation
 
+Provider-facing observation contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeObservation: NativeObservation;
+type NativeObservation = RunWatchFrame<NativeRun>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L28)
 
 ### NativeProgressWriter
 
+Provider-facing progress writer contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeProgressWriter: NativeProgressWriter;
+export interface NativeProgressWriter {
+  readonly emit: (
+    value: JsonValue,
+    context?: OperationContext,
+  ) => MaybePromise<ProgressEmitReceipt | void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L44)
 
 ### NativeReceipt
 
+Provider acknowledgement for an accepted submission.
+
 **Signature**
 
 ```ts
-declare const NativeReceipt: NativeReceipt;
+type NativeReceipt = RunHandle | JobUnknownOutcome;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter-requests.types.ts#L55)
 
 ### NativeRetryRequest
 
+Provider-facing retry request contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeRetryRequest: NativeRetryRequest;
+export interface NativeRetryRequest {
+  readonly runId: string;
+  readonly operationId: string;
+  readonly retryIdentity?: string;
+  readonly canonicalInput?: JobWireEnvelope;
+  readonly inputHash?: string;
+  readonly inputSchemaHash?: string;
+  readonly taskId?: string;
+  readonly jobId?: string;
+  readonly taskVersion?: string;
+  readonly buildId?: string;
+  readonly scope?: string;
+  readonly acceptanceIdentity?: string;
+  readonly canonicalAdmission?: {
+    readonly validatePinnedInput: true;
+    readonly allocateFreshBudget: true;
+    readonly clearInitialDelay: true;
+  };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter-requests.types.ts#L73)
 
 ### NativeRun
 
+Provider-facing run contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeRun: NativeRun;
+type NativeRun = RunSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L22)
 
 ### NativeRunPage
 
+Provider-facing run page contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeRunPage: NativeRunPage;
+type NativeRunPage = RunPage<NativeRun>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L26)
 
 ### NativeRunQuery
 
@@ -522,23 +605,42 @@ declare const NativeRunQuery: RunListQuery;
 
 ### NativeScheduleOperations
 
+Provider-facing schedule operations contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeScheduleOperations: NativeScheduleOperations;
+export interface NativeScheduleOperations {
+  readonly list: (
+    query: Readonly<Record<string, unknown>>,
+    context: OperationContext,
+  ) => Promise<unknown>;
+  readonly get: (id: string, context: OperationContext) => Promise<unknown>;
+  readonly upsert: (definition: JsonValue, context: OperationContext) => Promise<unknown>;
+  readonly pause: (id: string, context: OperationContext) => Promise<unknown>;
+  readonly resume: (id: string, context: OperationContext) => Promise<unknown>;
+  readonly delete: (id: string, context: OperationContext) => Promise<unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L32)
 
 ### NativeStreamWriter
 
+Provider-facing stream writer contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeStreamWriter: NativeStreamWriter;
+export interface NativeStreamWriter {
+  readonly emit: (
+    value: JsonValue,
+    context?: OperationContext,
+  ) => MaybePromise<ProgressEmitReceipt | void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L51)
 
 ### NativeStreamWriters
 
@@ -552,83 +654,198 @@ declare const NativeStreamWriters: Readonly<Record<string, NativeStreamWriter>>;
 
 ### NativeSubmission
 
+Provider request created from a validated job submission.
+
 **Signature**
 
 ```ts
-declare const NativeSubmission: NativeSubmission;
+export interface NativeSubmission {
+  readonly jobId: string;
+  readonly taskId: string;
+  readonly taskVersion: string;
+  readonly buildId: string;
+  readonly execution?: "durable" | "retryable";
+  readonly scope?: string;
+  readonly input: JsonValue;
+  readonly operationId: string;
+  readonly idempotencyKey?: string;
+  readonly canonicalInput?: JobWireEnvelope;
+  readonly inputHash?: string;
+  readonly inputSchemaHash?: string;
+  readonly policy?: JsonValue;
+  readonly scheduledFor?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+  readonly parentRunId?: string;
+  readonly propagation?: TracePropagation;
+  readonly acceptanceIdentity?: string;
+  readonly occurrenceIdentity?: string;
+  readonly retryOfRunId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter-requests.types.ts#L30)
 
 ### NativeTaskWork
 
+Provider-facing task work contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeTaskWork: NativeTaskWork;
+export interface NativeTaskWork {
+  readonly envelope: TaskExecutionEnvelope;
+  readonly binding: TaskExecutionBinding;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L118)
 
 ### NativeTaskWorker
 
+Provider worker operations for accepting and completing task work.
+
 **Signature**
 
 ```ts
-declare const NativeTaskWorker: NativeTaskWorker;
+export interface NativeTaskWorker {
+  readonly next: (context: OperationContext) => Promise<NativeTaskWork | undefined>;
+  readonly complete: (runId: string, output: unknown, context: OperationContext) => Promise<void>;
+  readonly fail: (runId: string, error: unknown, context: OperationContext) => Promise<void>;
+  /** Returns an intentional provider park/yield to the native continuation owner. */
+  readonly suspend?: (runId: string, value: unknown, context: OperationContext) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L123)
 
 ### NativeWatchRequest
 
+Provider-facing watch request contract at the adapter boundary.
+
 **Signature**
 
 ```ts
-declare const NativeWatchRequest: NativeWatchRequest;
+export interface NativeWatchRequest {
+  readonly runId: string;
+  readonly after?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter-requests.types.ts#L60)
 
 ### OperationContext
 
+Scope, signal, and tracing data passed to one provider operation.
+
 **Signature**
 
 ```ts
-declare const OperationContext: OperationContext;
+export interface OperationContext {
+  readonly signal: AbortSignal;
+  readonly application: string;
+  readonly environment: string;
+  readonly scope: string;
+  readonly service: string;
+  readonly serviceGeneration: string;
+  readonly operationId?: string;
+  readonly deadlineMs?: number;
+  readonly correlationId?: string;
+  readonly parentRunId?: string;
+  readonly propagation?: TracePropagation;
+  readonly acceptanceIdentity?: string;
+  readonly occurrenceIdentity?: string;
+  readonly inputSchemaHash?: string;
+  readonly retryOfRunId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter-requests.types.ts#L11)
 
 ### TaskExecutionBinding
 
+Provider-owned context and sinks supplied to one task execution.
+
 **Signature**
 
 ```ts
-declare const TaskExecutionBinding: TaskExecutionBinding;
+export interface TaskExecutionBinding {
+  readonly run: {
+    readonly runId: string;
+    readonly jobId: string;
+    readonly taskId: string;
+    readonly taskVersion: string;
+    readonly buildId: string;
+    readonly service?: string;
+    readonly serviceGeneration?: string;
+    readonly attempt?: number;
+    readonly acceptedAt?: string;
+    readonly scheduledFor?: string;
+    readonly parentRunId?: string;
+    readonly deadlineMs?: number;
+    readonly scope?: string;
+    readonly inputSchemaHash?: string;
+    readonly acceptanceIdentity?: string;
+    readonly occurrenceIdentity?: string;
+    readonly propagation?: TracePropagation;
+  };
+  readonly signal: AbortSignal;
+  readonly isSuspension?: (cause: unknown) => boolean;
+  readonly sleep?: NativeDurableSleep;
+  readonly progress?: NativeProgressWriter;
+  readonly streams?: NativeStreamWriters;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L131)
 
 ### TaskExecutionEnvelope
 
+Provider-owned envelope containing the accepted task input and run identity.
+
 **Signature**
 
 ```ts
-declare const TaskExecutionEnvelope: TaskExecutionEnvelope;
+export interface TaskExecutionEnvelope {
+  readonly runId: string;
+  readonly jobId: string;
+  readonly taskId: string;
+  readonly taskVersion: string;
+  readonly buildId: string;
+  readonly input: JobWireEnvelope;
+  readonly inputHash?: string;
+  readonly inputSchemaHash?: string;
+  readonly acceptedAt?: string;
+  readonly scheduledFor?: string;
+  readonly attempt?: number;
+  readonly parentRunId?: string;
+  readonly service?: string;
+  readonly serviceGeneration?: string;
+  readonly scope?: string;
+  readonly acceptanceIdentity?: string;
+  readonly occurrenceIdentity?: string;
+  readonly propagation?: TracePropagation;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L65)
 
 ### TaskExecutor
 
+Execution callback used by a native task worker.
+
 **Signature**
 
 ```ts
-declare const TaskExecutor: TaskExecutor;
+export interface TaskExecutor {
+  readonly execute: (
+    envelope: TaskExecutionEnvelope,
+    binding: TaskExecutionBinding,
+  ) => Promise<unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/adapter.types.ts#L86)
 
 ### assertAdapterMethods
 
@@ -1090,13 +1307,25 @@ declare const readCursorValue: (
 
 ### JobCursorBinding
 
+Trusted job and scope identity bound into a pagination cursor.
+
 **Signature**
 
 ```ts
-declare const JobCursorBinding: JobCursorBinding;
+export interface JobCursorBinding {
+  readonly application?: string;
+  readonly environment?: string;
+  readonly scope: string;
+  readonly subject?: string;
+  readonly jobId: string;
+  readonly operation: JobClientOperation;
+  readonly filters: JsonValue;
+  readonly schema: string;
+  readonly position: JsonValue;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization-cursor.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization-cursor.types.ts#L4)
 
 ### JobCursorFailure (class)
 
@@ -1118,13 +1347,18 @@ declare class JobCursorFailure
 
 ### JobCursorOptions
 
+Options accepted for job cursor operations.
+
 **Signature**
 
 ```ts
-declare const JobCursorOptions: JobCursorOptions;
+export interface JobCursorOptions {
+  readonly key: string | Uint8Array;
+  readonly keyId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization-cursor.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization-cursor.types.ts#L16)
 
 ### createJobCursor
 
@@ -1470,13 +1704,17 @@ declare const boundedTextEffect: (
 
 ### JobProjectionOptions
 
+Fields needed to disclose a declared job error safely.
+
 **Signature**
 
 ```ts
-declare const JobProjectionOptions: JobProjectionOptions;
+export interface JobProjectionOptions {
+  readonly declaredErrorIds?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization-projection.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization-projection.types.ts#L2)
 
 ### projectRunPage
 
@@ -1648,13 +1886,27 @@ declare const JobCursorOptions: any;
 
 ### TrustedJobScope
 
+Trusted application and tenant context for a jobs authorization decision.
+The scope may be narrowed by a policy but never broadened.
+
+**Example**
+
+```ts
+const trusted: TrustedJobScope = { application: "app", environment: "test", scope: "tenant:a" };
+```
+
 **Signature**
 
 ```ts
-declare const TrustedJobScope: TrustedJobScope;
+export interface TrustedJobScope {
+  readonly application: string;
+  readonly environment: string;
+  readonly scope: string;
+  readonly subject?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/authorization.types.ts#L5)
 
 ### assertAuthorizedOperation
 
@@ -2065,13 +2317,19 @@ declare const assertCanonicalProjectionEffect: (
 
 ### JobsCapability
 
+Evidence and constraints for one provider capability.
+
 **Signature**
 
 ```ts
-declare const JobsCapability: JobsCapability;
+export interface JobsCapability {
+  readonly support: JobsCapabilitySupport;
+  readonly constraints?: Readonly<Record<string, unknown>>;
+  readonly evidence?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.types.ts#L4)
 
 ### JobsCapabilityError (class)
 
@@ -2133,33 +2391,48 @@ declare class JobsCapabilityFailure
 
 ### JobsCapabilityName
 
+Standard jobs capability names.
+
 **Signature**
 
 ```ts
-declare const JobsCapabilityName: JobsCapabilityName;
+type JobsCapabilityName =
+  "submission" | "read" | "list" | "observation" | "cancel" | "retry" | "schedules" | "streams";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.types.ts#L20)
 
 ### JobsCapabilityReport
 
+Provider capabilities validated at the jobs boundary.
+
 **Signature**
 
 ```ts
-declare const JobsCapabilityReport: JobsCapabilityReport;
+export interface JobsCapabilityReport {
+  readonly service: string;
+  readonly provider?: string;
+  readonly adapterId?: string;
+  readonly protocolVersion?: 1;
+  readonly features: Readonly<Record<string, boolean>>;
+  readonly capabilities?: Readonly<Record<string, JobsCapability>>;
+  readonly limits?: Readonly<Record<string, number>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.types.ts#L10)
 
 ### JobsCapabilitySupport
 
+Level of support reported by a jobs provider.
+
 **Signature**
 
 ```ts
-declare const JobsCapabilitySupport: JobsCapabilitySupport;
+type JobsCapabilitySupport = "native" | "adapter" | "unsupported" | "unverified";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/capabilities.types.ts#L2)
 
 ### assertAdapterMethods
 
@@ -2590,13 +2863,15 @@ declare class JobResultFailure
 
 ### ReadRun
 
+Substitutable snapshot reader for result polling.
+
 **Signature**
 
 ```ts
-declare const ReadRun: ReadRun;
+type ReadRun = (runtime: JobsRuntime, runId: string, signal?: AbortSignal) => Promise<RunSnapshot>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/control-result.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/control-result.types.ts#L4)
 
 ### ResultRunReader (class)
 
@@ -3565,23 +3840,35 @@ declare const JobObserveFailure: typeof JobObserveFailure;
 
 ### JobObserveOptions
 
+Signal and per-read timeout for native run observation.
+
 **Signature**
 
 ```ts
-declare const JobObserveOptions: JobObserveOptions;
+export interface JobObserveOptions {
+  readonly signal?: AbortSignal;
+  readonly timeout?: DurationInput;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/control-support.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/control-support.types.ts#L4)
 
 ### UnknownControlOutcome
 
+Native control response with an uncertain outcome.
+
 **Signature**
 
 ```ts
-declare const UnknownControlOutcome: UnknownControlOutcome;
+export interface UnknownControlOutcome {
+  readonly operationId: string;
+  readonly idempotencyKey?: string;
+  readonly outcome: "unknown";
+  readonly recovery?: JobUnknownOutcome["recovery"];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/control-support.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/control-support.types.ts#L9)
 
 ### observeWithTimeout
 
@@ -4147,13 +4434,19 @@ declare const retryRunValue: (
 
 ### JobCancelOptions
 
+Options accepted for job cancel operations.
+
 **Signature**
 
 ```ts
-declare const JobCancelOptions: JobCancelOptions;
+export interface JobCancelOptions {
+  readonly operationId: string;
+  readonly reason?: string;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/controls.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/controls.types.ts#L14)
 
 ### JobControlFailure (class)
 
@@ -4175,33 +4468,62 @@ declare class JobControlFailure
 
 ### JobObserveOptions
 
+Signal and per-read timeout for native run observation.
+
 **Signature**
 
 ```ts
-declare const JobObserveOptions: JobObserveOptions;
+export interface JobObserveOptions {
+  readonly signal?: AbortSignal;
+  readonly timeout?: DurationInput;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/controls.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/control-support.types.ts#L4)
 
 ### JobRetryOptions
 
+Options accepted for job retry operations.
+
 **Signature**
 
 ```ts
-declare const JobRetryOptions: JobRetryOptions;
+export interface JobRetryOptions {
+  readonly operationId: string;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/controls.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/controls.types.ts#L20)
 
 ### JobsControls
 
+Run read, observation, cancellation, retry, result, and schedule operations.
+
 **Signature**
 
 ```ts
-declare const JobsControls: JobsControls;
+export interface JobsControls {
+  readonly get: (
+    locator: string,
+    options?: { readonly signal?: AbortSignal },
+  ) => Promise<RunSnapshot>;
+  readonly list: (
+    query?: RunListQuery,
+    options?: { readonly signal?: AbortSignal },
+  ) => Promise<RunPage<RunSnapshot>>;
+  readonly observe: (
+    request: NativeWatchRequest,
+    options?: JobObserveOptions,
+  ) => AsyncIterable<RunWatchFrame<RunSnapshot>>;
+  readonly cancel: (runId: string, options: JobCancelOptions) => Promise<RunCancellationReceipt>;
+  readonly retry: (runId: string, options: JobRetryOptions) => Promise<RunRetryReceipt>;
+  readonly result: (runId: string, options: RunResultOptions) => Promise<unknown>;
+  readonly schedules?: JobScheduleClient;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/controls.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/controls.types.ts#L25)
 
 ### cancelRun
 
@@ -4634,23 +4956,33 @@ declare class JobDefinitionFailure
 
 ### RetryJitter
 
+Jitter strategy for a retry policy.
+
 **Signature**
 
 ```ts
-declare const RetryJitter: RetryJitter;
+type RetryJitter = "none" | "full" | "equal";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L49)
 
 ### RetryPolicy
 
+Retry attempts, delays, multiplier, and jitter for event delivery.
+
 **Signature**
 
 ```ts
-declare const RetryPolicy: RetryPolicy;
+export interface RetryPolicy {
+  readonly maxAttempts: number;
+  readonly initialDelayMs: number;
+  readonly maxDelayMs: number;
+  readonly multiplier: number;
+  readonly jitter: RetryJitter;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-job.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L51)
 
 ### assertJobDescriptor
 
@@ -5082,7 +5414,7 @@ if (error instanceof TaskDefinitionFailure) console.log(error.message);
 declare class TaskDefinitionFailure
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L20)
 
 ### assertTaskDescriptor
 
@@ -5104,7 +5436,7 @@ assertTaskDescriptor(task);
 declare const assertTaskDescriptor: (value: unknown) => asserts value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L153)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L169)
 
 ### assertTaskDescriptorEffect
 
@@ -5124,7 +5456,7 @@ declare const assertTaskDescriptorEffect: (
 ) => Effect.Effect<undefined, TaskDefinitionFailure, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L136)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L152)
 
 ### defineTaskEffect
 
@@ -5148,9 +5480,9 @@ declare const defineTaskEffect: <
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends Readonly<Record<string, StandardSchemaV1<unknown, unknown>>> = {},
-  const Execution extends TaskExecution = "durable",
+  const Execution extends TaskExecution = TaskExecution,
 >(
-  options: DefineTaskOptions<
+  options: DefineTaskCallOptions<
     Id,
     Version,
     InputSchema,
@@ -5171,14 +5503,14 @@ declare const defineTaskEffect: <
     Errors,
     ProgressSchema,
     Streams,
-    Execution
+    TaskForm<Execution>
   >,
   TaskDefinitionFailure,
   never
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L29)
 
 ### isTaskDescriptor
 
@@ -5196,7 +5528,7 @@ if (isTaskDescriptor(value)) console.log(value.id);
 declare const isTaskDescriptor: (value: unknown) => value is TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L128)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L144)
 
 ### isTaskDescriptorEffect
 
@@ -5214,7 +5546,7 @@ Effect.runSync(isTaskDescriptorEffect(value));
 declare const isTaskDescriptorEffect: (value: unknown) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L117)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/define-task.ts#L133)
 
 ## `duration.ts`
 
@@ -5242,13 +5574,27 @@ declare const DurationInput:
 
 ### DurationUnit
 
+Units accepted by the authored duration syntax.
+
 **Signature**
 
 ```ts
-declare const DurationUnit: DurationUnit;
+type DurationUnit =
+  | "millisecond"
+  | "milliseconds"
+  | "second"
+  | "seconds"
+  | "minute"
+  | "minutes"
+  | "hour"
+  | "hours"
+  | "day"
+  | "days"
+  | "week"
+  | "weeks";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/duration.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/duration.types.ts#L2)
 
 ### DurationValidationError (class)
 
@@ -5907,13 +6253,35 @@ export * from "./task-wire.js";
 
 ### DefineJobOptions
 
+Options accepted for define job operations.
+
 **Signature**
 
 ```ts
-declare const DefineJobOptions: DefineJobOptions<Name, Task, Id>;
+type DefineJobOptions<
+  Name extends string,
+  Task extends TaskDescriptorAny,
+  Id extends string = Name,
+> = DescriptorMetadata &
+  JobServiceSelection & {
+    /** Public name of the job; the generated client calls it as `client.jobs.<name>`. */
+    readonly name: Name & ValidJobName<Name>;
+    /** Stable ID of the job. Defaults to `name`. */
+    readonly id?: Id;
+    /** The task that every run of the job executes. */
+    readonly task: Task;
+    /** Marks the job that a trigger of the task itself uses when the task has several jobs. */
+    readonly default?: boolean;
+    /** Schedules that start runs, each with its `input` and a cron rule or an interval. */
+    readonly schedules?: readonly ScheduleDefinition<InferInput<Task["input"]>>[];
+    /** How a run is accepted: a start time in the past, and the input field that deduplicates. */
+    readonly admission?: JobAdmission<InferOutput<Task["input"]>>;
+    /** What the generated client may do with the job; the job is private when omitted. */
+    readonly client?: JobClientAccess<StreamsOf<Task>>;
+  };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L121)
 
 ### DurationInput
 
@@ -5939,13 +6307,27 @@ declare const DurationInput:
 
 ### DurationUnit
 
+Units accepted by the authored duration syntax.
+
 **Signature**
 
 ```ts
-declare const DurationUnit: DurationUnit;
+type DurationUnit =
+  | "millisecond"
+  | "milliseconds"
+  | "second"
+  | "seconds"
+  | "minute"
+  | "minutes"
+  | "hour"
+  | "hours"
+  | "day"
+  | "days"
+  | "week"
+  | "weeks";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/duration.types.ts#L2)
 
 ### DurationValidationError
 
@@ -6031,43 +6413,90 @@ declare const JobAccessRequest: JobAccessRequest;
 
 ### JobAdmission
 
+Policy for late schedules and idempotent submissions.
+
 **Signature**
 
 ```ts
-declare const JobAdmission: JobAdmission<Input>;
+export interface JobAdmission<Input = unknown> {
+  /** Whether a trigger whose start time is already past is run or rejected. */
+  readonly pastAt?: "run" | "reject";
+  /** Repeated triggers with the same value of the input field `key` reuse the first run. */
+  readonly idempotency?: {
+    readonly key?: Extract<keyof Input, string>;
+    readonly retention?: DurationInput;
+  };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L60)
 
 ### JobAuthorizationContext
 
+Trusted scope and optional subject data passed to an access policy.
+
 **Signature**
 
 ```ts
-declare const JobAuthorizationContext: JobAuthorizationContext;
+export interface JobAuthorizationContext {
+  readonly application: string;
+  readonly environment: string;
+  readonly scope: string;
+  readonly subject?: string;
+  readonly auth?: unknown;
+  readonly run?: import("../contracts/jobs.js").RunSnapshot;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L73)
 
 ### JobClientAccess
 
+Public or policy-guarded operations and fields exposed to clients.
+
 **Signature**
 
 ```ts
-declare const JobClientAccess: JobClientAccess<Streams>;
+type JobClientAccess<Streams extends TaskStreamSchemas = TaskStreamSchemas> =
+  | {
+      /** Exposes the listed operations to every caller. */
+      readonly public: true;
+      /** Operations the client may call, such as `"trigger"`, `"watch"` and `"cancel"`. */
+      readonly operations: readonly JobClientOperation[];
+      /** Run fields the client may read, such as `"status"`, `"progress"` and `"output"`. */
+      readonly fields?: readonly JobClientField[];
+      /** Names of the task's streams the client may read. */
+      readonly streams?: readonly (keyof Streams & string)[];
+    }
+  | {
+      /** Called for each client request; returns the caller's scope, or throws to deny access. */
+      readonly authorize: (
+        request: JobAccessRequest,
+        context: JobAuthorizationContext,
+      ) => MaybePromise<JobAccessGrant>;
+      readonly public?: never;
+      /** Operations the client may call, such as `"trigger"`, `"watch"` and `"cancel"`. */
+      readonly operations: readonly JobClientOperation[];
+      /** Run fields the client may read, such as `"status"`, `"progress"` and `"output"`. */
+      readonly fields?: readonly JobClientField[];
+      /** Names of the task's streams the client may read. */
+      readonly streams?: readonly (keyof Streams & string)[];
+    };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L82)
 
 ### JobClientField
 
+Run fields that authorization may expose to a client.
+
 **Signature**
 
 ```ts
-declare const JobClientField: JobClientField;
+type JobClientField = "status" | "input" | "progress" | "output" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L71)
 
 ### JobClientOperation
 
@@ -6081,23 +6510,59 @@ declare const JobClientOperation: JobClientOperation;
 
 ### JobDescriptor
 
+Validated job definition and its task-specific trigger operation.
+
 **Signature**
 
 ```ts
-declare const JobDescriptor: JobDescriptor<Name, Id, Task>;
+type JobDescriptor<
+  Name extends string,
+  Id extends string,
+  Task extends TaskDescriptorAny,
+> = DescriptorBase<"job", Id> &
+  JobRef<Id, Task["input"], Task["output"], Task> & {
+    readonly name: Name;
+    readonly task: Task;
+    readonly input: Task["input"];
+    readonly output: Task["output"];
+    readonly errors?: Task["errors"];
+    readonly progress?: Task["progress"];
+    readonly streams?: Task["streams"];
+    readonly execution: Task["execution"];
+    readonly observation?: TaskObservation<
+      Task["streams"] extends TaskStreamSchemas ? Task["streams"] : {}
+    >;
+    readonly service?: string;
+    readonly default?: boolean;
+    readonly schedules?: readonly ScheduleDefinition<InferOutput<Task["input"]>>[];
+    readonly admission?: JobAdmission<InferOutput<Task["input"]>>;
+    readonly client?: JobClientAccess<StreamsOf<Task>>;
+    readonly trigger: (
+      input: InferInput<Task["input"]>,
+      options?: ServerTriggerOptions,
+    ) => Promise<RunHandle>;
+  };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L144)
 
 ### JobDescriptorAny
 
+Erases task-specific admission keys at runtime boundaries without making concrete jobs invariant.
+
 **Signature**
 
 ```ts
-declare const JobDescriptorAny: JobDescriptorAny;
+type JobDescriptorAny = Omit<
+  JobDescriptor<string, string, TaskDescriptorAny>,
+  "admission" | "trigger"
+> & {
+  readonly admission?: JobAdmission<any>;
+  readonly trigger: (input: any, options?: ServerTriggerOptions) => Promise<RunHandle>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L70)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L176)
 
 ### JobErrorEnvelope
 
@@ -6111,13 +6576,15 @@ declare const JobErrorEnvelope: JobErrorEnvelope;
 
 ### JobName
 
+A validated job name, preserving literal types when available.
+
 **Signature**
 
 ```ts
-declare const JobName: JobName<Name>;
+type JobName<Name extends string = string> = string extends Name ? string : ValidJobName<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-name.types.ts#L63)
 
 ### JobNameValidationError
 
@@ -6151,23 +6618,52 @@ declare const JobRunStatus: JobRunStatus;
 
 ### JobScheduleClient
 
+Read and write operations available for a job's schedules.
+
 **Signature**
 
 ```ts
-declare const JobScheduleClient: JobScheduleClient<Definition>;
+export interface JobScheduleClient<Definition = ScheduleDefinition> {
+  readonly list: (options?: ScheduleListOptions) => Promise<ScheduleReadReceipt<Definition>>;
+  readonly get: (
+    id: string,
+    options?: { readonly signal?: AbortSignal },
+  ) => Promise<ScheduleReadReceipt<Definition>>;
+  readonly upsert: (
+    definition: Definition,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+  readonly pause: (
+    id: string,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+  readonly resume: (
+    id: string,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+  readonly delete: (
+    id: string,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L67)
 
 ### JobServiceSelection
 
+Jobs service that runs the job.
+
 **Signature**
 
 ```ts
-declare const JobServiceSelection: JobServiceSelection;
+export interface JobServiceSelection {
+  /** Name of the jobs service that runs the job; the application's default when omitted. */
+  readonly service?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L109)
 
 ### JobUnknownOutcome
 
@@ -6341,93 +6837,147 @@ declare const RunWatchFrame: RunWatchFrame<Run>;
 
 ### ScheduleDefinition
 
+Authored schedule target, timing, and admission policy.
+
 **Signature**
 
 ```ts
-declare const ScheduleDefinition: ScheduleDefinition<Input>;
+type ScheduleDefinition<Input = unknown> = {
+  readonly id: string;
+  readonly input: Input;
+  readonly overlap?: ScheduleOverlap;
+  readonly misfire?: ScheduleMisfire;
+} & (
+  | { readonly cron: string; readonly timezone: string; readonly every?: never }
+  | { readonly every: DurationInput; readonly cron?: never; readonly timezone?: never }
+);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L10)
 
 ### ScheduleListOptions
 
+Options accepted for schedule list operations.
+
 **Signature**
 
 ```ts
-declare const ScheduleListOptions: ScheduleListOptions;
+export interface ScheduleListOptions {
+  readonly limit?: number;
+  readonly cursor?: string;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L79)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L44)
 
 ### ScheduleMisfire
 
+How missed occurrences are handled after downtime.
+
 **Signature**
 
 ```ts
-declare const ScheduleMisfire: ScheduleMisfire;
+type ScheduleMisfire = "skip" | "latest" | "all";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L75)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L7)
 
 ### ScheduleOverlap
 
+Whether simultaneous occurrences are skipped or allowed.
+
 **Signature**
 
 ```ts
-declare const ScheduleOverlap: ScheduleOverlap;
+type ScheduleOverlap = "allow" | "skip";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L76)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L5)
 
 ### ScheduleReadReceipt
 
+Receipt returned after a schedule read operation.
+
 **Signature**
 
 ```ts
-declare const ScheduleReadReceipt: ScheduleReadReceipt<Definition>;
+export interface ScheduleReadReceipt<Definition = ScheduleDefinition> {
+  readonly outcome: "available" | "unavailable";
+  readonly schedule?: ScheduleRecord<Definition>;
+  readonly schedules?: readonly ScheduleRecord<Definition>[];
+  readonly nextCursor?: string;
+  readonly hasMore?: boolean;
+  readonly reason?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L77)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L30)
 
 ### ScheduleRecord
 
+Provider read model for a persisted schedule.
+
 **Signature**
 
 ```ts
-declare const ScheduleRecord: ScheduleRecord<Definition>;
+export interface ScheduleRecord<Definition = ScheduleDefinition> {
+  readonly id: string;
+  readonly jobId: string;
+  readonly state: "active" | "paused" | "missing" | "unknown";
+  readonly definition: Definition;
+  readonly observedAt?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L78)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L21)
 
 ### ScheduleWriteOptions
 
+Options accepted for schedule write operations.
+
 **Signature**
 
 ```ts
-declare const ScheduleWriteOptions: ScheduleWriteOptions;
+export interface ScheduleWriteOptions {
+  readonly operationId: string;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L51)
 
 ### ScheduleWriteOutcome
 
+Result category for a native schedule mutation.
+
 **Signature**
 
 ```ts
-declare const ScheduleWriteOutcome: ScheduleWriteOutcome;
+type ScheduleWriteOutcome =
+  "created" | "updated" | "paused" | "resumed" | "deleted" | "requested" | "unsupported";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L81)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L40)
 
 ### ScheduleWriteReceipt
 
+Receipt returned after a schedule write operation.
+
 **Signature**
 
 ```ts
-declare const ScheduleWriteReceipt: ScheduleWriteReceipt<Definition>;
+type ScheduleWriteReceipt<Definition = ScheduleDefinition> =
+  | {
+      readonly operationId: string;
+      readonly scheduleId: string;
+      readonly outcome: ScheduleWriteOutcome;
+      readonly schedule?: ScheduleRecord<Definition>;
+    }
+  | (JobUnknownOutcome & { readonly scheduleId: string });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L82)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L57)
 
 ### StreamIdentity
 
@@ -6511,13 +7061,25 @@ declare const TASK_REASON_MAX_BYTES: 1024;
 
 ### ValidJobName
 
+Compile-time predicate for a literal job name.
+
 **Signature**
 
 ```ts
-declare const ValidJobName: ValidJobName<Name>;
+type ValidJobName<Name extends string = string> = string extends Name
+  ? never
+  : Name extends (typeof JOB_NAME_RESERVED)[number]
+    ? never
+    : Name extends `${LowercaseLetter}${infer Rest}`
+      ? ValidCharacters<Rest> extends true
+        ? AtMost64<Name> extends true
+          ? Name
+          : never
+        : never
+      : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/index.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-name.types.ts#L50)
 
 ### VoidWireEnvelope
 
@@ -6906,13 +7468,15 @@ declare const JOB_NAME_RESERVED: readonly [
 
 ### JobName
 
+A validated job name, preserving literal types when available.
+
 **Signature**
 
 ```ts
-declare const JobName: JobName<Name>;
+type JobName<Name extends string = string> = string extends Name ? string : ValidJobName<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-name.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-name.types.ts#L63)
 
 ### JobNameValidationError (class)
 
@@ -6934,13 +7498,25 @@ declare class JobNameValidationError
 
 ### ValidJobName
 
+Compile-time predicate for a literal job name.
+
 **Signature**
 
 ```ts
-declare const ValidJobName: ValidJobName<Name>;
+type ValidJobName<Name extends string = string> = string extends Name
+  ? never
+  : Name extends (typeof JOB_NAME_RESERVED)[number]
+    ? never
+    : Name extends `${LowercaseLetter}${infer Rest}`
+      ? ValidCharacters<Rest> extends true
+        ? AtMost64<Name> extends true
+          ? Name
+          : never
+        : never
+      : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-name.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-name.types.ts#L50)
 
 ### assertJobName
 
@@ -7203,13 +7779,18 @@ declare const copyClient: (
 
 ### ClientDeclarations
 
+Task schemas available when authoring job client access.
+
 **Signature**
 
 ```ts
-declare const ClientDeclarations: ClientDeclarations;
+export interface ClientDeclarations {
+  readonly progress?: unknown;
+  readonly streams?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-validation.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job-validation.types.ts#L2)
 
 ### JobValidationFailure (class)
 
@@ -7355,17 +7936,24 @@ type DefineJobOptions<
   Id extends string = Name,
 > = DescriptorMetadata &
   JobServiceSelection & {
+    /** Public name of the job; the generated client calls it as `client.jobs.<name>`. */
     readonly name: Name & ValidJobName<Name>;
+    /** Stable ID of the job. Defaults to `name`. */
     readonly id?: Id;
+    /** The task that every run of the job executes. */
     readonly task: Task;
+    /** Marks the job that a trigger of the task itself uses when the task has several jobs. */
     readonly default?: boolean;
+    /** Schedules that start runs, each with its `input` and a cron rule or an interval. */
     readonly schedules?: readonly ScheduleDefinition<InferInput<Task["input"]>>[];
+    /** How a run is accepted: a start time in the past, and the input field that deduplicates. */
     readonly admission?: JobAdmission<InferOutput<Task["input"]>>;
+    /** What the generated client may do with the job; the job is private when omitted. */
     readonly client?: JobClientAccess<StreamsOf<Task>>;
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L121)
 
 ### JobAdmission (interface)
 
@@ -7375,7 +7963,9 @@ Policy for late schedules and idempotent submissions.
 
 ```ts
 export interface JobAdmission<Input = unknown> {
+  /** Whether a trigger whose start time is already past is run or rejected. */
   readonly pastAt?: "run" | "reject";
+  /** Repeated triggers with the same value of the input field `key` reuse the first run. */
   readonly idempotency?: {
     readonly key?: Extract<keyof Input, string>;
     readonly retention?: DurationInput;
@@ -7402,7 +7992,7 @@ export interface JobAuthorizationContext {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L73)
 
 ### JobClientAccess (type alias)
 
@@ -7413,24 +8003,32 @@ Public or policy-guarded operations and fields exposed to clients.
 ```ts
 type JobClientAccess<Streams extends TaskStreamSchemas = TaskStreamSchemas> =
   | {
+      /** Exposes the listed operations to every caller. */
       readonly public: true;
+      /** Operations the client may call, such as `"trigger"`, `"watch"` and `"cancel"`. */
       readonly operations: readonly JobClientOperation[];
+      /** Run fields the client may read, such as `"status"`, `"progress"` and `"output"`. */
       readonly fields?: readonly JobClientField[];
+      /** Names of the task's streams the client may read. */
       readonly streams?: readonly (keyof Streams & string)[];
     }
   | {
+      /** Called for each client request; returns the caller's scope, or throws to deny access. */
       readonly authorize: (
         request: JobAccessRequest,
         context: JobAuthorizationContext,
       ) => MaybePromise<JobAccessGrant>;
       readonly public?: never;
+      /** Operations the client may call, such as `"trigger"`, `"watch"` and `"cancel"`. */
       readonly operations: readonly JobClientOperation[];
+      /** Run fields the client may read, such as `"status"`, `"progress"` and `"output"`. */
       readonly fields?: readonly JobClientField[];
+      /** Names of the task's streams the client may read. */
       readonly streams?: readonly (keyof Streams & string)[];
     };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L80)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L82)
 
 ### JobClientField (type alias)
 
@@ -7442,7 +8040,7 @@ Run fields that authorization may expose to a client.
 type JobClientField = "status" | "input" | "progress" | "output" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L69)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L71)
 
 ### JobDescriptor (type alias)
 
@@ -7480,7 +8078,7 @@ type JobDescriptor<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L144)
 
 ### JobDescriptorAny (type alias)
 
@@ -7498,7 +8096,7 @@ type JobDescriptorAny = Omit<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L158)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L176)
 
 ### JobRunResultOptions (type alias)
 
@@ -7510,17 +8108,41 @@ Options accepted for job run result operations.
 type JobRunResultOptions = RunResultOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L155)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L173)
 
 ### JobScheduleClient
+
+Read and write operations available for a job's schedules.
 
 **Signature**
 
 ```ts
-declare const JobScheduleClient: JobScheduleClient<Definition>;
+export interface JobScheduleClient<Definition = ScheduleDefinition> {
+  readonly list: (options?: ScheduleListOptions) => Promise<ScheduleReadReceipt<Definition>>;
+  readonly get: (
+    id: string,
+    options?: { readonly signal?: AbortSignal },
+  ) => Promise<ScheduleReadReceipt<Definition>>;
+  readonly upsert: (
+    definition: Definition,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+  readonly pause: (
+    id: string,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+  readonly resume: (
+    id: string,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+  readonly delete: (
+    id: string,
+    options: ScheduleWriteOptions,
+  ) => Promise<ScheduleWriteReceipt<Definition>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L67)
 
 ### JobServiceSelection (interface)
 
@@ -7530,11 +8152,12 @@ Jobs service that runs the job.
 
 ```ts
 export interface JobServiceSelection {
+  /** Name of the jobs service that runs the job; the application's default when omitted. */
   readonly service?: string;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L109)
 
 ### RetryJitter (type alias)
 
@@ -7568,123 +8191,195 @@ export interface RetryPolicy {
 
 ### RunResultOptions
 
+Options accepted for run result operations.
+
 **Signature**
 
 ```ts
-declare const RunResultOptions: RunResultOptions;
+export interface RunResultOptions {
+  readonly timeout: DurationInput;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L32)
 
 ### ScheduleDefinition
 
+Authored schedule target, timing, and admission policy.
+
 **Signature**
 
 ```ts
-declare const ScheduleDefinition: ScheduleDefinition<Input>;
+type ScheduleDefinition<Input = unknown> = {
+  readonly id: string;
+  readonly input: Input;
+  readonly overlap?: ScheduleOverlap;
+  readonly misfire?: ScheduleMisfire;
+} & (
+  | { readonly cron: string; readonly timezone: string; readonly every?: never }
+  | { readonly every: DurationInput; readonly cron?: never; readonly timezone?: never }
+);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L10)
 
 ### ScheduleListOptions
 
+Options accepted for schedule list operations.
+
 **Signature**
 
 ```ts
-declare const ScheduleListOptions: ScheduleListOptions;
+export interface ScheduleListOptions {
+  readonly limit?: number;
+  readonly cursor?: string;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L44)
 
 ### ScheduleMisfire
 
+How missed occurrences are handled after downtime.
+
 **Signature**
 
 ```ts
-declare const ScheduleMisfire: ScheduleMisfire;
+type ScheduleMisfire = "skip" | "latest" | "all";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L7)
 
 ### ScheduleOverlap
 
+Whether simultaneous occurrences are skipped or allowed.
+
 **Signature**
 
 ```ts
-declare const ScheduleOverlap: ScheduleOverlap;
+type ScheduleOverlap = "allow" | "skip";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L5)
 
 ### ScheduleReadReceipt
 
+Receipt returned after a schedule read operation.
+
 **Signature**
 
 ```ts
-declare const ScheduleReadReceipt: ScheduleReadReceipt<Definition>;
+export interface ScheduleReadReceipt<Definition = ScheduleDefinition> {
+  readonly outcome: "available" | "unavailable";
+  readonly schedule?: ScheduleRecord<Definition>;
+  readonly schedules?: readonly ScheduleRecord<Definition>[];
+  readonly nextCursor?: string;
+  readonly hasMore?: boolean;
+  readonly reason?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L30)
 
 ### ScheduleRecord
 
+Provider read model for a persisted schedule.
+
 **Signature**
 
 ```ts
-declare const ScheduleRecord: ScheduleRecord<Definition>;
+export interface ScheduleRecord<Definition = ScheduleDefinition> {
+  readonly id: string;
+  readonly jobId: string;
+  readonly state: "active" | "paused" | "missing" | "unknown";
+  readonly definition: Definition;
+  readonly observedAt?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L21)
 
 ### ScheduleWriteOptions
 
+Options accepted for schedule write operations.
+
 **Signature**
 
 ```ts
-declare const ScheduleWriteOptions: ScheduleWriteOptions;
+export interface ScheduleWriteOptions {
+  readonly operationId: string;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L51)
 
 ### ScheduleWriteOutcome
 
+Result category for a native schedule mutation.
+
 **Signature**
 
 ```ts
-declare const ScheduleWriteOutcome: ScheduleWriteOutcome;
+type ScheduleWriteOutcome =
+  "created" | "updated" | "paused" | "resumed" | "deleted" | "requested" | "unsupported";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L40)
 
 ### ScheduleWriteReceipt
 
+Receipt returned after a schedule write operation.
+
 **Signature**
 
 ```ts
-declare const ScheduleWriteReceipt: ScheduleWriteReceipt<Definition>;
+type ScheduleWriteReceipt<Definition = ScheduleDefinition> =
+  | {
+      readonly operationId: string;
+      readonly scheduleId: string;
+      readonly outcome: ScheduleWriteOutcome;
+      readonly schedule?: ScheduleRecord<Definition>;
+    }
+  | (JobUnknownOutcome & { readonly scheduleId: string });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule.types.ts#L57)
 
 ### ServerTriggerOptions
 
+Options accepted for server trigger operations.
+
 **Signature**
 
 ```ts
-declare const ServerTriggerOptions: ServerTriggerOptions;
+export interface ServerTriggerOptions extends TriggerOptions {
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L15)
 
 ### TriggerOptions
 
+Browser-safe submission fields. Server-only signals and selectors are separate.
+
 **Signature**
 
 ```ts
-declare const TriggerOptions: TriggerOptions;
+export interface TriggerOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly delay?: DurationInput;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/job.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L5)
 
 ## `jobs-observability.ts`
 
@@ -7998,43 +8693,80 @@ declare const sameEffect: (
 
 ### JobBindingMigration
 
+Binding mode recorded in a job migration snapshot.
+
 **Signature**
 
 ```ts
-declare const JobBindingMigration: JobBindingMigration;
+type JobBindingMigration = "implicit" | "default" | "explicit";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.types.ts#L2)
 
 ### JobMigrationDiagnostic
 
+Actionable compatibility finding for an authored job change.
+
 **Signature**
 
 ```ts
-declare const JobMigrationDiagnostic: JobMigrationDiagnostic;
+export interface JobMigrationDiagnostic {
+  readonly code:
+    | "DEFAULT_DERIVED_JOB_ID_RENAME"
+    | "PINNED_JOB_ID_CHANGED"
+    | "IMPLICIT_TO_EXPLICIT_BINDING"
+    | "TASK_ID_CHANGED"
+    | "TASK_VERSION_CHANGED"
+    | "TASK_INPUT_SCHEMA_CHANGED"
+    | "HISTORICAL_RUNS_PINNED"
+    | "SCHEDULE_TARGET_CHANGED"
+    | "DEDUPE_SCOPE_CHANGED"
+    | "PUBLIC_CLIENT_FINGERPRINT_CHANGED";
+  readonly severity: JobMigrationSeverity;
+  readonly breaking: boolean;
+  readonly message: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.types.ts#L25)
 
 ### JobMigrationSeverity
 
+Severity assigned to one compatibility diagnostic.
+
 **Signature**
 
 ```ts
-declare const JobMigrationSeverity: JobMigrationSeverity;
+type JobMigrationSeverity = "warning" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.types.ts#L5)
 
 ### JobMigrationSnapshot
 
+Versioned job identity and public contract facts used by migration checks.
+
 **Signature**
 
 ```ts
-declare const JobMigrationSnapshot: JobMigrationSnapshot;
+export interface JobMigrationSnapshot {
+  readonly name: string;
+  readonly id: string;
+  readonly idSource?: "explicit" | "name";
+  readonly taskId: string;
+  readonly taskVersion: string;
+  readonly inputSchemaHash?: string;
+  readonly binding: JobBindingMigration;
+  readonly publicFingerprint?: string;
+  readonly clientFingerprint?: string;
+  readonly service?: string;
+  readonly hasHistoricalRuns?: boolean;
+  readonly scheduleIds?: readonly string[];
+  readonly dedupeScope?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/migration.types.ts#L8)
 
 ### diagnoseJobMigration
 
@@ -8305,23 +9037,37 @@ declare const taskIdOfEffect: (
 
 ### BindingSource
 
+How a task selected its job binding.
+
 **Signature**
 
 ```ts
-declare const BindingSource: BindingSource;
+type BindingSource = "explicit" | "default" | "implicit";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.types.ts#L5)
 
 ### JobBindingErrorCode
 
+Machine-readable reason for a binding resolution failure.
+
 **Signature**
 
 ```ts
-declare const JobBindingErrorCode: JobBindingErrorCode;
+type JobBindingErrorCode =
+  | "MISSING_IMPLICIT_NAME"
+  | "INVALID_IMPLICIT_NAME"
+  | "TASK_SELECTOR_MISMATCH"
+  | "UNKNOWN_JOB_SELECTOR"
+  | "AMBIGUOUS_JOB"
+  | "DUPLICATE_JOB_ID"
+  | "MULTIPLE_DEFAULT_JOBS"
+  | "MISSING_JOB_PROFILE"
+  | "AMBIGUOUS_JOB_PROFILE"
+  | "UNKNOWN_JOB_PROFILE";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.types.ts#L33)
 
 ### JobBindingFailure (class)
 
@@ -8353,23 +9099,46 @@ declare const JobBindingResolutionError: typeof JobBindingResolutionError;
 
 ### ResolveBindingOptions
 
+Inputs for resolving one task to its executable job.
+
 **Signature**
 
 ```ts
-declare const ResolveBindingOptions: ResolveBindingOptions;
+export interface ResolveBindingOptions {
+  readonly task: TaskRefAny;
+  readonly jobs?: readonly JobDescriptorAny[];
+  readonly selector?: JobDescriptorAny | JobRefAny;
+  readonly implicitName?: string;
+  readonly profiles?: readonly string[] | Readonly<Record<string, unknown>>;
+  readonly defaultProfile?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.types.ts#L8)
 
 ### ResolvedTaskBinding
 
+Canonical task-to-job selection returned by the binding resolver.
+
 **Signature**
 
 ```ts
-declare const ResolvedTaskBinding: ResolvedTaskBinding;
+export interface ResolvedTaskBinding {
+  readonly taskId: string;
+  readonly taskVersion?: string;
+  readonly jobId: string;
+  readonly name: string;
+  readonly service?: string;
+  readonly profile: string;
+  readonly source: BindingSource;
+  readonly implicit: boolean;
+  readonly default: boolean;
+  readonly private: boolean;
+  readonly job?: JobDescriptorAny;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/resolve-binding.types.ts#L18)
 
 ### resolveBinding
 
@@ -8691,13 +9460,18 @@ declare const runLocatorStoreLayer: (
 
 ### RunLocatorGeneration
 
+One retained service generation and its locator verification keys.
+
 **Signature**
 
 ```ts
-declare const RunLocatorGeneration: RunLocatorGeneration;
+export interface RunLocatorGeneration {
+  readonly generation: string;
+  readonly keyRing: RunLocatorKeyRing;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id-router.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id-router.types.ts#L3)
 
 ### RunLocatorGenerationStorage
 
@@ -8711,13 +9485,18 @@ declare const RunLocatorGenerationStorage: typeof RunLocatorGenerationStorage;
 
 ### RunLocatorGenerationStore
 
+Replaceable persistence boundary for locator generations.
+
 **Signature**
 
 ```ts
-declare const RunLocatorGenerationStore: RunLocatorGenerationStore;
+export interface RunLocatorGenerationStore {
+  readonly load: () => readonly RunLocatorGeneration[] | Promise<readonly RunLocatorGeneration[]>;
+  readonly save: (generations: readonly RunLocatorGeneration[]) => void | Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id-router.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id-router.types.ts#L8)
 
 ### RunLocatorRouter (class)
 
@@ -9122,13 +9901,18 @@ declare const RUN_LOCATOR_VERSION: 1;
 
 ### RunLocatorCreateOptions
 
+Options accepted for run locator create operations.
+
 **Signature**
 
 ```ts
-declare const RunLocatorCreateOptions: RunLocatorCreateOptions;
+export interface RunLocatorCreateOptions {
+  readonly payload: RunLocatorPayload;
+  readonly keyRing: RunLocatorKeyRing;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.types.ts#L27)
 
 ### RunLocatorError
 
@@ -9160,53 +9944,90 @@ declare class RunLocatorFailure
 
 ### RunLocatorKeyRing
 
+Signing and verification keys for run locators.
+
 **Signature**
 
 ```ts
-declare const RunLocatorKeyRing: RunLocatorKeyRing;
+export interface RunLocatorKeyRing {
+  readonly activeKeyId: string;
+  readonly keys: Readonly<Record<string, string | Uint8Array>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.types.ts#L17)
 
 ### RunLocatorKeyRingStore
 
+Store of key rings used during locator rotation.
+
 **Signature**
 
 ```ts
-declare const RunLocatorKeyRingStore: RunLocatorKeyRingStore;
+export interface RunLocatorKeyRingStore {
+  readonly load: () => RunLocatorKeyRing | Promise<RunLocatorKeyRing>;
+  readonly save: (ring: RunLocatorKeyRing) => void | Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.types.ts#L22)
 
 ### RunLocatorPayload
 
+Signed run identity and namespace fields carried by a locator.
+
 **Signature**
 
 ```ts
-declare const RunLocatorPayload: RunLocatorPayload;
+export interface RunLocatorPayload {
+  readonly application: string;
+  readonly environment: string;
+  readonly serviceGeneration: string;
+  readonly jobId: string;
+  readonly taskId: string;
+  readonly taskVersion: string;
+  readonly buildId: string;
+  /** Accepted only while creating a locator; the clear-text scope is never encoded. */
+  readonly scope?: string;
+  readonly namespaceHash?: string;
+  readonly schemaHash?: string;
+  readonly native: { readonly kind: string; readonly value: string };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.types.ts#L2)
 
 ### RunLocatorVerifyOptions
 
+Options accepted for run locator verify operations.
+
 **Signature**
 
 ```ts
-declare const RunLocatorVerifyOptions: RunLocatorVerifyOptions;
+export interface RunLocatorVerifyOptions {
+  readonly keyRing: RunLocatorKeyRing;
+  readonly application?: string;
+  readonly environment?: string;
+  readonly scope?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.types.ts#L32)
 
 ### VerifiedRunLocator
 
+Decoded signed locator with trusted namespace and run identity.
+
 **Signature**
 
 ```ts
-declare const VerifiedRunLocator: VerifiedRunLocator;
+export interface VerifiedRunLocator extends RunLocatorPayload {
+  readonly keyId: string;
+  readonly version: 1;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/run-id.types.ts#L39)
 
 ### createRunLocator
 
@@ -9875,43 +10696,116 @@ declare const resolveBindingEffect: (
 
 ### JobsManifestLike
 
+Minimal manifest fields used to resolve authored jobs and tasks.
+
 **Signature**
 
 ```ts
-declare const JobsManifestLike: JobsManifestLike;
+export interface JobsManifestLike {
+  readonly protocol?: string;
+  readonly version?: number;
+  readonly app?: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
+  readonly tasks?: readonly {
+    readonly id: string;
+    readonly version?: string;
+    readonly buildId?: string;
+    readonly schemaHashes?: unknown;
+    readonly policy?: unknown;
+  }[];
+  readonly jobs?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly taskId: string;
+    readonly taskVersion?: string;
+    readonly buildId?: string;
+    readonly profile?: string;
+    readonly serviceGeneration?: string;
+    readonly default?: boolean;
+  }[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.types.ts#L12)
 
 ### JobsOperationOptions
 
+Caller signal and trusted metadata passed to a native jobs operation.
+
 **Signature**
 
 ```ts
-declare const JobsOperationOptions: JobsOperationOptions;
+type JobsOperationOptions = Pick<OperationContext, "signal"> &
+  Partial<
+    Pick<
+      OperationContext,
+      | "scope"
+      | "operationId"
+      | "deadlineMs"
+      | "correlationId"
+      | "parentRunId"
+      | "propagation"
+      | "acceptanceIdentity"
+      | "occurrenceIdentity"
+      | "inputSchemaHash"
+      | "retryOfRunId"
+    >
+  >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.types.ts#L67)
 
 ### JobsRuntime
 
+Validated runtime bindings and provider access for job operations.
+
 **Signature**
 
 ```ts
-declare const JobsRuntime: JobsRuntime;
+export interface JobsRuntime {
+  readonly adapter: JobsAdapterRuntime;
+  readonly capabilities: JobsCapabilityReport;
+  readonly application: string;
+  readonly environment: string;
+  readonly scope: string;
+  readonly service: string;
+  readonly serviceGeneration: string;
+  readonly manifest?: JobsManifestLike;
+  readonly jobs?: readonly JobDescriptorAny[];
+  readonly taskExecutor?: TaskExecutor;
+  readonly tasks?: readonly TaskDescriptorAny[];
+  readonly resolveBinding: (task: TaskRefAny, selector?: JobRefAny) => JobsRuntimeBinding;
+  readonly operationContext: (options: JobsOperationOptions) => OperationContext;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.types.ts#L84)
 
 ### JobsRuntimeBinding
 
+Resolved task, job, service, and build identity pinned for one run.
+
 **Signature**
 
 ```ts
-declare const JobsRuntimeBinding: JobsRuntimeBinding;
+export interface JobsRuntimeBinding {
+  readonly taskId: string;
+  readonly taskVersion: string;
+  readonly jobId: string;
+  readonly name: string;
+  readonly profile: string;
+  readonly service: string;
+  readonly serviceGeneration: string;
+  readonly buildId: string;
+  readonly inputSchemaHash?: string;
+  readonly scope?: string;
+  readonly policy?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.types.ts#L37)
 
 ### JobsRuntimeCallbackError
 
@@ -9935,13 +10829,29 @@ declare const JobsRuntimeError: typeof JobsRuntimeError;
 
 ### JobsRuntimeOptions
 
+Provider, manifest, and authored descriptors used to create a jobs runtime.
+
 **Signature**
 
 ```ts
-declare const JobsRuntimeOptions: JobsRuntimeOptions;
+export interface JobsRuntimeOptions {
+  readonly adapter?: unknown;
+  readonly provider?: unknown;
+  readonly providerHandle?: { readonly value: unknown };
+  readonly capabilities?: JobsCapabilityReport;
+  readonly application?: string;
+  readonly environment?: string;
+  readonly scope?: string;
+  readonly service?: string;
+  readonly serviceGeneration?: string;
+  readonly manifest?: JobsManifestLike;
+  readonly jobs?: readonly JobDescriptorAny[];
+  readonly taskExecutor?: TaskExecutor;
+  readonly tasks?: readonly TaskDescriptorAny[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.types.ts#L51)
 
 ### NativeLocator
 
@@ -9955,13 +10865,35 @@ declare const NativeLocator: string;
 
 ### TaskDescriptorAny
 
+Task descriptor widened for registry and runtime boundaries.
+
 **Signature**
 
 ```ts
-declare const TaskDescriptorAny: TaskDescriptorAny;
+type TaskDescriptorAny = DescriptorBase<"task", string> &
+  TaskRef<string, StandardSchemaV1, StandardSchemaV1, readonly ErrorDescriptorAny[]> & {
+    readonly version: string;
+    readonly execution: TaskExecution;
+    readonly inputWire?: StandardSchemaV1 | undefined;
+    readonly dependencies?: TaskDependencies | undefined;
+    readonly progress?: StandardSchemaV1 | undefined;
+    readonly streams?: TaskStreamSchemas | undefined;
+    readonly observation?: TaskObservation | undefined;
+    readonly retry: NormalizedTaskRetryPolicy;
+    readonly resources?: TaskResources | undefined;
+    readonly concurrency?: TaskConcurrency | undefined;
+    readonly maxDuration?: DurationInput | undefined;
+    readonly maxElapsed?: DurationInput | undefined;
+    readonly logging?: TaskLogging | undefined;
+    readonly onStart?: (...args: never[]) => Promise<void>;
+    readonly onSuccess?: (...args: never[]) => Promise<void>;
+    readonly onFailure?: (...args: never[]) => Promise<void>;
+    readonly handler: (...args: never[]) => unknown;
+    readonly trigger: (...args: never[]) => Promise<RunHandle>;
+  };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L210)
 
 ### createJobsRuntime
 
@@ -10938,13 +11870,20 @@ declare const writeWithRecoveryEffect: (
 
 ### NativeOwnedScheduleRecord
 
+Native schedule visible to reconciliation, including ownership metadata.
+
 **Signature**
 
 ```ts
-declare const NativeOwnedScheduleRecord: NativeOwnedScheduleRecord;
+export interface NativeOwnedScheduleRecord {
+  readonly id: string;
+  readonly state?: "active" | "paused" | "missing" | "unknown";
+  readonly definition?: ScheduleDefinition;
+  readonly metadata?: Readonly<Record<string, unknown>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-reconciliation.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-reconciliation.types.ts#L4)
 
 ### NativeScheduleService
 
@@ -10968,23 +11907,41 @@ declare const ScheduleReconciliationFailure: typeof ScheduleReconciliationFailur
 
 ### ScheduleReconciliationOptions
 
+Existing Promise API options, including the native provider.
+
 **Signature**
 
 ```ts
-declare const ScheduleReconciliationOptions: ScheduleReconciliationOptions;
+export interface ScheduleReconciliationOptions {
+  readonly native: NativeScheduleOperations;
+  readonly desired: readonly ScheduleDefinition[];
+  readonly existing?: readonly NativeOwnedScheduleRecord[];
+  readonly context: OperationContext;
+  readonly jobId: string;
+  readonly taskId?: string;
+  readonly taskVersion?: string;
+  readonly buildId: string;
+  readonly workerReady?: (() => Promise<void>) | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-reconciliation.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-reconciliation.types.ts#L17)
 
 ### ScheduleReconciliationResult
 
+Ordered changes made by a reconciliation pass.
+
 **Signature**
 
 ```ts
-declare const ScheduleReconciliationResult: ScheduleReconciliationResult;
+export interface ScheduleReconciliationResult {
+  readonly upserted: readonly string[];
+  readonly deleted: readonly string[];
+  readonly preserved: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-reconciliation.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-reconciliation.types.ts#L11)
 
 ### nativeScheduleLayer
 
@@ -11177,13 +12134,18 @@ declare class ScheduleValidationError
 
 ### ScheduleValidationOptions
 
+Schemas used to validate and canonicalize authored schedule input.
+
 **Signature**
 
 ```ts
-declare const ScheduleValidationOptions: ScheduleValidationOptions;
+export interface ScheduleValidationOptions {
+  readonly callerSchema?: StandardSchemaV1;
+  readonly canonicalSchema?: StandardSchemaV1;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-validation.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/schedule-validation.types.ts#L3)
 
 ### copySchedules
 
@@ -11542,43 +12504,85 @@ declare const JobsServerError: typeof JobsServerError;
 
 ### RunResultOptions
 
+Options accepted for run result operations.
+
 **Signature**
 
 ```ts
-declare const RunResultOptions: RunResultOptions;
+export interface RunResultOptions {
+  readonly timeout: DurationInput;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/server.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L32)
 
 ### RunWithJobsConfig
 
+Options for a server invocation with a jobs runtime.
+The caller retains ownership when runtime is supplied.
+
+**Example**
+
+```ts
+const config: RunWithJobsConfig = { projectRoot: process.cwd() };
+```
+
 **Signature**
 
 ```ts
-declare const RunWithJobsConfig: RunWithJobsConfig;
+export interface RunWithJobsConfig {
+  readonly projectRoot: string;
+  readonly environment?: string;
+  readonly manifestPath?: string;
+  readonly runtime?: JobsRuntime;
+  readonly adapter?: unknown;
+  readonly provider?: unknown;
+  readonly providerHandle?: { readonly value: unknown };
+  readonly application?: string;
+  readonly scope?: string;
+  readonly service?: string;
+  readonly serviceGeneration?: string;
+  readonly capabilities?: JobsRuntimeOptions["capabilities"];
+  readonly jobs?: JobsRuntimeOptions["jobs"];
+  readonly taskExecutor?: JobsRuntimeOptions["taskExecutor"];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/server.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/server.types.ts#L11)
 
 ### ServerTriggerOptions
 
+Options accepted for server trigger operations.
+
 **Signature**
 
 ```ts
-declare const ServerTriggerOptions: ServerTriggerOptions;
+export interface ServerTriggerOptions extends TriggerOptions {
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/server.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L15)
 
 ### TriggerOptions
 
+Browser-safe submission fields. Server-only signals and selectors are separate.
+
 **Signature**
 
 ```ts
-declare const TriggerOptions: TriggerOptions;
+export interface TriggerOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly delay?: DurationInput;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/server.ts#L100)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L5)
 
 ### runWithJobs
 
@@ -11634,13 +12638,38 @@ declare const runWithJobsEffect: <A>(
 
 ### JobsManifestLike
 
+Minimal manifest fields used to resolve authored jobs and tasks.
+
 **Signature**
 
 ```ts
-declare const JobsManifestLike: JobsManifestLike;
+export interface JobsManifestLike {
+  readonly protocol?: string;
+  readonly version?: number;
+  readonly app?: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
+  readonly tasks?: readonly {
+    readonly id: string;
+    readonly version?: string;
+    readonly buildId?: string;
+    readonly schemaHashes?: unknown;
+    readonly policy?: unknown;
+  }[];
+  readonly jobs?: readonly {
+    readonly id: string;
+    readonly name: string;
+    readonly taskId: string;
+    readonly taskVersion?: string;
+    readonly buildId?: string;
+    readonly profile?: string;
+    readonly serviceGeneration?: string;
+    readonly default?: boolean;
+  }[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/server.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.types.ts#L12)
 
 ### JobsManifestReaderService (interface)
 
@@ -11669,13 +12698,29 @@ export interface JobsManifestReaderService {
 
 ### JobsRuntimeOptions
 
+Provider, manifest, and authored descriptors used to create a jobs runtime.
+
 **Signature**
 
 ```ts
-declare const JobsRuntimeOptions: JobsRuntimeOptions;
+export interface JobsRuntimeOptions {
+  readonly adapter?: unknown;
+  readonly provider?: unknown;
+  readonly providerHandle?: { readonly value: unknown };
+  readonly capabilities?: JobsCapabilityReport;
+  readonly application?: string;
+  readonly environment?: string;
+  readonly scope?: string;
+  readonly service?: string;
+  readonly serviceGeneration?: string;
+  readonly manifest?: JobsManifestLike;
+  readonly jobs?: readonly JobDescriptorAny[];
+  readonly taskExecutor?: TaskExecutor;
+  readonly tasks?: readonly TaskDescriptorAny[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/server.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/runtime.types.ts#L51)
 
 ### RunWithJobsConfig (interface)
 
@@ -11787,23 +12832,50 @@ declare const JobsServiceBehavior: Readonly<Record<string, JsonValue>>;
 
 ### JobsServiceOptionName
 
+Recognized top-level jobs service configuration keys.
+
 **Signature**
 
 ```ts
-declare const JobsServiceOptionName: JobsServiceOptionName;
+type JobsServiceOptionName =
+  "limits" | "workers" | "observation" | "maxElapsed" | "hookTimeout" | "shutdownGrace";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/service-options.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/service-options.types.ts#L30)
 
 ### JobsServiceOptions
 
+Options accepted for jobs service operations.
+
 **Signature**
 
 ```ts
-declare const JobsServiceOptions: JobsServiceOptions;
+export interface JobsServiceOptions {
+  readonly limits?: {
+    readonly inputBytes?: number;
+    readonly outputBytes?: number;
+    readonly progressItemBytes?: number;
+    readonly streamItemBytes?: number;
+  };
+  readonly workers?: {
+    readonly classes: readonly {
+      readonly id: string;
+      readonly cpu: number;
+      readonly memory: MemoryInput;
+      readonly nativeClass?: string;
+    }[];
+  };
+  readonly observation?: {
+    readonly pollInterval?: DurationInput;
+    readonly readTimeout?: DurationInput;
+  };
+  readonly maxElapsed?: DurationInput;
+  readonly hookTimeout?: DurationInput;
+  readonly shutdownGrace?: DurationInput;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/service-options.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/service-options.types.ts#L4)
 
 ### JobsServiceOptionsError
 
@@ -13628,13 +14700,17 @@ declare const SubmissionSupportFailure: typeof SubmissionSupportFailure;
 
 ### UnknownSubmissionOutcome
 
+Submission response that requires recovery after an uncertain native write.
+
 **Signature**
 
 ```ts
-declare const UnknownSubmissionOutcome: UnknownSubmissionOutcome;
+type UnknownSubmissionOutcome = JobUnknownOutcome & {
+  readonly recovery: JobUnknownOutcome["recovery"];
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission-support.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission-support.types.ts#L4)
 
 ### submitAbortable
 
@@ -13780,13 +14856,27 @@ export interface SubmissionWriteRegistration {
 
 ### CanonicalTaskSubmissionOptions
 
+Options accepted for canonical task submission operations.
+
 **Signature**
 
 ```ts
-declare const CanonicalTaskSubmissionOptions: CanonicalTaskSubmissionOptions;
+export interface CanonicalTaskSubmissionOptions {
+  readonly canonicalInput: JobWireEnvelope;
+  readonly operationId: string;
+  readonly idempotencyKey?: string;
+  readonly signal?: AbortSignal;
+  readonly scheduledFor?: string;
+  readonly occurrenceIdentity?: string;
+  readonly acceptanceIdentity?: string;
+  readonly retryOfRunId?: string;
+  readonly inputHash?: string;
+  readonly inputSchemaHash?: string;
+  readonly job?: JobDescriptorAny;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.types.ts#L23)
 
 ### JobReceiptError
 
@@ -13840,33 +14930,70 @@ declare const JobSubmissionUnknownError: typeof JobSubmissionUnknownError;
 
 ### SubmissionAdmission
 
+Prepared admission identity and timing for one submission.
+
 **Signature**
 
 ```ts
-declare const SubmissionAdmission: SubmissionAdmission;
+export interface SubmissionAdmission {
+  readonly task: TaskDescriptorAny;
+  readonly job?: JobDescriptorAny;
+  readonly binding: JobsRuntimeBinding;
+  readonly input: JsonValue;
+  readonly canonicalInput: JsonValue | undefined;
+  readonly inputHash: string;
+  readonly metadata: TaskSubmissionMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.types.ts#L38)
 
 ### SubmissionPipeline
 
+Validated submission stages and their prepared values.
+
 **Signature**
 
 ```ts
-declare const SubmissionPipeline: SubmissionPipeline;
+export interface SubmissionPipeline {
+  readonly submitTask: (
+    task: TaskDescriptorAny,
+    input: unknown,
+    options?: unknown,
+  ) => Promise<RunHandle>;
+  readonly submitJob: (
+    job: JobDescriptorAny,
+    input: unknown,
+    options?: unknown,
+  ) => Promise<RunHandle>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.types.ts#L49)
 
 ### TaskSubmissionMetadata
 
+Task identity, build, and tracing facts sent with a submission.
+
 **Signature**
 
 ```ts
-declare const TaskSubmissionMetadata: TaskSubmissionMetadata;
+export interface TaskSubmissionMetadata {
+  readonly operationId: string;
+  readonly idempotencyKey?: string;
+  readonly scheduledFor?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+  readonly parentRunId?: string;
+  readonly propagation?: TracePropagation;
+  readonly acceptanceIdentity?: string;
+  readonly occurrenceIdentity?: string;
+  readonly inputSchemaHash?: string;
+  readonly retryOfRunId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/submission.types.ts#L8)
 
 ### createSubmissionPipeline
 
@@ -14371,33 +15498,47 @@ declare const DurationInput:
 
 ### InputOf
 
+Caller input inferred from a task or job schema.
+
 **Signature**
 
 ```ts
-declare const InputOf: InputOf<T>;
+type InputOf<T> = T extends { readonly input: infer Schema }
+  ? Schema extends StandardSchemaV1
+    ? InferInput<Schema>
+    : unknown
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-client.types.ts#L6)
 
 ### JobDescriptorForThisTask
 
+Job reference constrained to target the selected task.
+
 **Signature**
 
 ```ts
-declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
+type JobDescriptorForThisTask<Task extends TaskRefAny = TaskRefAny> = JobRefAny & {
+  readonly task: Task;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L20)
 
 ### JobTriggerClients
 
+Named job trigger clients mapped from declared dependencies.
+
 **Signature**
 
 ```ts
-declare const JobTriggerClients: JobTriggerClients<M>;
+type JobTriggerClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: TaskJobClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-client.types.ts#L34)
 
 ### MemoryInput (type alias)
 
@@ -14413,23 +15554,37 @@ type MemoryInput = `${number} MiB` | `${number} GiB`;
 
 ### NormalizedTaskRetryPolicy
 
+Fully populated retry policy used by the runtime.
+
 **Signature**
 
 ```ts
-declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
+export interface NormalizedTaskRetryPolicy {
+  readonly maxAttempts: number;
+  readonly initialDelay: DurationInput;
+  readonly maxDelay: DurationInput;
+  readonly factor: number;
+  readonly jitter: "none" | "full";
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-context-policy.types.ts#L19)
 
 ### OutputOf
 
+Validated output inferred from a task or job schema.
+
 **Signature**
 
 ```ts
-declare const OutputOf: OutputOf<T>;
+type OutputOf<T> = T extends { readonly output: infer Schema }
+  ? Schema extends StandardSchemaV1
+    ? InferOutput<Schema>
+    : unknown
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-client.types.ts#L13)
 
 ### PublishedEventName (type alias)
 
@@ -14445,63 +15600,89 @@ type PublishedEventName = Extract<keyof Relkit.EventRegistry, string>;
 
 ### RunResultOptions
 
+Options accepted for run result operations.
+
 **Signature**
 
 ```ts
-declare const RunResultOptions: RunResultOptions;
+export interface RunResultOptions {
+  readonly timeout: DurationInput;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L32)
 
 ### ServerTriggerOptions
 
+Options accepted for server trigger operations.
+
 **Signature**
 
 ```ts
-declare const ServerTriggerOptions: ServerTriggerOptions;
+export interface ServerTriggerOptions extends TriggerOptions {
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L15)
 
 ### TaskAuthContext
 
+Session lookup supplied to a task through its auth dependency.
+
 **Signature**
 
 ```ts
-declare const TaskAuthContext: TaskAuthContext<Session>;
+export interface TaskAuthContext<Session = unknown> {
+  readonly getSession: () => Promise<Session | null>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-context-policy.types.ts#L5)
 
 ### TaskClientFor
 
+Typed trigger operation for one task reference.
+
 **Signature**
 
 ```ts
-declare const TaskClientFor: TaskClientFor<T>;
+type TaskClientFor<T> = {
+  readonly trigger: (input: InputOf<T>, options?: ServerTriggerOptions) => Promise<RunHandle>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-client.types.ts#L20)
 
 ### TaskClients
 
+Named task trigger clients mapped from declared dependencies.
+
 **Signature**
 
 ```ts
-declare const TaskClients: TaskClients<M>;
+type TaskClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: TaskClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-client.types.ts#L25)
 
 ### TaskConcurrency
 
+Limit and optional input key for task execution concurrency.
+
 **Signature**
 
 ```ts
-declare const TaskConcurrency: TaskConcurrency<InputKey>;
+export interface TaskConcurrency<InputKey extends string = string> {
+  readonly limit: number;
+  readonly key?: InputKey;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-context-policy.types.ts#L34)
 
 ### TaskContext (type alias)
 
@@ -14612,53 +15793,74 @@ type TaskHookContext<Dependencies extends TaskDependencies = {}> = TaskContextBa
 
 ### TaskProgressEmitter
 
+Emitter contract for task progress items.
+
 **Signature**
 
 ```ts
-declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
+export interface TaskProgressEmitter<Value = unknown> {
+  readonly emit: (value: Value) => Promise<ProgressEmitReceipt>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L6)
 
 ### TaskProgressInput
 
+Input type inferred for task progress.
+
 **Signature**
 
 ```ts
-declare const TaskProgressInput: TaskProgressInput<Schema>;
+type TaskProgressInput<Schema extends StandardSchemaV1> = InferInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L18)
 
 ### TaskProgressOutput
 
+Output type inferred for task progress.
+
 **Signature**
 
 ```ts
-declare const TaskProgressOutput: TaskProgressOutput<Schema>;
+type TaskProgressOutput<Schema extends StandardSchemaV1> = InferOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L20)
 
 ### TaskResources
 
+CPU and memory resources requested for task execution.
+
 **Signature**
 
 ```ts
-declare const TaskResources: TaskResources;
+export interface TaskResources {
+  readonly cpu: number;
+  readonly memory: MemoryInput;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-context-policy.types.ts#L28)
 
 ### TaskRetryPolicy
 
+Authoring policy for task retry attempts and backoff.
+
 **Signature**
 
 ```ts
-declare const TaskRetryPolicy: TaskRetryPolicy;
+export interface TaskRetryPolicy {
+  readonly maxAttempts: number;
+  readonly initialDelay?: DurationInput;
+  readonly maxDelay?: DurationInput;
+  readonly factor?: number;
+  readonly jitter?: "none" | "full";
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-context-policy.types.ts#L10)
 
 ### TaskRunContext (interface)
 
@@ -14686,73 +15888,97 @@ export interface TaskRunContext {
 
 ### TaskSleepOptions
 
+Stable sleep key used when a durable task suspends.
+
 **Signature**
 
 ```ts
-declare const TaskSleepOptions: TaskSleepOptions;
+export interface TaskSleepOptions {
+  readonly key: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-context-policy.types.ts#L40)
 
 ### TaskStreamEmitter
 
+Emitter contract for task stream items.
+
 **Signature**
 
 ```ts
-declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
+export interface TaskStreamEmitter<Value = unknown> {
+  readonly emit: (value: Value) => Promise<ProgressEmitReceipt>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L11)
 
 ### TaskStreamEmitters
 
+Named emitters whose input types follow each declared stream schema.
+
 **Signature**
 
 ```ts
-declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
+type TaskStreamEmitters<Streams extends TaskStreamSchemas> = {
+  readonly [Name in keyof Streams & string]: TaskStreamEmitter<TaskStreamInput<Streams[Name]>>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L26)
 
 ### TaskStreamFrames
 
+Discriminated frames for all declared task streams.
+
 **Signature**
 
 ```ts
-declare const TaskStreamFrames: TaskStreamFrames<Streams>;
+type TaskStreamFrames<Streams extends TaskStreamSchemas> = {
+  readonly [Name in keyof Streams & string]: NamedStreamFrame<TaskStreamOutput<Streams[Name]>> & {
+    readonly name: Name;
+  };
+}[keyof Streams & string];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L30)
 
 ### TaskStreamInput
 
+Input type inferred for task stream.
+
 **Signature**
 
 ```ts
-declare const TaskStreamInput: TaskStreamInput<Schema>;
+type TaskStreamInput<Schema extends StandardSchemaV1> = InferInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L22)
 
 ### TaskStreamItem
 
+Validated item output inferred from a stream schema.
+
 **Signature**
 
 ```ts
-declare const TaskStreamItem: TaskStreamItem<Schema>;
+type TaskStreamItem<Schema extends StandardSchemaV1> = InferOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L16)
 
 ### TaskStreamOutput
 
+Output type inferred for task stream.
+
 **Signature**
 
 ```ts
-declare const TaskStreamOutput: TaskStreamOutput<Schema>;
+type TaskStreamOutput<Schema extends StandardSchemaV1> = InferOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-emission.types.ts#L24)
 
 ### TaskStreamSchemas (type alias)
 
@@ -14768,23 +15994,38 @@ type TaskStreamSchemas = Readonly<Record<string, StandardSchemaV1>>;
 
 ### TaskTriggerOptions
 
+Options accepted for task trigger operations.
+
 **Signature**
 
 ```ts
-declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
+export interface TaskTriggerOptions<
+  Task extends TaskRefAny = TaskRefAny,
+> extends ServerTriggerOptions {
+  readonly job?: JobDescriptorForThisTask<Task>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L25)
 
 ### TriggerOptions
 
+Browser-safe submission fields. Server-only signals and selectors are separate.
+
 **Signature**
 
 ```ts
-declare const TriggerOptions: TriggerOptions;
+export interface TriggerOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly delay?: DurationInput;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-core.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger.types.ts#L5)
 
 ## `task-definition-inference.types.ts`
 
@@ -14994,6 +16235,58 @@ type TaskSuccessHook<
 
 ## `task-definition.types.ts`
 
+### DefineTaskCallOptions (type alias)
+
+The options of one `defineTask` call. `execution` is declared here, outside
+`DefineTaskOptions`, so that it alone selects the form the other options are typed by.
+
+**Example**
+
+```ts
+const options: DefineTaskCallOptions<"send", "1", typeof input, typeof output> = {
+  id: "send",
+  version: "1",
+  input,
+  output,
+  handler,
+};
+```
+
+**Signature**
+
+```ts
+type DefineTaskCallOptions<
+  Id extends string,
+  Version extends string,
+  InputSchema extends StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends TaskDependencies = {},
+  Errors extends readonly ErrorDescriptorAny[] = readonly [],
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+  Streams extends TaskStreamSchemas = {},
+  Execution extends TaskExecution = TaskExecution,
+> = Omit<
+  DefineTaskOptions<
+    Id,
+    Version,
+    InputSchema,
+    OutputSchema,
+    Dependencies,
+    Errors,
+    ProgressSchema,
+    Streams,
+    TaskForm<Execution>
+  >,
+  "execution"
+> & {
+  /** `durable` (the default) may sleep and resumes after a restart; `retryable` runs again from
+   * the start. */
+  readonly execution?: Execution;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L136)
+
 ### DefineTaskOptions (interface)
 
 Authoring contract for task schemas, dependencies, hooks, and execution policy.
@@ -15012,26 +16305,47 @@ export interface DefineTaskOptions<
   Streams extends TaskStreamSchemas = {},
   Execution extends TaskExecution = "durable",
 > extends DescriptorMetadata {
+  /** Stable ID of the task; keep it unchanged when the file moves. */
   readonly id: Id;
+  /** Identifies a compatible definition of the task, not a deployment build. */
   readonly version: Version;
+  /** Schema of the input a run is started with. */
   readonly input: InputSchema;
+  /** Schema that checks the stored input unchanged; needed when `input` transforms its value. */
   readonly inputWire?: StandardSchemaV1<InferOutput<InputSchema>, InferOutput<InputSchema>>;
+  /** Schema of the run's result. */
   readonly output: OutputSchema;
+  /** Declared errors the handler may return or throw. */
   readonly errors?: Errors;
+  /** `durable` (the default) may sleep and resume; `retryable` runs again from the start. */
   readonly execution?: Execution;
+  /** Everything the handler calls, by kind; each entry becomes a client on `context`. */
   readonly dependencies?: ValidTaskDependencies<Dependencies>;
+  /** Schema of the progress values the handler reports through `context.progress`. */
   readonly progress?: ProgressSchema;
+  /** Named streams the handler writes to through `context.streams`, each with its item schema. */
   readonly streams?: Streams;
+  /** Requires progress (`"durable"`) or streams (`"history"`) to be kept, not only sent live. */
   readonly observation?: TaskObservation<Streams, ProgressSchema>;
+  /** Attempts and backoff after a failure. Defaults to 3 attempts, 1 to 30 seconds apart. */
   readonly retry?: TaskRetryPolicy;
+  /** The least CPU and memory a worker needs to run the task. */
   readonly resources?: TaskResources;
+  /** Most runs at once; with `key`, the limit applies per value of that input field. */
   readonly concurrency?: TaskConcurrency<CanonicalInputKey<InputSchema>>;
+  /** Longest active time of one attempt; time asleep or waiting to retry does not count. */
   readonly maxDuration?: DurationInput;
+  /** Longest total time from the acceptance of a run, including delays, sleep and retries. */
   readonly maxElapsed?: DurationInput;
+  /** Log level of the task's runs and the fields to redact from their logs. */
   readonly logging?: TaskLogging;
+  /** Runs before the handler starts, with the validated input. */
   readonly onStart?: TaskStartHook<InputSchema, Dependencies>;
+  /** Runs after the handler returns and its output is validated. */
   readonly onSuccess?: TaskSuccessHook<OutputSchema, Dependencies>;
+  /** Runs after an attempt fails, with its error; not only after the last attempt. */
   readonly onFailure?: TaskFailureHook<Dependencies>;
+  /** The task's work: receives the validated input and `context`, returns the output. */
   readonly handler: TaskHandler<
     InputSchema,
     OutputSchema,
@@ -15048,23 +16362,31 @@ export interface DefineTaskOptions<
 
 ### TaskCallerInput
 
+Caller-facing input alias for a task reference.
+
 **Signature**
 
 ```ts
-declare const TaskCallerInput: TaskCallerInput<T>;
+type TaskCallerInput<T extends TaskRef> = TaskInput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-inference.types.ts#L18)
 
 ### TaskCanonicalInput
 
+Parsed canonical input inferred from a task's input schema.
+
 **Signature**
 
 ```ts
-declare const TaskCanonicalInput: TaskCanonicalInput<T>;
+type TaskCanonicalInput<T extends TaskRef> = T extends { readonly input: infer Schema }
+  ? Schema extends StandardSchemaV1
+    ? InferOutput<Schema>
+    : unknown
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-inference.types.ts#L20)
 
 ### TaskDescriptor (interface)
 
@@ -15117,7 +16439,7 @@ export interface TaskDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L103)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L166)
 
 ### TaskDescriptorAny (type alias)
 
@@ -15149,17 +16471,44 @@ type TaskDescriptorAny = DescriptorBase<"task", string> &
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L147)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L210)
 
 ### TaskFailureHook
+
+Hook invoked after task execution fails.
 
 **Signature**
 
 ```ts
-declare const TaskFailureHook: TaskFailureHook<Dependencies>;
+type TaskFailureHook<Dependencies extends TaskDependencies> = (
+  error: unknown,
+  context: TaskHookContext<Dependencies>,
+) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L43)
+
+### TaskForm (type alias)
+
+The form a `defineTask` call selects: the value of `execution`, or `durable` when the call
+leaves it out. The call's type parameter is then every form, which is also what an editor reads
+for suggestions while the option is being typed.
+
+**Example**
+
+```ts
+type Form = TaskForm<"retryable">;
+```
+
+**Signature**
+
+```ts
+type TaskForm<Execution extends TaskExecution> = [TaskExecution] extends [Execution]
+  ? "durable"
+  : Execution;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L128)
 
 ### TaskHandler
 
@@ -15181,93 +16530,139 @@ declare const TaskHandler: TaskHandler<
 
 ### TaskHandlerResult
 
+Allowed output and declared failure forms returned by a task handler.
+
 **Signature**
 
 ```ts
-declare const TaskHandlerResult: TaskHandlerResult<Output, Errors>;
+type TaskHandlerResult<Output, Errors extends readonly ErrorDescriptorAny[]> =
+  Output | DeclaredErrorsOf<Errors> | FunctionFailure<DeclaredErrorsOf<Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L27)
 
 ### TaskInput
 
+Caller input inferred from a task's input schema.
+
 **Signature**
 
 ```ts
-declare const TaskInput: TaskInput<T>;
+type TaskInput<T extends TaskRef> = T extends { readonly input: infer Schema }
+  ? Schema extends StandardSchemaV1
+    ? InferInput<Schema>
+    : unknown
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-inference.types.ts#L5)
 
 ### TaskLogging
 
+Log level and fields to redact during task execution.
+
 **Signature**
 
 ```ts
-declare const TaskLogging: TaskLogging;
+export interface TaskLogging {
+  readonly level?: "trace" | "debug" | "info" | "warn" | "error";
+  readonly redact?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L58)
 
 ### TaskObservation
 
+Visibility settings for progress and named streams.
+
 **Signature**
 
 ```ts
-declare const TaskObservation: TaskObservation<Streams, ProgressSchema>;
+export interface TaskObservation<
+  Streams extends TaskStreamSchemas = TaskStreamSchemas,
+  ProgressSchema extends StandardSchemaV1 | undefined = StandardSchemaV1 | undefined,
+> {
+  readonly progress?: [ProgressSchema] extends [undefined] ? never : "live" | "durable";
+  readonly streams?: Readonly<{ [Name in keyof Streams & string]?: "live" | "history" }>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L49)
 
 ### TaskOutput
 
+Validated output inferred from a task's output schema.
+
 **Signature**
 
 ```ts
-declare const TaskOutput: TaskOutput<T>;
+type TaskOutput<T extends TaskRef> = T extends { readonly output: infer Schema }
+  ? Schema extends StandardSchemaV1
+    ? InferOutput<Schema>
+    : unknown
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-inference.types.ts#L11)
 
 ### TaskRawHandlerOutput
 
+Handler return value accepted by a task's output schema.
+
 **Signature**
 
 ```ts
-declare const TaskRawHandlerOutput: TaskRawHandlerOutput<T>;
+type TaskRawHandlerOutput<T extends TaskRef> = T extends { readonly output: infer Schema }
+  ? Schema extends StandardSchemaV1
+    ? InferInput<Schema>
+    : unknown
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-inference.types.ts#L26)
 
 ### TaskStartHook
 
+Hook invoked before task execution begins.
+
 **Signature**
 
 ```ts
-declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies>;
+type TaskStartHook<InputSchema extends StandardSchemaV1, Dependencies extends TaskDependencies> = (
+  input: InferOutput<InputSchema>,
+  context: TaskHookContext<Dependencies>,
+) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L31)
 
 ### TaskSuccessHook
 
+Hook invoked after a task completes successfully.
+
 **Signature**
 
 ```ts
-declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies>;
+type TaskSuccessHook<
+  OutputSchema extends StandardSchemaV1,
+  Dependencies extends TaskDependencies,
+> = (output: InferOutput<OutputSchema>, context: TaskHookContext<Dependencies>) => Promise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L37)
 
 ### TaskValidatedOutput
 
+Output after validation through a task's output schema.
+
 **Signature**
 
 ```ts
-declare const TaskValidatedOutput: TaskValidatedOutput<T>;
+type TaskValidatedOutput<T extends TaskRef> = TaskOutput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition.types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-inference.types.ts#L32)
 
 ## `task-emission.types.ts`
 
@@ -15485,13 +16880,21 @@ type ObservationStreams = TaskStreamSchemas | undefined;
 
 ### TaskObservation
 
+Visibility settings for progress and named streams.
+
 **Signature**
 
 ```ts
-declare const TaskObservation: TaskObservation<Streams, ProgressSchema>;
+export interface TaskObservation<
+  Streams extends TaskStreamSchemas = TaskStreamSchemas,
+  ProgressSchema extends StandardSchemaV1 | undefined = StandardSchemaV1 | undefined,
+> {
+  readonly progress?: [ProgressSchema] extends [undefined] ? never : "live" | "durable";
+  readonly streams?: Readonly<{ [Name in keyof Streams & string]?: "live" | "history" }>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-observation-validation.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-definition-support.types.ts#L49)
 
 ### TaskStreamSchemas
 
@@ -16561,13 +17964,18 @@ declare class TaskEmissionFailure
 
 ### EffectTaskEmitter
 
+An emitter with a typed Effect operation alongside its Promise adapter.
+
 **Signature**
 
 ```ts
-declare const EffectTaskEmitter: EffectTaskEmitter<Value>;
+export interface EffectTaskEmitter<Value> {
+  readonly emit: (value: Value) => Promise<ProgressEmitReceipt>;
+  readonly emitEffect: (value: Value) => Effect.Effect<ProgressEmitReceipt, TaskEmissionFailure>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.types.ts#L42)
 
 ### TaskEmissionError
 
@@ -16581,13 +17989,24 @@ declare const TaskEmissionError: typeof TaskEmissionError;
 
 ### TaskEmissionErrorCode
 
+Stable compatibility error codes for task emissions.
+
 **Signature**
 
 ```ts
-declare const TaskEmissionErrorCode: TaskEmissionErrorCode;
+type TaskEmissionErrorCode =
+  | "RELKIT_TASK_PROGRESS_INVALID"
+  | "RELKIT_TASK_STREAM_INVALID"
+  | "RELKIT_TASK_PROGRESS_TOO_LARGE"
+  | "RELKIT_TASK_STREAM_TOO_LARGE"
+  | "RELKIT_TASK_PROGRESS_PERSISTENCE"
+  | "RELKIT_TASK_STREAM_PERSISTENCE"
+  | "RELKIT_TASK_PROGRESS_RETENTION"
+  | "RELKIT_TASK_STREAM_RETENTION"
+  | "RELKIT_TASK_EMISSION_ABORTED";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.types.ts#L31)
 
 ### TaskEmissionFailure
 
@@ -16601,43 +18020,68 @@ declare const TaskEmissionFailure: typeof TaskEmissionFailure;
 
 ### TaskEmissionSink
 
+Sink for a validated progress item.
+
 **Signature**
 
 ```ts
-declare const TaskEmissionSink: TaskEmissionSink;
+type TaskEmissionSink = (
+  value: unknown,
+  signal: AbortSignal,
+) => MaybePromise<ProgressEmitReceipt | void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.types.ts#L6)
 
 ### TaskEmitterOptions
 
+Delivery and retention settings for a progress emitter.
+
 **Signature**
 
 ```ts
-declare const TaskEmitterOptions: TaskEmitterOptions;
+export interface TaskEmitterOptions {
+  readonly signal?: AbortSignal;
+  readonly sink?: TaskEmissionSink;
+  readonly durable?: boolean;
+  readonly maxBytes?: number;
+  readonly generation?: string;
+  readonly requireGeneration?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.types.ts#L11)
 
 ### TaskStreamEmitterOptions
 
+Delivery settings for a named stream emitter.
+
 **Signature**
 
 ```ts
-declare const TaskStreamEmitterOptions: TaskStreamEmitterOptions;
+export interface TaskStreamEmitterOptions extends Omit<TaskEmitterOptions, "sink"> {
+  readonly name: string;
+  readonly sink?: TaskStreamSink;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.types.ts#L20)
 
 ### TaskStreamSink
 
+Sink for a validated named stream item.
+
 **Signature**
 
 ```ts
-declare const TaskStreamSink: TaskStreamSink;
+type TaskStreamSink = (
+  value: unknown,
+  signal: AbortSignal,
+  identity: { readonly name: string; readonly generation?: string },
+) => MaybePromise<ProgressEmitReceipt | void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-progress.types.ts#L25)
 
 ### createTaskProgressEmitter
 
@@ -17975,13 +19419,21 @@ declare const wirePromiseEffect: <A>(
 
 ### TaskWireErrorCode
 
+Stable codes for wire validation, identity, and size errors.
+
 **Signature**
 
 ```ts
-declare const TaskWireErrorCode: TaskWireErrorCode;
+type TaskWireErrorCode =
+  | "RELKIT_TASK_WIRE_INVALID"
+  | "RELKIT_TASK_INPUT_INVALID"
+  | "RELKIT_TASK_OUTPUT_INVALID"
+  | "RELKIT_TASK_INPUT_WIRE_NON_IDENTITY"
+  | "RELKIT_TASK_INPUT_TOO_LARGE"
+  | "RELKIT_TASK_OUTPUT_TOO_LARGE";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-wire-support.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-wire-support.types.ts#L2)
 
 ### TaskWireValidationError (class)
 
@@ -18524,13 +19976,21 @@ declare const validateTaskOutput: <S extends StandardSchemaV1>(
 
 ### TaskWireErrorCode
 
+Stable codes for wire validation, identity, and size errors.
+
 **Signature**
 
 ```ts
-declare const TaskWireErrorCode: TaskWireErrorCode;
+type TaskWireErrorCode =
+  | "RELKIT_TASK_WIRE_INVALID"
+  | "RELKIT_TASK_INPUT_INVALID"
+  | "RELKIT_TASK_OUTPUT_INVALID"
+  | "RELKIT_TASK_INPUT_WIRE_NON_IDENTITY"
+  | "RELKIT_TASK_INPUT_TOO_LARGE"
+  | "RELKIT_TASK_OUTPUT_TOO_LARGE";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-wire-value.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-wire-support.types.ts#L2)
 
 ### TaskWireValidationError
 
@@ -18715,13 +20175,21 @@ export * from "./task-wire-validation.js";
 
 ### TaskWireErrorCode
 
+Stable codes for wire validation, identity, and size errors.
+
 **Signature**
 
 ```ts
-declare const TaskWireErrorCode: TaskWireErrorCode;
+type TaskWireErrorCode =
+  | "RELKIT_TASK_WIRE_INVALID"
+  | "RELKIT_TASK_INPUT_INVALID"
+  | "RELKIT_TASK_OUTPUT_INVALID"
+  | "RELKIT_TASK_INPUT_WIRE_NON_IDENTITY"
+  | "RELKIT_TASK_INPUT_TOO_LARGE"
+  | "RELKIT_TASK_OUTPUT_TOO_LARGE";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-wire.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/task-wire-support.types.ts#L2)
 
 ### TaskWireFailure
 
@@ -18747,13 +20215,15 @@ declare const TaskWireValidationError: typeof TaskWireValidationError;
 
 ### CopiedTriggerOptions
 
+Validated trigger options with an optional authored job selector.
+
 **Signature**
 
 ```ts
-declare const CopiedTriggerOptions: CopiedTriggerOptions;
+type CopiedTriggerOptions = ServerTriggerOptions & { readonly job?: unknown };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger-validation.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/jobs/trigger-validation.types.ts#L3)
 
 ### TriggerValidationError (class)
 

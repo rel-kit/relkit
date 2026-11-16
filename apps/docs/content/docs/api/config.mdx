@@ -56,13 +56,38 @@ Since v0.1.0
 
 ### ConfigOperation
 
+Stable, bounded names for environment configuration operations.
+
 **Signature**
 
 ```ts
-declare const ConfigOperation: ConfigOperation;
+type ConfigOperation =
+  | "define"
+  | "resolve"
+  | "resolve-provider"
+  | "project"
+  | "is-ref"
+  | "create-ref"
+  | "json-value"
+  | "parse-number"
+  | "parse-port"
+  | "parse-boolean"
+  | "parse-literal"
+  | "builder-create"
+  | "builder-get-default"
+  | "builder-parse"
+  | "builder-literal"
+  | "builder-or-binding"
+  | "parse-url"
+  | "parse-json"
+  | "builder-default"
+  | "builder-optional"
+  | "builder-required-in"
+  | "builder-description"
+  | "builder-example";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.types.ts#L4)
 
 ### ConfigTelemetry (class)
 
@@ -102,13 +127,26 @@ declare const ConfigTelemetryLive: Layer.Layer<ConfigTelemetry, never, never>;
 
 ### ConfigTelemetryService
 
+Substitutable observer used by the config Effect operations.
+
 **Signature**
 
 ```ts
-declare const ConfigTelemetryService: ConfigTelemetryService;
+export interface ConfigTelemetryService {
+  /** Observe one operation without changing its success or error.
+   * @param operation - Stable bounded operation name.
+   * @param effect - Effect to instrument.
+   * @returns The original Effect success and error channels.
+   * @example observe("resolve", Effect.succeed({ MODE: "test" }));
+   */
+  readonly observe: <A, E, R>(
+    operation: ConfigOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.types.ts#L30)
 
 ### observeConfig
 
@@ -606,13 +644,22 @@ export interface EnvBuilderFactory {
 
 ### JsonValue
 
+Deeply JSON-safe value suitable for declaration metadata.
+
+**Example**
+
+```ts
+const example: JsonValue = { enabled: true };
+```
+
 **Signature**
 
 ```ts
-declare const JsonValue: JsonValue;
+type JsonValue =
+  string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.types.ts#L4)
 
 ### toJsonValue
 
@@ -978,133 +1025,413 @@ declare const BindingValueRef: BindingValueRef<Name, Value, Type>;
 
 ### EnvBuilder
 
+Value-free field declaration with immutable fluent metadata methods.
+Every method returns a new frozen builder; the original remains unchanged.
+
+**Example**
+
+```ts
+const mode = env.string().default("test").description("Runtime mode");
+```
+
 **Signature**
 
 ```ts
-declare const EnvBuilder: EnvBuilder<T>;
+export interface EnvBuilder<T> extends EnvBuilderBase {
+  readonly parse: (value: string) => Exclude<T, undefined>;
+  readonly getDefault: () => Exclude<T, undefined> | undefined;
+  /** Attach a lazy or literal default.
+   * @param value - Default literal or factory, invoked during resolution.
+   * @returns A new builder whose value is required when present.
+   * @example env.string().default("test");
+   */
+  default(
+    value: Exclude<T, undefined> | (() => Exclude<T, undefined>),
+  ): EnvBuilder<Exclude<T, undefined>>;
+  /** Allow absence outside explicitly required environments.
+   * @returns A new builder whose value may be undefined.
+   * @example env.string().optional();
+   */
+  optional(): EnvBuilder<T | undefined>;
+  /** Require the field in named environments.
+   * @param environments - Environment names, with duplicates removed.
+   * @returns A new builder with merged requirement metadata.
+   * @throws TypeError when a name is empty.
+   * @example env.string().requiredIn("production");
+   */
+  requiredIn(...environments: readonly string[]): EnvBuilder<T>;
+  /** Add human-readable field guidance.
+   * @param text - Description shown in metadata.
+   * @returns A new builder with a description.
+   * @example env.string().description("Public origin");
+   */
+  description(text: string): EnvBuilder<T>;
+  /** Add a JSON-safe example, redacting sensitive fields.
+   * @param value - Example value.
+   * @returns A new builder with example metadata.
+   * @throws TypeError when a public example is not JSON-safe.
+   * @example env.url().example(new URL("https://example.test"));
+   */
+  example(value: T): EnvBuilder<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L73)
 
 ### EnvBuilderBase
 
+Minimum builder contract used during resolution.
+`parse` and `getDefault` remain synchronous compatibility callbacks.
+
+**Example**
+
+```ts
+const field: EnvBuilderBase = env.string();
+```
+
 **Signature**
 
 ```ts
-declare const EnvBuilderBase: EnvBuilderBase;
+export interface EnvBuilderBase {
+  /** Marks the value as an environment field declaration; always `"env-builder"`. */
+  readonly kind: "env-builder";
+  /** The field's type, requirements and description as plain data; never its value or default. */
+  readonly metadata: EnvMetadata;
+  /** Parse a raw string through the field's Effect-backed compatibility adapter.
+   * @param value - Raw environment value.
+   * @returns Parsed field value.
+   * @throws TypeError for invalid built-in values; custom parsers may throw.
+   * @example env.number().parse("2");
+   */
+  readonly parse: (value: string) => unknown;
+  /** Produce a lazy default only when resolution needs it.
+   * @returns Default value or undefined.
+   * @throws A user default factory's original error.
+   * @example env.string().default("test").getDefault();
+   */
+  readonly getDefault: () => unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L49)
 
 ### EnvBuilderFactory
 
+Public overloads for field builders and named binding references.
+Calling without a name declares a field; passing a name creates a binding reference.
+
+**Example**
+
+```ts
+const mode = env.string();
+const cache = env.secret("CACHE_URL");
+```
+
 **Signature**
 
 ```ts
-declare const EnvBuilderFactory: EnvBuilderFactory;
+export interface EnvBuilderFactory {
+  /** Declare a string field.
+   * @returns A string builder.
+   * @example env.string();
+   */
+  string(): EnvBuilder<string>;
+  /** Reference a named string binding.
+   * @param name - Binding environment name.
+   * @returns A value-free string binding reference.
+   * @example env.string("MODE");
+   */
+  string<const Name extends string>(name: Name): BindingValueRef<Name, string, "string">;
+  /** Declare a finite number field.
+   * @returns A number builder.
+   * @example env.number();
+   */
+  number(): EnvBuilder<number>;
+  /** Reference a named number binding.
+   * @param name - Binding environment name.
+   * @returns A number binding reference.
+   * @example env.number("RETRIES");
+   */
+  number<const Name extends string>(name: Name): BindingValueRef<Name, number, "number">;
+  /** Declare an exact Boolean field.
+   * @returns A Boolean builder.
+   * @example env.boolean();
+   */
+  boolean(): EnvBuilder<boolean>;
+  /** Reference a named Boolean binding.
+   * @param name - Binding environment name.
+   * @returns A Boolean binding reference.
+   * @example env.boolean("ENABLED");
+   */
+  boolean<const Name extends string>(name: Name): BindingValueRef<Name, boolean, "boolean">;
+  /** Declare a TCP port field.
+   * @returns A port builder.
+   * @example env.port();
+   */
+  port(): EnvBuilder<number>;
+  /** Reference a named port binding.
+   * @param name - Binding environment name.
+   * @returns A port binding reference.
+   * @example env.port("SERVICE_PORT");
+   */
+  port<const Name extends string>(name: Name): BindingValueRef<Name, number, "port">;
+  /** Declare finite literal choices.
+   * @param values - Nonempty list of allowed choices.
+   * @returns A literal builder.
+   * @throws TypeError when a numeric choice is not finite.
+   * @example env.literal("test", "production");
+   */
+  literal<const Values extends readonly [LiteralValue, ...LiteralValue[]]>(
+    ...values: Values
+  ): EnvBuilder<Values[number]>;
+  /** Declare a URL field.
+   * @returns A URL builder.
+   * @example env.url();
+   */
+  url(): EnvBuilder<URL>;
+  /** Reference a named URL binding.
+   * @param name - Binding environment name.
+   * @returns A URL binding reference.
+   * @example env.url("ORIGIN");
+   */
+  url<const Name extends string>(name: Name): BindingValueRef<Name, URL, "url">;
+  /** Declare a JSON field.
+   * @returns A JSON builder.
+   * @example env.json();
+   */
+  json(): EnvBuilder<JsonValue>;
+  /** Reference a named JSON binding.
+   * @param name - Binding environment name.
+   * @returns A JSON binding reference.
+   * @example env.json("SETTINGS");
+   */
+  json<const Name extends string>(name: Name): BindingValueRef<Name, JsonValue, "json">;
+  /** Declare a sensitive string field.
+   * @returns A secret string builder.
+   * @example env.secret();
+   */
+  secret(): EnvBuilder<string>;
+  /** Reference a named secret binding.
+   * @param name - Binding environment name.
+   * @returns A secret binding reference.
+   * @example env.secret("API_TOKEN");
+   */
+  secret<const Name extends string>(name: Name): BindingValueRef<Name, string, "secret-string">;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.types.ts#L9)
 
 ### EnvDefinition
 
+Immutable, value-free declaration returned by `defineEnv`.
+Field references are non-enumerable; shape and metadata are frozen.
+
+**Example**
+
+```ts
+const declaration: EnvDefinition<{ MODE: EnvBuilder<string> }> = defineEnv({ MODE: env.string() });
+```
+
 **Signature**
 
 ```ts
-declare const EnvDefinition: EnvDefinition<S>;
+type EnvDefinition<S extends EnvShape> = {
+  readonly kind: "env-definition";
+  readonly shape: S;
+  readonly metadata: EnvMetadataMap<S>;
+} & {
+  readonly [K in keyof S]: EnvRef<K & string, InferEnvValue<S[K]>>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L136)
 
 ### EnvMetadata
 
+JSON-safe metadata emitted by an environment declaration.
+Defaults are represented by `hasDefault` and never exposed here.
+
+**Example**
+
+```ts
+const metadata = env.secret().metadata;
+```
+
 **Signature**
 
 ```ts
-declare const EnvMetadata: EnvMetadata;
+export interface EnvMetadata {
+  readonly type: EnvValueType;
+  readonly requiredIn: readonly string[];
+  readonly hasDefault: boolean;
+  readonly optional: boolean;
+  readonly sensitive: boolean;
+  readonly values?: readonly LiteralValue[];
+  readonly description?: string;
+  readonly example?: JsonValue;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L21)
 
 ### EnvMetadataMap
 
+Infer a metadata map from a declaration shape.
+
+**Example**
+
+```ts
+type Metadata = EnvMetadataMap<{ MODE: EnvBuilder<string> }>;
+```
+
 **Signature**
 
 ```ts
-declare const EnvMetadataMap: EnvMetadataMap<S>;
+type EnvMetadataMap<S extends EnvShape> = {
+  readonly [K in keyof S]: EnvMetadata;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L128)
 
 ### EnvRef
 
+Typed, value-free reference to one declared variable.
+`__value` is phantom typing; the declaration never reads source values.
+
+**Example**
+
+```ts
+const reference = defineEnv({ MODE: env.string() }).MODE;
+```
+
 **Signature**
 
 ```ts
-declare const EnvRef: EnvRef<Name, Value>;
+export interface EnvRef<Name extends string = string, Value = unknown> {
+  readonly kind: "env-ref";
+  readonly name: Name;
+  readonly type: EnvValueType;
+  readonly sensitive: boolean;
+  readonly metadata: EnvMetadata;
+  readonly __value?: Value;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L36)
 
 ### EnvShape
 
+Map field names to builders without reading runtime values.
+
+**Example**
+
+```ts
+const shape: EnvShape = { MODE: env.string() };
+```
+
 **Signature**
 
 ```ts
-declare const EnvShape: EnvShape;
+type EnvShape = { readonly [name: string]: EnvBuilderBase };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L114)
 
 ### EnvValueType
 
+Stable field type emitted in metadata.
+
+**Example**
+
+```ts
+const type: EnvValueType = "secret-string";
+```
+
 **Signature**
 
 ```ts
-declare const EnvValueType: EnvValueType;
+type EnvValueType =
+  "string" | "number" | "boolean" | "port" | "literal" | "url" | "json" | "secret-string";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L14)
 
 ### InferEnvValue
 
+Extract a field builder's resolved value type.
+
+**Example**
+
+```ts
+type Mode = InferEnvValue<ReturnType<typeof env.string>>;
+```
+
 **Signature**
 
 ```ts
-declare const InferEnvValue: InferEnvValue<B>;
+type InferEnvValue<B> = B extends EnvBuilder<infer T> ? T : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L118)
 
 ### InferEnvValues
 
+Infer the immutable runtime value object from a declaration shape.
+
+**Example**
+
+```ts
+type Values = InferEnvValues<{ MODE: EnvBuilder<string> }>;
+```
+
 **Signature**
 
 ```ts
-declare const InferEnvValues: InferEnvValues<S>;
+type InferEnvValues<S extends EnvShape> = {
+  readonly [K in keyof S]: InferEnvValue<S[K]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L122)
 
 ### JsonValue
 
+Deeply JSON-safe value suitable for declaration metadata.
+
+**Example**
+
+```ts
+const example: JsonValue = { enabled: true };
+```
+
 **Signature**
 
 ```ts
-declare const JsonValue: JsonValue;
+type JsonValue =
+  string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.types.ts#L4)
 
 ### LiteralValue
 
+Scalar literals accepted by `env.literal`.
+
+**Example**
+
+```ts
+env.literal("test", "production");
+```
+
 **Signature**
 
 ```ts
-declare const LiteralValue: LiteralValue;
+type LiteralValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L9)
 
 ### defineEnvEffect
 
@@ -1211,7 +1538,7 @@ export interface EnvBuilder<T> extends EnvBuilderBase {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L71)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L73)
 
 ### EnvBuilderBase (interface)
 
@@ -1228,7 +1555,9 @@ const field: EnvBuilderBase = env.string();
 
 ```ts
 export interface EnvBuilderBase {
+  /** Marks the value as an environment field declaration; always `"env-builder"`. */
   readonly kind: "env-builder";
+  /** The field's type, requirements and description as plain data; never its value or default. */
   readonly metadata: EnvMetadata;
   /** Parse a raw string through the field's Effect-backed compatibility adapter.
    * @param value - Raw environment value.
@@ -1250,13 +1579,110 @@ export interface EnvBuilderBase {
 
 ### EnvBuilderFactory
 
+Public overloads for field builders and named binding references.
+Calling without a name declares a field; passing a name creates a binding reference.
+
+**Example**
+
+```ts
+const mode = env.string();
+const cache = env.secret("CACHE_URL");
+```
+
 **Signature**
 
 ```ts
-declare const EnvBuilderFactory: EnvBuilderFactory;
+export interface EnvBuilderFactory {
+  /** Declare a string field.
+   * @returns A string builder.
+   * @example env.string();
+   */
+  string(): EnvBuilder<string>;
+  /** Reference a named string binding.
+   * @param name - Binding environment name.
+   * @returns A value-free string binding reference.
+   * @example env.string("MODE");
+   */
+  string<const Name extends string>(name: Name): BindingValueRef<Name, string, "string">;
+  /** Declare a finite number field.
+   * @returns A number builder.
+   * @example env.number();
+   */
+  number(): EnvBuilder<number>;
+  /** Reference a named number binding.
+   * @param name - Binding environment name.
+   * @returns A number binding reference.
+   * @example env.number("RETRIES");
+   */
+  number<const Name extends string>(name: Name): BindingValueRef<Name, number, "number">;
+  /** Declare an exact Boolean field.
+   * @returns A Boolean builder.
+   * @example env.boolean();
+   */
+  boolean(): EnvBuilder<boolean>;
+  /** Reference a named Boolean binding.
+   * @param name - Binding environment name.
+   * @returns A Boolean binding reference.
+   * @example env.boolean("ENABLED");
+   */
+  boolean<const Name extends string>(name: Name): BindingValueRef<Name, boolean, "boolean">;
+  /** Declare a TCP port field.
+   * @returns A port builder.
+   * @example env.port();
+   */
+  port(): EnvBuilder<number>;
+  /** Reference a named port binding.
+   * @param name - Binding environment name.
+   * @returns A port binding reference.
+   * @example env.port("SERVICE_PORT");
+   */
+  port<const Name extends string>(name: Name): BindingValueRef<Name, number, "port">;
+  /** Declare finite literal choices.
+   * @param values - Nonempty list of allowed choices.
+   * @returns A literal builder.
+   * @throws TypeError when a numeric choice is not finite.
+   * @example env.literal("test", "production");
+   */
+  literal<const Values extends readonly [LiteralValue, ...LiteralValue[]]>(
+    ...values: Values
+  ): EnvBuilder<Values[number]>;
+  /** Declare a URL field.
+   * @returns A URL builder.
+   * @example env.url();
+   */
+  url(): EnvBuilder<URL>;
+  /** Reference a named URL binding.
+   * @param name - Binding environment name.
+   * @returns A URL binding reference.
+   * @example env.url("ORIGIN");
+   */
+  url<const Name extends string>(name: Name): BindingValueRef<Name, URL, "url">;
+  /** Declare a JSON field.
+   * @returns A JSON builder.
+   * @example env.json();
+   */
+  json(): EnvBuilder<JsonValue>;
+  /** Reference a named JSON binding.
+   * @param name - Binding environment name.
+   * @returns A JSON binding reference.
+   * @example env.json("SETTINGS");
+   */
+  json<const Name extends string>(name: Name): BindingValueRef<Name, JsonValue, "json">;
+  /** Declare a sensitive string field.
+   * @returns A secret string builder.
+   * @example env.secret();
+   */
+  secret(): EnvBuilder<string>;
+  /** Reference a named secret binding.
+   * @param name - Binding environment name.
+   * @returns A secret binding reference.
+   * @example env.secret("API_TOKEN");
+   */
+  secret<const Name extends string>(name: Name): BindingValueRef<Name, string, "secret-string">;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.types.ts#L9)
 
 ### EnvDefinition (type alias)
 
@@ -1281,7 +1707,7 @@ type EnvDefinition<S extends EnvShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L134)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L136)
 
 ### EnvMetadata (interface)
 
@@ -1329,7 +1755,7 @@ type EnvMetadataMap<S extends EnvShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L126)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L128)
 
 ### EnvRef (interface)
 
@@ -1373,7 +1799,7 @@ const shape: EnvShape = { MODE: env.string() };
 type EnvShape = { readonly [name: string]: EnvBuilderBase };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L112)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L114)
 
 ### EnvValueType (type alias)
 
@@ -1410,7 +1836,7 @@ type Mode = InferEnvValue<ReturnType<typeof env.string>>;
 type InferEnvValue<B> = B extends EnvBuilder<infer T> ? T : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L116)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L118)
 
 ### InferEnvValues (type alias)
 
@@ -1430,7 +1856,7 @@ type InferEnvValues<S extends EnvShape> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L122)
 
 ### LiteralValue (type alias)
 
@@ -1464,13 +1890,38 @@ declare const BindingValueRef: BindingValueRef<Name, Value, Type>;
 
 ### ConfigOperation
 
+Stable, bounded names for environment configuration operations.
+
 **Signature**
 
 ```ts
-declare const ConfigOperation: ConfigOperation;
+type ConfigOperation =
+  | "define"
+  | "resolve"
+  | "resolve-provider"
+  | "project"
+  | "is-ref"
+  | "create-ref"
+  | "json-value"
+  | "parse-number"
+  | "parse-port"
+  | "parse-boolean"
+  | "parse-literal"
+  | "builder-create"
+  | "builder-get-default"
+  | "builder-parse"
+  | "builder-literal"
+  | "builder-or-binding"
+  | "parse-url"
+  | "parse-json"
+  | "builder-default"
+  | "builder-optional"
+  | "builder-required-in"
+  | "builder-description"
+  | "builder-example";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.types.ts#L4)
 
 ### ConfigTelemetry
 
@@ -1494,13 +1945,26 @@ declare const ConfigTelemetryLive: Layer<ConfigTelemetry, never, never>;
 
 ### ConfigTelemetryService
 
+Substitutable observer used by the config Effect operations.
+
 **Signature**
 
 ```ts
-declare const ConfigTelemetryService: ConfigTelemetryService;
+export interface ConfigTelemetryService {
+  /** Observe one operation without changing its success or error.
+   * @param operation - Stable bounded operation name.
+   * @param effect - Effect to instrument.
+   * @returns The original Effect success and error channels.
+   * @example observe("resolve", Effect.succeed({ MODE: "test" }));
+   */
+  readonly observe: <A, E, R>(
+    operation: ConfigOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/config-observability.types.ts#L30)
 
 ### ConfigValidationError
 
@@ -1514,93 +1978,350 @@ declare const ConfigValidationError: typeof ConfigValidationError;
 
 ### EnvBuilder
 
+Value-free field declaration with immutable fluent metadata methods.
+Every method returns a new frozen builder; the original remains unchanged.
+
+**Example**
+
+```ts
+const mode = env.string().default("test").description("Runtime mode");
+```
+
 **Signature**
 
 ```ts
-declare const EnvBuilder: EnvBuilder<T>;
+export interface EnvBuilder<T> extends EnvBuilderBase {
+  readonly parse: (value: string) => Exclude<T, undefined>;
+  readonly getDefault: () => Exclude<T, undefined> | undefined;
+  /** Attach a lazy or literal default.
+   * @param value - Default literal or factory, invoked during resolution.
+   * @returns A new builder whose value is required when present.
+   * @example env.string().default("test");
+   */
+  default(
+    value: Exclude<T, undefined> | (() => Exclude<T, undefined>),
+  ): EnvBuilder<Exclude<T, undefined>>;
+  /** Allow absence outside explicitly required environments.
+   * @returns A new builder whose value may be undefined.
+   * @example env.string().optional();
+   */
+  optional(): EnvBuilder<T | undefined>;
+  /** Require the field in named environments.
+   * @param environments - Environment names, with duplicates removed.
+   * @returns A new builder with merged requirement metadata.
+   * @throws TypeError when a name is empty.
+   * @example env.string().requiredIn("production");
+   */
+  requiredIn(...environments: readonly string[]): EnvBuilder<T>;
+  /** Add human-readable field guidance.
+   * @param text - Description shown in metadata.
+   * @returns A new builder with a description.
+   * @example env.string().description("Public origin");
+   */
+  description(text: string): EnvBuilder<T>;
+  /** Add a JSON-safe example, redacting sensitive fields.
+   * @param value - Example value.
+   * @returns A new builder with example metadata.
+   * @throws TypeError when a public example is not JSON-safe.
+   * @example env.url().example(new URL("https://example.test"));
+   */
+  example(value: T): EnvBuilder<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L73)
 
 ### EnvBuilderBase
 
+Minimum builder contract used during resolution.
+`parse` and `getDefault` remain synchronous compatibility callbacks.
+
+**Example**
+
+```ts
+const field: EnvBuilderBase = env.string();
+```
+
 **Signature**
 
 ```ts
-declare const EnvBuilderBase: EnvBuilderBase;
+export interface EnvBuilderBase {
+  /** Marks the value as an environment field declaration; always `"env-builder"`. */
+  readonly kind: "env-builder";
+  /** The field's type, requirements and description as plain data; never its value or default. */
+  readonly metadata: EnvMetadata;
+  /** Parse a raw string through the field's Effect-backed compatibility adapter.
+   * @param value - Raw environment value.
+   * @returns Parsed field value.
+   * @throws TypeError for invalid built-in values; custom parsers may throw.
+   * @example env.number().parse("2");
+   */
+  readonly parse: (value: string) => unknown;
+  /** Produce a lazy default only when resolution needs it.
+   * @returns Default value or undefined.
+   * @throws A user default factory's original error.
+   * @example env.string().default("test").getDefault();
+   */
+  readonly getDefault: () => unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L49)
 
 ### EnvBuilderFactory
 
+Public overloads for field builders and named binding references.
+Calling without a name declares a field; passing a name creates a binding reference.
+
+**Example**
+
+```ts
+const mode = env.string();
+const cache = env.secret("CACHE_URL");
+```
+
 **Signature**
 
 ```ts
-declare const EnvBuilderFactory: EnvBuilderFactory;
+export interface EnvBuilderFactory {
+  /** Declare a string field.
+   * @returns A string builder.
+   * @example env.string();
+   */
+  string(): EnvBuilder<string>;
+  /** Reference a named string binding.
+   * @param name - Binding environment name.
+   * @returns A value-free string binding reference.
+   * @example env.string("MODE");
+   */
+  string<const Name extends string>(name: Name): BindingValueRef<Name, string, "string">;
+  /** Declare a finite number field.
+   * @returns A number builder.
+   * @example env.number();
+   */
+  number(): EnvBuilder<number>;
+  /** Reference a named number binding.
+   * @param name - Binding environment name.
+   * @returns A number binding reference.
+   * @example env.number("RETRIES");
+   */
+  number<const Name extends string>(name: Name): BindingValueRef<Name, number, "number">;
+  /** Declare an exact Boolean field.
+   * @returns A Boolean builder.
+   * @example env.boolean();
+   */
+  boolean(): EnvBuilder<boolean>;
+  /** Reference a named Boolean binding.
+   * @param name - Binding environment name.
+   * @returns A Boolean binding reference.
+   * @example env.boolean("ENABLED");
+   */
+  boolean<const Name extends string>(name: Name): BindingValueRef<Name, boolean, "boolean">;
+  /** Declare a TCP port field.
+   * @returns A port builder.
+   * @example env.port();
+   */
+  port(): EnvBuilder<number>;
+  /** Reference a named port binding.
+   * @param name - Binding environment name.
+   * @returns A port binding reference.
+   * @example env.port("SERVICE_PORT");
+   */
+  port<const Name extends string>(name: Name): BindingValueRef<Name, number, "port">;
+  /** Declare finite literal choices.
+   * @param values - Nonempty list of allowed choices.
+   * @returns A literal builder.
+   * @throws TypeError when a numeric choice is not finite.
+   * @example env.literal("test", "production");
+   */
+  literal<const Values extends readonly [LiteralValue, ...LiteralValue[]]>(
+    ...values: Values
+  ): EnvBuilder<Values[number]>;
+  /** Declare a URL field.
+   * @returns A URL builder.
+   * @example env.url();
+   */
+  url(): EnvBuilder<URL>;
+  /** Reference a named URL binding.
+   * @param name - Binding environment name.
+   * @returns A URL binding reference.
+   * @example env.url("ORIGIN");
+   */
+  url<const Name extends string>(name: Name): BindingValueRef<Name, URL, "url">;
+  /** Declare a JSON field.
+   * @returns A JSON builder.
+   * @example env.json();
+   */
+  json(): EnvBuilder<JsonValue>;
+  /** Reference a named JSON binding.
+   * @param name - Binding environment name.
+   * @returns A JSON binding reference.
+   * @example env.json("SETTINGS");
+   */
+  json<const Name extends string>(name: Name): BindingValueRef<Name, JsonValue, "json">;
+  /** Declare a sensitive string field.
+   * @returns A secret string builder.
+   * @example env.secret();
+   */
+  secret(): EnvBuilder<string>;
+  /** Reference a named secret binding.
+   * @param name - Binding environment name.
+   * @returns A secret binding reference.
+   * @example env.secret("API_TOKEN");
+   */
+  secret<const Name extends string>(name: Name): BindingValueRef<Name, string, "secret-string">;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-factory.types.ts#L9)
 
 ### EnvDefinition
 
+Immutable, value-free declaration returned by `defineEnv`.
+Field references are non-enumerable; shape and metadata are frozen.
+
+**Example**
+
+```ts
+const declaration: EnvDefinition<{ MODE: EnvBuilder<string> }> = defineEnv({ MODE: env.string() });
+```
+
 **Signature**
 
 ```ts
-declare const EnvDefinition: EnvDefinition<S>;
+type EnvDefinition<S extends EnvShape> = {
+  readonly kind: "env-definition";
+  readonly shape: S;
+  readonly metadata: EnvMetadataMap<S>;
+} & {
+  readonly [K in keyof S]: EnvRef<K & string, InferEnvValue<S[K]>>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L136)
 
 ### EnvIssue
 
+One invalid or missing declared field.
+Sensitive messages are redacted before an issue is exposed.
+
+**Example**
+
+```ts
+const issue: EnvIssue = {
+  name: "MODE",
+  code: "missing",
+  message: "Required value is missing",
+  sensitive: false,
+};
+```
+
 **Signature**
 
 ```ts
-declare const EnvIssue: EnvIssue;
+export interface EnvIssue {
+  readonly name: string;
+  readonly code: "missing" | "invalid";
+  readonly message: string;
+  readonly sensitive: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L20)
 
 ### EnvMetadata
 
+JSON-safe metadata emitted by an environment declaration.
+Defaults are represented by `hasDefault` and never exposed here.
+
+**Example**
+
+```ts
+const metadata = env.secret().metadata;
+```
+
 **Signature**
 
 ```ts
-declare const EnvMetadata: EnvMetadata;
+export interface EnvMetadata {
+  readonly type: EnvValueType;
+  readonly requiredIn: readonly string[];
+  readonly hasDefault: boolean;
+  readonly optional: boolean;
+  readonly sensitive: boolean;
+  readonly values?: readonly LiteralValue[];
+  readonly description?: string;
+  readonly example?: JsonValue;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L21)
 
 ### EnvMetadataMap
 
+Infer a metadata map from a declaration shape.
+
+**Example**
+
+```ts
+type Metadata = EnvMetadataMap<{ MODE: EnvBuilder<string> }>;
+```
+
 **Signature**
 
 ```ts
-declare const EnvMetadataMap: EnvMetadataMap<S>;
+type EnvMetadataMap<S extends EnvShape> = {
+  readonly [K in keyof S]: EnvMetadata;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L128)
 
 ### EnvProjection
 
+Public, value-free metadata for one field.
+
+**Example**
+
+```ts
+const fields: readonly EnvProjection[] = projectEnv(definition);
+```
+
 **Signature**
 
 ```ts
-declare const EnvProjection: EnvProjection;
+export interface EnvProjection extends EnvMetadata {
+  readonly name: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L35)
 
 ### EnvRef
 
+Typed, value-free reference to one declared variable.
+`__value` is phantom typing; the declaration never reads source values.
+
+**Example**
+
+```ts
+const reference = defineEnv({ MODE: env.string() }).MODE;
+```
+
 **Signature**
 
 ```ts
-declare const EnvRef: EnvRef<Name, Value>;
+export interface EnvRef<Name extends string = string, Value = unknown> {
+  readonly kind: "env-ref";
+  readonly name: Name;
+  readonly type: EnvValueType;
+  readonly sensitive: boolean;
+  readonly metadata: EnvMetadata;
+  readonly __value?: Value;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L36)
 
 ### EnvResolutionError
 
@@ -1614,13 +2335,21 @@ declare const EnvResolutionError: typeof EnvResolutionError;
 
 ### EnvShape
 
+Map field names to builders without reading runtime values.
+
+**Example**
+
+```ts
+const shape: EnvShape = { MODE: env.string() };
+```
+
 **Signature**
 
 ```ts
-declare const EnvShape: EnvShape;
+type EnvShape = { readonly [name: string]: EnvBuilderBase };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L114)
 
 ### EnvSource
 
@@ -1634,63 +2363,118 @@ declare const EnvSource: Readonly<Record<string, string | undefined>>;
 
 ### EnvValueType
 
+Stable field type emitted in metadata.
+
+**Example**
+
+```ts
+const type: EnvValueType = "secret-string";
+```
+
 **Signature**
 
 ```ts
-declare const EnvValueType: EnvValueType;
+type EnvValueType =
+  "string" | "number" | "boolean" | "port" | "literal" | "url" | "json" | "secret-string";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L14)
 
 ### InferEnvValue
 
+Extract a field builder's resolved value type.
+
+**Example**
+
+```ts
+type Mode = InferEnvValue<ReturnType<typeof env.string>>;
+```
+
 **Signature**
 
 ```ts
-declare const InferEnvValue: InferEnvValue<B>;
+type InferEnvValue<B> = B extends EnvBuilder<infer T> ? T : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L118)
 
 ### InferEnvValues
 
+Infer the immutable runtime value object from a declaration shape.
+
+**Example**
+
+```ts
+type Values = InferEnvValues<{ MODE: EnvBuilder<string> }>;
+```
+
 **Signature**
 
 ```ts
-declare const InferEnvValues: InferEnvValues<S>;
+type InferEnvValues<S extends EnvShape> = {
+  readonly [K in keyof S]: InferEnvValue<S[K]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L122)
 
 ### JsonValue
 
+Deeply JSON-safe value suitable for declaration metadata.
+
+**Example**
+
+```ts
+const example: JsonValue = { enabled: true };
+```
+
 **Signature**
 
 ```ts
-declare const JsonValue: JsonValue;
+type JsonValue =
+  string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env-json.types.ts#L4)
 
 ### LiteralValue
 
+Scalar literals accepted by `env.literal`.
+
+**Example**
+
+```ts
+env.literal("test", "production");
+```
+
 **Signature**
 
 ```ts
-declare const LiteralValue: LiteralValue;
+type LiteralValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/env.types.ts#L9)
 
 ### ResolveEnvOptions
 
+Inputs for resolving an environment declaration.
+
+**Example**
+
+```ts
+const options: ResolveEnvOptions = { environment: "test", source: {} };
+```
+
 **Signature**
 
 ```ts
-declare const ResolveEnvOptions: ResolveEnvOptions;
+export interface ResolveEnvOptions {
+  readonly environment: string;
+  readonly source: EnvSource;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L11)
 
 ### ResolvedEnv
 
@@ -1955,23 +2739,52 @@ declare const resolveField: (
 
 ### EnvIssue
 
+One invalid or missing declared field.
+Sensitive messages are redacted before an issue is exposed.
+
+**Example**
+
+```ts
+const issue: EnvIssue = {
+  name: "MODE",
+  code: "missing",
+  message: "Required value is missing",
+  sensitive: false,
+};
+```
+
 **Signature**
 
 ```ts
-declare const EnvIssue: EnvIssue;
+export interface EnvIssue {
+  readonly name: string;
+  readonly code: "missing" | "invalid";
+  readonly message: string;
+  readonly sensitive: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L20)
 
 ### EnvProjection
 
+Public, value-free metadata for one field.
+
+**Example**
+
+```ts
+const fields: readonly EnvProjection[] = projectEnv(definition);
+```
+
 **Signature**
 
 ```ts
-declare const EnvProjection: EnvProjection;
+export interface EnvProjection extends EnvMetadata {
+  readonly name: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L35)
 
 ### EnvResolutionError
 
@@ -1995,13 +2808,24 @@ declare const EnvSource: Readonly<Record<string, string | undefined>>;
 
 ### ResolveEnvOptions
 
+Inputs for resolving an environment declaration.
+
+**Example**
+
+```ts
+const options: ResolveEnvOptions = { environment: "test", source: {} };
+```
+
 **Signature**
 
 ```ts
-declare const ResolveEnvOptions: ResolveEnvOptions;
+export interface ResolveEnvOptions {
+  readonly environment: string;
+  readonly source: EnvSource;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/config/resolve.types.ts#L11)
 
 ### ResolvedEnv
 

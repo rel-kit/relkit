@@ -357,13 +357,20 @@ type NextConfig = Readonly<Record<string, unknown>> & {
 
 ### RelkitVitePlugin
 
+The minimal Vite plugin contract defining the generated client fingerprint.
+
 **Signature**
 
 ```ts
-declare const RelkitVitePlugin: RelkitVitePlugin;
+export interface RelkitVitePlugin {
+  readonly name: "relkit";
+  config(): {
+    readonly define: Readonly<Record<string, string>>;
+  };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/build/vite.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/build/vite.types.ts#L2)
 
 ### relkit
 
@@ -488,73 +495,115 @@ are needed only by their explicit integration entrypoints.
 
 ### AnyRouteContract
 
+Any finite or streamed route contract.
+
 **Signature**
 
 ```ts
-declare const AnyRouteContract: AnyRouteContract;
+type AnyRouteContract =
+  | (ClientRouteContract<unknown, unknown, unknown> & { readonly operation: "query" | "mutation" })
+  | (ClientStreamContract<unknown, unknown, unknown> & {
+      readonly operation: "query" | "mutation";
+    });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L4)
 
 ### ApiCallOptions
 
+Per-call options for a bound API route.
+
 **Signature**
 
 ```ts
-declare const ApiCallOptions: ApiCallOptions;
+export interface ApiCallOptions {
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L54)
 
 ### ApiClient
 
+The `api` tree with every route callable against one backend.
+
 **Signature**
 
 ```ts
-declare const ApiClient: ApiClient<Tree>;
+type ApiClient<Tree> = {
+  readonly [Key in keyof Tree]: Tree[Key] extends ApiRoute<infer Contract>
+    ? Tree[Key] &
+        ((input: Contract["input"], options?: ApiCallOptions) => Promise<Contract["output"]>)
+    : ApiClient<Tree[Key]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L62)
 
 ### ApiMutationRoute
 
+A finite mutation route.
+
 **Signature**
 
 ```ts
-declare const ApiMutationRoute: ApiMutationRoute;
+type ApiMutationRoute = ApiRoute<
+  ClientRouteContract<unknown, unknown, unknown> & { readonly operation: "mutation" }
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L44)
 
 ### ApiQueryRoute
 
+A finite query route.
+
 **Signature**
 
 ```ts
-declare const ApiQueryRoute: ApiQueryRoute;
+type ApiQueryRoute = ApiRoute<
+  ClientRouteContract<unknown, unknown, unknown> & { readonly operation: "query" }
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L39)
 
 ### ApiRoute
 
+One route in the generated `api` object.
+
+**Example**
+
+```ts
+type GetOrder = typeof api.orders.getOrder;
+```
+
 **Signature**
 
 ```ts
-declare const ApiRoute: ApiRoute<Contract>;
+export interface ApiRoute<Contract extends AnyRouteContract = AnyRouteContract> {
+  /** Path below the API root; read it with `apiRoutePath`. */
+  readonly "~route": readonly string[];
+  /** Type-only carrier of the route contract; always undefined at runtime. */
+  readonly "~contract"?: Contract;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L15)
 
 ### ApiStreamRoute
 
+A streamed route.
+
 **Signature**
 
 ```ts
-declare const ApiStreamRoute: ApiStreamRoute;
+type ApiStreamRoute = ApiRoute<
+  ClientStreamContract<unknown, unknown, unknown> & { readonly operation: "query" | "mutation" }
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L49)
 
 ### ClientApi (interface)
 
@@ -571,73 +620,128 @@ export interface ClientApi {}
 
 ### ClientHeaders
 
+Static headers or a provider evaluated for each future request.
+
 **Signature**
 
 ```ts
-declare const ClientHeaders: ClientHeaders;
+type ClientHeaders = ClientHeadersInit | (() => ClientHeadersInit | Promise<ClientHeadersInit>);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L6)
 
 ### ClientHeadersInit
 
+Native header inputs accepted without copying mutable Headers at construction.
+
 **Signature**
 
 ```ts
-declare const ClientHeadersInit: ClientHeadersInit;
+type ClientHeadersInit =
+  Headers | Readonly<Record<string, string>> | readonly (readonly [string, string])[];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L2)
 
 ### ClientRouteContract
 
+Generated finite route declaration preserving payload and failure inference.
+
 **Signature**
 
 ```ts
-declare const ClientRouteContract: ClientRouteContract<Input, Output, Failure>;
+export interface ClientRouteContract<
+  Input = unknown,
+  Output = unknown,
+  Failure = RelkitClientError,
+> {
+  readonly input: Input;
+  readonly output: Output;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: false;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L43)
 
 ### ClientStreamContract
 
+Generated route stream declaration preserving item and failure inference.
+
 **Signature**
 
 ```ts
-declare const ClientStreamContract: ClientStreamContract<Input, Item, Failure>;
+export interface ClientStreamContract<
+  Input = unknown,
+  Item = unknown,
+  Failure = RelkitClientError,
+> {
+  readonly input: Input;
+  readonly output: AsyncIterable<Item>;
+  readonly item: Item;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: true;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L61)
 
 ### CreateAutoClientOptions
 
+Combined transport options; fallback applies only to WebSocket establishment failure.
+
 **Signature**
 
 ```ts
-declare const CreateAutoClientOptions: CreateAutoClientOptions;
+export interface CreateAutoClientOptions
+  extends CreateClientOptions, CreateWebSocketClientOptions {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L34)
 
 ### CreateClientOptions
 
+HTTP client configuration preserving browser credentials and caller transport overrides.
+
 **Signature**
 
 ```ts
-declare const CreateClientOptions: CreateClientOptions;
+export interface CreateClientOptions {
+  /** Application HTTP origin and optional base path. */
+  readonly baseUrl: string;
+  /** Request-time headers, including asynchronous providers. */
+  readonly headers?: ClientHeaders;
+  /** Browser fetch credentials policy; the live adapter supplies the existing default. */
+  readonly credentials?: RequestInit["credentials"];
+  /** Borrowed fetch implementation used for all HTTP requests. */
+  readonly fetch?: typeof globalThis.fetch;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L10)
 
 ### CreateWebSocketClientOptions
 
+WebSocket configuration whose establishment timeout leaves accepted streams independent.
+
 **Signature**
 
 ```ts
-declare const CreateWebSocketClientOptions: CreateWebSocketClientOptions;
+export interface CreateWebSocketClientOptions {
+  /** Application origin converted to its corresponding WebSocket protocol. */
+  readonly baseUrl: string;
+  /** Maximum time allowed for initial connection establishment. */
+  readonly establishmentTimeoutMs?: number;
+  /** Headers retained with the existing WebSocket transport contract. */
+  readonly headers?: ClientHeaders;
+  /** Borrowed WebSocket constructor, or the browser implementation when omitted. */
+  readonly websocket?: typeof WebSocket;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L22)
 
 ### DefaultContract (type alias)
 
@@ -679,23 +783,42 @@ declare const ORPCError: typeof ORPCError;
 
 ### RelkitClientError
 
+Any client error: declared by a route or not.
+
 **Signature**
 
 ```ts
-declare const RelkitClientError: RelkitClientError;
+type RelkitClientError = RelkitDeclaredError<string, number, unknown> | RelkitUndeclaredError;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L131)
 
 ### RelkitDeclaredError
 
+An error a route declares, as the client receives it.
+
+**Example**
+
+```ts
+if (error.code === "orders.not-found") console.log(error.data.orderId);
+```
+
 **Signature**
 
 ```ts
-declare const RelkitDeclaredError: RelkitDeclaredError<Code, Status, Data>;
+export interface RelkitDeclaredError<
+  Code extends string,
+  Status extends number,
+  Data,
+> extends Error {
+  readonly code: Code;
+  readonly status: Status;
+  readonly data: Data;
+  readonly defined: true;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L81)
 
 ### RelkitNetworkError
 
@@ -709,73 +832,119 @@ declare const RelkitNetworkError: typeof RelkitNetworkError;
 
 ### RelkitUndeclaredError
 
+An error that no route declares. `NETWORK_ERROR` means no response arrived.
+
 **Signature**
 
 ```ts
-declare const RelkitUndeclaredError: RelkitUndeclaredError;
+export interface RelkitUndeclaredError extends Error {
+  readonly code: RelkitUndeclaredErrorCode;
+  readonly status: number;
+  readonly data: unknown;
+  readonly defined: false;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L123)
 
 ### RelkitUndeclaredErrorCode
 
+Codes of errors that no route declares: transport, framework and network failures.
+
 **Signature**
 
 ```ts
-declare const RelkitUndeclaredErrorCode: RelkitUndeclaredErrorCode;
+type RelkitUndeclaredErrorCode =
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "PAYMENT_REQUIRED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "METHOD_NOT_SUPPORTED"
+  | "NOT_ACCEPTABLE"
+  | "TIMEOUT"
+  | "CONFLICT"
+  | "GONE"
+  | "PRECONDITION_FAILED"
+  | "PAYLOAD_TOO_LARGE"
+  | "UNSUPPORTED_MEDIA_TYPE"
+  | "UNPROCESSABLE_CONTENT"
+  | "PRECONDITION_REQUIRED"
+  | "TOO_MANY_REQUESTS"
+  | "CLIENT_CLOSED_REQUEST"
+  | "INTERNAL_SERVER_ERROR"
+  | "NOT_IMPLEMENTED"
+  | "BAD_GATEWAY"
+  | "SERVICE_UNAVAILABLE"
+  | "GATEWAY_TIMEOUT"
+  | "IDENTITY_PRECONDITION_FAILED"
+  | "IDEMPOTENCY_CONFLICT"
+  | "IDEMPOTENCY_WINDOW_EXPIRED"
+  | "PROVIDER_STATE_LOST"
+  | "NETWORK_ERROR";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L93)
 
 ### RouteContractOf
 
+The contract an API route carries.
+
 **Signature**
 
 ```ts
-declare const RouteContractOf: RouteContractOf<Route>;
+type RouteContractOf<Route> = Route extends ApiRoute<infer Contract> ? Contract : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L23)
 
 ### RouteError
 
+The error union an API route rejects with, keyed by `code`.
+
 **Signature**
 
 ```ts
-declare const RouteError: RouteError<Route>;
+type RouteError<Route> = RouteContractOf<Route>["error"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L36)
 
 ### RouteInput
 
+The input an API route takes.
+
 **Signature**
 
 ```ts
-declare const RouteInput: RouteInput<Route>;
+type RouteInput<Route> = RouteContractOf<Route>["input"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L26)
 
 ### RouteItem
 
+The item type a streamed API route yields.
+
 **Signature**
 
 ```ts
-declare const RouteItem: RouteItem<Route>;
+type RouteItem<Route> = RouteContractOf<Route> extends { readonly item: infer Item } ? Item : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L32)
 
 ### RouteOutput
 
+The finite output an API route returns.
+
 **Signature**
 
 ```ts
-declare const RouteOutput: RouteOutput<Route>;
+type RouteOutput<Route> = RouteContractOf<Route>["output"];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/api.types.ts#L29)
 
 ### api
 
@@ -1658,13 +1827,23 @@ export * from "./contracts.types.js";
 
 ### JobCancelInputFor
 
+Infers the exact cancellation request or its dynamic fallback.
+
 **Signature**
 
 ```ts
-declare const JobCancelInputFor: JobCancelInputFor<Name>;
+type JobCancelInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly cancel: infer Cancel }
+      ? Cancel extends { readonly input: infer Input }
+        ? Input
+        : never
+      : never
+    : never
+  : JobCancelInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L117)
 
 ### JobCancelName
 
@@ -1678,13 +1857,23 @@ declare const JobCancelName: never;
 
 ### JobCancelOutputFor
 
+Infers the declared cancellation receipt or its standard fallback.
+
 **Signature**
 
 ```ts
-declare const JobCancelOutputFor: JobCancelOutputFor<Name>;
+type JobCancelOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly cancel: infer Cancel }
+      ? Cancel extends { readonly output: infer Output }
+        ? Output
+        : RunCancellationReceipt
+      : RunCancellationReceipt
+    : RunCancellationReceipt
+  : RunCancellationReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L131)
 
 ### JobClientOperation
 
@@ -1698,23 +1887,29 @@ declare const JobClientOperation: JobClientOperation;
 
 ### JobContract
 
+Generated job declaration retaining operation availability and selective field inference.
+
 **Signature**
 
 ```ts
-declare const JobContract: JobContract<
-  Name,
-  JobId,
-  Input,
-  Output,
-  Failure,
-  Progress,
-  Streams,
-  Operations,
-  Fields
->;
+type JobContract<
+  Name extends string = string,
+  JobId extends string = string,
+  Input = unknown,
+  Output = unknown,
+  Failure = JobErrorEnvelope,
+  Progress = unknown,
+  Streams extends Readonly<Record<string, unknown>> = Readonly<Record<string, unknown>>,
+  Operations extends readonly JobClientOperation[] = readonly JobClientOperation[],
+  Fields extends readonly JobClientField[] = readonly [],
+> = {
+  readonly name: Name;
+  readonly jobId: JobId;
+} & TriggerMember<Input, Failure, Operations> &
+  RunMembers<Input, Output, Progress, Failure, Streams, Operations, Fields>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L166)
 
 ### JobErrorEnvelope
 
@@ -1728,53 +1923,78 @@ declare const JobErrorEnvelope: JobErrorEnvelope;
 
 ### JobFailureFor
 
+Infers declared job failures while preserving the standard error envelope fallback.
+
 **Signature**
 
 ```ts
-declare const JobFailureFor: JobFailureFor<Name>;
+type JobFailureFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly error: infer Failure }
+      ? Failure
+      : JobErrorEnvelope
+    : JobErrorEnvelope
+  : JobErrorEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L79)
 
 ### JobFor
 
+Looks up one declared job contract without widening its members.
+
 **Signature**
 
 ```ts
-declare const JobFor: JobFor<Name>;
+type JobFor<Name extends JobSelector> = JobRegistry[Name];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L191)
 
 ### JobProcedureSelector
 
+Union of exact procedure selectors exposed by one declared job.
+
 **Signature**
 
 ```ts
-declare const JobProcedureSelector: JobProcedureSelector<Name>;
+type JobProcedureSelector<Name extends JobSelector = JobSelector> =
+  JobTriggerSelector<Name> | JobRunSelector<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L221)
 
 ### JobRegistry
 
+Augmentable registry of application-declared job contracts.
+
 **Signature**
 
 ```ts
-declare const JobRegistry: JobRegistry;
+export interface JobRegistry {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-types.ts#L6)
 
 ### JobRetryInputFor
 
+Infers the exact retry request or its dynamic fallback.
+
 **Signature**
 
 ```ts
-declare const JobRetryInputFor: JobRetryInputFor<Name>;
+type JobRetryInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly retry: infer Retry }
+      ? Retry extends { readonly input: infer Input }
+        ? Input
+        : never
+      : never
+    : never
+  : JobRetryInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L145)
 
 ### JobRetryName
 
@@ -1788,33 +2008,72 @@ declare const JobRetryName: never;
 
 ### JobRetryOutputFor
 
+Infers the declared retry receipt or its standard fallback.
+
 **Signature**
 
 ```ts
-declare const JobRetryOutputFor: JobRetryOutputFor<Name>;
+type JobRetryOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly retry: infer Retry }
+      ? Retry extends { readonly output: infer Output }
+        ? Output
+        : RunRetryReceipt
+      : RunRetryReceipt
+    : RunRetryReceipt
+  : RunRetryReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L159)
 
 ### JobRunFor
 
+Infers authoritative run payloads from get or watch contracts.
+
 **Signature**
 
 ```ts
-declare const JobRunFor: JobRunFor<Name>;
+type JobRunFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly get: infer Get }
+      ? Get extends { readonly output: infer Output }
+        ? Output
+        : RunSnapshot
+      : Runs extends { readonly watch: infer Watch }
+        ? Watch extends { readonly output: AsyncIterable<infer Frame> }
+          ? Frame extends { readonly run: infer Run }
+            ? Run
+            : RunSnapshot
+          : RunSnapshot
+        : RunSnapshot
+    : RunSnapshot
+  : RunSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L91)
 
 ### JobRunSelector
 
+Produces exact selectors for the declared run operations.
+
 **Signature**
 
 ```ts
-declare const JobRunSelector: JobRunSelector<Name>;
+type JobRunSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly runs: infer Runs }
+    ? {
+        [
+          Operation in "get" | "list" | "watch" | "stream" | "cancel" | "retry"
+        ]: Runs extends Record<Operation, unknown>
+          ? Runs[Operation] extends never
+            ? never
+            : `${Name}.runs.${Operation}`
+          : never;
+      }["get" | "list" | "watch" | "stream" | "cancel" | "retry"]
+    : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L204)
 
 ### JobRunStatus
 
@@ -1848,13 +2107,26 @@ declare const JobSelector: never;
 
 ### JobSnapshotFor
 
+Projects run payload fields according to the declared client visibility contract.
+
 **Signature**
 
 ```ts
-declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, Fields>;
+type JobSnapshotFor<
+  Input,
+  Output,
+  Progress,
+  Failure,
+  Fields extends readonly JobClientField[],
+> = RunSnapshot<
+  SelectedJobField<Fields, "input"> extends true ? Input : never,
+  SelectedJobField<Fields, "output"> extends true ? Output : never,
+  SelectedJobField<Fields, "progress"> extends true ? Progress : never,
+  SelectedJobField<Fields, "error"> extends true ? Failure : never
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L44)
 
 ### JobStreamGapError
 
@@ -1868,13 +2140,25 @@ declare const JobStreamGapError: typeof JobStreamGapError;
 
 ### JobStreamOptions
 
+Existing content bounds and request authority for one named stream.
+
 **Signature**
 
 ```ts
-declare const JobStreamOptions: JobStreamOptions;
+export interface JobStreamOptions {
+  readonly runId: string;
+  readonly name: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+  readonly signal?: AbortSignal;
+  readonly readTimeoutMs?: number;
+  readonly maxFrames?: number;
+  readonly maxBytes?: number;
+  readonly maxItemBytes?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.types.ts#L3)
 
 ### JobStreamOverflowError
 
@@ -1888,13 +2172,21 @@ declare const JobStreamOverflowError: typeof JobStreamOverflowError;
 
 ### JobTriggerInputFor
 
+Infers the declared trigger input while preserving the dynamic fallback.
+
 **Signature**
 
 ```ts
-declare const JobTriggerInputFor: JobTriggerInputFor<Name>;
+type JobTriggerInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly input: infer Input }
+      ? Input
+      : never
+    : never
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L55)
 
 ### JobTriggerName
 
@@ -1908,23 +2200,34 @@ declare const JobTriggerName: never;
 
 ### JobTriggerOutputFor
 
+Infers the declared trigger receipt while preserving RunHandle fallback.
+
 **Signature**
 
 ```ts
-declare const JobTriggerOutputFor: JobTriggerOutputFor<Name>;
+type JobTriggerOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly output: infer Output }
+      ? Output
+      : never
+    : never
+  : RunHandle;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L67)
 
 ### JobTriggerSelector
 
+Produces the exact trigger selector only for trigger-capable jobs.
+
 **Signature**
 
 ```ts
-declare const JobTriggerSelector: JobTriggerSelector<Name>;
+type JobTriggerSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly trigger: unknown } ? `${Name}.trigger` : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L197)
 
 ### JobWatchAbortedError
 
@@ -1938,13 +2241,22 @@ declare const JobWatchAbortedError: typeof JobWatchAbortedError;
 
 ### JobWatchController
 
+Reusable public watch owner with synchronous state and explicit Promise cleanup.
+
 **Signature**
 
 ```ts
-declare const JobWatchController: JobWatchController<Run>;
+export interface JobWatchController<Run = RunSnapshot> {
+  getSnapshot(): JobWatchState<Run>;
+  subscribe(listener: JobWatchListener<Run>): () => void;
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  dispose(): Promise<void>;
+  refetch(): Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L59)
 
 ### JobWatchDisposedError
 
@@ -1958,33 +2270,39 @@ declare const JobWatchDisposedError: typeof JobWatchDisposedError;
 
 ### JobWatchFrame
 
+Declared job run observation frame.
+
 **Signature**
 
 ```ts
-declare const JobWatchFrame: JobWatchFrame<Run>;
+type JobWatchFrame<Run = RunSnapshot> = RunWatchFrame<Run>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L47)
 
 ### JobWatchFrameFor
 
+Wraps the inferred authoritative run payload in its native watch frame.
+
 **Signature**
 
 ```ts
-declare const JobWatchFrameFor: JobWatchFrameFor<Name>;
+type JobWatchFrameFor<Name extends string> = RunWatchFrame<JobRunFor<Name>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L111)
 
 ### JobWatchListener
 
+Borrowed synchronous observer of frozen job watch state.
+
 **Signature**
 
 ```ts
-declare const JobWatchListener: JobWatchListener<Run>;
+type JobWatchListener<Run = RunSnapshot> = (state: JobWatchState<Run>) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L53)
 
 ### JobWatchName
 
@@ -1998,13 +2316,33 @@ declare const JobWatchName: never;
 
 ### JobWatchOptions
 
+Complete watch sharing authority, cursor/projection fields and retry/read bounds.
+
 **Signature**
 
 ```ts
-declare const JobWatchOptions: JobWatchOptions;
+export interface JobWatchOptions {
+  readonly runId: string;
+  readonly jobId?: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+  readonly identityKey?: string | null;
+  readonly applicationId?: string;
+  readonly environment?: string;
+  readonly grantScope?: string;
+  readonly projection?: string;
+  readonly schemaVersion?: string;
+  readonly protocolVersion?: number;
+  readonly source?: "native" | "polling";
+  readonly pollIntervalMs?: number;
+  readonly maxReconnectAttempts?: number;
+  readonly reconnectMinDelayMs?: number;
+  readonly reconnectMaxDelayMs?: number;
+  readonly readTimeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L5)
 
 ### JobWatchReadTimeoutError
 
@@ -2018,13 +2356,27 @@ declare const JobWatchReadTimeoutError: typeof JobWatchReadTimeoutError;
 
 ### JobWatchState
 
+Frozen external-store snapshot of connection, run and continuity evidence.
+
 **Signature**
 
 ```ts
-declare const JobWatchState: JobWatchState<Run>;
+export interface JobWatchState<Run = RunSnapshot> {
+  readonly run?: Run;
+  readonly connection: RunConnection;
+  readonly isStale: boolean;
+  readonly lastObservedAt?: string;
+  readonly connectionError?: unknown;
+  readonly continuity?: "state" | "history";
+  readonly resetReason?: "reconnected" | "cursor-expired" | "history-unavailable" | "overflow";
+  readonly source?: "native" | "polling";
+  readonly epoch?: string;
+  readonly sequence?: number;
+  readonly cursor?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L29)
 
 ### JobWatchUnavailableError
 
@@ -2118,13 +2470,18 @@ declare const RunWatchFrame: RunWatchFrame<Run>;
 
 ### SelectedJobField
 
+Tests whether a projection field belongs to the declared visible field set.
+
 **Signature**
 
 ```ts
-declare const SelectedJobField: SelectedJobField<Fields, Field>;
+type SelectedJobField<
+  Fields extends readonly JobClientField[],
+  Field extends JobClientField,
+> = Field extends Fields[number] ? true : false;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L31)
 
 ### watchJobRun
 
@@ -2797,13 +3154,19 @@ declare const newEpoch: () => string;
 
 ### WatchRequest
 
+Run identity, retained cursor and optional expected application identity.
+
 **Signature**
 
 ```ts
-declare const WatchRequest: WatchRequest;
+export interface WatchRequest {
+  readonly runId: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/reconcile.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/reconcile.types.ts#L7)
 
 ### authoritativeFrame
 
@@ -3065,13 +3428,25 @@ declare const JobStreamGapError: typeof JobStreamGapError;
 
 ### JobStreamOptions
 
+Existing content bounds and request authority for one named stream.
+
 **Signature**
 
 ```ts
-declare const JobStreamOptions: JobStreamOptions;
+export interface JobStreamOptions {
+  readonly runId: string;
+  readonly name: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+  readonly signal?: AbortSignal;
+  readonly readTimeoutMs?: number;
+  readonly maxFrames?: number;
+  readonly maxBytes?: number;
+  readonly maxItemBytes?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/stream.types.ts#L3)
 
 ### JobStreamOverflowError
 
@@ -3149,13 +3524,22 @@ readonly code: "RELKIT_JOB_WATCH_ABORTED"
 
 ### JobWatchController
 
+Reusable public watch owner with synchronous state and explicit Promise cleanup.
+
 **Signature**
 
 ```ts
-declare const JobWatchController: JobWatchController<Run>;
+export interface JobWatchController<Run = RunSnapshot> {
+  getSnapshot(): JobWatchState<Run>;
+  subscribe(listener: JobWatchListener<Run>): () => void;
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  dispose(): Promise<void>;
+  refetch(): Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L59)
 
 ### JobWatchDisposedError (class)
 
@@ -3181,33 +3565,57 @@ readonly code: "RELKIT_JOB_WATCH_DISPOSED"
 
 ### JobWatchFrame
 
+Declared job run observation frame.
+
 **Signature**
 
 ```ts
-declare const JobWatchFrame: JobWatchFrame<Run>;
+type JobWatchFrame<Run = RunSnapshot> = RunWatchFrame<Run>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L47)
 
 ### JobWatchListener
 
+Borrowed synchronous observer of frozen job watch state.
+
 **Signature**
 
 ```ts
-declare const JobWatchListener: JobWatchListener<Run>;
+type JobWatchListener<Run = RunSnapshot> = (state: JobWatchState<Run>) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L53)
 
 ### JobWatchOptions
 
+Complete watch sharing authority, cursor/projection fields and retry/read bounds.
+
 **Signature**
 
 ```ts
-declare const JobWatchOptions: JobWatchOptions;
+export interface JobWatchOptions {
+  readonly runId: string;
+  readonly jobId?: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+  readonly identityKey?: string | null;
+  readonly applicationId?: string;
+  readonly environment?: string;
+  readonly grantScope?: string;
+  readonly projection?: string;
+  readonly schemaVersion?: string;
+  readonly protocolVersion?: number;
+  readonly source?: "native" | "polling";
+  readonly pollIntervalMs?: number;
+  readonly maxReconnectAttempts?: number;
+  readonly reconnectMinDelayMs?: number;
+  readonly reconnectMaxDelayMs?: number;
+  readonly readTimeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/types.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L5)
 
 ### JobWatchReadTimeoutError (class)
 
@@ -3233,13 +3641,27 @@ readonly code: "RELKIT_JOB_WATCH_READ_TIMEOUT"
 
 ### JobWatchState
 
+Frozen external-store snapshot of connection, run and continuity evidence.
+
 **Signature**
 
 ```ts
-declare const JobWatchState: JobWatchState<Run>;
+export interface JobWatchState<Run = RunSnapshot> {
+  readonly run?: Run;
+  readonly connection: RunConnection;
+  readonly isStale: boolean;
+  readonly lastObservedAt?: string;
+  readonly connectionError?: unknown;
+  readonly continuity?: "state" | "history";
+  readonly resetReason?: "reconnected" | "cursor-expired" | "history-unavailable" | "overflow";
+  readonly source?: "native" | "polling";
+  readonly epoch?: string;
+  readonly sequence?: number;
+  readonly cursor?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.types.ts#L29)
 
 ### JobWatchUnavailableError (class)
 
@@ -3279,13 +3701,34 @@ declare const isTerminalRun: (run: unknown) => boolean;
 
 ### WatchFeedLoop
 
+State authority shared by native and polling observation workflows.
+
 **Signature**
 
 ```ts
-declare const WatchFeedLoop: WatchFeedLoop<Run>;
+export interface WatchFeedLoop<Run> {
+  readonly client: unknown;
+  readonly name: string;
+  readonly options: JobWatchOptions;
+  readonly isActive: (generation: number) => boolean;
+  readonly lastCursor: () => string | undefined;
+  readonly setAbort: (controller: AbortController | undefined) => void;
+  readonly setIterator: (iterator: AsyncIterator<unknown> | undefined) => void;
+  readonly acceptFrame: (value: unknown) => RunWatchFrame<Run> | undefined;
+  readonly emit: (event: FeedEvent<Run>) => void;
+  readonly verifyTerminal: (
+    frame: RunWatchFrame<Run>,
+    signal: AbortSignal,
+  ) => Promise<boolean | undefined>;
+  readonly releaseTerminal: () => void;
+  readonly resolveFirsts: () => void;
+  readonly rejectFirsts: (error: unknown) => void;
+  readonly failureCount: () => number;
+  readonly setFailureCount: (value: number) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-loop.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-loop.types.ts#L9)
 
 ### runWatchFeed
 
@@ -3340,13 +3783,18 @@ export interface WatchFeedLoop<Run> {
 
 ### WatchFeedObservers
 
+Each feed lease's callback and shared first-snapshot settlement authority.
+
 **Signature**
 
 ```ts
-declare const WatchFeedObservers: WatchFeedObservers<Run>;
+type WatchFeedObservers<Run> = ReadonlyMap<
+  string,
+  { readonly observer: FeedObserver<Run>; readonly first: Pending }
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-observers.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-observers.types.ts#L8)
 
 ### emitObservers
 
@@ -3502,13 +3950,20 @@ declare const refetchSharedWatchFeed: <Run>(
 
 ### WatchFeedState
 
+Accepted frame, epoch, sequence and cursor retained by one shared observation feed.
+
 **Signature**
 
 ```ts
-declare const WatchFeedState: WatchFeedState<Run>;
+export interface WatchFeedState<Run> {
+  readonly lastFrame: RunWatchFrame<Run> | undefined;
+  readonly lastCursor: string | undefined;
+  readonly lastSequence: number;
+  readonly nativeEpoch: string | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-state.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-state.types.ts#L7)
 
 ### acceptWatchFrame
 
@@ -3560,13 +4015,19 @@ export interface WatchFeedState<Run> {
 
 ### Pending
 
+Settled-once first-snapshot Promise with explicit resolve and reject functions.
+
 **Signature**
 
 ```ts
-declare const Pending: Pending;
+type Pending = {
+  readonly promise: Promise<void>;
+  readonly resolve: () => void;
+  readonly reject: (error: unknown) => void;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed-support.types.ts#L2)
 
 ### backoff
 
@@ -3764,23 +4225,30 @@ export * from "./watch-feed.types.js";
 
 ### FeedEvent
 
+Canonical native frame or physical observation lifecycle publication.
+
 **Signature**
 
 ```ts
-declare const FeedEvent: FeedEvent<Run>;
+type FeedEvent<Run> =
+  | { readonly kind: "frame"; readonly frame: RunWatchFrame<Run> }
+  | { readonly kind: "status"; readonly status: FeedStatus; readonly error?: unknown };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.types.ts#L7)
 
 ### FeedStatus
 
+Physical observation states projected into each passive external-store view.
+
 **Signature**
 
 ```ts
-declare const FeedStatus: FeedStatus;
+type FeedStatus =
+  "connecting" | "connected" | "reconnecting" | "completed" | "unauthorized" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.types.ts#L12)
 
 ### SharedWatchFeed (class)
 
@@ -3996,23 +4464,30 @@ readonly value: string
 
 ### FeedEvent
 
+Canonical native frame or physical observation lifecycle publication.
+
 **Signature**
 
 ```ts
-declare const FeedEvent: FeedEvent<Run>;
+type FeedEvent<Run> =
+  | { readonly kind: "frame"; readonly frame: RunWatchFrame<Run> }
+  | { readonly kind: "status"; readonly status: FeedStatus; readonly error?: unknown };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.types.ts#L7)
 
 ### FeedStatus
 
+Physical observation states projected into each passive external-store view.
+
 **Signature**
 
 ```ts
-declare const FeedStatus: FeedStatus;
+type FeedStatus =
+  "connecting" | "connected" | "reconnecting" | "completed" | "unauthorized" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/watch-feed.types.ts#L12)
 
 ### SharedWatchFeed
 
@@ -4488,13 +4963,19 @@ type AgentWaiting<Name extends AgentSelector> =
 
 ### AgentExecutionProjection
 
+Browser agent lifecycle and content projected from authoritative execution state.
+
 **Signature**
 
 ```ts
-declare const AgentExecutionProjection: AgentExecutionProjection<Output>;
+export interface AgentExecutionProjection<Output = unknown> {
+  readonly values?: unknown;
+  readonly output?: Output;
+  readonly executions: readonly AgentExecutionSnapshot[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-execution-observation.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-execution-observation.types.ts#L7)
 
 ### clientEventProjection
 
@@ -4809,23 +5290,35 @@ export interface AgentMessage {
 
 ### AgentNestedExecution
 
+Projects nested execution identity and public values from the declared scope.
+
 **Signature**
 
 ```ts
-declare const AgentNestedExecution: AgentNestedExecution<Scope, PublicState>;
+type AgentNestedExecution<Scope, PublicState> = Omit<
+  AgentExecutionSnapshot,
+  "agent" | "node" | "values"
+> & {
+  readonly agent?: ScopeId<Scope, "agent" | "subagent">;
+  readonly node?: ScopeId<Scope, "node">;
+  readonly values?: PublicState;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook-types.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook-contract.types.ts#L123)
 
 ### AgentOutput
 
+Infers the declared terminal agent output.
+
 **Signature**
 
 ```ts
-declare const AgentOutput: AgentOutput<Name>;
+type AgentOutput<Name extends AgentSelector> =
+  AgentFor<Name> extends { readonly output: infer Value } ? Value : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook-types.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-contract-selection.types.ts#L21)
 
 ### AgentProgress (type alias)
 
@@ -4912,13 +5405,27 @@ type AgentTimelineItem<Tool = ClientAgentDynamic> =
 
 ### AgentToolCall
 
+Stable browser projection of canonical tool identity, state, input and output.
+
 **Signature**
 
 ```ts
-declare const AgentToolCall: AgentToolCall;
+export interface AgentToolCall {
+  readonly toolCallId: string;
+  readonly messageId: string;
+  readonly partId: string;
+  readonly runId?: string;
+  readonly toolId: string;
+  readonly state: ToolPartState;
+  readonly inputText?: string;
+  readonly input?: unknown;
+  readonly output?: unknown;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook-types.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/agent-hook-contract.types.ts#L14)
 
 ### UseAgentResult (type alias)
 
@@ -5682,33 +6189,67 @@ declare const RelkitClientProvider: (props: RelkitClientProviderProps) => ReactN
 
 ### RelkitClientProviderProps
 
+React provider configuration retaining borrowed clients and hydration authority.
+
 **Signature**
 
 ```ts
-declare const RelkitClientProviderProps: RelkitClientProviderProps;
+export interface RelkitClientProviderProps {
+  readonly baseUrl?: string;
+  readonly environment?: string;
+  readonly credentials?: RequestInit["credentials"];
+  readonly headers?: ClientHeaders;
+  readonly queryClient?: QueryClient;
+  readonly identityKey?: string | null;
+  readonly hydratedState?: RelkitHydrationState;
+  readonly transport?: "auto" | "websocket" | "http-stream" | "sse";
+  readonly requestTimeoutMs?: number;
+  readonly streamEstablishmentTimeoutMs?: number;
+  readonly children: ReactNode;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.types.ts#L20)
 
 ### RelkitClientRuntime
 
+Provider-owned client and identity state shared by React boundary adapters.
+
 **Signature**
 
 ```ts
-declare const RelkitClientRuntime: RelkitClientRuntime;
+export interface RelkitClientRuntime {
+  readonly client: ReturnType<typeof createClient>;
+  readonly streamClient: ReturnType<typeof createClient>;
+  readonly queryClient: QueryClient;
+  readonly utils: unknown;
+  readonly identity?: ClientIdentityDocument;
+  readonly identityKey?: string | null;
+  readonly status: "loading" | "ready" | "application-updated" | "error";
+  readonly scope?: RelkitKeyScope;
+  readonly transport: "auto" | "websocket" | "http-stream" | "sse";
+  readonly streamEstablishmentTimeoutMs: number;
+  readonly environment?: string;
+  readonly realtime: RealtimeManager;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.types.ts#L37)
 
 ### RelkitHydrationState
 
+Server-supplied ready identity and application contract hydration.
+
 **Signature**
 
 ```ts
-declare const RelkitHydrationState: RelkitHydrationState;
+export interface RelkitHydrationState {
+  readonly scope: RelkitKeyScope;
+  readonly dehydrated: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.tsx#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/context.types.ts#L12)
 
 ### useRelkitClient
 
@@ -6167,23 +6708,40 @@ declare const CountPresence: CountPresence;
 
 ### JobCancelInput
 
+Cancellation request with caller-owned operation identity.
+
 **Signature**
 
 ```ts
-declare const JobCancelInput: JobCancelInput;
+type JobCancelInput = {
+  readonly runId: string;
+  readonly operationId: OperationId | string;
+  readonly reason?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L100)
 
 ### JobCancelInputFor
 
+Infers the exact cancellation request or its dynamic fallback.
+
 **Signature**
 
 ```ts
-declare const JobCancelInputFor: JobCancelInputFor<Name>;
+type JobCancelInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly cancel: infer Cancel }
+      ? Cancel extends { readonly input: infer Input }
+        ? Input
+        : never
+      : never
+    : never
+  : JobCancelInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L117)
 
 ### JobCancelName
 
@@ -6197,133 +6755,194 @@ declare const JobCancelName: never;
 
 ### JobCancelOutputFor
 
+Infers the declared cancellation receipt or its standard fallback.
+
 **Signature**
 
 ```ts
-declare const JobCancelOutputFor: JobCancelOutputFor<Name>;
+type JobCancelOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly cancel: infer Cancel }
+      ? Cancel extends { readonly output: infer Output }
+        ? Output
+        : RunCancellationReceipt
+      : RunCancellationReceipt
+    : RunCancellationReceipt
+  : RunCancellationReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L131)
 
 ### JobClientField
 
+Client-visible run projection fields.
+
 **Signature**
 
 ```ts
-declare const JobClientField: JobClientField;
+type JobClientField = "status" | "input" | "progress" | "output" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L10)
 
 ### JobContract
 
+Generated job declaration retaining operation availability and selective field inference.
+
 **Signature**
 
 ```ts
-declare const JobContract: JobContract<
-  Name,
-  JobId,
-  Input,
-  Output,
-  Failure,
-  Progress,
-  Streams,
-  Operations,
-  Fields
->;
+type JobContract<
+  Name extends string = string,
+  JobId extends string = string,
+  Input = unknown,
+  Output = unknown,
+  Failure = JobErrorEnvelope,
+  Progress = unknown,
+  Streams extends Readonly<Record<string, unknown>> = Readonly<Record<string, unknown>>,
+  Operations extends readonly JobClientOperation[] = readonly JobClientOperation[],
+  Fields extends readonly JobClientField[] = readonly [],
+> = {
+  readonly name: Name;
+  readonly jobId: JobId;
+} & TriggerMember<Input, Failure, Operations> &
+  RunMembers<Input, Output, Progress, Failure, Streams, Operations, Fields>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L166)
 
 ### JobFor
 
+Looks up one declared job contract without widening its members.
+
 **Signature**
 
 ```ts
-declare const JobFor: JobFor<Name>;
+type JobFor<Name extends JobSelector> = JobRegistry[Name];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L191)
 
 ### JobGetInput
 
+Authoritative run lookup and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobGetInput: JobGetInput;
+type JobGetInput = {
+  readonly runId: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L64)
 
 ### JobListInput
 
+Job-specific listing filters and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobListInput: JobListInput;
+type JobListInput = {
+  readonly query?: JobListQuery;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L72)
 
 ### JobListQuery
 
+Filters accepted by a generated job-specific list; ownership is server-derived.
+
 **Signature**
 
 ```ts
-declare const JobListQuery: JobListQuery;
+type JobListQuery = Omit<RunListQuery, "jobId" | "service">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L5)
 
 ### JobProcedureContract
 
+Generated finite procedure shape preserving input, output and failure inference.
+
 **Signature**
 
 ```ts
-declare const JobProcedureContract: JobProcedureContract<Input, Output, Failure>;
+export interface JobProcedureContract<Input, Output, Failure = Error> {
+  readonly input: Input;
+  readonly output: Output;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: false;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L28)
 
 ### JobProcedureSelector
 
+Union of exact procedure selectors exposed by one declared job.
+
 **Signature**
 
 ```ts
-declare const JobProcedureSelector: JobProcedureSelector<Name>;
+type JobProcedureSelector<Name extends JobSelector = JobSelector> =
+  JobTriggerSelector<Name> | JobRunSelector<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L221)
 
 ### JobRegistry
 
+Augmentable registry of application-declared job contracts.
+
 **Signature**
 
 ```ts
-declare const JobRegistry: JobRegistry;
+export interface JobRegistry {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-types.ts#L6)
 
 ### JobRetryInput
 
+Retry request with caller-owned operation identity.
+
 **Signature**
 
 ```ts
-declare const JobRetryInput: JobRetryInput;
+type JobRetryInput = {
+  readonly runId: string;
+  readonly operationId: OperationId | string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L110)
 
 ### JobRetryInputFor
 
+Infers the exact retry request or its dynamic fallback.
+
 **Signature**
 
 ```ts
-declare const JobRetryInputFor: JobRetryInputFor<Name>;
+type JobRetryInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly retry: infer Retry }
+      ? Retry extends { readonly input: infer Input }
+        ? Input
+        : never
+      : never
+    : never
+  : JobRetryInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L145)
 
 ### JobRetryName
 
@@ -6337,33 +6956,72 @@ declare const JobRetryName: never;
 
 ### JobRetryOutputFor
 
+Infers the declared retry receipt or its standard fallback.
+
 **Signature**
 
 ```ts
-declare const JobRetryOutputFor: JobRetryOutputFor<Name>;
+type JobRetryOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly retry: infer Retry }
+      ? Retry extends { readonly output: infer Output }
+        ? Output
+        : RunRetryReceipt
+      : RunRetryReceipt
+    : RunRetryReceipt
+  : RunRetryReceipt;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L159)
 
 ### JobRunFor
 
+Infers authoritative run payloads from get or watch contracts.
+
 **Signature**
 
 ```ts
-declare const JobRunFor: JobRunFor<Name>;
+type JobRunFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly runs: infer Runs }
+    ? Runs extends { readonly get: infer Get }
+      ? Get extends { readonly output: infer Output }
+        ? Output
+        : RunSnapshot
+      : Runs extends { readonly watch: infer Watch }
+        ? Watch extends { readonly output: AsyncIterable<infer Frame> }
+          ? Frame extends { readonly run: infer Run }
+            ? Run
+            : RunSnapshot
+          : RunSnapshot
+        : RunSnapshot
+    : RunSnapshot
+  : RunSnapshot;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L91)
 
 ### JobRunSelector
 
+Produces exact selectors for the declared run operations.
+
 **Signature**
 
 ```ts
-declare const JobRunSelector: JobRunSelector<Name>;
+type JobRunSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly runs: infer Runs }
+    ? {
+        [
+          Operation in "get" | "list" | "watch" | "stream" | "cancel" | "retry"
+        ]: Runs extends Record<Operation, unknown>
+          ? Runs[Operation] extends never
+            ? never
+            : `${Name}.runs.${Operation}`
+          : never;
+      }["get" | "list" | "watch" | "stream" | "cancel" | "retry"]
+    : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L204)
 
 ### JobSelector
 
@@ -6377,53 +7035,96 @@ declare const JobSelector: never;
 
 ### JobSnapshotFor
 
+Projects run payload fields according to the declared client visibility contract.
+
 **Signature**
 
 ```ts
-declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, Fields>;
+type JobSnapshotFor<
+  Input,
+  Output,
+  Progress,
+  Failure,
+  Fields extends readonly JobClientField[],
+> = RunSnapshot<
+  SelectedJobField<Fields, "input"> extends true ? Input : never,
+  SelectedJobField<Fields, "output"> extends true ? Output : never,
+  SelectedJobField<Fields, "progress"> extends true ? Progress : never,
+  SelectedJobField<Fields, "error"> extends true ? Failure : never
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L44)
 
 ### JobStreamInput
 
+Named content observation cursor and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobStreamInput: JobStreamInput<StreamName>;
+type JobStreamInput<StreamName extends string = string> = {
+  readonly runId: string;
+  readonly name: StreamName;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L90)
 
 ### JobStreamProcedureContract
 
+Generated stream procedure shape preserving item and failure inference.
+
 **Signature**
 
 ```ts
-declare const JobStreamProcedureContract: JobStreamProcedureContract<Input, Item, Failure>;
+export interface JobStreamProcedureContract<Input, Item, Failure = Error> {
+  readonly input: Input;
+  readonly output: AsyncIterable<Item>;
+  readonly item: Item;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: true;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L42)
 
 ### JobTriggerInput
 
+Job trigger request and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobTriggerInput: JobTriggerInput<Input>;
+type JobTriggerInput<Input> = {
+  readonly input: Input;
+  readonly options?: JobTriggerOptions;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L55)
 
 ### JobTriggerInputFor
 
+Infers the declared trigger input while preserving the dynamic fallback.
+
 **Signature**
 
 ```ts
-declare const JobTriggerInputFor: JobTriggerInputFor<Name>;
+type JobTriggerInputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly input: infer Input }
+      ? Input
+      : never
+    : never
+  : unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L55)
 
 ### JobTriggerName
 
@@ -6437,53 +7138,81 @@ declare const JobTriggerName: never;
 
 ### JobTriggerOptions
 
+Browser-safe options accepted by a generated job trigger.
+
 **Signature**
 
 ```ts
-declare const JobTriggerOptions: JobTriggerOptions;
+export interface JobTriggerOptions {
+  readonly operationId?: OperationId | string;
+  readonly idempotencyKey?: string;
+  readonly delay?: string;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L13)
 
 ### JobTriggerOutputFor
 
+Infers the declared trigger receipt while preserving RunHandle fallback.
+
 **Signature**
 
 ```ts
-declare const JobTriggerOutputFor: JobTriggerOutputFor<Name>;
+type JobTriggerOutputFor<Name extends string> = Name extends JobSelector
+  ? JobFor<Name> extends { readonly trigger: infer Trigger }
+    ? Trigger extends { readonly output: infer Output }
+      ? Output
+      : never
+    : never
+  : RunHandle;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L67)
 
 ### JobTriggerSelector
 
+Produces the exact trigger selector only for trigger-capable jobs.
+
 **Signature**
 
 ```ts
-declare const JobTriggerSelector: JobTriggerSelector<Name>;
+type JobTriggerSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly trigger: unknown } ? `${Name}.trigger` : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L197)
 
 ### JobWatchFrameFor
 
+Wraps the inferred authoritative run payload in its native watch frame.
+
 **Signature**
 
 ```ts
-declare const JobWatchFrameFor: JobWatchFrameFor<Name>;
+type JobWatchFrameFor<Name extends string> = RunWatchFrame<JobRunFor<Name>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-derived.types.ts#L111)
 
 ### JobWatchInput
 
+Run observation cursor and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobWatchInput: JobWatchInput;
+type JobWatchInput = {
+  readonly runId: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L80)
 
 ### JobWatchName
 
@@ -6507,25 +7236,36 @@ declare const MemberPresence: MemberPresence<Member>;
 
 ### SelectedJobField
 
+Tests whether a projection field belongs to the declared visible field set.
+
 **Signature**
 
 ```ts
-declare const SelectedJobField: SelectedJobField<Fields, Field>;
+type SelectedJobField<
+  Fields extends readonly JobClientField[],
+  Field extends JobClientField,
+> = Field extends Fields[number] ? true : false;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/index.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L31)
 
 ## `job-hooks-support.ts`
 
 ### PreparedJobRequest
 
+Transmitted job input and its operation/run receipt references.
+
 **Signature**
 
 ```ts
-declare const PreparedJobRequest: PreparedJobRequest;
+export interface PreparedJobRequest {
+  readonly value: unknown;
+  readonly operationId: string;
+  readonly idempotencyKey?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-hooks-support.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-hooks-support.types.ts#L2)
 
 ### generatedJobTriggerName
 
@@ -6615,33 +7355,54 @@ export interface PreparedJobRequest {
 
 ### JobMutationOptions
 
+Job mutation options preserving operation identity, retry and TanStack callback inference.
+
 **Signature**
 
 ```ts
-declare const JobMutationOptions: JobMutationOptions<Output, Failure, Input, Context>;
+type JobMutationOptions<Output, Failure, Input, Context> = Omit<
+  UseMutationOptions<Output, Failure, Input, Context>,
+  "mutationKey" | "mutationFn"
+> & { readonly jobId?: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-hooks.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.types.ts#L10)
 
 ### UseJobRunOptions
 
+Watch request authority and explicit connection/recovery policy for the declared job.
+
 **Signature**
 
 ```ts
-declare const UseJobRunOptions: UseJobRunOptions;
+export interface UseJobRunOptions extends Omit<
+  JobWatchOptions,
+  "runId" | "expectedIdentity" | "identityKey" | "applicationId" | "protocolVersion"
+> {
+  readonly runId?: string;
+  readonly enabled?: boolean;
+  readonly autoConnect?: boolean;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-hooks.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-hooks.types.ts#L6)
 
 ### UseJobRunResult
 
+Frozen job run state plus connection, refetch and disposal controls.
+
 **Signature**
 
 ```ts
-declare const UseJobRunResult: UseJobRunResult<Run>;
+export interface UseJobRunResult<Run = RunSnapshot> extends JobWatchState<Run> {
+  readonly connect: () => Promise<void>;
+  readonly disconnect: () => Promise<void>;
+  readonly refetch: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-hooks.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-hooks.types.ts#L20)
 
 ### useJobCancel
 
@@ -6769,13 +7530,18 @@ export interface UseJobRunResult<Run = RunSnapshot> extends JobWatchState<Run> {
 
 ### JobMutationOptions
 
+Job mutation options preserving operation identity, retry and TanStack callback inference.
+
 **Signature**
 
 ```ts
-declare const JobMutationOptions: JobMutationOptions<Output, Failure, Input, Context>;
+type JobMutationOptions<Output, Failure, Input, Context> = Omit<
+  UseMutationOptions<Output, Failure, Input, Context>,
+  "mutationKey" | "mutationFn"
+> & { readonly jobId?: string };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/job-mutation-hooks.types.ts#L10)
 
 ### useJobCancel
 
@@ -6913,23 +7679,43 @@ declare const writableScope: (
 
 ### RelkitJobKeyOptions
 
+Run, cursor, named-content and projection fields participating in a job cache key.
+
 **Signature**
 
 ```ts
-declare const RelkitJobKeyOptions: RelkitJobKeyOptions;
+export interface RelkitJobKeyOptions {
+  readonly jobId: string;
+  readonly runId?: string;
+  readonly projection?: string;
+  readonly schemaVersion?: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/keys.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/keys.types.ts#L14)
 
 ### RelkitKeyScope
 
+Backend, fingerprint, transport, identity and session boundaries of cached client work.
+
 **Signature**
 
 ```ts
-declare const RelkitKeyScope: RelkitKeyScope;
+export interface RelkitKeyScope {
+  readonly backend: string;
+  readonly applicationId: string;
+  readonly identityScope: string;
+  readonly sessionEpoch: string;
+  readonly identityKey: string | null | undefined;
+  readonly publicFingerprint: string;
+  readonly environment?: string;
+  readonly jobsProtocolVersion?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/keys.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/keys.types.ts#L2)
 
 ### relkitJobKey
 
@@ -7449,13 +8235,20 @@ declare const PendingRecoveryUnavailableError: typeof PendingRecoveryUnavailable
 
 ### PendingRememberOptions
 
+Submission/recovery authority retained from the existing pending API.
+
 **Signature**
 
 ```ts
-declare const PendingRememberOptions: PendingRememberOptions;
+export interface PendingRememberOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly recovery?: JobUnknownOutcome["recovery"];
+  readonly retainRequest?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/pending.types.ts#L5)
 
 ### PendingRequestMismatchError
 
@@ -7722,13 +8515,22 @@ export interface PendingRememberOptions {
 
 ### ProcedureUtilsLike
 
+Generated TanStack query/mutation options and keys resolved by exact selector.
+
 **Signature**
 
 ```ts
-declare const ProcedureUtilsLike: ProcedureUtilsLike;
+export interface ProcedureUtilsLike {
+  queryOptions(options: object): object;
+  infiniteOptions(options: object): object;
+  mutationOptions(options?: object): object;
+  queryKey(options?: object): QueryKey;
+  infiniteKey(options?: object): QueryKey;
+  mutationKey(options?: object): QueryKey;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/procedure.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/procedure.types.ts#L4)
 
 ### procedureCall
 
@@ -7809,33 +8611,55 @@ declare const ChannelHandlers: Partial<{
 
 ### UseChannelOptions
 
+Channel parameters and current-view event handlers.
+
 **Signature**
 
 ```ts
-declare const UseChannelOptions: UseChannelOptions<Name>;
+export interface UseChannelOptions<Name extends ChannelSelector> {
+  readonly params: ParamsFor<Name>;
+  readonly on?: ChannelHandlers<Name>;
+  readonly onCaughtUp?: () => void | Promise<void>;
+  readonly onGap?: (reason: string) => void | Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-hook.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-hook.types.ts#L58)
 
 ### UseChannelResult
 
+Typed channel projection and explicit realtime controls.
+
 **Signature**
 
 ```ts
-declare const UseChannelResult: UseChannelResult<Name>;
+type UseChannelResult<Name extends ChannelSelector> = Omit<ChannelState, "presence"> &
+  ([PresenceFor<Name>] extends [never] ? {} : { readonly presence: PresenceFor<Name> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-hook.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-hook.types.ts#L78)
 
 ### UseRealtimeResult
 
+Realtime connection state with explicit channel observer controls.
+
 **Signature**
 
 ```ts
-declare const UseRealtimeResult: UseRealtimeResult;
+export interface UseRealtimeResult {
+  readonly status: RealtimeStatus;
+  readonly subscribe: <Name extends ChannelSelector>(
+    name: Name,
+    params: ParamsFor<Name>,
+    listener: (frame: RealtimeFrame) => void,
+  ) => () => void;
+  readonly bind: UseRealtimeResult["subscribe"];
+  readonly unbind: (unsubscribe: () => void) => void;
+  readonly unsubscribe: (unsubscribe: () => void) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-hook.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-hook.types.ts#L34)
 
 ### useChannel
 
@@ -8005,13 +8829,24 @@ export interface UseRealtimeResult {
 
 ### RealtimeFrame
 
+Public channel frames retained without changing wire schemas.
+
 **Signature**
 
 ```ts
-declare const RealtimeFrame: RealtimeFrame;
+type RealtimeFrame =
+  | {
+      readonly kind: "event";
+      readonly event: string;
+      readonly payload: unknown;
+      readonly checkpoint: ChannelCheckpoint;
+    }
+  | { readonly kind: "caught-up"; readonly checkpoint: ChannelCheckpoint }
+  | { readonly kind: "gap"; readonly reason: string; readonly checkpoint: ChannelCheckpoint }
+  | { readonly kind: "presence"; readonly presence: PresenceSnapshot };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L7)
 
 ### RealtimeManager (class)
 
@@ -8085,13 +8920,15 @@ declare const close: () => Promise<void>;
 
 ### RealtimeStatus
 
+Existing realtime external-store states.
+
 **Signature**
 
 ```ts
-declare const RealtimeStatus: RealtimeStatus;
+type RealtimeStatus = "idle" | "connecting" | "connected" | "stale" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/realtime-manager.types.ts#L4)
 
 ### realtimeSubscriptionKey
 
@@ -8393,153 +9230,239 @@ export interface ClientChannelContract<
 
 ### ClientRouteContract
 
+Generated finite route declaration preserving payload and failure inference.
+
 **Signature**
 
 ```ts
-declare const ClientRouteContract: ClientRouteContract<Input, Output, Failure>;
+export interface ClientRouteContract<
+  Input = unknown,
+  Output = unknown,
+  Failure = RelkitClientError,
+> {
+  readonly input: Input;
+  readonly output: Output;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: false;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L43)
 
 ### ClientStreamContract
 
+Generated route stream declaration preserving item and failure inference.
+
 **Signature**
 
 ```ts
-declare const ClientStreamContract: ClientStreamContract<Input, Item, Failure>;
+export interface ClientStreamContract<
+  Input = unknown,
+  Item = unknown,
+  Failure = RelkitClientError,
+> {
+  readonly input: Input;
+  readonly output: AsyncIterable<Item>;
+  readonly item: Item;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: true;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/index.types.ts#L61)
 
 ### JobCancelInput
 
+Cancellation request with caller-owned operation identity.
+
 **Signature**
 
 ```ts
-declare const JobCancelInput: JobCancelInput;
+type JobCancelInput = {
+  readonly runId: string;
+  readonly operationId: OperationId | string;
+  readonly reason?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L100)
 
 ### JobClientField
 
+Client-visible run projection fields.
+
 **Signature**
 
 ```ts
-declare const JobClientField: JobClientField;
+type JobClientField = "status" | "input" | "progress" | "output" | "error";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L10)
 
 ### JobContract
 
+Generated job declaration retaining operation availability and selective field inference.
+
 **Signature**
 
 ```ts
-declare const JobContract: JobContract<
-  Name,
-  JobId,
-  Input,
-  Output,
-  Failure,
-  Progress,
-  Streams,
-  Operations,
-  Fields
->;
+type JobContract<
+  Name extends string = string,
+  JobId extends string = string,
+  Input = unknown,
+  Output = unknown,
+  Failure = JobErrorEnvelope,
+  Progress = unknown,
+  Streams extends Readonly<Record<string, unknown>> = Readonly<Record<string, unknown>>,
+  Operations extends readonly JobClientOperation[] = readonly JobClientOperation[],
+  Fields extends readonly JobClientField[] = readonly [],
+> = {
+  readonly name: Name;
+  readonly jobId: JobId;
+} & TriggerMember<Input, Failure, Operations> &
+  RunMembers<Input, Output, Progress, Failure, Streams, Operations, Fields>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L166)
 
 ### JobFor
 
+Looks up one declared job contract without widening its members.
+
 **Signature**
 
 ```ts
-declare const JobFor: JobFor<Name>;
+type JobFor<Name extends JobSelector> = JobRegistry[Name];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L191)
 
 ### JobGetInput
 
+Authoritative run lookup and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobGetInput: JobGetInput;
+type JobGetInput = {
+  readonly runId: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L64)
 
 ### JobListInput
 
+Job-specific listing filters and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobListInput: JobListInput;
+type JobListInput = {
+  readonly query?: JobListQuery;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L72)
 
 ### JobListQuery
 
+Filters accepted by a generated job-specific list; ownership is server-derived.
+
 **Signature**
 
 ```ts
-declare const JobListQuery: JobListQuery;
+type JobListQuery = Omit<RunListQuery, "jobId" | "service">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L5)
 
 ### JobProcedureContract
 
+Generated finite procedure shape preserving input, output and failure inference.
+
 **Signature**
 
 ```ts
-declare const JobProcedureContract: JobProcedureContract<Input, Output, Failure>;
+export interface JobProcedureContract<Input, Output, Failure = Error> {
+  readonly input: Input;
+  readonly output: Output;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: false;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L28)
 
 ### JobProcedureSelector
 
+Union of exact procedure selectors exposed by one declared job.
+
 **Signature**
 
 ```ts
-declare const JobProcedureSelector: JobProcedureSelector<Name>;
+type JobProcedureSelector<Name extends JobSelector = JobSelector> =
+  JobTriggerSelector<Name> | JobRunSelector<Name>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L221)
 
 ### JobRegistry
 
+Augmentable registry of application-declared job contracts.
+
 **Signature**
 
 ```ts
-declare const JobRegistry: JobRegistry;
+export interface JobRegistry {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry-types.ts#L6)
 
 ### JobRetryInput
 
+Retry request with caller-owned operation identity.
+
 **Signature**
 
 ```ts
-declare const JobRetryInput: JobRetryInput;
+type JobRetryInput = {
+  readonly runId: string;
+  readonly operationId: OperationId | string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L110)
 
 ### JobRunSelector
 
+Produces exact selectors for the declared run operations.
+
 **Signature**
 
 ```ts
-declare const JobRunSelector: JobRunSelector<Name>;
+type JobRunSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly runs: infer Runs }
+    ? {
+        [
+          Operation in "get" | "list" | "watch" | "stream" | "cancel" | "retry"
+        ]: Runs extends Record<Operation, unknown>
+          ? Runs[Operation] extends never
+            ? never
+            : `${Name}.runs.${Operation}`
+          : never;
+      }["get" | "list" | "watch" | "stream" | "cancel" | "retry"]
+    : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L204)
 
 ### JobSelector
 
@@ -8553,105 +9476,175 @@ declare const JobSelector: never;
 
 ### JobSnapshotFor
 
+Projects run payload fields according to the declared client visibility contract.
+
 **Signature**
 
 ```ts
-declare const JobSnapshotFor: JobSnapshotFor<Input, Output, Progress, Failure, Fields>;
+type JobSnapshotFor<
+  Input,
+  Output,
+  Progress,
+  Failure,
+  Fields extends readonly JobClientField[],
+> = RunSnapshot<
+  SelectedJobField<Fields, "input"> extends true ? Input : never,
+  SelectedJobField<Fields, "output"> extends true ? Output : never,
+  SelectedJobField<Fields, "progress"> extends true ? Progress : never,
+  SelectedJobField<Fields, "error"> extends true ? Failure : never
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L44)
 
 ### JobStreamInput
 
+Named content observation cursor and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobStreamInput: JobStreamInput<StreamName>;
+type JobStreamInput<StreamName extends string = string> = {
+  readonly runId: string;
+  readonly name: StreamName;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L90)
 
 ### JobStreamProcedureContract
 
+Generated stream procedure shape preserving item and failure inference.
+
 **Signature**
 
 ```ts
-declare const JobStreamProcedureContract: JobStreamProcedureContract<Input, Item, Failure>;
+export interface JobStreamProcedureContract<Input, Item, Failure = Error> {
+  readonly input: Input;
+  readonly output: AsyncIterable<Item>;
+  readonly item: Item;
+  readonly error: Failure;
+  readonly operation: "query" | "mutation";
+  readonly stream: true;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L42)
 
 ### JobTriggerInput
 
+Job trigger request and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobTriggerInput: JobTriggerInput<Input>;
+type JobTriggerInput<Input> = {
+  readonly input: Input;
+  readonly options?: JobTriggerOptions;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L55)
 
 ### JobTriggerOptions
 
+Browser-safe options accepted by a generated job trigger.
+
 **Signature**
 
 ```ts
-declare const JobTriggerOptions: JobTriggerOptions;
+export interface JobTriggerOptions {
+  readonly operationId?: OperationId | string;
+  readonly idempotencyKey?: string;
+  readonly delay?: string;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L13)
 
 ### JobTriggerSelector
 
+Produces the exact trigger selector only for trigger-capable jobs.
+
 **Signature**
 
 ```ts
-declare const JobTriggerSelector: JobTriggerSelector<Name>;
+type JobTriggerSelector<Name extends JobSelector> =
+  JobFor<Name> extends { readonly trigger: unknown } ? `${Name}.trigger` : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L197)
 
 ### JobWatchInput
 
+Run observation cursor and expected application identity.
+
 **Signature**
 
 ```ts
-declare const JobWatchInput: JobWatchInput;
+type JobWatchInput = {
+  readonly runId: string;
+  readonly after?: string;
+  readonly expectedIdentity?: ExpectedClientIdentity;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/contracts.types.ts#L80)
 
 ### SelectedJobField
 
+Tests whether a projection field belongs to the declared visible field set.
+
 **Signature**
 
 ```ts
-declare const SelectedJobField: SelectedJobField<Fields, Field>;
+type SelectedJobField<
+  Fields extends readonly JobClientField[],
+  Field extends JobClientField,
+> = Field extends Fields[number] ? true : false;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/registry.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/jobs/job-registry.types.ts#L31)
 
 ## `stream-hook.ts`
 
 ### StreamState
 
+Current stream lifecycle, latest item, retained item history and original failure.
+
 **Signature**
 
 ```ts
-declare const StreamState: StreamState<Item, Error>;
+export interface StreamState<Item, Error> {
+  readonly status: "idle" | "starting" | "streaming" | "completed" | "cancelled" | "error";
+  readonly items: readonly Item[];
+  readonly error?: Error;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-hook.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-hook.types.ts#L6)
 
 ### UseStreamResult
 
+Typed stream state with explicit start and cancellation controls.
+
 **Signature**
 
 ```ts
-declare const UseStreamResult: UseStreamResult<Input, Item, Error>;
+export interface UseStreamResult<Input, Item, Error> extends StreamState<Item, Error> {
+  readonly start: (input: Input) => Promise<void>;
+  readonly cancel: () => void;
+  readonly reset: () => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-hook.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/react/stream-hook.types.ts#L18)
 
 ### useStream
 
@@ -8901,23 +9894,52 @@ Loads and caches the backend's client routes document.
 
 ### ClientRouteEntry
 
+One route in the backend's client routes document (`/_relkit/v1/client/routes`), a copy
+of `ClientRouteEntry` in `relkit/contracts` so the browser bundle needs no runtime import.
+
 **Signature**
 
 ```ts
-declare const ClientRouteEntry: ClientRouteEntry;
+export interface ClientRouteEntry {
+  readonly id: string;
+  /** Path below the `api` root, such as `["orders", "searchOrders"]`. */
+  readonly api: readonly string[];
+  readonly method: string;
+  readonly path: string;
+  /** The compiled request mapping the server reads the input with. */
+  readonly request: unknown;
+  readonly stream: "sse" | "text" | "bytes" | null;
+  readonly operation: "query" | "mutation";
+  /** Declared error codes. */
+  readonly errors: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.types.ts#L5)
 
 ### RouteTable
 
+Looks routes up by the name a call uses.
+
 **Signature**
 
 ```ts
-declare const RouteTable: RouteTable;
+export interface RouteTable {
+  /**
+   * Finds the route a call path names: an `api` path (`["api", "orders", "getOrder"]`),
+   * a `METHOD /path` selector or a route ID.
+   * @param path - Call path.
+   * @param signal - Cancels the table request.
+   * @returns The route, or undefined when the backend has none by that name.
+   */
+  readonly find: (
+    path: readonly string[],
+    signal?: AbortSignal,
+  ) => Promise<ClientRouteEntry | undefined>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/rest-routes.types.ts#L20)
 
 ### createRouteTable
 
@@ -9039,33 +10061,54 @@ Install @orpc/tanstack-query@1.16.1 and @tanstack/query-core@^5 alongside
 
 ### CreateRelkitServerContextOptions
 
+Server request, backend and query-client configuration for one hydration context.
+
 **Signature**
 
 ```ts
-declare const CreateRelkitServerContextOptions: CreateRelkitServerContextOptions;
+export interface CreateRelkitServerContextOptions {
+  readonly baseUrl: string;
+  readonly request: Request;
+  readonly queryClient: QueryClient;
+  readonly identityKey?: string | null;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server-context.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server-context.types.ts#L22)
 
 ### RelkitServerContext
 
+Typed finite client, TanStack utilities and dehydrated server query state.
+
 **Signature**
 
 ```ts
-declare const RelkitServerContext: RelkitServerContext;
+export interface RelkitServerContext {
+  readonly client: ReturnType<typeof createClient<DefaultContract>>;
+  readonly utils: ReturnType<typeof createTanstackQueryUtils<RelkitServerContext["client"]>>;
+  readonly identity: ClientIdentityDocument;
+  readonly dehydrate: () => RelkitServerHydrationState;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server-context.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server-context.types.ts#L30)
 
 ### RelkitServerHydrationState
 
+Identity-bound query snapshot accepted by the React provider on hydration.
+
 **Signature**
 
 ```ts
-declare const RelkitServerHydrationState: RelkitServerHydrationState;
+export interface RelkitServerHydrationState {
+  /** Backend, application and session authority attached to the cached data. */
+  readonly scope: RelkitKeyScope;
+  /** Native query-core snapshot, preserving query and mutation metadata. */
+  readonly dehydrated: DehydratedState;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server-context.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/client/src/server-context.types.ts#L14)
 
 ### createRelkitServerContext
 

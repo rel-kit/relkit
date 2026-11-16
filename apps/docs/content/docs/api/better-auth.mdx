@@ -612,23 +612,34 @@ export interface AuthServiceInterface {
 
 ### BetterAuthHandler
 
+Native route handler retaining the session type and the access control's names.
+
 **Signature**
 
 ```ts
-declare const BetterAuthHandler: BetterAuthHandler<Session, Access>;
+type BetterAuthHandler<Session = unknown, Access = BetterAuthAccess> = RawHttpHandler & {
+  readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
+  readonly __session?: Session;
+  readonly __access?: Access;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L36)
 
 ### BetterAuthRegistration
 
+Frozen registration used by route discovery without acquiring native auth.
+
 **Signature**
 
 ```ts
-declare const BetterAuthRegistration: BetterAuthRegistration;
+export interface BetterAuthRegistration {
+  readonly kind: "better-auth";
+  readonly service: BetterAuthServiceDescriptor<any>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L30)
 
 ### BetterAuthRuntime (interface)
 
@@ -648,13 +659,30 @@ export interface BetterAuthRuntime<Options extends BetterAuthServiceOptions> {
 
 ### BetterAuthServiceDescriptor
 
+Lazy authoring declaration whose identity survives isolated activation.
+
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session, Access>;
+export interface BetterAuthServiceDescriptor<
+  Options extends BetterAuthServiceOptions,
+  Session = Auth<Options>["$Infer"]["Session"],
+  Access = BetterAuthAccessOf<Options>,
+> extends ReturnType<typeof createDescriptorBase<"service", string>> {
+  readonly capability: {
+    readonly kind: "better-auth";
+    /** Where the handler is mounted when no route mounts it. */
+    readonly basePath?: string;
+    /** `false` when the application mounts the handler itself, or not at all. */
+    readonly mount?: boolean;
+    /** `custom` when the instance brings its own database instead of the Drizzle service. */
+    readonly database?: "drizzle" | "custom";
+  };
+  readonly handler: BetterAuthHandler<Session, Access>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L57)
 
 ### BetterAuthServiceOptions (type alias)
 
@@ -672,13 +700,16 @@ type BetterAuthServiceOptions = DeclarationOptions & {
 
 ### InferBetterAuthSession
 
+Projects the session inferred by a lazy authentication handler.
+
 **Signature**
 
 ```ts
-declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
+type InferBetterAuthSession<Handler> =
+  Handler extends BetterAuthHandler<infer Session, unknown> ? Session : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L43)
 
 ## `declaration.types.ts`
 
@@ -865,13 +896,21 @@ Native Better Auth borrowing the selected Drizzle owner's lifetime and admission
 
 ### AuthConfiguration
 
+Runtime dependencies captured once when constructing a native auth service.
+
 **Signature**
 
 ```ts
-declare const AuthConfiguration: AuthConfiguration;
+export interface AuthConfiguration {
+  /** Native options; an instance's options may carry their own `database` and `basePath`. */
+  readonly options: BetterAuthServiceOptions | BetterAuthOptions;
+  /** The Drizzle service; unused when the options bring their own `database`. */
+  readonly database: AuthDatabase | undefined;
+  readonly basePath: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L31)
 
 ### AuthFactory
 
@@ -885,13 +924,22 @@ declare const AuthFactory: typeof AuthFactory;
 
 ### AuthFactoryInterface
 
+Replaceable SDK construction contract; expected SDK failures retain their cause.
+
 **Signature**
 
 ```ts
-declare const AuthFactoryInterface: AuthFactoryInterface;
+export interface AuthFactoryInterface {
+  /**
+   * Constructs native auth during service acquisition.
+   * @param options - Native options including the owner-supplied database adapter.
+   * @returns Lazy factory effect retaining expected SDK failures as AuthFailure.
+   */
+  readonly create: (options: BetterAuthOptions) => Effect.Effect<Auth<any>, AuthFailure>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L40)
 
 ### AuthFailure
 
@@ -915,13 +963,33 @@ declare const AuthService: typeof AuthService;
 
 ### AuthServiceInterface
 
+Effect-native operations sharing one native SDK instance and database admission.
+
 **Signature**
 
 ```ts
-declare const AuthServiceInterface: AuthServiceInterface;
+export interface AuthServiceInterface {
+  /**
+   * Executes native routing while holding borrowed database admission.
+   * @param request - Unmodified native Request, including its cancellation signal.
+   * @returns Lazy response effect; SDK failures retain their original cause.
+   */
+  readonly handler: (request: Request) => Effect.Effect<Response, AuthFailure | DrizzleFailure>;
+
+  /**
+   * Executes a native endpoint with its original arguments and callable metadata.
+   * @param method - Native API property; diagnostics normalize it to bounded labels.
+   * @param args - Native arguments passed without inspecting sensitive payloads.
+   * @returns Lazy opaque native result, with admission and SDK typed failures.
+   */
+  readonly api: (
+    method: string,
+    args: readonly unknown[],
+  ) => Effect.Effect<unknown, AuthFailure | DrizzleFailure>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/auth.types.ts#L50)
 
 ### BETTER_AUTH_HANDLER
 
@@ -935,63 +1003,104 @@ declare const BETTER_AUTH_HANDLER: unique symbol;
 
 ### BetterAuthActivationOptions
 
+Acquisition policy for authentication bound to an independently owned database.
+
 **Signature**
 
 ```ts
-declare const BetterAuthActivationOptions: BetterAuthActivationOptions;
+export interface BetterAuthActivationOptions {
+  /** Creates native auth without replacing the descriptor's shared handler target. */
+  readonly isolated?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/activation.types.ts#L2)
 
 ### BetterAuthHandler
 
+Native route handler retaining the session type and the access control's names.
+
 **Signature**
 
 ```ts
-declare const BetterAuthHandler: BetterAuthHandler<Session, Access>;
+type BetterAuthHandler<Session = unknown, Access = BetterAuthAccess> = RawHttpHandler & {
+  readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
+  readonly __session?: Session;
+  readonly __access?: Access;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L36)
 
 ### BetterAuthRegistration
 
+Frozen registration used by route discovery without acquiring native auth.
+
 **Signature**
 
 ```ts
-declare const BetterAuthRegistration: BetterAuthRegistration;
+export interface BetterAuthRegistration {
+  readonly kind: "better-auth";
+  readonly service: BetterAuthServiceDescriptor<any>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L30)
 
 ### BetterAuthServiceDescriptor
 
+Lazy authoring declaration whose identity survives isolated activation.
+
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session, Access>;
+export interface BetterAuthServiceDescriptor<
+  Options extends BetterAuthServiceOptions,
+  Session = Auth<Options>["$Infer"]["Session"],
+  Access = BetterAuthAccessOf<Options>,
+> extends ReturnType<typeof createDescriptorBase<"service", string>> {
+  readonly capability: {
+    readonly kind: "better-auth";
+    /** Where the handler is mounted when no route mounts it. */
+    readonly basePath?: string;
+    /** `false` when the application mounts the handler itself, or not at all. */
+    readonly mount?: boolean;
+    /** `custom` when the instance brings its own database instead of the Drizzle service. */
+    readonly database?: "drizzle" | "custom";
+  };
+  readonly handler: BetterAuthHandler<Session, Access>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L57)
 
 ### BetterAuthServiceOptions
 
+Native options; activation supplies the database and route-derived base path.
+
 **Signature**
 
 ```ts
-declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
+type BetterAuthServiceOptions = Omit<BetterAuthOptions, "database" | "basePath"> & {
+  readonly database?: never;
+  readonly basePath?: never;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L9)
 
 ### InferBetterAuthSession
 
+Projects the session inferred by a lazy authentication handler.
+
 **Signature**
 
 ```ts
-declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
+type InferBetterAuthSession<Handler> =
+  Handler extends BetterAuthHandler<infer Session, unknown> ? Session : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/drizzle.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L43)
 
 ### activateBetterAuthService
 
@@ -1129,103 +1238,209 @@ declare const BETTER_AUTH_HANDLER: unique symbol;
 
 ### BetterAuthAccess
 
+The role and permission names an access rule may use; `string` where they are not known.
+
+**Example**
+
+```ts
+type Names = BetterAuthAccess<"owner" | "member", "order:create">;
+```
+
 **Signature**
 
 ```ts
-declare const BetterAuthAccess: BetterAuthAccess<Roles, Permissions>;
+export interface BetterAuthAccess<
+  Roles extends string = string,
+  Permissions extends string = string,
+> {
+  readonly roles: Roles;
+  readonly permissions: Permissions;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/access.types.ts#L11)
 
 ### BetterAuthAccessOf
 
+The names of a Better Auth instance's access control, from the type of its options.
+Without the organization plugin both are `string`: roles then come from `user.role` and no
+permission is granted. With `dynamicAccessControl` roles are created at run time and are
+`string`. The two unions are written inline so that a type error lists the names.
+
+**Example**
+
+```ts
+type Names = BetterAuthAccessOf<typeof auth.options>;
+```
+
 **Signature**
 
 ```ts
-declare const BetterAuthAccessOf: BetterAuthAccessOf<Options>;
+type BetterAuthAccessOf<Options> = [OrganizationOf<Options>] extends [never]
+  ? BetterAuthAccess
+  : OrganizationOf<Options> extends infer Organization
+    ? StatementsOf<Organization> extends infer Statements
+      ? BetterAuthAccess<
+          Organization extends { readonly dynamicAccessControl: { readonly enabled: true } }
+            ? string
+            : Organization extends { readonly roles: infer Roles extends object }
+              ? Extract<keyof Roles, string>
+              : "owner" | "admin" | "member",
+          {
+            [
+              Resource in keyof Statements & string
+            ]: Statements[Resource] extends readonly (infer Action extends string)[]
+              ? `${Resource}:${Action}`
+              : never;
+          }[keyof Statements & string]
+        >
+      : never
+    : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/access.types.ts#L42)
 
 ### BetterAuthHandler
 
+Native route handler retaining the session type and the access control's names.
+
 **Signature**
 
 ```ts
-declare const BetterAuthHandler: BetterAuthHandler<Session, Access>;
+type BetterAuthHandler<Session = unknown, Access = BetterAuthAccess> = RawHttpHandler & {
+  readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
+  readonly __session?: Session;
+  readonly __access?: Access;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L36)
 
 ### BetterAuthInstance
 
+The application's own Better Auth instance, from `betterAuth({...})` in a Better Auth file.
+
 **Signature**
 
 ```ts
-declare const BetterAuthInstance: BetterAuthInstance;
+export interface BetterAuthInstance {
+  readonly options: BetterAuthOptions;
+  readonly handler: (request: Request) => Promise<Response>;
+  readonly $Infer: { readonly Session: unknown };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L15)
 
 ### BetterAuthInstanceServiceOptions
 
+Options for a service built from the application's Better Auth instance.
+
 **Signature**
 
 ```ts
-declare const BetterAuthInstanceServiceOptions: BetterAuthInstanceServiceOptions<Instance>;
+export interface BetterAuthInstanceServiceOptions<Instance extends BetterAuthInstance> {
+  /** The Better Auth instance; RelKit rebuilds it from `auth.options` when the server starts. */
+  readonly auth: Instance;
+  /** `false` keeps RelKit from mounting the handler at the instance's `basePath`. */
+  readonly mount?: false;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L22)
 
 ### BetterAuthRegistration
 
+Frozen registration used by route discovery without acquiring native auth.
+
 **Signature**
 
 ```ts
-declare const BetterAuthRegistration: BetterAuthRegistration;
+export interface BetterAuthRegistration {
+  readonly kind: "better-auth";
+  readonly service: BetterAuthServiceDescriptor<any>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L30)
 
 ### BetterAuthServiceDescriptor
 
+Lazy authoring declaration whose identity survives isolated activation.
+
 **Signature**
 
 ```ts
-declare const BetterAuthServiceDescriptor: BetterAuthServiceDescriptor<Options, Session, Access>;
+export interface BetterAuthServiceDescriptor<
+  Options extends BetterAuthServiceOptions,
+  Session = Auth<Options>["$Infer"]["Session"],
+  Access = BetterAuthAccessOf<Options>,
+> extends ReturnType<typeof createDescriptorBase<"service", string>> {
+  readonly capability: {
+    readonly kind: "better-auth";
+    /** Where the handler is mounted when no route mounts it. */
+    readonly basePath?: string;
+    /** `false` when the application mounts the handler itself, or not at all. */
+    readonly mount?: boolean;
+    /** `custom` when the instance brings its own database instead of the Drizzle service. */
+    readonly database?: "drizzle" | "custom";
+  };
+  readonly handler: BetterAuthHandler<Session, Access>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L57)
 
 ### BetterAuthServiceOptions
 
+Native options; activation supplies the database and route-derived base path.
+
 **Signature**
 
 ```ts
-declare const BetterAuthServiceOptions: BetterAuthServiceOptions;
+type BetterAuthServiceOptions = Omit<BetterAuthOptions, "database" | "basePath"> & {
+  readonly database?: never;
+  readonly basePath?: never;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L9)
 
 ### InferBetterAuthAccess
 
+Projects the role and permission names of a handler's access control; the generated context
+registry uses it to type function access rules.
+
+**Example**
+
+```ts
+interface ApplicationAccess extends InferBetterAuthAccess<typeof service.handler> {}
+```
+
 **Signature**
 
 ```ts
-declare const InferBetterAuthAccess: InferBetterAuthAccess<Handler>;
+type InferBetterAuthAccess<Handler> = Handler extends {
+  readonly __access?: infer Access extends BetterAuthAccess;
+}
+  ? Access
+  : BetterAuthAccess;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L50)
 
 ### InferBetterAuthSession
 
+Projects the session inferred by a lazy authentication handler.
+
 **Signature**
 
 ```ts
-declare const InferBetterAuthSession: InferBetterAuthSession<Handler>;
+type InferBetterAuthSession<Handler> =
+  Handler extends BetterAuthHandler<infer Session, unknown> ? Session : never;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/declaration.types.ts#L43)
 
 ## `openapi-errors.ts`
 
@@ -1487,13 +1702,25 @@ declare const generateBetterAuthOpenApi: (
 
 ### BetterAuthClientLike
 
+Browser SDK hook contract retaining the native inferred session type.
+
 **Signature**
 
 ```ts
-declare const BetterAuthClientLike: BetterAuthClientLike<Session>;
+export interface BetterAuthClientLike<Session> {
+  /**
+   * Reads reactive authentication state; hook ownership stays with React.
+   * @returns Native session data, loading state and optional SDK error.
+   */
+  useSession(): {
+    readonly data: Session | null | undefined;
+    readonly isPending: boolean;
+    readonly error?: unknown;
+  };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/react.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/react.types.ts#L7)
 
 ### BetterAuthRelkitClientProvider
 
@@ -1521,13 +1748,17 @@ declare const BetterAuthRelkitClientProvider: <Session>(
 
 ### BetterAuthRelkitClientProviderProps
 
+Client provider props with a native auth hook; no server runtime dependency.
+
 **Signature**
 
 ```ts
-declare const BetterAuthRelkitClientProviderProps: BetterAuthRelkitClientProviderProps<Session>;
+export interface BetterAuthRelkitClientProviderProps<Session> extends RelkitClientProviderProps {
+  readonly authClient: BetterAuthClientLike<Session>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/react.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/better-auth/src/react.types.ts#L23)
 
 ## `react.types.ts`
 

@@ -527,195 +527,593 @@ Since v0.1.0
 
 ### AnySchema
 
+Any compatible validator accepted by a composite builder.
+
+**Example**
+
+```ts
+const child: AnySchema = z.string();
+```
+
 **Signature**
 
 ```ts
-declare const AnySchema: AnySchema;
+type AnySchema = StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L7)
 
 ### InputOf
 
+Accepted input of a child validator.
+
+**Example**
+
+```ts
+type Input = InputOf<typeof schema>;
+```
+
 **Signature**
 
 ```ts
-declare const InputOf: InputOf<S>;
+type InputOf<S extends AnySchema> = InferInput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L17)
 
 ### NumberSchema
 
+Finite-number schema with range and integer refinement methods.
+
+**Example**
+
+```ts
+const schema: NumberSchema = z.number().int();
+```
+
 **Signature**
 
 ```ts
-declare const NumberSchema: NumberSchema;
+export interface NumberSchema extends Schema<number, number> {
+  /**
+   * Requires an inclusive minimum.
+   * @param value - Minimum value.
+   * @param message - Optional issue text.
+   * @returns A refined number schema.
+   * @example z.number().min(1);
+   */
+  min(value: number, message?: string): NumberSchema;
+  /**
+   * Requires an inclusive maximum.
+   * @param value - Maximum value.
+   * @param message - Optional issue text.
+   * @returns A refined number schema.
+   * @example z.number().max(10);
+   */
+  max(value: number, message?: string): NumberSchema;
+  /**
+   * Requires an integer.
+   * @param message - Optional issue text.
+   * @returns An integer schema.
+   * @example z.number().int();
+   */
+  int(message?: string): NumberSchema;
+  /**
+   * Requires a value above zero.
+   * @param message - Optional issue text.
+   * @returns A positive number schema.
+   * @example z.number().positive();
+   */
+  positive(message?: string): NumberSchema;
+  /**
+   * Requires a value of zero or greater.
+   * @param message - Optional issue text.
+   * @returns A nonnegative number schema.
+   * @example z.number().nonnegative();
+   */
+  nonnegative(message?: string): NumberSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-refinements.types.ts#L51)
 
 ### ObjectInput
 
+Object input with optional keys inferred from child schemas.
+
+**Example**
+
+```ts
+type Input = ObjectInput<{ id: typeof idSchema }>;
+```
+
 **Signature**
 
 ```ts
-declare const ObjectInput: ObjectInput<S>;
+type ObjectInput<S extends Shape> = {
+  [K in RequiredInputKeys<S>]: InputOf<S[K]>;
+} & {
+  [K in OptionalInputKeys<S>]?: Exclude<InputOf<S[K]>, undefined>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L35)
 
 ### ObjectOutput
 
+Object output with optional keys inferred from child schemas.
+
+**Example**
+
+```ts
+type Output = ObjectOutput<{ id: typeof idSchema }>;
+```
+
 **Signature**
 
 ```ts
-declare const ObjectOutput: ObjectOutput<S>;
+type ObjectOutput<S extends Shape> = {
+  [K in RequiredOutputKeys<S>]: OutputOf<S[K]>;
+} & {
+  [K in OptionalOutputKeys<S>]?: Exclude<OutputOf<S[K]>, undefined>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L44)
 
 ### OutputOf
 
+Validated output of a child validator.
+
+**Example**
+
+```ts
+type Output = OutputOf<typeof schema>;
+```
+
 **Signature**
 
 ```ts
-declare const OutputOf: OutputOf<S>;
+type OutputOf<S extends AnySchema> = InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L22)
 
 ### SchemaTuple
 
+Nonempty tuple of union members, preserving declaration order.
+
+**Example**
+
+```ts
+const members: SchemaTuple = [z.string(), z.number()];
+```
+
 **Signature**
 
 ```ts
-declare const SchemaTuple: SchemaTuple;
+type SchemaTuple = readonly [AnySchema, ...AnySchema[]];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L53)
 
 ### Shape
 
+Named child validators for an object schema.
+
+**Example**
+
+```ts
+const shape: Shape = { id: z.string() };
+```
+
 **Signature**
 
 ```ts
-declare const Shape: Shape;
+type Shape = Record<string, AnySchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L12)
 
 ### StringSchema
 
+String schema with length and format refinement methods.
+
+**Example**
+
+```ts
+const schema: StringSchema = z.string().min(1);
+```
+
 **Signature**
 
 ```ts
-declare const StringSchema: StringSchema;
+export interface StringSchema extends Schema<string, string> {
+  /**
+   * Requires a minimum string length.
+   * @param length - Minimum length.
+   * @param message - Optional issue text.
+   * @returns A refined string schema.
+   * @example z.string().min(2);
+   */
+  min(length: number, message?: string): StringSchema;
+  /**
+   * Requires a maximum string length.
+   * @param length - Maximum length.
+   * @param message - Optional issue text.
+   * @returns A refined string schema.
+   * @example z.string().max(8);
+   */
+  max(length: number, message?: string): StringSchema;
+  /**
+   * Requires a UUID string.
+   * @param message - Optional issue text.
+   * @returns A UUID string schema.
+   * @example z.string().uuid();
+   */
+  uuid(message?: string): StringSchema;
+  /**
+   * Requires a parseable datetime string.
+   * @param message - Optional issue text.
+   * @returns A datetime string schema.
+   * @example z.string().datetime();
+   */
+  datetime(message?: string): StringSchema;
+  /**
+   * Requires an email address string.
+   * @param message - Optional issue text.
+   * @returns An email string schema.
+   * @example z.string().email();
+   */
+  email(message?: string): StringSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-refinements.types.ts#L7)
 
 ### ZBuilder
 
+Builder methods used to compose Standard Schema validators.
+
+**Example**
+
+```ts
+const builder: ZBuilder = z;
+```
+
 **Signature**
 
 ```ts
-declare const ZBuilder: ZBuilder;
+export interface ZBuilder {
+  /**
+   * Builds a string validator.
+   * @returns A string schema with refinement methods.
+   * @example z.string().min(1);
+   */
+  string(): StringSchema;
+  /**
+   * Builds a finite-number validator.
+   * @returns A number schema with refinement methods.
+   * @example z.number().int();
+   */
+  number(): NumberSchema;
+  /**
+   * Builds a boolean validator.
+   * @returns A boolean schema.
+   * @example z.boolean().parse(true);
+   */
+  boolean(): Schema<boolean, boolean>;
+  /**
+   * Builds a validator accepting any input without changing it.
+   * @returns An unknown-value schema.
+   * @example z.unknown().parse({ name: "Ada" });
+   */
+  unknown(): Schema<unknown, unknown>;
+  /**
+   * Builds an unrestricted value validator.
+   * @returns An unknown-value schema.
+   * @example z.any().parse(null);
+   */
+  any(): Schema<unknown, unknown>;
+  /**
+   * Builds a null validator.
+   * @returns A null schema.
+   * @example z.null().parse(null);
+   */
+  null(): Schema<null, null>;
+  /**
+   * Builds a buffered Web File validator.
+   * @param options - Byte and media-type constraints.
+   * @returns A File schema.
+   * @example z.file({ maxBytes: 1024 });
+   */
+  file(options?: FileSchemaOptions): FileSchema;
+  /**
+   * Builds a void-result validator.
+   * @returns An undefined schema.
+   * @example z.void().parse(undefined);
+   */
+  void(): Schema<undefined, undefined>;
+  /**
+   * Builds an exact-value validator.
+   * @param value - Literal value to require.
+   * @returns A literal schema.
+   * @example z.literal("ready").parse("ready");
+   */
+  literal<T extends string | number | boolean | null | undefined>(value: T): Schema<T, T>;
+  /**
+   * Builds a named object validator.
+   * @param shape - Child schemas by property name.
+   * @returns An object schema with inferred input and output.
+   * @example z.object({ id: z.string() });
+   */
+  object<S extends Shape>(shape: S): Schema<ObjectInput<S>, ObjectOutput<S>>;
+  /**
+   * Builds an array validator.
+   * @param schema - Child item schema.
+   * @returns An array schema with inferred item types.
+   * @example z.array(z.number());
+   */
+  array<S extends AnySchema>(schema: S): Schema<InputOf<S>[], OutputOf<S>[]>;
+  /**
+   * Builds a nonempty union validator.
+   * @param schemas - Member schemas in precedence order.
+   * @returns A union schema with inferred member types.
+   * @example z.union([z.string(), z.number()]);
+   */
+  union<S extends SchemaTuple>(schemas: S): Schema<InputOf<S[number]>, OutputOf<S[number]>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L29)
 
 ## `builder.types.ts`
 
 ### AnySchema
 
+Any compatible validator accepted by a composite builder.
+
+**Example**
+
+```ts
+const child: AnySchema = z.string();
+```
+
 **Signature**
 
 ```ts
-declare const AnySchema: AnySchema;
+type AnySchema = StandardSchemaV1;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L7)
 
 ### InputOf
 
+Accepted input of a child validator.
+
+**Example**
+
+```ts
+type Input = InputOf<typeof schema>;
+```
+
 **Signature**
 
 ```ts
-declare const InputOf: InputOf<S>;
+type InputOf<S extends AnySchema> = InferInput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L17)
 
 ### NumberSchema
 
+Finite-number schema with range and integer refinement methods.
+
+**Example**
+
+```ts
+const schema: NumberSchema = z.number().int();
+```
+
 **Signature**
 
 ```ts
-declare const NumberSchema: NumberSchema;
+export interface NumberSchema extends Schema<number, number> {
+  /**
+   * Requires an inclusive minimum.
+   * @param value - Minimum value.
+   * @param message - Optional issue text.
+   * @returns A refined number schema.
+   * @example z.number().min(1);
+   */
+  min(value: number, message?: string): NumberSchema;
+  /**
+   * Requires an inclusive maximum.
+   * @param value - Maximum value.
+   * @param message - Optional issue text.
+   * @returns A refined number schema.
+   * @example z.number().max(10);
+   */
+  max(value: number, message?: string): NumberSchema;
+  /**
+   * Requires an integer.
+   * @param message - Optional issue text.
+   * @returns An integer schema.
+   * @example z.number().int();
+   */
+  int(message?: string): NumberSchema;
+  /**
+   * Requires a value above zero.
+   * @param message - Optional issue text.
+   * @returns A positive number schema.
+   * @example z.number().positive();
+   */
+  positive(message?: string): NumberSchema;
+  /**
+   * Requires a value of zero or greater.
+   * @param message - Optional issue text.
+   * @returns A nonnegative number schema.
+   * @example z.number().nonnegative();
+   */
+  nonnegative(message?: string): NumberSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-refinements.types.ts#L51)
 
 ### ObjectInput
 
+Object input with optional keys inferred from child schemas.
+
+**Example**
+
+```ts
+type Input = ObjectInput<{ id: typeof idSchema }>;
+```
+
 **Signature**
 
 ```ts
-declare const ObjectInput: ObjectInput<S>;
+type ObjectInput<S extends Shape> = {
+  [K in RequiredInputKeys<S>]: InputOf<S[K]>;
+} & {
+  [K in OptionalInputKeys<S>]?: Exclude<InputOf<S[K]>, undefined>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L35)
 
 ### ObjectOutput
 
+Object output with optional keys inferred from child schemas.
+
+**Example**
+
+```ts
+type Output = ObjectOutput<{ id: typeof idSchema }>;
+```
+
 **Signature**
 
 ```ts
-declare const ObjectOutput: ObjectOutput<S>;
+type ObjectOutput<S extends Shape> = {
+  [K in RequiredOutputKeys<S>]: OutputOf<S[K]>;
+} & {
+  [K in OptionalOutputKeys<S>]?: Exclude<OutputOf<S[K]>, undefined>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L44)
 
 ### OutputOf
 
+Validated output of a child validator.
+
+**Example**
+
+```ts
+type Output = OutputOf<typeof schema>;
+```
+
 **Signature**
 
 ```ts
-declare const OutputOf: OutputOf<S>;
+type OutputOf<S extends AnySchema> = InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L22)
 
 ### SchemaTuple
 
+Nonempty tuple of union members, preserving declaration order.
+
+**Example**
+
+```ts
+const members: SchemaTuple = [z.string(), z.number()];
+```
+
 **Signature**
 
 ```ts
-declare const SchemaTuple: SchemaTuple;
+type SchemaTuple = readonly [AnySchema, ...AnySchema[]];
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L53)
 
 ### Shape
 
+Named child validators for an object schema.
+
+**Example**
+
+```ts
+const shape: Shape = { id: z.string() };
+```
+
 **Signature**
 
 ```ts
-declare const Shape: Shape;
+type Shape = Record<string, AnySchema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-composites.types.ts#L12)
 
 ### StringSchema
 
+String schema with length and format refinement methods.
+
+**Example**
+
+```ts
+const schema: StringSchema = z.string().min(1);
+```
+
 **Signature**
 
 ```ts
-declare const StringSchema: StringSchema;
+export interface StringSchema extends Schema<string, string> {
+  /**
+   * Requires a minimum string length.
+   * @param length - Minimum length.
+   * @param message - Optional issue text.
+   * @returns A refined string schema.
+   * @example z.string().min(2);
+   */
+  min(length: number, message?: string): StringSchema;
+  /**
+   * Requires a maximum string length.
+   * @param length - Maximum length.
+   * @param message - Optional issue text.
+   * @returns A refined string schema.
+   * @example z.string().max(8);
+   */
+  max(length: number, message?: string): StringSchema;
+  /**
+   * Requires a UUID string.
+   * @param message - Optional issue text.
+   * @returns A UUID string schema.
+   * @example z.string().uuid();
+   */
+  uuid(message?: string): StringSchema;
+  /**
+   * Requires a parseable datetime string.
+   * @param message - Optional issue text.
+   * @returns A datetime string schema.
+   * @example z.string().datetime();
+   */
+  datetime(message?: string): StringSchema;
+  /**
+   * Requires an email address string.
+   * @param message - Optional issue text.
+   * @returns An email string schema.
+   * @example z.string().email();
+   */
+  email(message?: string): StringSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-refinements.types.ts#L7)
 
 ### ZBuilder (interface)
 
@@ -817,23 +1215,42 @@ export interface ZBuilder {
 
 ### FileSchema
 
+A schema that accepts and returns a Web File.
+
+**Example**
+
+```ts
+const schema: FileSchema = z.file();
+```
+
 **Signature**
 
 ```ts
-declare const FileSchema: FileSchema;
+type FileSchema = Schema<File, File>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/file.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/file.types.ts#L16)
 
 ### FileSchemaOptions
 
+Constraints for a buffered Web File validator.
+
+**Example**
+
+```ts
+const options: FileSchemaOptions = { maxBytes: 1024, mediaTypes: ["image/*"] };
+```
+
 **Signature**
 
 ```ts
-declare const FileSchemaOptions: FileSchemaOptions;
+export interface FileSchemaOptions {
+  readonly maxBytes?: number;
+  readonly mediaTypes?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/file.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/file.types.ts#L7)
 
 ### fileSchema
 
@@ -902,43 +1319,62 @@ export interface FileSchemaOptions {
 
 ### FileSchema
 
+A schema that accepts and returns a Web File.
+
+**Example**
+
+```ts
+const schema: FileSchema = z.file();
+```
+
 **Signature**
 
 ```ts
-declare const FileSchema: FileSchema;
+type FileSchema = Schema<File, File>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/file.types.ts#L16)
 
 ### FileSchemaOptions
 
+Constraints for a buffered Web File validator.
+
+**Example**
+
+```ts
+const options: FileSchemaOptions = { maxBytes: 1024, mediaTypes: ["image/*"] };
+```
+
 **Signature**
 
 ```ts
-declare const FileSchemaOptions: FileSchemaOptions;
+export interface FileSchemaOptions {
+  readonly maxBytes?: number;
+  readonly mediaTypes?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/file.types.ts#L7)
 
 ### InferInput
 
 **Signature**
 
 ```ts
-declare const InferInput: InferInput<S>;
+type InferInput<S extends StandardSchemaV1> = import("./standard-schema.types.js").InferInput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L125)
 
 ### InferOutput
 
 **Signature**
 
 ```ts
-declare const InferOutput: InferOutput<S>;
+type InferOutput<S extends StandardSchemaV1> = import("./standard-schema.types.js").InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L127)
 
 ### JSON_SCHEMA_DIALECT
 
@@ -962,23 +1398,42 @@ declare const JSON_SCHEMA_UNAVAILABLE: "RELKIT_SCHEMA_UNAVAILABLE";
 
 ### JsonSchema
 
+A deterministic JSON Schema document.
+
+**Example**
+
+```ts
+const document: JsonSchema = { type: "string" };
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchema: JsonSchema;
+type JsonSchema = { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L9)
 
 ### JsonSchemaAvailable
 
+A successful JSON Schema projection.
+
+**Example**
+
+```ts
+const available: JsonSchemaAvailable = { ok: true, schema: { type: "string" } };
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaAvailable: JsonSchemaAvailable;
+export interface JsonSchemaAvailable {
+  readonly ok: true;
+  readonly schema: JsonSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L14)
 
 ### JsonSchemaDirection
 
@@ -992,43 +1447,85 @@ declare const JsonSchemaDirection: SchemaProjectionDirection;
 
 ### JsonSchemaFactory
 
+Factory for a JSON-safe schema value.
+
+**Example**
+
+```ts
+const projection: JsonSchemaFactory = () => ({ type: "string" });
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaFactory: JsonSchemaFactory;
+type JsonSchemaFactory = () => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L36)
 
 ### JsonSchemaOptions
 
+Options for a JSON Schema projection.
+
+**Example**
+
+```ts
+const options: JsonSchemaOptions = { direction: "output" };
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaOptions: JsonSchemaOptions;
+export interface JsonSchemaOptions {
+  readonly direction?: JsonSchemaDirection;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L46)
 
 ### JsonSchemaResult
 
+The result of a JSON Schema projection.
+
+**Example**
+
+```ts
+const result: JsonSchemaResult = getJsonSchema(z.string());
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaResult: JsonSchemaResult;
+type JsonSchemaResult = JsonSchemaAvailable | JsonSchemaUnavailable;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L31)
 
 ### JsonSchemaUnavailable
 
+An unavailable projection with a stable code and reason.
+
+**Example**
+
+```ts
+const unavailable: JsonSchemaUnavailable = {
+  ok: false,
+  code: JSON_SCHEMA_UNAVAILABLE,
+  reason: "missing",
+};
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaUnavailable: JsonSchemaUnavailable;
+export interface JsonSchemaUnavailable {
+  readonly ok: false;
+  readonly code: typeof JSON_SCHEMA_UNAVAILABLE;
+  readonly reason: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L22)
 
 ### JsonSchemaUnavailableError
 
@@ -1042,23 +1539,88 @@ declare const JsonSchemaUnavailableError: typeof JsonSchemaUnavailableError;
 
 ### NumberSchema
 
+Finite-number schema with range and integer refinement methods.
+
+**Example**
+
+```ts
+const schema: NumberSchema = z.number().int();
+```
+
 **Signature**
 
 ```ts
-declare const NumberSchema: NumberSchema;
+export interface NumberSchema extends Schema<number, number> {
+  /**
+   * Requires an inclusive minimum.
+   * @param value - Minimum value.
+   * @param message - Optional issue text.
+   * @returns A refined number schema.
+   * @example z.number().min(1);
+   */
+  min(value: number, message?: string): NumberSchema;
+  /**
+   * Requires an inclusive maximum.
+   * @param value - Maximum value.
+   * @param message - Optional issue text.
+   * @returns A refined number schema.
+   * @example z.number().max(10);
+   */
+  max(value: number, message?: string): NumberSchema;
+  /**
+   * Requires an integer.
+   * @param message - Optional issue text.
+   * @returns An integer schema.
+   * @example z.number().int();
+   */
+  int(message?: string): NumberSchema;
+  /**
+   * Requires a value above zero.
+   * @param message - Optional issue text.
+   * @returns A positive number schema.
+   * @example z.number().positive();
+   */
+  positive(message?: string): NumberSchema;
+  /**
+   * Requires a value of zero or greater.
+   * @param message - Optional issue text.
+   * @returns A nonnegative number schema.
+   * @example z.number().nonnegative();
+   */
+  nonnegative(message?: string): NumberSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-refinements.types.ts#L51)
 
 ### RelkitSchema
 
+RelKit schema boundary with optional legacy and directional projections.
+
+**Example**
+
+```ts
+const schema: RelkitSchema = z.string();
+```
+
 **Signature**
 
 ```ts
-declare const RelkitSchema: RelkitSchema<TInput, TOutput>;
+export interface RelkitSchema<TInput = unknown, TOutput = TInput> extends StandardSchemaV1<
+  TInput,
+  TOutput
+> {
+  readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
+    StandardJSONSchemaV1<TInput, TOutput>["~standard"];
+  readonly relkit?: {
+    readonly jsonSchema?: () => JsonValue;
+    readonly inputJsonSchema?: () => JsonValue;
+    readonly outputJsonSchema?: () => JsonValue;
+  };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L135)
 
 ### SCHEMA_LIBRARIES
 
@@ -1072,13 +1634,83 @@ declare const SCHEMA_LIBRARIES: Readonly<Record<string, SchemaLibrary>>;
 
 ### Schema
 
+RelKit schema with parsing and composition methods.
+Input and output types may differ after transformation.
+
+**Example**
+
+```ts
+const schema: Schema<string, number> = z.string().transform(Number);
+```
+
 **Signature**
 
 ```ts
-declare const Schema: Schema<TInput, TOutput>;
+export interface Schema<TInput = unknown, TOutput = TInput> extends RelkitSchema<TInput, TOutput> {
+  /**
+   * Accepts undefined as input and output.
+   * @returns A schema with optional value types.
+   * @example z.string().optional();
+   */
+  optional(): Schema<TInput | undefined, TOutput | undefined>;
+  /**
+   * Accepts null as input and output.
+   * @returns A nullable schema.
+   * @example z.string().nullable();
+   */
+  nullable(): Schema<TInput | null, TOutput | null>;
+  /**
+   * Supplies a value for undefined input.
+   * @param value - Constant or lazy default.
+   * @returns A schema with optional input and required output.
+   * @example z.string().default("ready");
+   */
+  default(value: TInput | (() => TInput)): Schema<TInput | undefined, TOutput>;
+  /**
+   * Maps a valid output to a new value.
+   * @param transform - Synchronous or asynchronous mapper.
+   * @returns A schema with the mapped output type.
+   * @example z.string().transform(Number);
+   */
+  transform<TNext>(transform: (value: TOutput) => TNext | Promise<TNext>): Schema<TInput, TNext>;
+  /**
+   * Checks a valid output with a predicate.
+   * @param check - Predicate for valid output.
+   * @param message - Failure message.
+   * @returns A refined schema.
+   * @example z.number().refine((value) => value > 0);
+   */
+  refine(
+    check: (value: TOutput) => boolean | Promise<boolean>,
+    message?: string,
+  ): Schema<TInput, TOutput>;
+  /**
+   * Parses synchronously or throws.
+   * @param value - Input to parse.
+   * @returns Validated output.
+   * @throws SchemaValidationError or TypeError for invalid or asynchronous input.
+   * @example z.string().parse("ready");
+   */
+  parse(value: unknown): TOutput;
+  /**
+   * Parses and awaits asynchronous checks.
+   * @param value - Input to parse.
+   * @returns A promise of validated output.
+   * @throws SchemaValidationError for invalid input.
+   * @example await z.string().parseAsync("ready");
+   */
+  parseAsync(value: unknown): Promise<TOutput>;
+  /**
+   * Returns a result for sync or async validation.
+   * @param value - Input to validate.
+   * @returns A result or promise with value or issues.
+   * @example z.string().safeParse("ready");
+   */
+  safeParse(value: unknown): StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-implementation.types.ts#L18)
 
 ### SchemaAsyncError
 
@@ -1102,13 +1734,21 @@ declare const SchemaBuilderError: typeof SchemaBuilderError;
 
 ### SchemaConverter
 
+Converts one schema to JSON Schema for the input or output side.
+
+**Example**
+
+```ts
+const converter: SchemaConverter = (schema, direction) => ({ type: "string" });
+```
+
 **Signature**
 
 ```ts
-declare const SchemaConverter: SchemaConverter;
+type SchemaConverter = (schema: StandardSchemaV1, direction: "input" | "output") => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-converters.types.ts#L7)
 
 ### SchemaExecutionError
 
@@ -1142,13 +1782,25 @@ declare const SchemaIssuesError: typeof SchemaIssuesError;
 
 ### SchemaLibrary
 
+A schema library RelKit recognizes, with the package that makes its schemas and, when the
+schemas cannot describe themselves, the package that converts them.
+
+**Example**
+
+```ts
+const valibot: SchemaLibrary = { package: "valibot", converter: "@valibot/to-json-schema" };
+```
+
 **Signature**
 
 ```ts
-declare const SchemaLibrary: SchemaLibrary;
+export interface SchemaLibrary {
+  readonly package: string;
+  readonly converter?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-converters.types.ts#L17)
 
 ### SchemaProjector
 
@@ -1172,13 +1824,34 @@ declare const SchemaProjectorLive: Layer<SchemaProjector, never, never>;
 
 ### SchemaProjectorService
 
+Injectable boundary for a schema's JSON projection hook.
+Test Layers can substitute projection without a third-party schema package.
+
+**Example**
+
+```ts
+Layer.succeed(SchemaProjector, { projection: () => () => ({ type: "string" }) });
+```
+
 **Signature**
 
 ```ts
-declare const SchemaProjectorService: SchemaProjectorService;
+export interface SchemaProjectorService {
+  /**
+   * Selects a directional or legacy projection hook.
+   * @param schema - Compatible schema to inspect.
+   * @param direction - Input, output, or legacy projection.
+   * @returns A projection factory when the schema exposes one.
+   * @example projector.projection(z.string(), "input");
+   */
+  readonly projection: (
+    schema: StandardSchemaV1,
+    direction: JsonSchemaDirection | "legacy",
+  ) => JsonSchemaFactory | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema-effect.types.ts#L9)
 
 ### SchemaTelemetry
 
@@ -1202,13 +1875,34 @@ declare const SchemaTelemetryLive: Layer<SchemaTelemetry, never, never>;
 
 ### SchemaTelemetryService
 
+Injectable observer for schema operations.
+A test Layer can replace the live span and metric behavior.
+
+**Example**
+
+```ts
+Layer.succeed(SchemaTelemetry, { observe: (_name, effect) => effect });
+```
+
 **Signature**
 
 ```ts
-declare const SchemaTelemetryService: SchemaTelemetryService;
+export interface SchemaTelemetryService {
+  /**
+   * Wraps one operation without changing its Effect channels.
+   * @param operation - Fixed operation name.
+   * @param effect - Operation being observed.
+   * @returns The observed Effect with its original success and error channels.
+   * @example telemetry.observe("validate", Effect.succeed(1));
+   */
+  readonly observe: <A, E, R>(
+    operation: SchemaOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.types.ts#L42)
 
 ### SchemaValidationError
 
@@ -1242,123 +1936,341 @@ declare const SchemaValidatorLive: Layer<SchemaValidator, never, never>;
 
 ### SchemaValidatorService
 
+Substitutable boundary for third-party Standard Schema validation.
+Test Layers can provide a deterministic validator.
+
+**Example**
+
+```ts
+Layer.succeed(SchemaValidator, { validate: () => ({ value: "ok" }) });
+```
+
 **Signature**
 
 ```ts
-declare const SchemaValidatorService: SchemaValidatorService;
+export interface SchemaValidatorService {
+  /**
+   * Runs one Standard Schema validation hook.
+   * @param schema - Compatible validator.
+   * @param value - Candidate input.
+   * @returns A result or promise of a result.
+   * @example validator.validate(z.string(), "ok");
+   */
+  readonly validate: <T>(
+    schema: StandardSchemaV1<unknown, T>,
+    value: unknown,
+  ) => StandardResult<T> | Promise<StandardResult<T>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema-effect.types.ts#L8)
 
 ### StandardFailure
 
+Standard Schema validation failure with structured issues.
+
+**Example**
+
+```ts
+const failure: StandardFailure = { issues: [{ message: "Required" }] };
+```
+
 **Signature**
 
 ```ts
-declare const StandardFailure: StandardFailure;
+export interface StandardFailure {
+  readonly issues: readonly StandardIssue[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L29)
 
 ### StandardIssue
 
+A portable issue that may identify a nested path.
+
+**Example**
+
+```ts
+const issue: StandardIssue = { message: "Required", path: ["name"] };
+```
+
 **Signature**
 
 ```ts
-declare const StandardIssue: StandardIssue;
+export interface StandardIssue {
+  readonly message: string;
+  readonly path?: readonly StandardPathSegment[] | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L11)
 
 ### StandardJSONSchemaV1
 
-**Signature**
-
-```ts
-declare const StandardJSONSchemaV1: StandardJSONSchemaV1<TInput, TOutput>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L88)
 
 ### StandardPathSegment
 
+A Standard Schema issue path accepts keys and structured segments.
+
+**Example**
+
+```ts
+const path: StandardPathSegment[] = ["items", 0, { key: "name" }];
+```
+
 **Signature**
 
 ```ts
-declare const StandardPathSegment: StandardPathSegment;
+type StandardPathSegment = PropertyKey | { readonly key: PropertyKey };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L5)
 
 ### StandardResult
 
+Result union that preserves issues instead of throwing.
+
+**Example**
+
+```ts
+const result: StandardResult<number> = { value: 2 };
+```
+
 **Signature**
 
 ```ts
-declare const StandardResult: StandardResult<T>;
+type StandardResult<T> = StandardSuccess<T> | StandardFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L37)
 
 ### StandardSchemaOptions
 
+Vendor-specific options accepted by a compatible validator.
+
+**Example**
+
+```ts
+const options: StandardSchemaOptions = { libraryOptions: {} };
+```
+
 **Signature**
 
 ```ts
-declare const StandardSchemaOptions: StandardSchemaOptions;
+export interface StandardSchemaOptions {
+  readonly libraryOptions?: Record<string, unknown> | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L43)
 
 ### StandardSchemaTypes
 
+Phantom input and output types advertised by Standard Schema.
+
+**Example**
+
+```ts
+type Types = StandardSchemaTypes<string, number>;
+```
+
 **Signature**
 
 ```ts
-declare const StandardSchemaTypes: StandardSchemaTypes<TInput, TOutput>;
+export interface StandardSchemaTypes<TInput = unknown, TOutput = TInput> {
+  readonly input: TInput;
+  readonly output: TOutput;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L58)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L51)
 
 ### StandardSchemaV1
 
-**Signature**
+Namespace aliases matching the official Standard Schema v1 vocabulary.
+
+**Example**
 
 ```ts
-declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
+type Result = StandardSchemaV1.Result<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L116)
 
 ### StandardSuccess
 
+Successful Standard Schema validation with a typed output.
+
+**Example**
+
+```ts
+const success: StandardSuccess<string> = { value: "ready" };
+```
+
 **Signature**
 
 ```ts
-declare const StandardSuccess: StandardSuccess<T>;
+export interface StandardSuccess<T> {
+  readonly value: T;
+  readonly issues?: undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L20)
 
 ### StringSchema
 
+String schema with length and format refinement methods.
+
+**Example**
+
+```ts
+const schema: StringSchema = z.string().min(1);
+```
+
 **Signature**
 
 ```ts
-declare const StringSchema: StringSchema;
+export interface StringSchema extends Schema<string, string> {
+  /**
+   * Requires a minimum string length.
+   * @param length - Minimum length.
+   * @param message - Optional issue text.
+   * @returns A refined string schema.
+   * @example z.string().min(2);
+   */
+  min(length: number, message?: string): StringSchema;
+  /**
+   * Requires a maximum string length.
+   * @param length - Maximum length.
+   * @param message - Optional issue text.
+   * @returns A refined string schema.
+   * @example z.string().max(8);
+   */
+  max(length: number, message?: string): StringSchema;
+  /**
+   * Requires a UUID string.
+   * @param message - Optional issue text.
+   * @returns A UUID string schema.
+   * @example z.string().uuid();
+   */
+  uuid(message?: string): StringSchema;
+  /**
+   * Requires a parseable datetime string.
+   * @param message - Optional issue text.
+   * @returns A datetime string schema.
+   * @example z.string().datetime();
+   */
+  datetime(message?: string): StringSchema;
+  /**
+   * Requires an email address string.
+   * @param message - Optional issue text.
+   * @returns An email string schema.
+   * @example z.string().email();
+   */
+  email(message?: string): StringSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder-refinements.types.ts#L7)
 
 ### ZBuilder
 
+Builder methods used to compose Standard Schema validators.
+
+**Example**
+
+```ts
+const builder: ZBuilder = z;
+```
+
 **Signature**
 
 ```ts
-declare const ZBuilder: ZBuilder;
+export interface ZBuilder {
+  /**
+   * Builds a string validator.
+   * @returns A string schema with refinement methods.
+   * @example z.string().min(1);
+   */
+  string(): StringSchema;
+  /**
+   * Builds a finite-number validator.
+   * @returns A number schema with refinement methods.
+   * @example z.number().int();
+   */
+  number(): NumberSchema;
+  /**
+   * Builds a boolean validator.
+   * @returns A boolean schema.
+   * @example z.boolean().parse(true);
+   */
+  boolean(): Schema<boolean, boolean>;
+  /**
+   * Builds a validator accepting any input without changing it.
+   * @returns An unknown-value schema.
+   * @example z.unknown().parse({ name: "Ada" });
+   */
+  unknown(): Schema<unknown, unknown>;
+  /**
+   * Builds an unrestricted value validator.
+   * @returns An unknown-value schema.
+   * @example z.any().parse(null);
+   */
+  any(): Schema<unknown, unknown>;
+  /**
+   * Builds a null validator.
+   * @returns A null schema.
+   * @example z.null().parse(null);
+   */
+  null(): Schema<null, null>;
+  /**
+   * Builds a buffered Web File validator.
+   * @param options - Byte and media-type constraints.
+   * @returns A File schema.
+   * @example z.file({ maxBytes: 1024 });
+   */
+  file(options?: FileSchemaOptions): FileSchema;
+  /**
+   * Builds a void-result validator.
+   * @returns An undefined schema.
+   * @example z.void().parse(undefined);
+   */
+  void(): Schema<undefined, undefined>;
+  /**
+   * Builds an exact-value validator.
+   * @param value - Literal value to require.
+   * @returns A literal schema.
+   * @example z.literal("ready").parse("ready");
+   */
+  literal<T extends string | number | boolean | null | undefined>(value: T): Schema<T, T>;
+  /**
+   * Builds a named object validator.
+   * @param shape - Child schemas by property name.
+   * @returns An object schema with inferred input and output.
+   * @example z.object({ id: z.string() });
+   */
+  object<S extends Shape>(shape: S): Schema<ObjectInput<S>, ObjectOutput<S>>;
+  /**
+   * Builds an array validator.
+   * @param schema - Child item schema.
+   * @returns An array schema with inferred item types.
+   * @example z.array(z.number());
+   */
+  array<S extends AnySchema>(schema: S): Schema<InputOf<S>[], OutputOf<S>[]>;
+  /**
+   * Builds a nonempty union validator.
+   * @param schemas - Member schemas in precedence order.
+   * @returns A union schema with inferred member types.
+   * @example z.union([z.string(), z.number()]);
+   */
+  union<S extends SchemaTuple>(schemas: S): Schema<InputOf<S[number]>, OutputOf<S[number]>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/builder.types.ts#L29)
 
 ### buildSchemaEffect
 
@@ -1803,23 +2715,42 @@ declare const JSON_SCHEMA_UNAVAILABLE: "RELKIT_SCHEMA_UNAVAILABLE";
 
 ### JsonSchema
 
+A deterministic JSON Schema document.
+
+**Example**
+
+```ts
+const document: JsonSchema = { type: "string" };
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchema: JsonSchema;
+type JsonSchema = { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L9)
 
 ### JsonSchemaAvailable
 
+A successful JSON Schema projection.
+
+**Example**
+
+```ts
+const available: JsonSchemaAvailable = { ok: true, schema: { type: "string" } };
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaAvailable: JsonSchemaAvailable;
+export interface JsonSchemaAvailable {
+  readonly ok: true;
+  readonly schema: JsonSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L14)
 
 ### JsonSchemaDirection
 
@@ -1833,43 +2764,85 @@ declare const JsonSchemaDirection: SchemaProjectionDirection;
 
 ### JsonSchemaFactory
 
+Factory for a JSON-safe schema value.
+
+**Example**
+
+```ts
+const projection: JsonSchemaFactory = () => ({ type: "string" });
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaFactory: JsonSchemaFactory;
+type JsonSchemaFactory = () => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L36)
 
 ### JsonSchemaOptions
 
+Options for a JSON Schema projection.
+
+**Example**
+
+```ts
+const options: JsonSchemaOptions = { direction: "output" };
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaOptions: JsonSchemaOptions;
+export interface JsonSchemaOptions {
+  readonly direction?: JsonSchemaDirection;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L46)
 
 ### JsonSchemaResult
 
+The result of a JSON Schema projection.
+
+**Example**
+
+```ts
+const result: JsonSchemaResult = getJsonSchema(z.string());
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaResult: JsonSchemaResult;
+type JsonSchemaResult = JsonSchemaAvailable | JsonSchemaUnavailable;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L31)
 
 ### JsonSchemaUnavailable
 
+An unavailable projection with a stable code and reason.
+
+**Example**
+
+```ts
+const unavailable: JsonSchemaUnavailable = {
+  ok: false,
+  code: JSON_SCHEMA_UNAVAILABLE,
+  reason: "missing",
+};
+```
+
 **Signature**
 
 ```ts
-declare const JsonSchemaUnavailable: JsonSchemaUnavailable;
+export interface JsonSchemaUnavailable {
+  readonly ok: false;
+  readonly code: typeof JSON_SCHEMA_UNAVAILABLE;
+  readonly reason: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/json-schema.types.ts#L22)
 
 ### JsonSchemaValueError (class)
 
@@ -2283,23 +3256,43 @@ declare const SCHEMA_LIBRARIES: Readonly<Record<string, SchemaLibrary>>;
 
 ### SchemaConverter
 
+Converts one schema to JSON Schema for the input or output side.
+
+**Example**
+
+```ts
+const converter: SchemaConverter = (schema, direction) => ({ type: "string" });
+```
+
 **Signature**
 
 ```ts
-declare const SchemaConverter: SchemaConverter;
+type SchemaConverter = (schema: StandardSchemaV1, direction: "input" | "output") => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-converters.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-converters.types.ts#L7)
 
 ### SchemaLibrary
 
+A schema library RelKit recognizes, with the package that makes its schemas and, when the
+schemas cannot describe themselves, the package that converts them.
+
+**Example**
+
+```ts
+const valibot: SchemaLibrary = { package: "valibot", converter: "@valibot/to-json-schema" };
+```
+
 **Signature**
 
 ```ts
-declare const SchemaLibrary: SchemaLibrary;
+export interface SchemaLibrary {
+  readonly package: string;
+  readonly converter?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-converters.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-converters.types.ts#L17)
 
 ### missingConverterReason
 
@@ -3221,13 +4214,32 @@ declare const withTransformMetadataEffect: (
 
 ### SchemaMetadata
 
+Metadata attached to a RelKit schema for deterministic projection.
+Directional hooks may differ after a transform or default is applied.
+
+**Example**
+
+```ts
+const metadata: SchemaMetadata = { jsonSchema: () => ({ type: "string" }) };
+```
+
 **Signature**
 
 ```ts
-declare const SchemaMetadata: SchemaMetadata;
+export interface SchemaMetadata {
+  /** Historical projection used by getJsonSchema(schema) without options. */
+  readonly jsonSchema?: SchemaProjection;
+  readonly inputJsonSchema?: SchemaProjection;
+  readonly outputJsonSchema?: SchemaProjection;
+  readonly optional?: boolean;
+  readonly inputOptional?: boolean;
+  readonly outputOptional?: boolean;
+  readonly transformed?: boolean;
+  readonly refined?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-metadata.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-metadata.types.ts#L19)
 
 ### SchemaMetadataError (class)
 
@@ -3250,23 +4262,39 @@ declare class SchemaMetadataError
 
 ### SchemaProjection
 
+Factory for a JSON-safe schema projection.
+
+**Example**
+
+```ts
+const projection: SchemaProjection = () => ({ type: "string" });
+```
+
 **Signature**
 
 ```ts
-declare const SchemaProjection: SchemaProjection;
+type SchemaProjection = () => JsonValue;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-metadata.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-metadata.types.ts#L7)
 
 ### SchemaProjectionDirection
 
+Projection direction for input or validated output.
+
+**Example**
+
+```ts
+const direction: SchemaProjectionDirection = "input";
+```
+
 **Signature**
 
 ```ts
-declare const SchemaProjectionDirection: SchemaProjectionDirection;
+type SchemaProjectionDirection = "input" | "output";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-metadata.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-metadata.types.ts#L12)
 
 ### getMetadataProjection
 
@@ -3593,13 +4621,49 @@ type SchemaProjectionDirection = "input" | "output";
 
 ### SchemaOperation
 
+Fixed operation names used for schema telemetry labels.
+The union prevents input data from entering metric cardinality.
+
+**Example**
+
+```ts
+const operation: SchemaOperation = "validate";
+```
+
 **Signature**
 
 ```ts
-declare const SchemaOperation: SchemaOperation;
+type SchemaOperation =
+  | "builder.string"
+  | "builder.number"
+  | "builder.boolean"
+  | "builder.unknown"
+  | "builder.any"
+  | "builder.null"
+  | "builder.void"
+  | "builder.literal"
+  | "builder.object"
+  | "builder.array"
+  | "builder.union"
+  | "builder.file"
+  | "builder.string-refine"
+  | "builder.number-refine"
+  | "schema.optional"
+  | "schema.nullable"
+  | "schema.default"
+  | "schema.transform"
+  | "schema.refine"
+  | "validate"
+  | "validate-sync"
+  | "json-schema"
+  | "schema.create"
+  | "schema.run"
+  | "schema.parse"
+  | "schema.parse-async"
+  | "schema.safe-parse";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.types.ts#L8)
 
 ### SchemaTelemetry (class)
 
@@ -3639,13 +4703,34 @@ declare const SchemaTelemetryLive: Layer.Layer<SchemaTelemetry, never, never>;
 
 ### SchemaTelemetryService
 
+Injectable observer for schema operations.
+A test Layer can replace the live span and metric behavior.
+
+**Example**
+
+```ts
+Layer.succeed(SchemaTelemetry, { observe: (_name, effect) => effect });
+```
+
 **Signature**
 
 ```ts
-declare const SchemaTelemetryService: SchemaTelemetryService;
+export interface SchemaTelemetryService {
+  /**
+   * Wraps one operation without changing its Effect channels.
+   * @param operation - Fixed operation name.
+   * @param effect - Operation being observed.
+   * @returns The observed Effect with its original success and error channels.
+   * @example telemetry.observe("validate", Effect.succeed(1));
+   */
+  readonly observe: <A, E, R>(
+    operation: SchemaOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-observability.types.ts#L42)
 
 ### observeSchema
 
@@ -4433,50 +5518,148 @@ export interface SchemaValidatorService {
 **Signature**
 
 ```ts
-declare const InferInput: InferInput<S>;
+type InferInput<S extends StandardSchemaV1> = import("./standard-schema.types.js").InferInput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L125)
 
 ### InferOutput
 
 **Signature**
 
 ```ts
-declare const InferOutput: InferOutput<S>;
+type InferOutput<S extends StandardSchemaV1> = import("./standard-schema.types.js").InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L127)
 
 ### JsonValue
 
+JSON-safe value produced by a schema projection hook.
+
+**Example**
+
+```ts
+const projection: JsonValue = { type: "string" };
+```
+
 **Signature**
 
 ```ts
-declare const JsonValue: JsonValue;
+type JsonValue =
+  string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L152)
 
 ### RelkitSchema
 
+RelKit schema boundary with optional legacy and directional projections.
+
+**Example**
+
+```ts
+const schema: RelkitSchema = z.string();
+```
+
 **Signature**
 
 ```ts
-declare const RelkitSchema: RelkitSchema<TInput, TOutput>;
+export interface RelkitSchema<TInput = unknown, TOutput = TInput> extends StandardSchemaV1<
+  TInput,
+  TOutput
+> {
+  readonly "~standard": StandardSchemaV1<TInput, TOutput>["~standard"] &
+    StandardJSONSchemaV1<TInput, TOutput>["~standard"];
+  readonly relkit?: {
+    readonly jsonSchema?: () => JsonValue;
+    readonly inputJsonSchema?: () => JsonValue;
+    readonly outputJsonSchema?: () => JsonValue;
+  };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L135)
 
 ### Schema
 
+RelKit schema with parsing and composition methods.
+Input and output types may differ after transformation.
+
+**Example**
+
+```ts
+const schema: Schema<string, number> = z.string().transform(Number);
+```
+
 **Signature**
 
 ```ts
-declare const Schema: Schema<TInput, TOutput>;
+export interface Schema<TInput = unknown, TOutput = TInput> extends RelkitSchema<TInput, TOutput> {
+  /**
+   * Accepts undefined as input and output.
+   * @returns A schema with optional value types.
+   * @example z.string().optional();
+   */
+  optional(): Schema<TInput | undefined, TOutput | undefined>;
+  /**
+   * Accepts null as input and output.
+   * @returns A nullable schema.
+   * @example z.string().nullable();
+   */
+  nullable(): Schema<TInput | null, TOutput | null>;
+  /**
+   * Supplies a value for undefined input.
+   * @param value - Constant or lazy default.
+   * @returns A schema with optional input and required output.
+   * @example z.string().default("ready");
+   */
+  default(value: TInput | (() => TInput)): Schema<TInput | undefined, TOutput>;
+  /**
+   * Maps a valid output to a new value.
+   * @param transform - Synchronous or asynchronous mapper.
+   * @returns A schema with the mapped output type.
+   * @example z.string().transform(Number);
+   */
+  transform<TNext>(transform: (value: TOutput) => TNext | Promise<TNext>): Schema<TInput, TNext>;
+  /**
+   * Checks a valid output with a predicate.
+   * @param check - Predicate for valid output.
+   * @param message - Failure message.
+   * @returns A refined schema.
+   * @example z.number().refine((value) => value > 0);
+   */
+  refine(
+    check: (value: TOutput) => boolean | Promise<boolean>,
+    message?: string,
+  ): Schema<TInput, TOutput>;
+  /**
+   * Parses synchronously or throws.
+   * @param value - Input to parse.
+   * @returns Validated output.
+   * @throws SchemaValidationError or TypeError for invalid or asynchronous input.
+   * @example z.string().parse("ready");
+   */
+  parse(value: unknown): TOutput;
+  /**
+   * Parses and awaits asynchronous checks.
+   * @param value - Input to parse.
+   * @returns A promise of validated output.
+   * @throws SchemaValidationError for invalid input.
+   * @example await z.string().parseAsync("ready");
+   */
+  parseAsync(value: unknown): Promise<TOutput>;
+  /**
+   * Returns a result for sync or async validation.
+   * @param value - Input to validate.
+   * @returns A result or promise with value or issues.
+   * @example z.string().safeParse("ready");
+   */
+  safeParse(value: unknown): StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-implementation.types.ts#L18)
 
 ### SchemaValidationError
 
@@ -4490,93 +5673,158 @@ declare const SchemaValidationError: typeof SchemaValidationError;
 
 ### StandardFailure
 
+Standard Schema validation failure with structured issues.
+
+**Example**
+
+```ts
+const failure: StandardFailure = { issues: [{ message: "Required" }] };
+```
+
 **Signature**
 
 ```ts
-declare const StandardFailure: StandardFailure;
+export interface StandardFailure {
+  readonly issues: readonly StandardIssue[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L29)
 
 ### StandardIssue
 
+A portable issue that may identify a nested path.
+
+**Example**
+
+```ts
+const issue: StandardIssue = { message: "Required", path: ["name"] };
+```
+
 **Signature**
 
 ```ts
-declare const StandardIssue: StandardIssue;
+export interface StandardIssue {
+  readonly message: string;
+  readonly path?: readonly StandardPathSegment[] | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L11)
 
 ### StandardJSONSchemaV1
 
-**Signature**
-
-```ts
-declare const StandardJSONSchemaV1: StandardJSONSchemaV1<TInput, TOutput>;
-```
-
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L88)
 
 ### StandardPathSegment
 
+A Standard Schema issue path accepts keys and structured segments.
+
+**Example**
+
+```ts
+const path: StandardPathSegment[] = ["items", 0, { key: "name" }];
+```
+
 **Signature**
 
 ```ts
-declare const StandardPathSegment: StandardPathSegment;
+type StandardPathSegment = PropertyKey | { readonly key: PropertyKey };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L5)
 
 ### StandardResult
 
+Result union that preserves issues instead of throwing.
+
+**Example**
+
+```ts
+const result: StandardResult<number> = { value: 2 };
+```
+
 **Signature**
 
 ```ts
-declare const StandardResult: StandardResult<T>;
+type StandardResult<T> = StandardSuccess<T> | StandardFailure;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L37)
 
 ### StandardSchemaOptions
 
+Vendor-specific options accepted by a compatible validator.
+
+**Example**
+
+```ts
+const options: StandardSchemaOptions = { libraryOptions: {} };
+```
+
 **Signature**
 
 ```ts
-declare const StandardSchemaOptions: StandardSchemaOptions;
+export interface StandardSchemaOptions {
+  readonly libraryOptions?: Record<string, unknown> | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L43)
 
 ### StandardSchemaTypes
 
+Phantom input and output types advertised by Standard Schema.
+
+**Example**
+
+```ts
+type Types = StandardSchemaTypes<string, number>;
+```
+
 **Signature**
 
 ```ts
-declare const StandardSchemaTypes: StandardSchemaTypes<TInput, TOutput>;
+export interface StandardSchemaTypes<TInput = unknown, TOutput = TInput> {
+  readonly input: TInput;
+  readonly output: TOutput;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L51)
 
 ### StandardSchemaV1
 
-**Signature**
+Namespace aliases matching the official Standard Schema v1 vocabulary.
+
+**Example**
 
 ```ts
-declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
+type Result = StandardSchemaV1.Result<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L116)
 
 ### StandardSuccess
 
+Successful Standard Schema validation with a typed output.
+
+**Example**
+
+```ts
+const success: StandardSuccess<string> = { value: "ready" };
+```
+
 **Signature**
 
 ```ts
-declare const StandardSuccess: StandardSuccess<T>;
+export interface StandardSuccess<T> {
+  readonly value: T;
+  readonly issues?: undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L20)
 
 ### createSchema
 
@@ -4766,13 +6014,83 @@ export interface RelkitSchema<TInput = unknown, TOutput = TInput> extends Standa
 
 ### Schema
 
+RelKit schema with parsing and composition methods.
+Input and output types may differ after transformation.
+
+**Example**
+
+```ts
+const schema: Schema<string, number> = z.string().transform(Number);
+```
+
 **Signature**
 
 ```ts
-declare const Schema: Schema<TInput, TOutput>;
+export interface Schema<TInput = unknown, TOutput = TInput> extends RelkitSchema<TInput, TOutput> {
+  /**
+   * Accepts undefined as input and output.
+   * @returns A schema with optional value types.
+   * @example z.string().optional();
+   */
+  optional(): Schema<TInput | undefined, TOutput | undefined>;
+  /**
+   * Accepts null as input and output.
+   * @returns A nullable schema.
+   * @example z.string().nullable();
+   */
+  nullable(): Schema<TInput | null, TOutput | null>;
+  /**
+   * Supplies a value for undefined input.
+   * @param value - Constant or lazy default.
+   * @returns A schema with optional input and required output.
+   * @example z.string().default("ready");
+   */
+  default(value: TInput | (() => TInput)): Schema<TInput | undefined, TOutput>;
+  /**
+   * Maps a valid output to a new value.
+   * @param transform - Synchronous or asynchronous mapper.
+   * @returns A schema with the mapped output type.
+   * @example z.string().transform(Number);
+   */
+  transform<TNext>(transform: (value: TOutput) => TNext | Promise<TNext>): Schema<TInput, TNext>;
+  /**
+   * Checks a valid output with a predicate.
+   * @param check - Predicate for valid output.
+   * @param message - Failure message.
+   * @returns A refined schema.
+   * @example z.number().refine((value) => value > 0);
+   */
+  refine(
+    check: (value: TOutput) => boolean | Promise<boolean>,
+    message?: string,
+  ): Schema<TInput, TOutput>;
+  /**
+   * Parses synchronously or throws.
+   * @param value - Input to parse.
+   * @returns Validated output.
+   * @throws SchemaValidationError or TypeError for invalid or asynchronous input.
+   * @example z.string().parse("ready");
+   */
+  parse(value: unknown): TOutput;
+  /**
+   * Parses and awaits asynchronous checks.
+   * @param value - Input to parse.
+   * @returns A promise of validated output.
+   * @throws SchemaValidationError for invalid input.
+   * @example await z.string().parseAsync("ready");
+   */
+  parseAsync(value: unknown): Promise<TOutput>;
+  /**
+   * Returns a result for sync or async validation.
+   * @param value - Input to validate.
+   * @returns A result or promise with value or issues.
+   * @example z.string().safeParse("ready");
+   */
+  safeParse(value: unknown): StandardResult<TOutput> | Promise<StandardResult<TOutput>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/standard-schema.types.ts#L179)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/schema/schema-implementation.types.ts#L18)
 
 ### StandardFailure (interface)
 

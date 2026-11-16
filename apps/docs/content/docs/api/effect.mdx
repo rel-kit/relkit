@@ -129,7 +129,14 @@ const inspector: InspectorConfig = { enabled: true };
 **Signature**
 
 ```ts
-export interface InspectorConfig extends InspectorConfigurationInput {}
+export interface InspectorConfig extends InspectorConfigurationInput {
+  /** Starts the bridge the Inspector connects to. Defaults to `false`. */
+  readonly enabled?: boolean;
+  /** Address the bridge listens on; port `0` takes a free port. */
+  readonly connection?: { readonly host?: string; readonly port?: number };
+  /** Largest payload preview the bridge returns, in bytes. Defaults to 1,048,576. */
+  readonly maxPreviewBytes?: number;
+}
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L45)
@@ -405,6 +412,24 @@ declare const normalizeProvidersEffect: (
 
 ## `app-provider.types.ts`
 
+### AppProviderBinding (type alias)
+
+The binding of one capability among the bindings of a `defineApp` call, or `undefined`.
+
+**Example**
+
+```ts
+type Cache = AppProviderBinding<{ cache: typeof redisAdapter }, "cache">;
+```
+
+**Signature**
+
+```ts
+type AppProviderBinding<Providers, Key> = Key extends keyof Providers ? Providers[Key] : undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L60)
+
 ### AppProviderBindings (type alias)
 
 Provider bindings as one `defineApp` call infers them: a capability the call leaves out is
@@ -461,12 +486,12 @@ const defaults: AppProviderDefaults<typeof providers> = { cache: "default" };
 type AppProviderDefaults<Providers extends AppProviderBindings> = {
   // NoInfer: a default never decides what a binding is; it is only checked against it.
   readonly [Key in keyof AppProviderInputs]?: NoInfer<
-    DefaultProfile<BindingOf<Providers, Key>, Key>
+    DefaultProfile<AppProviderBinding<Providers, Key>, Key>
   >;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L92)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L97)
 
 ### AppProviderInputs (interface)
 
@@ -516,11 +541,35 @@ const options: AppProviderOptions<{ cache: typeof redisAdapter }> = { cache: red
 
 ```ts
 type AppProviderOptions<Providers extends AppProviderBindings> = {
-  readonly [Key in keyof AppProviderInputs]?: BindingOf<Providers, Key>;
+  readonly [Key in keyof AppProviderInputs]?: AppProviderBinding<Providers, Key>;
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L89)
+
+### ApplicationProfilesOf (type alias)
+
+The profile names of an application per capability, from the type of its descriptor. The
+generated context registry uses it to type `profile` in buckets, caches, events and channels.
+A capability without a provider has no names.
+
+**Example**
+
+```ts
+interface ApplicationProfiles extends ApplicationProfilesOf<typeof app> {}
+```
+
+**Signature**
+
+```ts
+type ApplicationProfilesOf<Application> = Application extends {
+  readonly defaults: infer Defaults;
+}
+  ? { readonly [Capability in keyof Defaults]-?: NonNullable<Defaults[Capability]> }
+  : {};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L116)
 
 ### NoProviderConfigured (interface)
 
@@ -561,7 +610,7 @@ type NormalizedAppProviderDefaults<Providers extends AppProviderBindings> = Read
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L102)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L107)
 
 ### NormalizedProviders (type alias)
 
@@ -585,7 +634,7 @@ type NormalizedProviders<Providers extends AppProviderBindings> = {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L125)
 
 ## `app-runtime-metadata.ts`
 
@@ -1209,13 +1258,36 @@ declare const AppConstantRunnerPromiseLive: Layer.Layer<AppConstantRunner, never
 
 ### AppConstantRunnerService
 
+Replaceable execution boundary for dynamic constant callbacks.
+
+**Example**
+
+```ts
+const runner: AppConstantRunnerService = { run: () => Effect.succeed("eu") };
+```
+
 **Signature**
 
 ```ts
-declare const AppConstantRunnerService: AppConstantRunnerService;
+export interface AppConstantRunnerService {
+  /** Invokes a dynamic constant resolver.
+   * @param resolver - User supplied constant callback.
+   * @param options - Environment, logger, and caller signal available to the callback.
+   * @returns The callback result or ContextResolutionFailure.
+   * @example runner.run(() => "eu", { env: {}, log });
+   */
+  readonly run: (
+    resolver: ConstantResolver,
+    options: {
+      readonly env: Readonly<Record<string, unknown>>;
+      readonly log: PublicLogger;
+      readonly signal: AbortSignal;
+    },
+  ) => Effect.Effect<unknown, ContextResolutionFailure>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolution-service.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/context-resolution-service.types.ts#L9)
 
 ## `context-resolution-service.types.ts`
 
@@ -1511,13 +1583,28 @@ declare const defineAppEffect: <
 
 ### ApiDocsConfig
 
+API documentation visibility and domain exclusions.
+
+**Example**
+
+```ts
+const docs: ApiDocsConfig = { enabledInProduction: false };
+```
+
 **Signature**
 
 ```ts
-declare const ApiDocsConfig: ApiDocsConfig;
+export interface ApiDocsConfig {
+  /** Explicitly selects Scalar; omitted/false keeps JSON OpenAPI only. */
+  readonly ui?: "scalar" | false;
+  /** Serves the OpenAPI document and the reference in production too. Defaults to `false`. */
+  readonly enabledInProduction?: boolean;
+  /** Services left out of the served document; their routes still answer. */
+  readonly excludeDomains?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L10)
 
 ### AppCheckConfig (interface)
 
@@ -1538,7 +1625,7 @@ export interface AppCheckConfig {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L52)
 
 ### AppDeploymentConfig (type alias)
 
@@ -1556,17 +1643,46 @@ const deployment: AppDeploymentConfig = { engine: "pulumi" };
 type AppDeploymentConfig = Readonly<Record<string, JsonValue>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L47)
 
-### AppProviderBindings
+### AppProviderBinding
+
+The binding of one capability among the bindings of a `defineApp` call, or `undefined`.
+
+**Example**
+
+```ts
+type Cache = AppProviderBinding<{ cache: typeof redisAdapter }, "cache">;
+```
 
 **Signature**
 
 ```ts
-declare const AppProviderBindings: AppProviderBindings;
+type AppProviderBinding<Providers, Key> = Key extends keyof Providers ? Providers[Key] : undefined;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L60)
+
+### AppProviderBindings
+
+Provider bindings as one `defineApp` call infers them: a capability the call leaves out is
+`undefined`, which is how a default for it is told apart from a default for a bound one.
+
+**Example**
+
+```ts
+const bindings: AppProviderBindings = { cache: redisAdapter, bucket: undefined };
+```
+
+**Signature**
+
+```ts
+type AppProviderBindings = {
+  readonly [Key in keyof AppProviderInputs]?: AppProviderInputs[Key] | undefined;
+};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L43)
 
 ### AppProviderCapability
 
@@ -1577,39 +1693,87 @@ declare const AppProviderCapability:
   "bucket" | "cache" | "job" | "event" | "model" | "realtime" | "agent-state";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L18)
 
 ### AppProviderDefaults
 
+Default profile per capability, named as the options are (`jobs`, not `job`). Each entry
+accepts the profile names of that capability's binding, or `"default"` for a single adapter.
+
+**Example**
+
+```ts
+const defaults: AppProviderDefaults<typeof providers> = { cache: "default" };
+```
+
 **Signature**
 
 ```ts
-declare const AppProviderDefaults: AppProviderDefaults<Providers>;
+type AppProviderDefaults<Providers extends AppProviderBindings> = {
+  // NoInfer: a default never decides what a binding is; it is only checked against it.
+  readonly [Key in keyof AppProviderInputs]?: NoInfer<
+    DefaultProfile<AppProviderBinding<Providers, Key>, Key>
+  >;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L97)
 
 ### AppProviderInputs
 
+Optional provider bindings for every supported capability.
+
+**Example**
+
+```ts
+const providers: AppProviderInputs = { cache: redisAdapter };
+```
+
 **Signature**
 
 ```ts
-declare const AppProviderInputs: AppProviderInputs;
+export interface AppProviderInputs {
+  /** Object storage for buckets: one adapter, or a map of named profiles. */
+  readonly bucket?: CapabilityInput<"bucket">;
+  /** Key-value storage for caches: one adapter, or a map of named profiles. */
+  readonly cache?: CapabilityInput<"cache">;
+  /** The backend that runs jobs and tasks: one adapter, or a map of named profiles. */
+  readonly jobs?: CapabilityInput<"job">;
+  /** The transport that delivers events: one adapter, or a map of named profiles. */
+  readonly event?: CapabilityInput<"event">;
+  /** Language models for agents: one adapter, or a map of named profiles. */
+  readonly model?: CapabilityInput<"model">;
+  /** The transport of realtime channels: one adapter, or a map of named profiles. */
+  readonly realtime?: CapabilityInput<"realtime">;
+  /** Storage for agent threads and runs: one adapter, or a map of named profiles. */
+  readonly "agent-state"?: CapabilityInput<"agent-state">;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L22)
 
 ### AppProviderOptions
 
+The provider options of `defineApp`, one property per capability so that each binding is
+inferred from its own property.
+
+**Example**
+
+```ts
+const options: AppProviderOptions<{ cache: typeof redisAdapter }> = { cache: redisAdapter };
+```
+
 **Signature**
 
 ```ts
-declare const AppProviderOptions: AppProviderOptions<Providers>;
+type AppProviderOptions<Providers extends AppProviderBindings> = {
+  readonly [Key in keyof AppProviderInputs]?: AppProviderBinding<Providers, Key>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L89)
 
-### AppTelemetryConfig (type alias)
+### AppTelemetryConfig (interface)
 
 Application telemetry settings parameterized by exporters.
 
@@ -1622,11 +1786,23 @@ const telemetry: AppTelemetryConfig = { redaction: { mode: "off" } };
 **Signature**
 
 ```ts
-type AppTelemetryConfig<Exporters extends TelemetryExporterMap = TelemetryExporterMap> =
-  TelemetryConfiguration<Exporters>;
+export interface AppTelemetryConfig<
+  Exporters extends TelemetryExporterMap = TelemetryExporterMap,
+> extends TelemetryConfiguration<Exporters> {
+  /** Which signals are recorded; all of them when omitted. */
+  readonly capture?: NonNullable<TelemetryConfiguration<Exporters>["capture"]>;
+  /** How recorded payloads are redacted, and the largest payload kept. */
+  readonly redaction?: NonNullable<TelemetryConfiguration<Exporters>["redaction"]>;
+  /** Limits of the local store: records, age and bytes. */
+  readonly localRetention?: NonNullable<TelemetryConfiguration<Exporters>["localRetention"]>;
+  /** Share of traces and lowest log level sent to exporters. */
+  readonly exportSampling?: NonNullable<TelemetryConfiguration<Exporters>["exportSampling"]>;
+  /** Exporters by name, such as `otlp()` or `sentry()`. */
+  readonly exporters?: Exporters;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L29)
 
 ### ApplicationDescriptor (type alias)
 
@@ -1657,7 +1833,31 @@ type ApplicationDescriptor<
   };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L121)
+
+### ApplicationProfilesOf
+
+The profile names of an application per capability, from the type of its descriptor. The
+generated context registry uses it to type `profile` in buckets, caches, events and channels.
+A capability without a provider has no names.
+
+**Example**
+
+```ts
+interface ApplicationProfiles extends ApplicationProfilesOf<typeof app> {}
+```
+
+**Signature**
+
+```ts
+type ApplicationProfilesOf<Application> = Application extends {
+  readonly defaults: infer Defaults;
+}
+  ? { readonly [Capability in keyof Defaults]-?: NonNullable<Defaults[Capability]> }
+  : {};
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L116)
 
 ### DefineAppBindings (interface)
 
@@ -1691,7 +1891,7 @@ export interface DefineAppBindings<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L100)
 
 ### DefineAppOptions (type alias)
 
@@ -1710,48 +1910,87 @@ type DefineAppOptions<
   Shape extends EnvShape,
   Providers extends AppProviderBindings,
   Exporters extends TelemetryExporterMap = TelemetryExporterMap,
-> = DescriptorMetadata &
-  AppProviderOptions<Providers> & {
-    /** Stable name of the application in graphs, telemetry and deployment. */
-    readonly id?: string;
-    /** The environment contract from `defineEnv`; handlers read it as `context.env`. */
-    readonly env: EnvDefinition<Shape>;
-    /** The profile a descriptor uses when it names none, per capability. */
-    readonly defaults?: AppProviderDefaults<Providers>;
-    /** Redaction, local retention, sampling and exporters of telemetry. */
-    readonly telemetry?: AppTelemetryConfig<Exporters>;
-    /** The HTTP server: port, body limit, API reference, MCP and startup hook. */
-    readonly server?: ServerConfig;
-    /** The development Inspector's bridge; off unless `enabled` is `true`. */
-    readonly inspector?: InspectorConfig;
-    /** JSON metadata for the deployment engine, such as `{ engine: "pulumi" }`. */
-    readonly deployment?: AppDeploymentConfig;
-    /** Opt-in rules of `relkit check`. */
-    readonly check?: AppCheckConfig;
-  };
+> = DescriptorMetadata & {
+  /** Stable name of the application in graphs, telemetry and deployment. */
+  readonly id?: string;
+  /** The environment contract from `defineEnv`; handlers read it as `context.env`. */
+  readonly env: EnvDefinition<Shape>;
+  /** Object storage for buckets: one adapter, or a map of named profiles. */
+  readonly bucket?: AppProviderBinding<Providers, "bucket">;
+  /** Key-value storage for caches: one adapter, or a map of named profiles. */
+  readonly cache?: AppProviderBinding<Providers, "cache">;
+  /** The backend that runs jobs and tasks: one adapter, or a map of named profiles. */
+  readonly jobs?: AppProviderBinding<Providers, "jobs">;
+  /** The transport that delivers events: one adapter, or a map of named profiles. */
+  readonly event?: AppProviderBinding<Providers, "event">;
+  /** Language models for agents: one adapter, or a map of named profiles. */
+  readonly model?: AppProviderBinding<Providers, "model">;
+  /** The transport of realtime channels: one adapter, or a map of named profiles. */
+  readonly realtime?: AppProviderBinding<Providers, "realtime">;
+  /** Storage for agent threads and runs: one adapter, or a map of named profiles. */
+  readonly "agent-state"?: AppProviderBinding<Providers, "agent-state">;
+  /** The profile a descriptor uses when it names none, per capability. */
+  readonly defaults?: AppProviderDefaults<Providers>;
+  /** Redaction, local retention, sampling and exporters of telemetry. */
+  readonly telemetry?: AppTelemetryConfig<Exporters>;
+  /** The HTTP server: port, body limit, API reference, MCP and startup hook. */
+  readonly server?: ServerConfig;
+  /** The development Inspector's bridge; off unless `enabled` is `true`. */
+  readonly inspector?: InspectorConfig;
+  /** JSON metadata for the deployment engine, such as `{ engine: "pulumi" }`. */
+  readonly deployment?: AppDeploymentConfig;
+  /** Opt-in rules of `relkit check`. */
+  readonly check?: AppCheckConfig;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L60)
 
 ### InspectorConfig
 
+Development bridge selection; installing or running the UI is independent.
+
+**Example**
+
+```ts
+const inspector: InspectorConfig = { enabled: true };
+```
+
 **Signature**
 
 ```ts
-declare const InspectorConfig: InspectorConfig;
+export interface InspectorConfig extends InspectorConfigurationInput {
+  /** Starts the bridge the Inspector connects to. Defaults to `false`. */
+  readonly enabled?: boolean;
+  /** Address the bridge listens on; port `0` takes a free port. */
+  readonly connection?: { readonly host?: string; readonly port?: number };
+  /** Largest payload preview the bridge returns, in bytes. Defaults to 1,048,576. */
+  readonly maxPreviewBytes?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L45)
 
 ### NoProviderConfigured
 
+The type a `defaults` entry has when the application binds no provider to its capability, so
+the type error on that entry names the capability.
+
+**Example**
+
+```ts
+const missing: NoProviderConfigured<"cache"> = { capability: "cache" };
+```
+
 **Signature**
 
 ```ts
-declare const NoProviderConfigured: NoProviderConfigured<Capability>;
+export interface NoProviderConfigured<Capability extends string> {
+  readonly capability: Capability;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-provider.types.ts#L51)
 
 ### NormalizedAppProviderDefaults
 
@@ -1769,17 +2008,43 @@ declare const NormalizedAppProviderDefaults: Readonly<{
 }>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L23)
 
 ### ServerConfig
+
+HTTP server settings attached to an application descriptor.
+
+**Example**
+
+```ts
+const server: ServerConfig = { port: 3000, apiDocs: { enabledInProduction: false } };
+```
 
 **Signature**
 
 ```ts
-declare const ServerConfig: ServerConfig;
+export interface ServerConfig {
+  /** Port the HTTP server listens on. */
+  readonly port?: number;
+  /** Largest request body in bytes; a larger one is answered `413`. A route can set its own. */
+  readonly maxBodyBytes?: number;
+  /** The served OpenAPI document and its reference page. */
+  readonly apiDocs?: ApiDocsConfig;
+  /** Serves the contract that the generated client reads. */
+  readonly clientContract?: boolean;
+  /** Enables the MCP endpoint; `{ auth: "required" }` limits it to signed-in callers. */
+  readonly mcp?: boolean | { readonly auth?: "required" };
+  /** Explicitly selects the optional AG-UI HTTP protocol independently of agent RPC. */
+  readonly agUi?: boolean;
+  /** Runs once after the application's providers are ready and before the server accepts
+   * requests; `getRelkit()` returns the application's handle inside it. A rejection stops startup.
+   * @example onStart: async () => { await getRelkit().functions.catalog.warmPrices({}); }
+   */
+  readonly onStart?: () => void | Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/define-app.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/app-config.types.ts#L22)
 
 ## `dev-handler-table.ts`
 
@@ -1792,23 +2057,41 @@ new one, never a mix. Requests already running keep the handler they resolved.
 
 ### HandlerTable
 
+A stable registry whose table can be replaced atomically.
+
 **Signature**
 
 ```ts
-declare const HandlerTable: HandlerTable;
+export interface HandlerTable {
+  /** Registry object handed to invocation; it always delegates to the current table. */
+  readonly registry: SwappableRegistry;
+  /** Number of swaps applied since startup. */
+  readonly generation: number;
+  /**
+   * Replaces the registry and the manifest's function and target entries in one step.
+   * @param next - Registry verified against the new graph and manifest.
+   * @param manifest - The new generation's manifest maps.
+   */
+  readonly swap: (next: SwappableRegistry, manifest: SwappableManifest) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L38)
 
 ### SwappableManifest
 
+The manifest maps the running server reads handlers and targets from.
+
 **Signature**
 
 ```ts
-declare const SwappableManifest: SwappableManifest;
+export interface SwappableManifest {
+  readonly functions?: Record<string, SwappableHandler>;
+  readonly targets?: Record<string, object>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L19)
 
 ### createHandlerTable
 
@@ -2009,13 +2292,44 @@ adapter, and runtimes without one (Node) restart the process instead.
 
 ### ModuleReloader
 
+Loaded-module tracking and eviction for one project root.
+
 **Signature**
 
 ```ts
-declare const ModuleReloader: ModuleReloader;
+export interface ModuleReloader {
+  /**
+   * Records the modification stamp of every loaded application module.
+   * @param before - Stamps taken with {@link ModuleReloader.stamps} before the modules were
+   * imported; a file changed while they loaded keeps its earlier stamp, so the next `changed`
+   * reports it instead of the loaded module silently standing for the newer file.
+   */
+  readonly record: (before?: ReadonlyMap<string, string>) => void;
+  /** @returns The current modification stamp of every loaded application module. */
+  readonly stamps: () => ReadonlyMap<string, string>;
+  /** @returns Every application module currently in the registry, sorted. */
+  readonly loaded: () => readonly string[];
+  /** @returns Loaded application modules whose file changed or disappeared since `record`. */
+  readonly changed: () => readonly string[];
+  /**
+   * Drops, by path, every file evicted since it last loaded, and the new files it imports,
+   * whether loaded or not. Call it after an import fails: a module that failed to parse stays in
+   * the runtime's loader without appearing in the registry keys, and a later import of it, or of
+   * a module importing it, never settles; one that threw at the top level stays half-initialized.
+   * `invalidate` first drops the ones that are not loaded, which covers the next reload.
+   * @returns The dropped absolute files, sorted.
+   */
+  readonly discardFailed: () => readonly string[];
+  /**
+   * Evicts files and every loaded module that transitively imports them.
+   * @param files - Absolute or project-relative changed files.
+   * @returns Every evicted absolute file, sorted.
+   */
+  readonly invalidate: (files: readonly string[]) => readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.types.ts#L4)
 
 ### createModuleReloader
 
@@ -2089,33 +2403,79 @@ reply says whether the swap happened; on failure the previous table keeps servin
 
 ### DevelopmentReloadOptions
 
+Inputs the generated server supplies to the reload hook.
+
 **Signature**
 
 ```ts
-declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
+export interface DevelopmentReloadOptions {
+  readonly projectRoot: string;
+  /** Directory of the running server's `index.ts`. */
+  readonly serverDirectory: string;
+  readonly table: HandlerTable;
+  /** Manifest the server started with; later reloads compare against the last one applied. */
+  readonly runtimeManifest: ReloadedManifest;
+  /**
+   * Verifies a graph and manifest pair the same way startup does.
+   * @param graph - Graph of the new generation.
+   * @param manifest - Manifest module's `runtimeManifest` export.
+   * @returns The verified registry.
+   */
+  readonly createRegistry: (
+    graph: ApplicationGraph,
+    manifest: SwappableManifest,
+  ) => SwappableRegistry;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L81)
 
 ### DevelopmentReloadReply
 
+The server's answer to a reload request.
+
 **Signature**
 
 ```ts
-declare const DevelopmentReloadReply: DevelopmentReloadReply;
+type DevelopmentReloadReply =
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: true;
+      /** Application modules evaluated again, project-relative. */
+      readonly reimported: readonly string[];
+      readonly pid: number;
+    }
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: false;
+      readonly error: string;
+      readonly pid: number;
+    };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L63)
 
 ### DevelopmentReloadRequest
 
+A request from `relkit dev` to load a new handler table.
+
 **Signature**
 
 ```ts
-declare const DevelopmentReloadRequest: DevelopmentReloadRequest;
+export interface DevelopmentReloadRequest {
+  readonly type: "relkit.dev.reload";
+  /** Correlates the acknowledgement. */
+  readonly id: number;
+  /** Manifest module file name in the server directory. */
+  readonly manifest: string;
+  /** Graph JSON file name in the server directory. */
+  readonly graph: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-reload.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L52)
 
 ### installDevelopmentReload
 
@@ -2403,18 +2763,14 @@ declare const definePromptEffect: <const Value extends PromptValue>(
 **Signature**
 
 ```ts
-declare const defineRouteEffect: {
-  <const Id extends string, const Handler extends RawRouteOptions<Id>["handler"]>(
-    options: RawRouteOptions<Id, Handler>,
-  ): Effect<RawRouteDescriptor<Id, Handler>, RouteOperationError>;
-  <
-    const Id extends string,
-    const Target extends FunctionRefAny,
-    const Request extends HttpRequestMapping | undefined = undefined,
-  >(
-    options: FunctionRouteOptions<Id, Target, Request>,
-  ): Effect<FunctionRouteDescriptor<Id, Target, Request>, RouteOperationError>;
-};
+declare const defineRouteEffect: <
+  const Id extends string,
+  const Target extends FunctionRefAny | undefined = undefined,
+  const Request extends HttpRequestMapping | undefined = undefined,
+  const Handler extends RawHttpHandler = RawHttpHandler,
+>(
+  options: DefineRouteOptions<Id, Target, Request, Handler>,
+) => Effect<DefinedRoute<Id, Target, Request, Handler>, RouteOperationError>;
 ```
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/effect.ts#L21)
@@ -2484,9 +2840,9 @@ declare const defineTaskEffect: <
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends Readonly<Record<string, StandardSchemaV1<unknown, unknown>>> = {},
-  const Execution extends TaskExecution = "durable",
+  const Execution extends TaskExecution = TaskExecution,
 >(
-  options: DefineTaskOptions<
+  options: DefineTaskCallOptions<
     Id,
     Version,
     InputSchema,
@@ -2507,7 +2863,7 @@ declare const defineTaskEffect: <
     Errors,
     ProgressSchema,
     Streams,
-    Execution
+    TaskForm<Execution>
   >,
   TaskDefinitionFailure,
   never
@@ -2723,63 +3079,158 @@ declare const AppConstantRunnerLive: Layer<AppConstantRunner, never, never>;
 
 ### DevelopmentReloadOptions
 
+Inputs the generated server supplies to the reload hook.
+
 **Signature**
 
 ```ts
-declare const DevelopmentReloadOptions: DevelopmentReloadOptions;
+export interface DevelopmentReloadOptions {
+  readonly projectRoot: string;
+  /** Directory of the running server's `index.ts`. */
+  readonly serverDirectory: string;
+  readonly table: HandlerTable;
+  /** Manifest the server started with; later reloads compare against the last one applied. */
+  readonly runtimeManifest: ReloadedManifest;
+  /**
+   * Verifies a graph and manifest pair the same way startup does.
+   * @param graph - Graph of the new generation.
+   * @param manifest - Manifest module's `runtimeManifest` export.
+   * @returns The verified registry.
+   */
+  readonly createRegistry: (
+    graph: ApplicationGraph,
+    manifest: SwappableManifest,
+  ) => SwappableRegistry;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L81)
 
 ### DevelopmentReloadReply
 
+The server's answer to a reload request.
+
 **Signature**
 
 ```ts
-declare const DevelopmentReloadReply: DevelopmentReloadReply;
+type DevelopmentReloadReply =
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: true;
+      /** Application modules evaluated again, project-relative. */
+      readonly reimported: readonly string[];
+      readonly pid: number;
+    }
+  | {
+      readonly type: "relkit.dev.reloaded";
+      readonly id: number;
+      readonly ok: false;
+      readonly error: string;
+      readonly pid: number;
+    };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L63)
 
 ### DevelopmentReloadRequest
 
+A request from `relkit dev` to load a new handler table.
+
 **Signature**
 
 ```ts
-declare const DevelopmentReloadRequest: DevelopmentReloadRequest;
+export interface DevelopmentReloadRequest {
+  readonly type: "relkit.dev.reload";
+  /** Correlates the acknowledgement. */
+  readonly id: number;
+  /** Manifest module file name in the server directory. */
+  readonly manifest: string;
+  /** Graph JSON file name in the server directory. */
+  readonly graph: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L52)
 
 ### HandlerTable
 
+A stable registry whose table can be replaced atomically.
+
 **Signature**
 
 ```ts
-declare const HandlerTable: HandlerTable;
+export interface HandlerTable {
+  /** Registry object handed to invocation; it always delegates to the current table. */
+  readonly registry: SwappableRegistry;
+  /** Number of swaps applied since startup. */
+  readonly generation: number;
+  /**
+   * Replaces the registry and the manifest's function and target entries in one step.
+   * @param next - Registry verified against the new graph and manifest.
+   * @param manifest - The new generation's manifest maps.
+   */
+  readonly swap: (next: SwappableRegistry, manifest: SwappableManifest) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L38)
 
 ### ModuleReloader
 
+Loaded-module tracking and eviction for one project root.
+
 **Signature**
 
 ```ts
-declare const ModuleReloader: ModuleReloader;
+export interface ModuleReloader {
+  /**
+   * Records the modification stamp of every loaded application module.
+   * @param before - Stamps taken with {@link ModuleReloader.stamps} before the modules were
+   * imported; a file changed while they loaded keeps its earlier stamp, so the next `changed`
+   * reports it instead of the loaded module silently standing for the newer file.
+   */
+  readonly record: (before?: ReadonlyMap<string, string>) => void;
+  /** @returns The current modification stamp of every loaded application module. */
+  readonly stamps: () => ReadonlyMap<string, string>;
+  /** @returns Every application module currently in the registry, sorted. */
+  readonly loaded: () => readonly string[];
+  /** @returns Loaded application modules whose file changed or disappeared since `record`. */
+  readonly changed: () => readonly string[];
+  /**
+   * Drops, by path, every file evicted since it last loaded, and the new files it imports,
+   * whether loaded or not. Call it after an import fails: a module that failed to parse stays in
+   * the runtime's loader without appearing in the registry keys, and a later import of it, or of
+   * a module importing it, never settles; one that threw at the top level stays half-initialized.
+   * `invalidate` first drops the ones that are not loaded, which covers the next reload.
+   * @returns The dropped absolute files, sorted.
+   */
+  readonly discardFailed: () => readonly string[];
+  /**
+   * Evicts files and every loaded module that transitively imports them.
+   * @param files - Absolute or project-relative changed files.
+   * @returns Every evicted absolute file, sorted.
+   */
+  readonly invalidate: (files: readonly string[]) => readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-module-reload.types.ts#L4)
 
 ### SwappableManifest
 
+The manifest maps the running server reads handlers and targets from.
+
 **Signature**
 
 ```ts
-declare const SwappableManifest: SwappableManifest;
+export interface SwappableManifest {
+  readonly functions?: Record<string, SwappableHandler>;
+  readonly targets?: Record<string, object>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/host.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/dev-handler-table.types.ts#L19)
 
 ### bindDescriptorIdentity
 
@@ -3186,6 +3637,26 @@ export * from "../services/index.js";
 
 ## `tasks.ts`
 
+### DefineTaskCallOptions
+
+**Signature**
+
+```ts
+declare const DefineTaskCallOptions: DefineTaskCallOptions<
+  Id,
+  Version,
+  InputSchema,
+  OutputSchema,
+  Dependencies,
+  Errors,
+  ProgressSchema,
+  Streams,
+  Execution
+>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L3)
+
 ### DefineTaskOptions
 
 **Signature**
@@ -3204,7 +3675,7 @@ declare const DefineTaskOptions: DefineTaskOptions<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L4)
 
 ### JobDescriptorForThisTask
 
@@ -3214,7 +3685,7 @@ declare const DefineTaskOptions: DefineTaskOptions<
 declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L5)
 
 ### NormalizedTaskRetryPolicy
 
@@ -3224,7 +3695,7 @@ declare const JobDescriptorForThisTask: JobDescriptorForThisTask<Task>;
 declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L6)
 
 ### RunResultOptions
 
@@ -3234,7 +3705,7 @@ declare const NormalizedTaskRetryPolicy: NormalizedTaskRetryPolicy;
 declare const RunResultOptions: RunResultOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L7)
 
 ### ServerTriggerOptions
 
@@ -3244,7 +3715,7 @@ declare const RunResultOptions: RunResultOptions;
 declare const ServerTriggerOptions: ServerTriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L8)
 
 ### TaskAuthContext
 
@@ -3254,7 +3725,7 @@ declare const ServerTriggerOptions: ServerTriggerOptions;
 declare const TaskAuthContext: TaskAuthContext<Session>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L9)
 
 ### TaskCallerInput
 
@@ -3264,7 +3735,7 @@ declare const TaskAuthContext: TaskAuthContext<Session>;
 declare const TaskCallerInput: TaskCallerInput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L10)
 
 ### TaskCanonicalInput
 
@@ -3274,7 +3745,7 @@ declare const TaskCallerInput: TaskCallerInput<T>;
 declare const TaskCanonicalInput: TaskCanonicalInput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L11)
 
 ### TaskConcurrency
 
@@ -3284,7 +3755,7 @@ declare const TaskCanonicalInput: TaskCanonicalInput<T>;
 declare const TaskConcurrency: TaskConcurrency<InputKey>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L12)
 
 ### TaskContext
 
@@ -3294,7 +3765,7 @@ declare const TaskConcurrency: TaskConcurrency<InputKey>;
 declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L13)
 
 ### TaskContextBase
 
@@ -3304,7 +3775,7 @@ declare const TaskContext: TaskContext<Execution, Dependencies, ProgressSchema, 
 declare const TaskContextBase: TaskContextBase<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L14)
 
 ### TaskDependencies
 
@@ -3314,7 +3785,7 @@ declare const TaskContextBase: TaskContextBase<Dependencies>;
 declare const TaskDependencies: TaskDependencies;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L15)
 
 ### TaskDescriptor
 
@@ -3334,7 +3805,7 @@ declare const TaskDescriptor: TaskDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L16)
 
 ### TaskDescriptorAny
 
@@ -3344,7 +3815,7 @@ declare const TaskDescriptor: TaskDescriptor<
 declare const TaskDescriptorAny: TaskDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L17)
 
 ### TaskExecution
 
@@ -3354,7 +3825,7 @@ declare const TaskDescriptorAny: TaskDescriptorAny;
 declare const TaskExecution: TaskExecution;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L18)
 
 ### TaskFailureHook
 
@@ -3364,7 +3835,17 @@ declare const TaskExecution: TaskExecution;
 declare const TaskFailureHook: TaskFailureHook<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L19)
+
+### TaskForm
+
+**Signature**
+
+```ts
+declare const TaskForm: TaskForm<Execution>;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L20)
 
 ### TaskHandler
 
@@ -3382,7 +3863,7 @@ declare const TaskHandler: TaskHandler<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L21)
 
 ### TaskHandlerResult
 
@@ -3392,7 +3873,7 @@ declare const TaskHandler: TaskHandler<
 declare const TaskHandlerResult: TaskHandlerResult<Output, Errors>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L22)
 
 ### TaskHookContext
 
@@ -3402,7 +3883,7 @@ declare const TaskHandlerResult: TaskHandlerResult<Output, Errors>;
 declare const TaskHookContext: TaskHookContext<Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L23)
 
 ### TaskInput
 
@@ -3412,7 +3893,7 @@ declare const TaskHookContext: TaskHookContext<Dependencies>;
 declare const TaskInput: TaskInput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L24)
 
 ### TaskLogging
 
@@ -3422,7 +3903,7 @@ declare const TaskInput: TaskInput<T>;
 declare const TaskLogging: TaskLogging;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L25)
 
 ### TaskOutput
 
@@ -3432,7 +3913,7 @@ declare const TaskLogging: TaskLogging;
 declare const TaskOutput: TaskOutput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L26)
 
 ### TaskProgressEmitter
 
@@ -3442,7 +3923,7 @@ declare const TaskOutput: TaskOutput<T>;
 declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L29)
 
 ### TaskProgressInput
 
@@ -3452,7 +3933,7 @@ declare const TaskProgressEmitter: TaskProgressEmitter<Value>;
 declare const TaskProgressInput: TaskProgressInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L27)
 
 ### TaskProgressOutput
 
@@ -3462,7 +3943,7 @@ declare const TaskProgressInput: TaskProgressInput<Schema>;
 declare const TaskProgressOutput: TaskProgressOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L28)
 
 ### TaskRawHandlerOutput
 
@@ -3472,7 +3953,7 @@ declare const TaskProgressOutput: TaskProgressOutput<Schema>;
 declare const TaskRawHandlerOutput: TaskRawHandlerOutput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L44)
 
 ### TaskResources
 
@@ -3482,7 +3963,7 @@ declare const TaskRawHandlerOutput: TaskRawHandlerOutput<T>;
 declare const TaskResources: TaskResources;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L30)
 
 ### TaskRetryPolicy
 
@@ -3492,7 +3973,7 @@ declare const TaskResources: TaskResources;
 declare const TaskRetryPolicy: TaskRetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L31)
 
 ### TaskRunContext
 
@@ -3502,7 +3983,7 @@ declare const TaskRetryPolicy: TaskRetryPolicy;
 declare const TaskRunContext: TaskRunContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L32)
 
 ### TaskSleepOptions
 
@@ -3512,7 +3993,7 @@ declare const TaskRunContext: TaskRunContext;
 declare const TaskSleepOptions: TaskSleepOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L33)
 
 ### TaskStartHook
 
@@ -3522,7 +4003,7 @@ declare const TaskSleepOptions: TaskSleepOptions;
 declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L34)
 
 ### TaskStreamEmitter
 
@@ -3532,7 +4013,7 @@ declare const TaskStartHook: TaskStartHook<InputSchema, Dependencies>;
 declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L35)
 
 ### TaskStreamEmitters
 
@@ -3542,7 +4023,7 @@ declare const TaskStreamEmitter: TaskStreamEmitter<Value>;
 declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L36)
 
 ### TaskStreamFrames
 
@@ -3552,7 +4033,7 @@ declare const TaskStreamEmitters: TaskStreamEmitters<Streams>;
 declare const TaskStreamFrames: TaskStreamFrames<Streams>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L37)
 
 ### TaskStreamInput
 
@@ -3562,7 +4043,7 @@ declare const TaskStreamFrames: TaskStreamFrames<Streams>;
 declare const TaskStreamInput: TaskStreamInput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L39)
 
 ### TaskStreamItem
 
@@ -3572,7 +4053,7 @@ declare const TaskStreamInput: TaskStreamInput<Schema>;
 declare const TaskStreamItem: TaskStreamItem<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L38)
 
 ### TaskStreamOutput
 
@@ -3582,7 +4063,7 @@ declare const TaskStreamItem: TaskStreamItem<Schema>;
 declare const TaskStreamOutput: TaskStreamOutput<Schema>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L40)
 
 ### TaskStreamSchemas
 
@@ -3592,7 +4073,7 @@ declare const TaskStreamOutput: TaskStreamOutput<Schema>;
 declare const TaskStreamSchemas: Readonly<Record<string, StandardSchemaV1<unknown, unknown>>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L41)
 
 ### TaskSuccessHook
 
@@ -3602,7 +4083,7 @@ declare const TaskStreamSchemas: Readonly<Record<string, StandardSchemaV1<unknow
 declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L42)
 
 ### TaskTriggerOptions
 
@@ -3612,7 +4093,7 @@ declare const TaskSuccessHook: TaskSuccessHook<OutputSchema, Dependencies>;
 declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L43)
 
 ### TaskValidatedOutput
 
@@ -3622,7 +4103,7 @@ declare const TaskTriggerOptions: TaskTriggerOptions<Task>;
 declare const TaskValidatedOutput: TaskValidatedOutput<T>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L45)
 
 ### TriggerOptions
 
@@ -3632,7 +4113,7 @@ declare const TaskValidatedOutput: TaskValidatedOutput<T>;
 declare const TriggerOptions: TriggerOptions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/app/tasks.ts#L46)
 
 ### assertTaskDescriptor
 
@@ -3658,9 +4139,9 @@ declare const defineTask: <
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
-  const Execution extends TaskExecution = "durable",
+  const Execution extends TaskExecution = TaskExecution,
 >(
-  options: DefineTaskOptions<
+  options: DefineTaskCallOptions<
     Id,
     Version,
     InputSchema,
@@ -3680,7 +4161,7 @@ declare const defineTask: <
   Errors,
   ProgressSchema,
   Streams,
-  Execution
+  TaskForm<Execution>
 >;
 ```
 
