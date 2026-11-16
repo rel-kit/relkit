@@ -50,10 +50,18 @@ export const executeProjectEffect = Effect.fn("Cli.project-command")(function* (
 /**
  * Formats stable project-check diagnostics.
  * @param result - Complete check result.
- * @returns Lazy human output with the checked project's actual source authority.
+ * @returns Lazy human output with the checked project's actual source authority; a check that
+ *   passed prints its warnings above the line that names the checked project.
  */
 function formatCheckResult(result: CheckResult) {
-  if (result.ok) return Effect.succeed(`Checked ${result.projectRoot}`);
+  if (result.ok) {
+    const checked = `Checked ${result.projectRoot}`;
+    const warnings = result.diagnostics.filter(({ severity }) => severity === "warning");
+    if (warnings.length === 0) return Effect.succeed(checked);
+    return formatDiagnosticsEffect(warnings, { projectRoot: result.projectRoot }).pipe(
+      Effect.map((text) => (text ? `${text}\n${checked}` : checked)),
+    );
+  }
   return formatDiagnosticsEffect(result.diagnostics, { projectRoot: result.projectRoot }).pipe(
     Effect.map((text) => text || "Application check failed."),
   );

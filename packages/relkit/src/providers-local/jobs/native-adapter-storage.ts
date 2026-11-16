@@ -49,6 +49,7 @@ export function persistNativeRun(store: JobStore, run: LocalNativeRun): Promise<
         ...(run.error === undefined ? {} : { error: run.error }),
         ...(run.retryOfRunId === undefined ? {} : { retryOfRunId: run.retryOfRunId }),
         completedSleeps: [...run.completedSleeps],
+        ...(run.activeMs === undefined ? {} : { activeMs: run.activeMs }),
         canonicalInput: run.canonicalInput,
       }),
     })
@@ -140,6 +141,7 @@ function readRun(value: JsonValue): LocalNativeRun {
         ? value.completedSleeps.filter((entry): entry is string => typeof entry === "string")
         : [],
     ),
+    ...(typeof value.activeMs === "number" ? { activeMs: value.activeMs } : {}),
     canonicalInput: value.canonicalInput as unknown as JobWireEnvelope,
   };
 }

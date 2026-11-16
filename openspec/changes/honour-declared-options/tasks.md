@@ -21,10 +21,10 @@
 
 ## 4. Task limits
 
-- [ ] 4.1 Write the table of what each backend does with `maxDuration`, `maxElapsed` and `logging` in the evidence.
-- [ ] 4.2 Add tests that the local backend does not enforce `maxDuration` and `maxElapsed`; verify they fail before the fix, then enforce them.
-- [ ] 4.3 Add tests for the diagnostic of a backend that cannot honour an option, at check and at start; verify they fail before the fix, then add the diagnostic.
-- [ ] 4.4 Decide `logging` from its documented meaning: implement it, or propose and stop.
+- [x] 4.1 Write the table of what each backend does with `maxDuration`, `maxElapsed` and `logging` in the evidence.
+- [x] 4.2 Add tests that the local backend does not enforce `maxDuration` and `maxElapsed`; verify they fail before the fix, then enforce them.
+- [x] 4.3 Add tests for the diagnostic of a backend that cannot honour an option, at check and at start; verify they fail before the fix, then add the diagnostic.
+- [x] 4.4 Decide `logging` from its documented meaning: implement it, or propose and stop.
 
 ## 5. Proof and archive
 

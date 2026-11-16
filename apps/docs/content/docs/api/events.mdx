@@ -558,6 +558,24 @@ declare const resolveValueEffect: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L113)
 
+### soleProfile
+
+The profile a client without one publishes to: the only profile of its source.
+
+**Example**
+
+```ts
+soleProfile({ local: provider }); // "local"
+```
+
+**Signature**
+
+```ts
+declare const soleProfile: (source: unknown) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L133)
+
 ## `client-publish.ts`
 
 ### EventPublisher (class)
@@ -1582,7 +1600,7 @@ export interface EventClient<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L112)
 
 ### EventClientOptions
 
@@ -1615,6 +1633,9 @@ export interface EventClientOptions<
   readonly payloadSchema?: PayloadSchema;
   readonly profile?: string;
   readonly resolveProfile?: (profile: string) => unknown;
+  /** What the publication's span records in place of the payload, such as a copy with the
+   * event's sensitive fields replaced. The provider and the caller receive the payload itself. */
+  readonly recordedPayload?: (payload: unknown) => unknown;
   readonly bridge?: EventInvocationBridge;
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;
@@ -1652,7 +1673,7 @@ export interface EventDeclaredEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L133)
 
 ### EventDependencyError
 
@@ -1741,7 +1762,7 @@ export interface EventObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L142)
 
 ### EventOperationCancelledError
 
@@ -2007,7 +2028,7 @@ export interface EventClient<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L112)
 
 ### EventClientOptions (interface)
 
@@ -2040,6 +2061,9 @@ export interface EventClientOptions<
   readonly payloadSchema?: PayloadSchema;
   readonly profile?: string;
   readonly resolveProfile?: (profile: string) => unknown;
+  /** What the publication's span records in place of the payload, such as a copy with the
+   * event's sensitive fields replaced. The provider and the caller receive the payload itself. */
+  readonly recordedPayload?: (payload: unknown) => unknown;
   readonly bridge?: EventInvocationBridge;
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;
@@ -2077,7 +2101,7 @@ export interface EventDeclaredEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L133)
 
 ### EventInvocationBridge (interface)
 
@@ -2156,7 +2180,7 @@ export interface EventObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L142)
 
 ### EventOperationContext (interface)
 
@@ -2343,7 +2367,7 @@ isEventFunctionDescriptor(candidate);
 declare const isEventFunctionDescriptor: (value: unknown) => value is EventFunctionDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L145)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L153)
 
 ### isEventFunctionDescriptorEffect
 
@@ -2363,7 +2387,7 @@ declare const isEventFunctionDescriptorEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L154)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L162)
 
 ## `define-event-function.types.ts`
 
@@ -2452,7 +2476,8 @@ export interface EventFunctionDescriptor<
   readonly invocationMode: "event-only";
   readonly event: Event;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -2484,7 +2509,8 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
   readonly invocationMode: "event-only";
   readonly event: string;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -2492,7 +2518,7 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L153)
 
 ### EventFunctionValidation (type alias)
 
@@ -2564,7 +2590,9 @@ export interface DefineEventOptions<
   readonly input: InputSchema;
   /** The event provider profile that delivers the event; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"event">;
-  /** Names of payload fields that hold sensitive data; the Inspector lists them with the event. */
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
   readonly sensitiveFields?: readonly string[];
   /** Not an option of an event: consume the event with `defineEventFunction`. */
   readonly handler?: never;
@@ -2822,7 +2850,9 @@ export interface DefineEventOptions<
   readonly input: InputSchema;
   /** The event provider profile that delivers the event; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"event">;
-  /** Names of payload fields that hold sensitive data; the Inspector lists them with the event. */
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
   readonly sensitiveFields?: readonly string[];
   /** Not an option of an event: consume the event with `defineEventFunction`. */
   readonly handler?: never;
@@ -4209,7 +4239,8 @@ export interface EventFunctionDescriptor<
   readonly invocationMode: "event-only";
   readonly event: Event;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -4241,7 +4272,8 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
   readonly invocationMode: "event-only";
   readonly event: string;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -4249,7 +4281,7 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L153)
 
 ### EventFunctionHandler (type alias)
 
@@ -4637,7 +4669,9 @@ export interface DefineEventOptions<
   readonly input: InputSchema;
   /** The event provider profile that delivers the event; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"event">;
-  /** Names of payload fields that hold sensitive data; the Inspector lists them with the event. */
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
   readonly sensitiveFields?: readonly string[];
   /** Not an option of an event: consume the event with `defineEventFunction`. */
   readonly handler?: never;
@@ -4690,7 +4724,7 @@ export interface EventClient<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L112)
 
 ### EventClientOptions
 
@@ -4723,6 +4757,9 @@ export interface EventClientOptions<
   readonly payloadSchema?: PayloadSchema;
   readonly profile?: string;
   readonly resolveProfile?: (profile: string) => unknown;
+  /** What the publication's span records in place of the payload, such as a copy with the
+   * event's sensitive fields replaced. The provider and the caller receive the payload itself. */
+  readonly recordedPayload?: (payload: unknown) => unknown;
   readonly bridge?: EventInvocationBridge;
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;
@@ -4760,7 +4797,7 @@ export interface EventDeclaredEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L133)
 
 ### EventDependencyError
 
@@ -4942,7 +4979,7 @@ export interface EventObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L142)
 
 ### EventOperationCancelledError
 

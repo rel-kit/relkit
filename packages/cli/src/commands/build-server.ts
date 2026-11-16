@@ -14,6 +14,7 @@ import { SERVER_TELEMETRY_SOURCE } from "./build-server-telemetry.js";
 import { serverApplicationSource } from "./build-server-application.js";
 import { serverProviderSource } from "./build-server-provider.js";
 import { localDurableProfiles } from "./build-durable-warnings.js";
+import { unsupportedTaskOptions } from "./task-option-warnings.js";
 import { serverTailSource } from "./build-server-tail.js";
 
 /** Opens the activation function; `createRelkit` calls it with `{ embedded: true }`. */
@@ -77,7 +78,10 @@ export function serverSource(
     serverIdentitySource(input),
     SERVER_TELEMETRY_SOURCE,
     serverApplicationSource(input),
-    serverProviderSource(localDurableProfiles(JSON.stringify(graph))),
+    serverProviderSource(
+      localDurableProfiles(JSON.stringify(graph)),
+      unsupportedTaskOptions(JSON.stringify(graph)),
+    ),
     serverTailSource(input),
     configuration.runtime === "workers" ? WORKERS_ACTIVATION_END : EMBEDDED_ACTIVATION_END,
   ].join("");

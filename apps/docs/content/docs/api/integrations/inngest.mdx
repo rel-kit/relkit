@@ -566,7 +566,7 @@ export interface InngestPolicyMapping {
 
 ### mapInngestPolicy
 
-Maps only fields whose semantics are certified by the pinned Inngest profile.
+Maps the task options Inngest has an equivalent for and refuses the ones it cannot map.
 
 **Signature**
 
@@ -574,7 +574,7 @@ Maps only fields whose semantics are certified by the pinned Inngest profile.
 declare const mapInngestPolicy: (value: unknown) => InngestPolicyMapping;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runtime/policy.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/inngest/src/runtime/policy.ts#L13)
 
 ## `realtime.ts`
 

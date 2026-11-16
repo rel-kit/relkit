@@ -23,3 +23,13 @@ trace views and telemetry exporters that send those records. Before, the option 
 shown as a label and nothing was redacted. Publishers, event functions and replay receive the real
 payload. A name matches a key anywhere in the payload; a dotted path such as `customer.email`
 matches from its root.
+
+Fixed: the local jobs backend enforces `maxDuration` and `maxElapsed` of a task. Before, both were
+ignored. An attempt that works longer than `maxDuration` fails with `RELKIT_TIMEOUT` and is retried
+while the task's `retry` allows it; time asleep or waiting to retry does not count. A run that
+reaches `maxElapsed`, counted from its acceptance, is not retried. A run stopped by either limit
+ends with the status `timed-out`. After the upgrade, a task on the local backend that declares a
+limit and ran longer than it now times out.
+
+Added: the diagnostic `RELKIT_JOB_TASK_OPTION_UNSUPPORTED` for a task limit that the selected jobs
+backend does not enforce.

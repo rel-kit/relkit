@@ -57,3 +57,64 @@ What the options mean (type comments and the archived design `2026-09-21-add-tas
 No backend reported any of the three at `relkit check` or at start. Sources: `providers-local/jobs/native-adapter-work.ts` (reads `retry` only), `integrations/packages/inngest/src/runtime/policy.ts` and `runtime/index.ts`, `integrations/packages/trigger/src/runtime/task-binding.ts`, `integrations/packages/effect-mq/src/runtime/postgres-state.ts`, `integrations/packages/postgres/src/runtime/jobs-lease.ts`.
 
 How the local backend runs an attempt: `createRun` stores `acceptedAt`; `nextRun` sets `startedAt` and a per-attempt abort controller; a sleep suspends the attempt (`suspendRun`) and the handler runs again from the start on wake; `failRun` schedules a retry or fails the run. The engine already fails an invocation whose binding carries `run.deadlineMs` with the failure kind `timeout` (`RELKIT_TIMEOUT`); no jobs adapter set that field.
+
+## 5. Task limits after this change
+
+### Reproduction on the local backend
+
+`packages/relkit/tests/providers-local/native-job-limits.test.ts` defines a task with `defineTask`, a job with `defineJob`, builds a jobs runtime over the real local backend in a temporary directory, submits with `submitJob`, and runs worker passes the way the generated server does (`worker.next`, `executeTask`, then `complete`, `suspend` or `fail`). So the policy travels from the definition to the backend as it does in an application.
+
+Before the change, five of its six tests failed (first run, with the first, shorter timings):
+
+| Test                                                                             | Before                                                             |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| An attempt that works longer than `maxDuration` is stopped and the run times out | the pass took 507 ms for a 40 ms limit; the handler ran to its end |
+| An attempt stopped by `maxDuration` is retried while attempts remain             | status `completed`, attempt 1                                      |
+| Time asleep does not count toward `maxDuration`, time worked before it does      | the run that worked 200 ms against 150 ms was `completed`          |
+| A run past `maxElapsed` times out without another attempt                        | 5 attempts ran against a limit that leaves room for 2              |
+| A run asleep past `maxElapsed` times out at the limit                            | the run was not claimed; it stayed `sleeping`                      |
+| A run without limits is not given a deadline                                     | passed (guard against a deadline on every run)                     |
+
+After the change all six pass, eight runs in a row. The limits in the test are 200 ms and more: the clock of an attempt starts when the backend claims it, and the claim is written to the journal first, which took up to tens of milliseconds on the loaded machine and made a 40 ms limit fail an attempt that did no work.
+
+### Reproduction of the missing report
+
+`packages/cli/tests/check-task-options.test.ts` copies the minimal fixture application, adds a task with both limits and a job, and runs the real check pipeline.
+
+| Test                                                                        | Before                                                           | After                                                                                           |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Check warns for each limit the jobs backend does not enforce (Inngest)      | no diagnostic                                                    | 2 warnings, check passes                                                                        |
+| The check command prints the warnings of a check that passes                | printed only `Checked <root>` (seen by disabling the new branch) | the warnings, then `Checked <root>`, exit code 0                                                |
+| The generated server logs each unenforced limit as a warning when it starts | the source had no such list                                      | one `warn` log record per entry, with the code, task, option, backend and profile in its fields |
+| Check does not warn on the local backend                                    | passes before and after                                          | it would fail if the local adapter lost a feature                                               |
+
+The output of `relkit check` on that application, as printed:
+
+```text
+src/hello/tasks/export.task.ts:4:16 - warning RELKIT_JOB_TASK_OPTION_UNSUPPORTED: Task "hello.export" declares maxDuration, which the inngest jobs backend (profile "default") does not enforce.
+  suggestion: Enforce the limit in the task's handler, or remove maxDuration. The local backend from `@relkit/local` enforces it.
+  docs: https://relkit.dev/docs/errors/relkit-job-task-option-unsupported
+src/hello/tasks/export.task.ts:4:16 - warning RELKIT_JOB_TASK_OPTION_UNSUPPORTED: Task "hello.export" declares maxElapsed, which the inngest jobs backend (profile "default") does not enforce.
+  suggestion: Enforce the limit in the task's handler, or remove maxElapsed. The local backend from `@relkit/local` enforces it.
+  docs: https://relkit.dev/docs/errors/relkit-job-task-option-unsupported
+Checked <project root>
+```
+
+Inngest: `integrations/packages/inngest/policy-defaults.test.ts` and `inngest.test.ts` were changed first and failed with the old message (`Inngest cannot certify task policy field "maxElapsed".`); they pass after the mapping changed.
+
+### What each backend does now
+
+| Option        | local                                                                                           | Inngest                                                                                                   | Trigger.dev                                 | Effect MQ                                   | Postgres                                    |
+| ------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------- | ------------------------------------------- |
+| `maxDuration` | enforced per attempt; `RELKIT_TIMEOUT`, retried by the task's `retry`, final status `timed-out` | not enforced; warning at check and at start. A submission still fails when the value is not whole seconds | not enforced; warning at check and at start | not enforced; warning at check and at start | not enforced; warning at check and at start |
+| `maxElapsed`  | enforced from acceptance; no further attempt, status `timed-out`                                | not enforced; warning at check and at start; a submission is no longer refused                            | not enforced; warning at check and at start | not enforced; warning at check and at start | not enforced; warning at check and at start |
+| `logging`     | no defined meaning; ignored, not reported (unchanged)                                           | a submission is refused, now with a message that names the backend and the option                         | ignored, not reported (unchanged)           | ignored, not reported (unchanged)           | ignored, not reported (unchanged)           |
+
+The rows for Inngest, Trigger.dev, Effect MQ and Postgres rest on reading their code and on the feature lists of their adapters, not on a run against those services. The warning for each was produced by the check from the adapter's real feature list only for Inngest; the others use the same rule (no `task-max-duration` or `task-max-elapsed` feature in `integrations/packages/*/src`).
+
+### Suites
+
+- `packages/relkit/tests/providers-local`, `tests/jobs`, `tests/diagnostics` (Vitest): 85 files passed, 309 tests.
+- `tests/compiler` (Bun): 163 passed. CLI tests near the change (check rules, check JSON, build warnings, build runtime, production artifacts, development logs): 27 passed. `integrations/packages/local` and `inngest`: 30 passed. Documentation error pages: 3 passed.
+- `bun run lint`, `bun run check`, `konsistent validate`, `generate:check`: passed.
+- `bun run test:integration` is not part of the required checks and has 10 failures that this change does not touch (an OpenAPI description, an upload status, a missing `defineAgent` export in the built LangChain package, a layout migration fixture).

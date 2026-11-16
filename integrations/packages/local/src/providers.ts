@@ -12,6 +12,9 @@ const event = defineProviderCapability("event");
 const job = defineProviderCapability("job");
 const durable = defineProviderFeature(job, "durable");
 const retryable = defineProviderFeature(job, "retryable");
+// The local backend stops an attempt at `maxDuration` and a run at `maxElapsed`.
+const maxDuration = defineProviderFeature(job, "task-max-duration");
+const maxElapsed = defineProviderFeature(job, "task-max-elapsed");
 const realtime = defineProviderCapability("realtime");
 const agentState = defineProviderCapability("agent-state");
 const integration = defineIntegrationReference("local");
@@ -55,7 +58,12 @@ export function localEvent(options: LocalProviderOptions = {}): LocalEventAdapte
  * @since 0.4.0
  */
 export function localJob(options: LocalProviderOptions = {}): LocalJobAdapter {
-  return adapter(job, "local-job", options, [durable, retryable]) as LocalJobAdapter;
+  return adapter(job, "local-job", options, [
+    durable,
+    retryable,
+    maxDuration,
+    maxElapsed,
+  ]) as LocalJobAdapter;
 }
 
 export function localRealtime(options: LocalProviderOptions = {}): LocalRealtimeAdapter {

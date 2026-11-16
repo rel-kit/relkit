@@ -36,6 +36,11 @@ reports each compiler error with its file, line and message. If your `tsconfig.j
 which extends yours and adds that file, and checks that configuration instead. A project that
 installs no TypeScript is checked with the TypeScript 5.9 bundled in `@relkit/cli`.
 
+A check that passes prints its warnings above the line that names the checked project, for example
+a task limit that the selected jobs backend does not enforce
+([`RELKIT_JOB_TASK_OPTION_UNSUPPORTED`](/docs/errors/relkit-job-task-option-unsupported)). A
+warning does not change the exit code. With `--json`, warnings are in `diagnostics`.
+
 ## Which side effects are blocked
 
 While a module is imported, the child replaces these Node and Bun APIs. A blocked call throws, the

@@ -660,10 +660,11 @@ declare const createApplicationRequest: (
   applicationRuntime: TestRuntime,
   services: TestApplicationServices,
   context: Record<string, unknown>,
+  overrides?: Readonly<Record<string, unknown>>,
 ) => TestHttpApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-request.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-request.ts#L21)
 
 ## `application-routes.ts`
 
@@ -5605,7 +5606,7 @@ export interface TestRuntimeOptions<S extends EnvShape = EnvShape> {
   readonly startTimeMs?: number;
   /** Time `close` waits for running work, in milliseconds. Defaults to `1000`. */
   readonly closeTimeoutMs?: number;
-  /** Fields that replace the handler context's defaults; `createTestApplication` ignores it. */
+  /** Fields that replace the handler context's defaults, such as `auth` or `database`. */
   readonly context?: Readonly<Record<string, unknown>>;
   /** Replacements for provider profiles, by capability then profile name, such as test fakes. */
   readonly providers?: TestProviderReplacements;
@@ -7187,7 +7188,7 @@ export interface TestRuntimeOptions<S extends EnvShape = EnvShape> {
   readonly startTimeMs?: number;
   /** Time `close` waits for running work, in milliseconds. Defaults to `1000`. */
   readonly closeTimeoutMs?: number;
-  /** Fields that replace the handler context's defaults; `createTestApplication` ignores it. */
+  /** Fields that replace the handler context's defaults, such as `auth` or `database`. */
   readonly context?: Readonly<Record<string, unknown>>;
   /** Replacements for provider profiles, by capability then profile name, such as test fakes. */
   readonly providers?: TestProviderReplacements;
@@ -7311,7 +7312,7 @@ export interface TestRuntimeOptions<S extends EnvShape = EnvShape> {
   readonly startTimeMs?: number;
   /** Time `close` waits for running work, in milliseconds. Defaults to `1000`. */
   readonly closeTimeoutMs?: number;
-  /** Fields that replace the handler context's defaults; `createTestApplication` ignores it. */
+  /** Fields that replace the handler context's defaults, such as `auth` or `database`. */
   readonly context?: Readonly<Record<string, unknown>>;
   /** Replacements for provider profiles, by capability then profile name, such as test fakes. */
   readonly providers?: TestProviderReplacements;
