@@ -12,9 +12,9 @@ library, `profile` accepts any string. For a name built in code, use `ProviderPr
 
 Fixed: an option that `defineFunction` or `defineEventFunction` does not have is a type error on
 that option, such as `Type 'number' is not assignable to type 'UnknownOption<"timeout">'`; before,
-it was accepted and the function failed when it was loaded. The removed option `publishes` is no
-longer suggested, and its error names what replaces it:
-`RemovedOption<"publishes", "dependencies.events">`.
+it was accepted without an error and had no effect. A project that has such an option now fails to
+type-check until the option is removed. The removed option `publishes` is no longer suggested, and
+its error names what replaces it: `RemovedOption<"publishes", "dependencies.events">`.
 
 Fixed: your editor suggests both values of `execution` in `defineTask` on TypeScript 5.9; before, it
 suggested `durable` only. `defineTask` and `defineTaskEffect` type the option through a parameter
