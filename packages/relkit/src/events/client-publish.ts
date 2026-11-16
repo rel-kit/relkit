@@ -136,16 +136,36 @@ export function publishEventEffect<
                 : Effect.runPromise(Effect.provide(execute(controller.signal), ambient), {
                     signal: effectSignal,
                   });
-            return (
-              options.bridge?.run(work, {
+            const record = options.recordedPayload;
+            if (record === undefined)
+              return (
+                options.bridge?.run(work, {
+                  name,
+                  attributes,
+                  input: payload,
+                  signal,
+                  kind: "producer",
+                }) ??
+                frameworkTrace.span(name, { input: payload, kind: "producer", attributes }, work)
+              );
+            // The span records its input and what its work returns. Both get the recorded form
+            // of the payload; the caller gets the result that `work` produced.
+            let published: Awaited<ReturnType<typeof work>> | undefined;
+            const recordedWork = async () => {
+              published = await work();
+              return { ...published, payload: record(published.payload) };
+            };
+            const input = record(payload);
+            const traced: Promise<unknown> =
+              options.bridge?.run(recordedWork, {
                 name,
                 attributes,
-                input: payload,
+                input,
                 signal,
                 kind: "producer",
               }) ??
-              frameworkTrace.span(name, { input: payload, kind: "producer", attributes }, work)
-            );
+              frameworkTrace.span(name, { input, kind: "producer", attributes }, recordedWork);
+            return traced.then(() => published!);
           }),
         (controller) => Effect.sync(() => controller.abort()),
       );

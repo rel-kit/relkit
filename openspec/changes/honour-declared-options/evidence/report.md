@@ -33,6 +33,13 @@ Traced from `context.events.<name>.publish(payload)` through delivery, replay an
 
 Capture is off unless `telemetry.redaction.mode` is `development-redacted`; with it off nothing above records the payload.
 
+Reproduced. `tests/security/redaction/event-sensitive-fields.test.ts`, with `sensitiveFields: ["cardNumber", "customer.email"]`:
+
+- The event function's span recorded `cardNumber: "4111-1111-1111-1111"` and `customer.email` in clear text. Failed first; it now records `[REDACTED]` for both, no record of any signal contains either value, and the handler received the real payload.
+- The publication's span recorded both values in its input and under `payload` in its output. Failed first; both now carry the marker, and the publishing function read the real card number back from the publish result.
+
+How each place is covered: the two spans by that test; the store, the Inspector's views and the Sentry exporter read the admitted span records, which the test reads from the collector; the Inspector's publish action passes the same option (`inspector-api/event-actions.ts`); replay is the event function's invocation with the source `event-replay`. Unit tests: `redactNamedFields` in `packages/relkit/tests/observability/redaction.test.ts`, the bound target in `packages/relkit/tests/events/event-binding.test.ts`.
+
 How the existing policy matches a key: the marker is `[REDACTED]`; a key matches by its name anywhere in the value, or by its dotted path from the root of the captured value, after lowercasing and removing spaces, `_` and `-`; an array index is a path segment.
 
 `sensitiveFields` today: an array of unique non-empty strings, trimmed; no syntax is checked and nothing is compared with the input schema. Its only description is the type comment.

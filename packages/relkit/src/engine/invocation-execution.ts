@@ -7,6 +7,7 @@ import {
 } from "../invocation/index.js";
 import { Context, Exit, Option, Tracer } from "effect";
 import { createInvocationSpanOptions } from "./invoke-tracing.js";
+import { recordedInput } from "./recorded-input.js";
 import type {
   InvocationIdSource,
   InvocationRecord,
@@ -134,7 +135,7 @@ export function createInvocationExecution<
   return Object.freeze({
     span,
     run: <A>(callback: () => A): A => runInExecutionContext(context, callback),
-    captureInput: (value: unknown): void => span.capture("input", value),
+    captureInput: (value: unknown): void => span.capture("input", recordedInput(target, value)),
     captureOutput: (value: unknown): void => span.capture("output", value),
     complete: (outcome: string, error?: InvocationValidationError | InvocationFailure): void => {
       const now = BigInt(Date.now()) * 1_000_000n;

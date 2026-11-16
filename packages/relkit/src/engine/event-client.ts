@@ -2,6 +2,7 @@ import { createEventClient, type EventObservedEdge } from "../events/index.js";
 import type { ObservedEdge } from "../graph/index.js";
 import type { DependencyClientBuildOptions } from "./dependencies.js";
 import { declaredDependencies } from "./dependency-identity.js";
+import { redactNamedFields } from "../observability/redaction.js";
 
 /** Bridge declared event publication with the active producer propagation context.
  * @returns A declared event publication client with invocation propagation.
@@ -24,6 +25,7 @@ export function createEventDependencyClient(
     source,
     ...(declaration?.input === undefined ? {} : { payloadSchema: declaration.input }),
     ...(declaration?.profile === undefined ? {} : { profile: declaration.profile }),
+    ...recordedPayloadOption(declaration),
     ...(options.bridge === undefined ? {} : { bridge: options.bridge }),
     ...(options.signal === undefined ? {} : { signal: options.signal }),
     ...(options.deadline === undefined ? {} : { deadline: options.deadline }),
@@ -37,4 +39,21 @@ export function createEventDependencyClient(
         }),
     declared: true,
   });
+}
+
+/** The publication records the marker for the fields the event declares sensitive.
+ * @param declaration - The declared event dependency, normally the event descriptor.
+ * @returns The client's `recordedPayload` option, or nothing when no field is sensitive.
+ * @example recordedPayloadOption({ sensitiveFields: ["cardNumber"] });
+ */
+export function recordedPayloadOption(declaration: unknown): {
+  readonly recordedPayload?: (payload: unknown) => unknown;
+} {
+  const fields =
+    declaration !== null && typeof declaration === "object"
+      ? (declaration as { readonly sensitiveFields?: unknown }).sensitiveFields
+      : undefined;
+  if (!Array.isArray(fields) || fields.length === 0) return {};
+  const names = fields.filter((field): field is string => typeof field === "string");
+  return { recordedPayload: (payload: unknown) => redactNamedFields(payload, names) };
 }

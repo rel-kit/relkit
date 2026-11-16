@@ -73,6 +73,17 @@ export function captureRedacted(
   }
   return Object.freeze({ mode: normalized.mode, bytes, truncated: false, content });
 }
+/** Replaces the named fields of one value with the marker, by the rules a capture uses: a name
+ * matches a key anywhere in the value, and a dotted path matches from the value's root. */
+export function redactNamedFields(value: unknown, fields: readonly string[]): unknown {
+  if (value === undefined || fields.length === 0) return value;
+  const policy = createRedactionPolicy({
+    mode: "development-redacted",
+    maxBytes: Number.MAX_SAFE_INTEGER,
+    redactKeys: [...fields],
+  });
+  return safeValue(redact(value, policy, true, ROOT, new Set<object>()));
+}
 /** Where the walk is: the normalized ancestor keys joined by "." and whether one ends in "capture". */
 interface RedactionPath {
   readonly depth: number;

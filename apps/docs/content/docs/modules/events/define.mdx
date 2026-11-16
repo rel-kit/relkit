@@ -61,6 +61,29 @@ Use `defineEvent` to name an event and describe its data. In your app, create `s
 
 Here, each order event carries an order ID, product code, and total.
 
+### Mark sensitive fields
+
+List the fields of the payload that must not be shown to people in `sensitiveFields`:
+
+```ts title="src/services/orders/events/order-created.event.ts"
+export default defineEvent({
+  id: "orders.created",
+  input: z.object({ orderId: z.string(), cardNumber: z.string(), customer: customerSchema }),
+  sensitiveFields: ["cardNumber", "customer.email"],
+});
+```
+
+RelKit records `[REDACTED]` in place of those fields wherever it records the payload: the trace of
+the function that publishes the event, the trace of each event function that receives it, the
+Inspector's views of those traces, and telemetry exporters. The publisher, the event functions and a
+replay receive the real values, so the event store keeps them.
+
+A name such as `cardNumber` matches a key of that name anywhere in the payload, whatever its case
+and separators. A dotted path such as `customer.email` matches from the root of the payload, and an
+array index is a segment of the path (`items.0.note`). Payloads are recorded only when
+`telemetry.redaction.mode` is `"development-redacted"`; the keys of that policy, such as `password`
+and `token`, are redacted as well.
+
 ## Check your event
 
 After adding the file, run this from your app's root:

@@ -15,9 +15,9 @@
 
 ## 3. Sensitive event fields
 
-- [ ] 3.1 List every place an event payload is recorded or shown, with the test for each, in the evidence.
-- [ ] 3.2 Add tests that a sensitive field appears unredacted at each place; verify they fail before the fix.
-- [ ] 3.3 Redact at the recording and projection boundary with the existing marker and path rules; verify the tests pass and that a handler, a reaction and a replay receive the real payload.
+- [x] 3.1 List every place an event payload is recorded or shown, with the test for each, in the evidence.
+- [x] 3.2 Add tests that a sensitive field appears unredacted at each place; verify they fail before the fix.
+- [x] 3.3 Redact at the recording and projection boundary with the existing marker and path rules; verify the tests pass and that a handler, a reaction and a replay receive the real payload.
 
 ## 4. Task limits
 

@@ -69,7 +69,9 @@ export interface DefineEventOptions<
   readonly input: InputSchema;
   /** The event provider profile that delivers the event; the application's default when omitted. */
   readonly profile?: ProviderProfileName<"event">;
-  /** Names of payload fields that hold sensitive data; the Inspector lists them with the event. */
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
   readonly sensitiveFields?: readonly string[];
   /** Not an option of an event: consume the event with `defineEventFunction`. */
   readonly handler?: never;
