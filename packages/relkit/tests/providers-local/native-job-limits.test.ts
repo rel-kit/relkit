@@ -11,12 +11,12 @@ import {
   type JobDescriptorAny,
   type JobsRuntime,
 } from "../../src/jobs/index.ts";
-import type { NativeJobsAdapter } from "../../src/jobs/adapter.js";
+import type { JobsAdapterRuntime } from "../../src/jobs/adapter.js";
 import { createLocalNativeJobProvider } from "../../src/providers-local/jobs/native-adapter.ts";
 import { z } from "../../src/schema/index.js";
 
 let root: string;
-let adapter: NativeJobsAdapter;
+let adapter: JobsAdapterRuntime;
 
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), "relkit-native-limits-"));
