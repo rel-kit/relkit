@@ -17,7 +17,8 @@ for (const [name, start] of Object.entries(EDITORS))
       driver = await start();
     }, 120_000);
     afterAll(async () => {
-      await driver.close();
+      // Unset when the editor did not start; that failure is already reported.
+      await (driver as EditorDriver | undefined)?.close();
     });
 
     test("the fixture application has no type error", async () => {

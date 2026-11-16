@@ -47,6 +47,8 @@ export interface DriverOptions {
   readonly project: string;
   /** Directory whose `node_modules` holds the TypeScript 5.9 package to load. */
   readonly typescriptFrom: string;
+  /** Major version the loaded package must have; another one is an error that names both. */
+  readonly major: number;
 }
 
 /**
@@ -58,6 +60,12 @@ export function createLanguageServiceDriver(options: DriverOptions): EditorDrive
   const ts = createRequire(join(options.typescriptFrom, "package.json"))(
     "typescript",
   ) as typeof TypeScript;
+  // Resolution falls back to the workspace compiler, which has another API, when the directory
+  // does not depend on this version.
+  if (!String(ts.version).startsWith(`${options.major}.`))
+    throw new Error(
+      `Expected TypeScript ${options.major} from ${options.typescriptFrom}, found ${ts.version}.`,
+    );
   const system = ts.sys;
   const parsed = ts.getParsedCommandLineOfConfigFile(
     options.project,

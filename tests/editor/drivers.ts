@@ -10,11 +10,13 @@ export const FIXTURE = join(import.meta.dir, "fixture");
 
 /** The editors by name; each starts on demand. */
 export const EDITORS: Readonly<Record<string, () => Promise<EditorDriver>>> = {
-  // `@relkit/cli` depends on TypeScript 5.9, the version generated applications start with.
+  // TypeScript 5.9 is the version generated applications start with. The documentation site is
+  // the workspace package that depends on it, so a clean install resolves it from there.
   "TypeScript 5.9 language service": async () =>
     createLanguageServiceDriver({
       project: join(import.meta.dir, "tsconfig.json"),
-      typescriptFrom: join(root, "packages/cli"),
+      typescriptFrom: join(root, "apps/docs"),
+      major: 5,
     }),
   // The workspace compiler is TypeScript 7; its language server is the same binary.
   "TypeScript 7 language server": () =>
