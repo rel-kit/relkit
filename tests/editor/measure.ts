@@ -54,8 +54,15 @@ export async function measure(
     // In the global scope a known value counts only when the editor ranks it first.
     const offered = global ? names.slice(0, probe.expect.length) : names;
     const found = probe.expect.filter((name) => offered.includes(name));
+    const unwanted = (probe.absent ?? []).filter((name) => names.includes(name));
     const verdict: Verdict =
-      found.length === probe.expect.length ? "works" : found.length === 0 ? "nothing" : "partly";
+      unwanted.length > 0
+        ? "misleading"
+        : found.length === probe.expect.length
+          ? "works"
+          : found.length === 0
+            ? "nothing"
+            : "partly";
     const list = names.slice(0, NAMES_SHOWN).join(", ");
     const more = names.length > NAMES_SHOWN ? ", …" : "";
     return {

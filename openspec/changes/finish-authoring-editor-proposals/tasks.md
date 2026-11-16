@@ -10,8 +10,8 @@
 
 ## 2. Unknown options
 
-- [ ] 2.1 Add probes for an unknown option in `defineEventFunction`, `defineTask` and `defineJob` and record the wanted verdicts for `defineFunction`; verify the editor test fails on them before the change.
-- [ ] 2.2 Type unknown keys as `UnknownOption` and `publishes` as `RemovedOption`; verify the editor test and `tests/types/` on both compilers.
+- [x] 2.1 Add probes for an unknown option in `defineEventFunction`, `defineTask` and `defineJob` and record the wanted verdicts for `defineFunction`; verify the editor test fails on them before the change.
+- [x] 2.2 Type unknown keys as `UnknownOption` and `publishes` as `RemovedOption`; verify the editor test and `tests/types/` on both compilers.
 
 ## 3. One signature
 

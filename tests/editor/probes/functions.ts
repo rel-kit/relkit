@@ -45,6 +45,7 @@ export const functionsProbes: readonly Probe[] = [
     "  timeoutMs: 10_000,\n",
     "  timeoutMs: 10_000,\n  |\n",
     ["progress", "concurrency", "tool", "onBefore", "onAfter", "description", "tags"],
+    { absent: ["publishes"] },
   ),
   suggest(
     "defineFunction",
@@ -100,8 +101,7 @@ export const functionsProbes: readonly Probe[] = [
     "create-order.function.ts",
     "  timeoutMs: 10_000,\n",
     "  timeoutMs: 10_000,\n  publishes: [orderPlaced],\n",
-    ["publishes"],
-    { verdict: "misleading", cause: "captured-options" },
+    ["dependencies.events"],
   ),
   wrong(
     "defineFunction",
@@ -110,7 +110,6 @@ export const functionsProbes: readonly Probe[] = [
     "  timeoutMs: 10_000,\n",
     "  timeout: 10_000,\n",
     ["timeout"],
-    { verdict: "nothing", cause: "captured-options" },
   ),
   suggest(
     "defineError",

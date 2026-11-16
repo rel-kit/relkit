@@ -191,4 +191,12 @@ export const routesEventsProbes: readonly Probe[] = [
     '  presence: "count",\n  profile: "main",\n',
     ["default"],
   ),
+  wrong(
+    "defineEventFunction",
+    "unknown option",
+    "on-order-placed.function.ts",
+    '  event: "orders.placed",\n',
+    '  event: "orders.placed",\n  timeout: 5,\n',
+    ["timeout"],
+  ),
 ];

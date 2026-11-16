@@ -33,3 +33,4 @@ export * from "./agent-thread-transition.js";
 export * from "./problem-details.js";
 export * from "./access.js";
 export type * from "./profile.types.js";
+export type * from "./option.types.js";

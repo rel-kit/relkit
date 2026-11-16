@@ -1,3 +1,4 @@
+import type { RejectUnknownOptions } from "../contracts/index.js";
 import type { InferOutput, StandardSchemaV1 } from "../schema/index.js";
 import type { ErrorDescriptorAny } from "./define-error.js";
 import type { FunctionToolMetadata } from "./function-tool.js";
@@ -29,8 +30,6 @@ export type FunctionCallOptions<
   >,
   "handler" | "onBefore" | "onAfter"
 > & {
-  /** Removed: declare each event under `dependencies.events` instead. */
-  readonly publishes?: never;
   // Repeats the constraint so an editor lists the dependency kinds while the object is being
   // typed: inference from the object is blocked then, and `Dependencies` alone has no members.
   readonly dependencies?: FunctionDependencies;
@@ -41,6 +40,15 @@ export type FunctionCallOptions<
     context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,
   ) => unknown;
 };
+
+/** Reports an option `defineFunction` does not have on its key; `publishes` was removed.
+ * @internal
+ */
+export type FunctionUnknownOptions<Options, Known extends PropertyKey> = RejectUnknownOptions<
+  Options,
+  Known,
+  { readonly publishes: "dependencies.events" }
+>;
 
 /** Rejects handler output or declared-error mismatches after contextual inference.
  * @internal

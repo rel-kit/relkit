@@ -27,6 +27,8 @@ export interface Probe {
   readonly replacement: string;
   /** Names a developer expects among the suggestions. */
   readonly expect?: readonly string[];
+  /** Names the editor must not offer, such as an option that was removed. */
+  readonly absent?: readonly string[];
   /** Texts the single error must contain, such as the valid names. */
   readonly error?: readonly string[];
   /** What the editor does here; the test fails when a measurement differs. */
@@ -45,7 +47,7 @@ export const suggest = (
   anchor: string,
   replacement: string,
   expect: readonly string[],
-  rest: Partial<Pick<Probe, "verdict" | "typescript7" | "cause">> = {},
+  rest: Partial<Pick<Probe, "verdict" | "typescript7" | "cause" | "absent">> = {},
 ): Probe => ({ surface, position, file, anchor, replacement, expect, verdict: "works", ...rest });
 
 /** A diagnostic probe whose single error names the given texts. */

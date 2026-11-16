@@ -14,6 +14,7 @@ import type {
   ErrorListOf,
   FunctionCallOptions,
   FunctionCallValidation,
+  FunctionUnknownOptions,
   ToolMetadataOf,
 } from "./define-function-inference.types.js";
 import type { FunctionOperationError } from "./function-observability.js";
@@ -47,7 +48,11 @@ export interface DefineFunction {
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> &
+      FunctionUnknownOptions<
+        NoInfer<Options>,
+        keyof FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>
+      >,
   ): FunctionDescriptor<
     Id,
     InferOutput<InputSchema>,
@@ -79,7 +84,11 @@ export interface DefineFunctionEffect {
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> &
+      FunctionUnknownOptions<
+        NoInfer<Options>,
+        keyof FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>
+      >,
   ): Effect.Effect<
     FunctionDescriptor<
       Id,

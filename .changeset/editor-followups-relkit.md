@@ -9,3 +9,9 @@ not a profile is a type error instead of a failure of `relkit check`. The names 
 generated context registry; run `relkit check` once so it carries them. Without them, as in a
 library, `profile` accepts any string. For a name built in code, use `ProviderProfileName` from
 `relkit/contracts`.
+
+Fixed: an option that `defineFunction` or `defineEventFunction` does not have is a type error on
+that option, such as `Type 'number' is not assignable to type 'UnknownOption<"timeout">'`; before,
+it was accepted and the function failed when it was loaded. The removed option `publishes` is no
+longer suggested, and its error names what replaces it:
+`RemovedOption<"publishes", "dependencies.events">`.

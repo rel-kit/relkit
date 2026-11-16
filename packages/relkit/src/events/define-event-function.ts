@@ -1,4 +1,4 @@
-import { isDescriptor, normalizeId } from "../contracts/index.js";
+import { isDescriptor, normalizeId, type RejectUnknownOptions } from "../contracts/index.js";
 import { createFunctionDescriptor } from "../functions/descriptor-factory.js";
 import { z } from "../schema/index.js";
 import { Effect, Option } from "effect";
@@ -65,7 +65,8 @@ export function defineEventFunction<
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ): EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>> {
   try {
     return runEventSync(defineEventFunctionEffect(options));
@@ -89,7 +90,8 @@ export function defineEventFunctionEffect<
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ): Effect.Effect<
   EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
   EventDefinitionError
