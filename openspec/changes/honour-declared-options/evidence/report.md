@@ -118,3 +118,60 @@ The rows for Inngest, Trigger.dev, Effect MQ and Postgres rest on reading their 
 - `tests/compiler` (Bun): 163 passed. CLI tests near the change (check rules, check JSON, build warnings, build runtime, production artifacts, development logs): 27 passed. `integrations/packages/local` and `inngest`: 30 passed. Documentation error pages: 3 passed.
 - `bun run lint`, `bun run check`, `konsistent validate`, `generate:check`: passed.
 - `bun run test:integration` is not part of the required checks and has 10 failures that this change does not touch (an OpenAPI description, an upload status, a missing `defineAgent` export in the built LangChain package, a layout migration fixture).
+
+## 6. Proof on the logistics application
+
+A plain folder copy of the application (`git archive main | tar -x`, outside both repositories), its own `.env`, the database `relkit_honour_proof`, port 4130. The branch's packages were packed, served from a local registry and installed with an empty cache: with npm and again with Bun, 14,037 files of 11 packages compared with the packed ones, 0 differ. The application itself was not changed; the edits below are in the copy only.
+
+### Event function without `profile`
+
+`profile: "local"` removed from `drivers.release-unavailable-vehicle` (the application has one event profile, `local`, and `defaults.event: "local"`).
+
+- `relkit check`: `Checked <copy>`, exit 0, on Node and on Bun. `tsc --noEmit`: exit 0.
+- The compiled graph's trigger `relkit.event.drivers.release-unavailable-vehicle.trigger` has `profile: "local"`.
+- The reaction ran 20 times in each harness run (its own log line `released driver from unavailable vehicle`), and the harness group `effects`, which checks that a driver is released when a vehicle leaves `active`, passed 72 of 72 on both runtimes.
+
+### `sensitiveFields` on the status-change event
+
+`sensitiveFields: ["vehicleId"]` added to `fleet.vehicle-status-changed`. The application has `telemetry.redaction.mode: "development-redacted"`. Read from the copy's Inspector (port 3240) for one `PUT /vehicles/<id>/status` that answered 200:
+
+| Where                                                                  | What is recorded                                                                                                                                |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Span `relkit.event.fleet.vehicle-status-changed.publish`, input        | `{"at": …, "from": "maintenance", "organizationId": …, "to": "active", "vehicleId": "[REDACTED]"}`                                              |
+| The same span, output                                                  | the publish result with `"payload": {…, "vehicleId": "[REDACTED]"}`                                                                             |
+| Span `relkit.invoke.drivers.release-unavailable-vehicle`, input        | `{…, "vehicleId": "[REDACTED]"}`                                                                                                                |
+| Inspector `GET /events` and `GET /events/fleet.vehicle-status-changed` | no payload; the event's schema and `"sensitiveFields": ["vehicleId"]`. None of the 16 vehicle ids of the run is in either answer                |
+| Development log                                                        | RelKit prints no event payload. The id is in two kinds of lines: the request line (`PUT /vehicles/<id>/status`) and the reaction's own log call |
+| The reaction                                                           | received the real id: its own line reads `{"released":0,"to":"maintenance","vehicleId":"e59682b4-…"}`                                           |
+
+The same id is still recorded where it is not this event's payload: the request's path, the input and output of the function that publishes the event (`fleet.change-vehicle-status`), and the output of the realtime channel's trigger. `sensitiveFields` of an event covers the event's payload only; the telemetry redaction policy's `redactKeys` covers a key everywhere.
+
+### Request harness
+
+`scripts/audit/run.mjs` against the copy with both edits, a fresh database for each runtime.
+
+|                                     | Audit, Node | Part A, Node | Now, Node | Audit, Bun | Part A, Bun | Now, Bun |
+| ----------------------------------- | ----------- | ------------ | --------- | ---------- | ----------- | -------- |
+| Rows                                | 1,243       | 1,242        | 1,242     | 1,243      | 1,242       | 1,242    |
+| As expected                         | 1,191       | 1,192        | 1,192     | 1,191      | 1,191       | 1,191    |
+| Passed in the earlier run, fail now |             |              | 0         |            |             | 0        |
+| 5xx answers                         |             |              | 0         |            |             | 0        |
+
+Row by row, the runs are identical to the Part A runs. Against the audit's runs the differences are the two of Part A: the row `contract:content-type | POST /api/auth/organization/set-active -> 403` no longer arises, and `contract:x-request-id-on-every-response` passes on Node.
+
+### Task limit on the generated server
+
+Not asked for; added because the application has no task. In the copy: a `jobs` profile on `localJob()`, a task `fleet.slow-report` with `maxDuration: "2 seconds"` and `retry.maxAttempts: 2` whose handler waits for the time its input gives, a job, and a function that starts the job. `relkit check` passed without a warning. The journal of the local backend after one run of 30 seconds and one of 200 ms:
+
+| Run        | Journal                                                                                                                                                                                                                 |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 30 seconds | running (attempt 1) at 13:14:05.547; queued (attempt 2); running at 13:14:08.649; `timed-out` at 13:14:10.657 with `{"code":"RELKIT_TIMEOUT","message":"Task \"fleet.slow-report\" exceeded maxDuration of 2 seconds"}` |
+| 200 ms     | running at 13:14:07.564, `completed` at 13:14:07.785                                                                                                                                                                    |
+
+So the limit declared with `defineTask` reaches the local backend through the generated server, and the worker moves on to the next run when an attempt is stopped.
+
+Found on the way, not changed: a job started through the client RPC (`relkit jobs trigger`, `POST /_relkit/v1/rpc/jobs/<name>/trigger`) on the local backend was accepted with the scope `public:<application>` and stayed `queued`; the server's worker asks the backend for runs of the scope `default`. Started from a function, the same job ran. Not compared with the published version.
+
+### Cleanup
+
+Development servers, the Inspector and the registry stopped; the database dropped; the copy's bucket volume removed; the copy and both package caches deleted.
