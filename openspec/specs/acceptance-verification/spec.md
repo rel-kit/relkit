@@ -771,3 +771,12 @@ A change that claims a finding of the real-application audit fixed SHALL be veri
 
 - **WHEN** a row that compares the served answers with the OpenAPI document still fails after the change
 - **THEN** the change's report names the documentation that states the behaviour and proposes the change to the harness's expectation
+
+### Requirement: The test application honours its context option
+
+`createTestApplication` SHALL give handlers the fields passed as `context`, with the meaning the option has in `createTestRuntime`.
+
+#### Scenario: A handler reads a replaced context field
+
+- **WHEN** a test passes `context` to `createTestApplication` and invokes a function that reads one of its fields
+- **THEN** the function reads the value the test passed

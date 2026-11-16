@@ -175,3 +175,13 @@ Found on the way, not changed: a job started through the client RPC (`relkit job
 ### Cleanup
 
 Development servers, the Inspector and the registry stopped; the database dropped; the copy's bucket volume removed; the copy and both package caches deleted.
+
+## 7. Final checks
+
+On `d7bab0ee7`, each to its end:
+
+- `bun run prepush`: exit 0. Its first run, one commit earlier, failed at the type check: the new limits test imported a type name that does not exist, which Vitest does not report. Fixed in `d7bab0ee7`; all five checks were then run again from the start.
+- `bun run test:types`: exit 0 (246 editor assertions on TypeScript 5.9 and 7).
+- `bun run test:packages`: exit 0 (Vitest 3,412 passed, 4 skipped; Bun 527 and 420 passed, 22 skipped, 0 failed).
+- `bun run test:inspector`: exit 0 (501 passed).
+- `openspec validate --specs`: 39 passed, 0 failed.

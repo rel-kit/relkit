@@ -30,4 +30,4 @@
 
 - [x] 5.1 Add the changesets and regenerate the documentation; verify `bun run changeset status` and `generate:check`.
 - [x] 5.2 Prove on a plain copy of the logistics application: the event function without `profile`, the redacted field in the log, the trace and the Inspector records, and the request harness on Node and on Bun without a regression.
-- [ ] 5.3 Run `bun run prepush`, `bun run test:types`, `bun run test:packages`, `bun run test:inspector` and `openspec validate --specs`; verify each passes, then archive the change.
+- [x] 5.3 Run `bun run prepush`, `bun run test:types`, `bun run test:packages`, `bun run test:inspector` and `openspec validate --specs`; verify each passes, then archive the change.
