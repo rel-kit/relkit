@@ -42,4 +42,11 @@ export interface ServerConfig {
 /** Development bridge selection; installing or running the UI is independent.
  * @example const inspector: InspectorConfig = { enabled: true };
  */
-export interface InspectorConfig extends InspectorConfigurationInput {}
+export interface InspectorConfig extends InspectorConfigurationInput {
+  /** Starts the bridge the Inspector connects to. Defaults to `false`. */
+  readonly enabled?: boolean;
+  /** Address the bridge listens on; port `0` takes a free port. */
+  readonly connection?: { readonly host?: string; readonly port?: number };
+  /** Largest payload preview the bridge returns, in bytes. Defaults to 1,048,576. */
+  readonly maxPreviewBytes?: number;
+}

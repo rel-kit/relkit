@@ -19,3 +19,7 @@ longer suggested, and its error names what replaces it:
 Fixed: your editor suggests both values of `execution` in `defineTask` on TypeScript 5.9; before, it
 suggested `durable` only. `defineTask` and `defineTaskEffect` type the option through a parameter
 that defaults to every form; a task that leaves `execution` out is durable, as before.
+
+The API reference prints `ServerConfig`, `InspectorConfig` and the telemetry options with their
+members, and the `defineApp` options block lists the seven provider options. `AppTelemetryConfig`
+is an interface that lists its members; it accepts and produces the same values as before.

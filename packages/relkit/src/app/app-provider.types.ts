@@ -54,7 +54,12 @@ export interface NoProviderConfigured<Capability extends string> {
 
 type Profile<Input> = Input extends ProviderSourceInput ? "default" : Extract<keyof Input, string>;
 
-type BindingOf<Providers, Key> = Key extends keyof Providers ? Providers[Key] : undefined;
+/** The binding of one capability among the bindings of a `defineApp` call, or `undefined`.
+ * @example type Cache = AppProviderBinding<{ cache: typeof redisAdapter }, "cache">;
+ */
+export type AppProviderBinding<Providers, Key> = Key extends keyof Providers
+  ? Providers[Key]
+  : undefined;
 
 type DefaultProfile<Input, Key extends string> = [Input] extends [undefined]
   ? NoProviderConfigured<Key>
@@ -82,7 +87,7 @@ type ProfileFor<Providers extends AppProviderBindings, Capability extends AppPro
  * @example const options: AppProviderOptions<{ cache: typeof redisAdapter }> = { cache: redisAdapter };
  */
 export type AppProviderOptions<Providers extends AppProviderBindings> = {
-  readonly [Key in keyof AppProviderInputs]?: BindingOf<Providers, Key>;
+  readonly [Key in keyof AppProviderInputs]?: AppProviderBinding<Providers, Key>;
 };
 
 /** Default profile per capability, named as the options are (`jobs`, not `job`). Each entry
@@ -92,7 +97,7 @@ export type AppProviderOptions<Providers extends AppProviderBindings> = {
 export type AppProviderDefaults<Providers extends AppProviderBindings> = {
   // NoInfer: a default never decides what a binding is; it is only checked against it.
   readonly [Key in keyof AppProviderInputs]?: NoInfer<
-    DefaultProfile<BindingOf<Providers, Key>, Key>
+    DefaultProfile<AppProviderBinding<Providers, Key>, Key>
   >;
 };
 
