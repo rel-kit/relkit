@@ -17,7 +17,7 @@
     "@relkit/app": "0.7.7",
     "@relkit/better-auth": "0.7.7",
     "@relkit/drizzle": "0.7.7",
-    "better-auth": "1.7.7",
+    "better-auth": "1.7.1",
     "drizzle-orm": "1.0.0-rc.5-169397b",
     "effect": "4.0.1"
   },
