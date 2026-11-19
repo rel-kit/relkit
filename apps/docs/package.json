@@ -58,7 +58,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@types/three": "0.186.0",
-    "astro": "7.4.2",
+    "astro": "7.4.7",
     "better-auth": "catalog:",
     "create-relkit": "workspace:*",
     "drizzle-kit": "catalog:",
