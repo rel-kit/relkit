@@ -180,23 +180,43 @@ declare const activateDrizzleService: <
 
 ### DrizzleActivation
 
+Frozen public activation; resource ownership ends at close.
+
 **Signature**
 
 ```ts
-declare const DrizzleActivation: DrizzleActivation<Service>;
+export interface DrizzleActivation<Service extends DrizzleServiceDescriptor<any, any, any, any>> {
+  /** Native escape hatch; callers must use admitted APIs to guarantee orderly close. */
+  readonly client: Service extends DrizzleServiceDescriptor<any, infer Client, any, any>
+    ? Client
+    : never;
+  readonly context: DatabaseContext<Service>;
+  /**
+   * Stops admission and releases the owner after admitted native work settles.
+   * @returns Shared close Promise; later calls observe the same completion.
+   */
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.types.ts#L16)
 
 ### DrizzleActivationOptions
 
+Acquisition policy for an application that owns its database lifetime.
+
 **Signature**
 
 ```ts
-declare const DrizzleActivationOptions: DrizzleActivationOptions;
+export interface DrizzleActivationOptions {
+  /** Bypasses descriptor sharing; the caller must close this activation. */
+  readonly isolated?: boolean;
+  /** Configured observation services captured by the compatibility owner. */
+  readonly instrumentation?: Context.Context<never>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.types.ts#L5)
 
 ## `activation.types.ts`
 
@@ -384,123 +404,274 @@ declare const ApplicationEnv: Readonly<Record<string, string>>;
 
 ### BaseOperations
 
+Stable public Promise CRUD contract over one table.
+
 **Signature**
 
 ```ts
-declare const BaseOperations: BaseOperations<T>;
+export interface BaseOperations<T extends Table> {
+  /**
+   * Selects one row by a complete unique key.
+   * @param args - Unique selector.
+   * @returns Matching row or null, rejecting invalid selectors/native failures.
+   */
+  findOne(args: FindOneArgs<T>): Promise<Row<T> | null>;
+
+  /**
+   * Selects a bounded ordered page.
+   * @param args - Optional filters, ordering and pagination.
+   * @returns Validated rows in driver order.
+   */
+  findMany(args?: FindManyArgs<T>): Promise<Row<T>[]>;
+
+  /**
+   * Inserts one row without automatic retries.
+   * @param args - Insert values.
+   * @returns Validated inserted row.
+   */
+  insert(args: InsertArgs<T>): Promise<Row<T>>;
+
+  /**
+   * Updates one selected row without automatic retries.
+   * @param args - Unique selector and partial update values.
+   * @returns Updated row or null when absent.
+   */
+  update(args: UpdateArgs<T>): Promise<Row<T> | null>;
+
+  /**
+   * Selects then inserts or updates using portable dialect semantics.
+   * @param args - Unique selector and create/update branches.
+   * @returns Resulting row; this portable read/write sequence is not an atomic SQL upsert.
+   */
+  upsert(args: UpsertArgs<T>): Promise<Row<T>>;
+
+  /**
+   * Removes one selected row without automatic retries.
+   * @param args - Complete unique selector.
+   * @returns Deleted row or null when absent.
+   */
+  delete(args: DeleteArgs<T>): Promise<Row<T> | null>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L88)
 
 ### DatabaseContext
 
+Public transaction-aware table operations and unchanged Zod schemas.
+
 **Signature**
 
 ```ts
-declare const DatabaseContext: DatabaseContext<Service>;
+type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, any, any>> = {
+  readonly [Name in keyof TablesOf<Service[typeof SERVICE_TYPES]["schema"]>]: BaseOperations<
+    TablesOf<Service[typeof SERVICE_TYPES]["schema"]>[Name]
+  > &
+    (Name extends keyof Service[typeof SERVICE_TYPES]["models"]
+      ? ConsumerExtensions<Service[typeof SERVICE_TYPES]["models"][Name]>
+      : {});
+} & {
+  /**
+   * Runs a callback in a portable transaction without nested portable transactions.
+   * @typeParam Value - Callback result.
+   * @param run - Callback receiving transaction-bound table operations.
+   * @returns Callback result after native commit, or original failure after rollback.
+   */
+  readonly transaction: <Value>(
+    run: (context: DatabaseContext<Service>) => MaybePromise<Value>,
+  ) => Promise<Value>;
+  readonly zodSchemas: {
+    readonly [Name in keyof TablesOf<Service[typeof SERVICE_TYPES]["schema"]>]: TableZodSchemas<
+      TablesOf<Service[typeof SERVICE_TYPES]["schema"]>[Name]
+    >;
+  };
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L170)
 
 ### DeleteArgs
 
+Complete unique selector for deletion.
+
 **Signature**
 
 ```ts
-declare const DeleteArgs: DeleteArgs<T>;
+export interface DeleteArgs<T extends Table> {
+  readonly where: Where<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L80)
 
 ### DrizzleActivationOptions
 
+Acquisition policy for an application that owns its database lifetime.
+
 **Signature**
 
 ```ts
-declare const DrizzleActivationOptions: DrizzleActivationOptions;
+export interface DrizzleActivationOptions {
+  /** Bypasses descriptor sharing; the caller must close this activation. */
+  readonly isolated?: boolean;
+  /** Configured observation services captured by the compatibility owner. */
+  readonly instrumentation?: Context.Context<never>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.types.ts#L5)
 
 ### DrizzleCapability
 
+Pure compiler-visible dialect, tables, constraints and custom methods.
+
 **Signature**
 
 ```ts
-declare const DrizzleCapability: DrizzleCapability;
+export interface DrizzleCapability {
+  readonly kind: "drizzle";
+  readonly dialect: "pg" | "mysql" | "sqlite";
+  /** Set when the service is marked as the application's default database. */
+  readonly default?: true;
+  readonly tables: readonly {
+    readonly name: string;
+    readonly databaseName: string;
+    readonly columns: readonly {
+      readonly key: string;
+      readonly name: string;
+      readonly dataType: string;
+      readonly notNull: boolean;
+      readonly hasDefault: boolean;
+      readonly primaryKey: boolean;
+      readonly unique: boolean;
+    }[];
+    readonly selectors: readonly (readonly string[])[];
+    readonly customMethods: readonly string[];
+  }[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L121)
 
 ### DrizzleOverrides
 
+Table-keyed override declarations.
+
 **Signature**
 
 ```ts
-declare const DrizzleOverrides: DrizzleOverrides<Tables>;
+type DrizzleOverrides<Tables extends TableMap> = {
+  readonly [Name in keyof Tables]?: TableOverrides<Tables[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L71)
 
 ### DrizzleServiceDescriptor
 
+Frozen service descriptor retaining native client, schema and model inference.
+
 **Signature**
 
 ```ts
-declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Schema, Models>;
+type DrizzleServiceDescriptor<
+  Id extends string,
+  Client,
+  Schema,
+  Models extends DrizzleModelMap<TablesOf<Schema>>,
+> = DescriptorBase<"service", Id> & {
+  readonly capability: DrizzleCapability;
+  readonly [SERVICE_TYPES]: {
+    readonly client: Client;
+    readonly schema: Schema;
+    readonly models: Models;
+  };
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L152)
 
 ### FindManyArgs
 
+Bounded ordered page filters; default limit is 100.
+
 **Signature**
 
 ```ts
-declare const FindManyArgs: FindManyArgs<T>;
+export interface FindManyArgs<T extends Table> {
+  readonly where?: Where<T>;
+  readonly orderBy?: {
+    readonly field: Extract<keyof Row<T>, string>;
+    readonly direction: "asc" | "desc";
+  };
+  readonly limit?: number;
+  readonly offset?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L39)
 
 ### FindOneArgs
 
+Complete unique selector for one row.
+
 **Signature**
 
 ```ts
-declare const FindOneArgs: FindOneArgs<T>;
+export interface FindOneArgs<T extends Table> {
+  readonly where: Where<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L31)
 
 ### InsertArgs
 
+Single-row insertion values.
+
 **Signature**
 
 ```ts
-declare const InsertArgs: InsertArgs<T>;
+export interface InsertArgs<T extends Table> {
+  readonly data: Insert<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L53)
 
 ### ModelDescriptor
 
+Frozen lazy model descriptor retaining authored extension types.
+
 **Signature**
 
 ```ts
-declare const ModelDescriptor: ModelDescriptor<T, Extensions>;
+export interface ModelDescriptor<
+  T extends Table,
+  Extensions extends ModelExtensionMap<T> = ModelExtensionMap<T>,
+> {
+  readonly table: T;
+  readonly extensionNames: readonly Extract<keyof Extensions, string>[];
+  readonly [MODEL_TYPES]: Extensions;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.types.ts#L47)
 
 ### ModelExtensionContext
 
+Injected table and transaction-bound native database.
+
 **Signature**
 
 ```ts
-declare const ModelExtensionContext: ModelExtensionContext<T, Database>;
+export interface ModelExtensionContext<T extends Table, Database = never> {
+  readonly table: T;
+  readonly database: Database;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.types.ts#L8)
 
 ### Row
 
@@ -526,23 +697,36 @@ declare const Row: {
 
 ### TableOverrides
 
+Optional replacements for the six reserved table operations.
+
 **Signature**
 
 ```ts
-declare const TableOverrides: TableOverrides<T>;
+type TableOverrides<T extends Table> = {
+  readonly [Name in keyof BaseOperations<T>]?: OperationOverride<
+    Parameters<BaseOperations<T>[Name]>[0],
+    Awaited<ReturnType<BaseOperations<T>[Name]>>
+  >;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L60)
 
 ### TableZodSchemas
 
+Unchanged public select, insert and update Zod contracts.
+
 **Signature**
 
 ```ts
-declare const TableZodSchemas: TableZodSchemas<T>;
+export interface TableZodSchemas<T extends Table> {
+  readonly select: ZodType<Row<T>>;
+  readonly insert: ZodType<Insert<T>>;
+  readonly update: ZodType<Update<T>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L103)
 
 ### Update
 
@@ -592,23 +776,34 @@ declare const Update: Partial<{
 
 ### UpdateArgs
 
+Complete selector and partial update values.
+
 **Signature**
 
 ```ts
-declare const UpdateArgs: UpdateArgs<T>;
+export interface UpdateArgs<T extends Table> {
+  readonly where: Where<T>;
+  readonly data: Update<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L61)
 
 ### UpsertArgs
 
+Selector and separate create/update branches.
+
 **Signature**
 
 ```ts
-declare const UpsertArgs: UpsertArgs<T>;
+export interface UpsertArgs<T extends Table> {
+  readonly where: Where<T>;
+  readonly create: Insert<T>;
+  readonly update: Update<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L70)
 
 ### Where
 
@@ -998,23 +1193,31 @@ Since v0.9.1
 
 ### MysqlDatabase
 
+An asynchronous Drizzle MySQL database whose connection pool can be ended.
+
 **Signature**
 
 ```ts
-declare const MysqlDatabase: MysqlDatabase<Relations>;
+type MysqlDatabase<Relations extends AnyRelations = EmptyRelations> = MySqlAsyncDatabase<
+  MySqlQueryResultHKT,
+  Relations
+> & { readonly $client: { end(): Promise<void> } };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/mysql-client.types.ts#L8)
 
 ### MysqlDatabaseConfig
 
+Drizzle settings passed through to the runtime's driver.
+
 **Signature**
 
 ```ts
-declare const MysqlDatabaseConfig: MysqlDatabaseConfig<Relations>;
+type MysqlDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzleMySqlConfig<Relations>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/mysql-client.types.ts#L14)
 
 ## `mysql-client.types.ts`
 
@@ -1109,23 +1312,31 @@ type DialectDatabase = Omit<MySqlAsyncDatabase<any, any>, "query">;
 
 ### MysqlDatabase
 
+An asynchronous Drizzle MySQL database whose connection pool can be ended.
+
 **Signature**
 
 ```ts
-declare const MysqlDatabase: MysqlDatabase<Relations>;
+type MysqlDatabase<Relations extends AnyRelations = EmptyRelations> = MySqlAsyncDatabase<
+  MySqlQueryResultHKT,
+  Relations
+> & { readonly $client: { end(): Promise<void> } };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/mysql-client.types.ts#L8)
 
 ### MysqlDatabaseConfig
 
+Drizzle settings passed through to the runtime's driver.
+
 **Signature**
 
 ```ts
-declare const MysqlDatabaseConfig: MysqlDatabaseConfig<Relations>;
+type MysqlDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzleMySqlConfig<Relations>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/mysql-client/mysql-client.types.ts#L14)
 
 ### defineModel
 
@@ -1987,23 +2198,31 @@ Since v0.9.1
 
 ### PostgresDatabase
 
+An asynchronous Drizzle PostgreSQL database whose connection pool can be ended.
+
 **Signature**
 
 ```ts
-declare const PostgresDatabase: PostgresDatabase<Relations>;
+type PostgresDatabase<Relations extends AnyRelations = EmptyRelations> = PgAsyncDatabase<
+  PgQueryResultHKT,
+  Relations
+> & { readonly $client: { end(): Promise<void> } };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/pg-client.types.ts#L8)
 
 ### PostgresDatabaseConfig
 
+Drizzle settings passed through to the runtime's driver.
+
 **Signature**
 
 ```ts
-declare const PostgresDatabaseConfig: PostgresDatabaseConfig<Relations>;
+type PostgresDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzlePgConfig<Relations>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/pg-client.types.ts#L14)
 
 ## `index.ts`
 
@@ -2098,23 +2317,31 @@ type DialectDatabase = Omit<PgAsyncDatabase<any, any>, "query">;
 
 ### PostgresDatabase
 
+An asynchronous Drizzle PostgreSQL database whose connection pool can be ended.
+
 **Signature**
 
 ```ts
-declare const PostgresDatabase: PostgresDatabase<Relations>;
+type PostgresDatabase<Relations extends AnyRelations = EmptyRelations> = PgAsyncDatabase<
+  PgQueryResultHKT,
+  Relations
+> & { readonly $client: { end(): Promise<void> } };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/pg-client.types.ts#L8)
 
 ### PostgresDatabaseConfig
 
+Drizzle settings passed through to the runtime's driver.
+
 **Signature**
 
 ```ts
-declare const PostgresDatabaseConfig: PostgresDatabaseConfig<Relations>;
+type PostgresDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzlePgConfig<Relations>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/pg-client/pg-client.types.ts#L14)
 
 ### defineModel
 
@@ -2313,13 +2540,26 @@ Server-only runtime ownership, typed failures and borrowed-work composition.
 
 ### DrizzleActivation
 
+Frozen public activation; resource ownership ends at close.
+
 **Signature**
 
 ```ts
-declare const DrizzleActivation: DrizzleActivation<Service>;
+export interface DrizzleActivation<Service extends DrizzleServiceDescriptor<any, any, any, any>> {
+  /** Native escape hatch; callers must use admitted APIs to guarantee orderly close. */
+  readonly client: Service extends DrizzleServiceDescriptor<any, infer Client, any, any>
+    ? Client
+    : never;
+  readonly context: DatabaseContext<Service>;
+  /**
+   * Stops admission and releases the owner after admitted native work settles.
+   * @returns Shared close Promise; later calls observe the same completion.
+   */
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/activation.types.ts#L16)
 
 ### DrizzleFailure
 
@@ -2343,23 +2583,67 @@ declare const DrizzleOwner: typeof DrizzleOwner;
 
 ### DrizzleOwnerInterface
 
+Shared live/test contract for one client lifetime.
+
 **Signature**
 
 ```ts
-declare const DrizzleOwnerInterface: DrizzleOwnerInterface;
+export interface DrizzleOwnerInterface {
+  readonly client: unknown;
+  readonly admission: Ref.Ref<AdmissionState>;
+  readonly drained: Latch.Latch;
+
+  /**
+   * Admits lazy work while preserving its caller requirements and causes.
+   * @typeParam A - Successful caller result.
+   * @typeParam E - Caller typed failure.
+   * @typeParam R - Required caller services.
+   * @param effect - SDK adapter work retaining its lease until native settlement.
+   * @returns Lazy caller work or a typed closed-owner admission failure.
+   */
+  readonly work: <A, E, R>(
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E | DrizzleFailure, R>;
+
+  /**
+   * Marks admission closed monotonically.
+   * @returns Lazy state transition; already admitted work retains its lease.
+   */
+  readonly beginClose: () => Effect.Effect<void>;
+
+  /**
+   * Awaits all previously admitted native work.
+   * @returns Lazy drain barrier; resource disposal must follow this completion.
+   */
+  readonly awaitDrained: () => Effect.Effect<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/owner.types.ts#L12)
 
 ### DrizzleServiceDescriptor
 
+Frozen service descriptor retaining native client, schema and model inference.
+
 **Signature**
 
 ```ts
-declare const DrizzleServiceDescriptor: DrizzleServiceDescriptor<Id, Client, Schema, Models>;
+type DrizzleServiceDescriptor<
+  Id extends string,
+  Client,
+  Schema,
+  Models extends DrizzleModelMap<TablesOf<Schema>>,
+> = DescriptorBase<"service", Id> & {
+  readonly capability: DrizzleCapability;
+  readonly [SERVICE_TYPES]: {
+    readonly client: Client;
+    readonly schema: Schema;
+    readonly models: Models;
+  };
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/server.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L152)
 
 ### activateDrizzleService
 
@@ -2546,13 +2830,41 @@ declare const withDrizzleWork: <A, E, R>(
 
 ### DefineDrizzleServiceOptions
 
+Lazy authoring options preserving native client and model extension inference.
+
 **Signature**
 
 ```ts
-declare const DefineDrizzleServiceOptions: DefineDrizzleServiceOptions<Client, Schema, Models>;
+export interface DefineDrizzleServiceOptions<
+  Client,
+  Schema extends Readonly<Record<string, unknown>>,
+  Models extends DrizzleModelMap<TablesOf<Schema>>,
+> {
+  readonly id?: string;
+  /**
+   * Makes this service `ctx.database` and the Better Auth database when an application defines
+   * several Drizzle services. A single service is the default without it.
+   */
+  readonly default?: boolean;
+  readonly schema: Schema;
+  /**
+   * Acquires a native client when the owner Layer is first built.
+   * @param context - First activation environment.
+   * @returns Native client or acquisition Promise; failures retain native identity.
+   */
+  readonly client: (context: { readonly env: ApplicationEnv }) => Client | Promise<Client>;
+  readonly models?: Models;
+  readonly overrides?: DrizzleOverrides<TablesOf<Schema>>;
+  /**
+   * Releases the owned native client once admitted work has drained.
+   * @param database - Successfully acquired client.
+   * @returns Optional native completion; failure remains visible at close.
+   */
+  readonly dispose?: (database: Client) => unknown | Promise<unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/service.types.ts#L9)
 
 ### drizzleRuntimeOf
 
@@ -2664,23 +2976,32 @@ Since v0.9.0
 
 ### SqliteDatabase
 
+A synchronous-driver Drizzle database whose native client can be closed.
+
 **Signature**
 
 ```ts
-declare const SqliteDatabase: SqliteDatabase<Relations>;
+type SqliteDatabase<Relations extends AnyRelations = EmptyRelations> = SQLiteAsyncDatabase<
+  "sync",
+  unknown,
+  Relations
+> & { readonly $client: { close(): void } };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L7)
 
 ### SqliteDatabaseConfig
 
+Drizzle settings passed through to the runtime's driver.
+
 **Signature**
 
 ```ts
-declare const SqliteDatabaseConfig: SqliteDatabaseConfig<Relations>;
+type SqliteDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzleSQLiteConfig<Relations>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L14)
 
 ## `index.ts`
 
@@ -2776,23 +3097,32 @@ type DialectDatabase = Omit<SQLiteAsyncDatabase<any, any, any>, "query">;
 
 ### SqliteDatabase
 
+A synchronous-driver Drizzle database whose native client can be closed.
+
 **Signature**
 
 ```ts
-declare const SqliteDatabase: SqliteDatabase<Relations>;
+type SqliteDatabase<Relations extends AnyRelations = EmptyRelations> = SQLiteAsyncDatabase<
+  "sync",
+  unknown,
+  Relations
+> & { readonly $client: { close(): void } };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L7)
 
 ### SqliteDatabaseConfig
 
+Drizzle settings passed through to the runtime's driver.
+
 **Signature**
 
 ```ts
-declare const SqliteDatabaseConfig: SqliteDatabaseConfig<Relations>;
+type SqliteDatabaseConfig<Relations extends AnyRelations = EmptyRelations> =
+  DrizzleSQLiteConfig<Relations>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/sqlite-client/sqlite-client.types.ts#L14)
 
 ### defineModel
 
@@ -2952,13 +3282,57 @@ type ApplicationEnv = keyof Relkit.ApplicationEnv extends never
 
 ### BaseOperations
 
+Stable public Promise CRUD contract over one table.
+
 **Signature**
 
 ```ts
-declare const BaseOperations: BaseOperations<T>;
+export interface BaseOperations<T extends Table> {
+  /**
+   * Selects one row by a complete unique key.
+   * @param args - Unique selector.
+   * @returns Matching row or null, rejecting invalid selectors/native failures.
+   */
+  findOne(args: FindOneArgs<T>): Promise<Row<T> | null>;
+
+  /**
+   * Selects a bounded ordered page.
+   * @param args - Optional filters, ordering and pagination.
+   * @returns Validated rows in driver order.
+   */
+  findMany(args?: FindManyArgs<T>): Promise<Row<T>[]>;
+
+  /**
+   * Inserts one row without automatic retries.
+   * @param args - Insert values.
+   * @returns Validated inserted row.
+   */
+  insert(args: InsertArgs<T>): Promise<Row<T>>;
+
+  /**
+   * Updates one selected row without automatic retries.
+   * @param args - Unique selector and partial update values.
+   * @returns Updated row or null when absent.
+   */
+  update(args: UpdateArgs<T>): Promise<Row<T> | null>;
+
+  /**
+   * Selects then inserts or updates using portable dialect semantics.
+   * @param args - Unique selector and create/update branches.
+   * @returns Resulting row; this portable read/write sequence is not an atomic SQL upsert.
+   */
+  upsert(args: UpsertArgs<T>): Promise<Row<T>>;
+
+  /**
+   * Removes one selected row without automatic retries.
+   * @param args - Complete unique selector.
+   * @returns Deleted row or null when absent.
+   */
+  delete(args: DeleteArgs<T>): Promise<Row<T> | null>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L88)
 
 ### DatabaseContext (type alias)
 
@@ -2996,13 +3370,17 @@ type DatabaseContext<Service extends DrizzleServiceDescriptor<any, any, any, any
 
 ### DeleteArgs
 
+Complete unique selector for deletion.
+
 **Signature**
 
 ```ts
-declare const DeleteArgs: DeleteArgs<T>;
+export interface DeleteArgs<T extends Table> {
+  readonly where: Where<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L80)
 
 ### DrizzleCapability (interface)
 
@@ -3090,23 +3468,37 @@ type DrizzleServiceDescriptor<
 
 ### FindManyArgs
 
+Bounded ordered page filters; default limit is 100.
+
 **Signature**
 
 ```ts
-declare const FindManyArgs: FindManyArgs<T>;
+export interface FindManyArgs<T extends Table> {
+  readonly where?: Where<T>;
+  readonly orderBy?: {
+    readonly field: Extract<keyof Row<T>, string>;
+    readonly direction: "asc" | "desc";
+  };
+  readonly limit?: number;
+  readonly offset?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L39)
 
 ### FindOneArgs
 
+Complete unique selector for one row.
+
 **Signature**
 
 ```ts
-declare const FindOneArgs: FindOneArgs<T>;
+export interface FindOneArgs<T extends Table> {
+  readonly where: Where<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L31)
 
 ### Insert
 
@@ -3156,53 +3548,78 @@ declare const Insert: {
 
 ### InsertArgs
 
+Single-row insertion values.
+
 **Signature**
 
 ```ts
-declare const InsertArgs: InsertArgs<T>;
+export interface InsertArgs<T extends Table> {
+  readonly data: Insert<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L53)
 
 ### ModelDescriptor
 
+Frozen lazy model descriptor retaining authored extension types.
+
 **Signature**
 
 ```ts
-declare const ModelDescriptor: ModelDescriptor<T, Extensions>;
+export interface ModelDescriptor<
+  T extends Table,
+  Extensions extends ModelExtensionMap<T> = ModelExtensionMap<T>,
+> {
+  readonly table: T;
+  readonly extensionNames: readonly Extract<keyof Extensions, string>[];
+  readonly [MODEL_TYPES]: Extensions;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.types.ts#L47)
 
 ### ModelDescriptorAny
 
+Internal erased model descriptor used for pure discovery.
+
 **Signature**
 
 ```ts
-declare const ModelDescriptorAny: ModelDescriptorAny;
+type ModelDescriptorAny = ModelDescriptor<Table, ModelExtensionMap<Table>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.types.ts#L57)
 
 ### ModelExtension
 
+Authored native extension with inferred caller arguments/results.
+
 **Signature**
 
 ```ts
-declare const ModelExtension: ModelExtension<T, Database>;
+type ModelExtension<T extends Table, Database = never> = (
+  context: ModelExtensionContext<T, Database>,
+  ...args: any[]
+) => unknown;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.types.ts#L20)
 
 ### ModelExtensionContext
 
+Injected table and transaction-bound native database.
+
 **Signature**
 
 ```ts
-declare const ModelExtensionContext: ModelExtensionContext<T, Database>;
+export interface ModelExtensionContext<T extends Table, Database = never> {
+  readonly table: T;
+  readonly database: Database;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.types.ts#L8)
 
 ### ModelExtensionMap
 
@@ -3216,13 +3633,16 @@ declare const ModelExtensionMap: Readonly<Record<string, ModelExtension<T, Datab
 
 ### NonEmptyExtensions
 
+Rejects declarations without any custom methods.
+
 **Signature**
 
 ```ts
-declare const NonEmptyExtensions: NonEmptyExtensions<Extensions>;
+type NonEmptyExtensions<Extensions extends Readonly<Record<string, unknown>>> =
+  keyof Extensions extends never ? never : Extensions;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/model.types.ts#L37)
 
 ### OperationOverride (type alias)
 
@@ -3371,23 +3791,34 @@ declare const Update: Partial<{
 
 ### UpdateArgs
 
+Complete selector and partial update values.
+
 **Signature**
 
 ```ts
-declare const UpdateArgs: UpdateArgs<T>;
+export interface UpdateArgs<T extends Table> {
+  readonly where: Where<T>;
+  readonly data: Update<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L61)
 
 ### UpsertArgs
 
+Selector and separate create/update branches.
+
 **Signature**
 
 ```ts
-declare const UpsertArgs: UpsertArgs<T>;
+export interface UpsertArgs<T extends Table> {
+  readonly where: Where<T>;
+  readonly create: Insert<T>;
+  readonly update: Update<T>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/types.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/drizzle/src/operations.types.ts#L70)
 
 ### Where
 

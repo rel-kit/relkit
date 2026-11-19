@@ -560,13 +560,15 @@ declare const buildCatalogProvider: (name: string) => string;
 
 ### CatalogManifest
 
+JSON package metadata accepted by the shared strict catalog resolver.
+
 **Signature**
 
 ```ts
-declare const CatalogManifest: CatalogManifest;
+type CatalogManifest = Record<string, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/catalog-resolution.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/catalog-resolution.types.ts#L2)
 
 ### resolveCatalogVersion
 
@@ -665,43 +667,91 @@ declare const CREATE_UNTESTED_DOCS: "https://relkit.dev/docs/modules/cli/relkit-
 
 ### CreateCapabilityEvidence
 
+Offered tuple backed by complete fresh and restart measurements for its template bytes.
+
 **Signature**
 
 ```ts
-declare const CreateCapabilityEvidence: CreateCapabilityEvidence;
+export interface CreateCapabilityEvidence extends CreateCapabilityTuple {
+  /** Exact tool and package catalog identity measured by the recorded certification host. */
+  readonly identity: CreateCapabilityIdentity;
+  /** SHA-256 over ordered template paths and their complete bytes. */
+  readonly templateDigest: string;
+  /** Complete 20-attempt fresh report, relative to the release's evidence reports. */
+  readonly freshEvidence: string;
+  /** Complete 20-attempt restart report, relative to the release's evidence reports. */
+  readonly restartEvidence: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.types.ts#L36)
 
 ### CreateCapabilityIdentity
 
+Release, template and runtime major.minor must match the running tool for a tuple to count as tested.
+
 **Signature**
 
 ```ts
-declare const CreateCapabilityIdentity: CreateCapabilityIdentity;
+export interface CreateCapabilityIdentity {
+  /** Exact first-party release version. */
+  readonly release: string;
+  /** Pinned native Bun version. */
+  readonly bun: string;
+  /** Exact TypeScript package version. */
+  readonly typescript: string;
+  /** SHA-256 of the complete tool dependency catalog. */
+  readonly packageCatalogDigest: string;
+  /** Exact source template directory identity. */
+  readonly template: string;
+  /** Prepared-input snapshot protocol version. */
+  readonly snapshotProtocol: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.types.ts#L20)
 
 ### CreateCapabilityTuple
 
+Complete public creation combination; absence of jobs preserves the native no-jobs option.
+
 **Signature**
 
 ```ts
-declare const CreateCapabilityTuple: CreateCapabilityTuple;
+export interface CreateCapabilityTuple {
+  /** Authored starter selected by the public CLI. */
+  readonly template: CreateOptions["template"];
+  /** Explicit cloud ownership selection. */
+  readonly cloud: CreateOptions["cloud"];
+  /** Explicit deployment engine selection. */
+  readonly deploy: CreateOptions["deploy"];
+  /** Optional durable-job integration selection. */
+  readonly jobs?: CreateOptions["jobs"];
+  /** Whether the starter's example sources are retained. */
+  readonly examples: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.types.ts#L6)
 
 ### CreateCapabilityWarning
 
+Coded notice that creation continues with a combination CI has not measured.
+
 **Signature**
 
 ```ts
-declare const CreateCapabilityWarning: CreateCapabilityWarning;
+export interface CreateCapabilityWarning {
+  /** Stable diagnostic code. */
+  readonly code: "RELKIT_CREATE_UNTESTED";
+  /** One-line explanation with the next step. */
+  readonly message: string;
+  /** Docs page explaining the warning. */
+  readonly docs: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-capabilities.types.ts#L62)
 
 ### CreateUntestedError (class)
 
@@ -968,13 +1018,21 @@ Builds a no-install creation preview from maintained template bytes and metadata
 
 ### CreateScaffoldPlan
 
+Existing read-only creation preview result.
+
 **Signature**
 
 ```ts
-declare const CreateScaffoldPlan: CreateScaffoldPlan;
+export interface CreateScaffoldPlan {
+  readonly destination: string;
+  readonly files: readonly string[];
+  readonly dependencies: Readonly<Record<string, string>>;
+  readonly profiles: readonly string[];
+  readonly warnings: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-preview.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-preview.types.ts#L2)
 
 ### formatCreatePlan
 
@@ -1056,23 +1114,37 @@ Resolves creation options and template choices through the prompt service while 
 
 ### ResolveCreateContext
 
+Existing create-resolution settings; noninteractive input never needs prompt authority.
+
 **Signature**
 
 ```ts
-declare const ResolveCreateContext: ResolveCreateContext;
+export interface ResolveCreateContext {
+  readonly json?: boolean;
+  readonly interactive?: boolean;
+  readonly promptDriver?: PromptDriver;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-resolver.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-resolver.types.ts#L6)
 
 ### ResolvedCreateOptions
 
+Existing resolver result; prompted records whether any creation choice was requested.
+
 **Signature**
 
 ```ts
-declare const ResolvedCreateOptions: ResolvedCreateOptions;
+export interface ResolvedCreateOptions {
+  readonly options: CreateOptions;
+  readonly prompted: boolean;
+  /** Coded notices to print before creation, such as an untested combination. */
+  readonly warnings: readonly CreateCapabilityWarning[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-resolver.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/create-resolver.types.ts#L14)
 
 ### resolveCreateOptions
 
@@ -1337,13 +1409,40 @@ into the generated-result contract. Formatting performs no runtime acquisition.
 
 ### GenerateNextSteps
 
+Local commands and endpoints displayed after successful project creation, spelled for the
+package manager the project was created with.
+
 **Signature**
 
 ```ts
-declare const GenerateNextSteps: GenerateNextSteps;
+export interface GenerateNextSteps {
+  readonly commands: Readonly<{
+    readonly cd: string;
+    readonly install?: `${PackageManagerName} install`;
+    /** Finite validation/preparation required after a skipped dependency installation. */
+    readonly prepare?:
+      | "bunx --no-install relkit dev --prepare"
+      | "npx --no-install relkit dev --prepare"
+      | "pnpm exec relkit dev --prepare";
+    readonly dev: RunScript<"dev">;
+    readonly test: RunScript<"test">;
+    readonly check: RunScript<"check">;
+    readonly build: RunScript<"build">;
+  }>;
+  readonly endpoints: Readonly<{
+    /** A served backend URL: the example route, or the API reference without examples. */
+    readonly backend:
+      "http://localhost:3000/hello?name=RelKit" | "http://localhost:3000/_relkit/v1/api-reference";
+    readonly inspector: "http://localhost:3210";
+    readonly openapi: "http://localhost:3000/_relkit/v1/openapi.json";
+    /** Present when the generated application selects the Scalar reference UI (the template default). */
+    readonly apiReference?: "http://localhost:3000/_relkit/v1/api-reference";
+    readonly route?: "GET http://localhost:3000/hello?name=RelKit";
+  }>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.ts#L120)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generate-output.types.ts#L10)
 
 ### createGenerateNextSteps
 
@@ -1747,13 +1846,18 @@ declare const projectGenerationLive: Layer.Layer<
 
 ### GeneratorCleanupFailure
 
+Secondary resource-release evidence, separated from the authoritative public failure.
+
 **Signature**
 
 ```ts
-declare const GeneratorCleanupFailure: GeneratorCleanupFailure;
+export interface GeneratorCleanupFailure {
+  readonly operation: "temporary-file" | "rollback" | "marker" | "stage" | "process";
+  readonly cause: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-cleanup.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/generator-cleanup.types.ts#L2)
 
 ### generatorCleanupFailures
 
@@ -2733,13 +2837,15 @@ export * from "./validate.js";
 
 ### CatalogManifest
 
+JSON package metadata accepted by the shared strict catalog resolver.
+
 **Signature**
 
 ```ts
-declare const CatalogManifest: CatalogManifest;
+type CatalogManifest = Record<string, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/catalog-resolution.types.ts#L2)
 
 ### resolveCatalogVersion
 
@@ -3273,43 +3379,131 @@ Defines the prompt driver's text, choice and cancellation contract shared by cre
 
 ### ChoicePromptOptions
 
+Question and finite choices accepted by a prompt adapter.
+
 **Signature**
 
 ```ts
-declare const ChoicePromptOptions: ChoicePromptOptions<Value>;
+export interface ChoicePromptOptions<Value extends string> {
+  readonly message: string;
+  readonly options: readonly PromptOption<Value>[];
+  readonly initialValue?: Value;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.types.ts#L30)
 
 ### PromptDriver
 
+Clack-compatible native questions and progress output, with optional caller cancellation.
+
 **Signature**
 
 ```ts
-declare const PromptDriver: PromptDriver;
+export interface PromptDriver {
+  /**
+   * Asks for text through the explicit, cancellation-aware native driver.
+   * @param options - Explicit options retaining existing defaults.
+   * @param signal - Optional caller cancellation signal.
+   * @returns Decoded text; prompt interruption propagates to the native driver.
+   */
+  readonly text: (options: TextPromptOptions, signal?: AbortSignal) => Promise<string>;
+  /**
+   * Asks the native driver for one declared choice.
+   * @typeParam Value - Union of declared native choice values.
+   * @param options - Question, declared choices and optional initial selection.
+   * @param signal - Optional caller cancellation signal.
+   * @returns A Promise for the native choice; cancellation rejects with the configured public code.
+   */
+  readonly select: <Value extends string>(
+    options: ChoicePromptOptions<Value>,
+    signal?: AbortSignal,
+  ) => Promise<Value>;
+  /**
+   * Asks the native driver for declared choices in selection order.
+   * @typeParam Value - Union of declared native choice values.
+   * @param options - Question, declared choices and optional required-selection policy.
+   * @param signal - Optional caller cancellation signal.
+   * @returns A Promise for selected native choices; cancellation rejects with the configured public code.
+   */
+  readonly multiselect: <Value extends string>(
+    options: ChoicePromptOptions<Value> & { readonly required?: boolean },
+    signal?: AbortSignal,
+  ) => Promise<readonly Value[]>;
+  /**
+   * Asks for boolean consent and decodes the native answer.
+   * @param options - Explicit options retaining existing defaults.
+   * @param signal - Optional caller cancellation signal.
+   * @returns Decoded consent; cancellation retains its original rejection.
+   */
+  readonly confirm: (
+    options: {
+      readonly message: string;
+      readonly initialValue?: boolean;
+    },
+    signal?: AbortSignal,
+  ) => Promise<boolean>;
+  /**
+   * Presents an existing explanatory note through the terminal adapter.
+   * @param message - Existing user-facing diagnostic.
+   * @param title - Title displayed by the native progress/prompt sink.
+   * @returns Completion after the existing contract has been applied.
+   */
+  readonly note: (message: string, title?: string) => void;
+  /**
+   * Presents the existing flow introduction through the terminal adapter.
+   * @param title - Title displayed by the native progress/prompt sink.
+   * @returns Completion after the existing contract has been applied.
+   */
+  readonly intro: (title: string) => void;
+  /**
+   * Presents the existing flow completion through the terminal adapter.
+   * @param message - Existing user-facing diagnostic.
+   * @returns Completion after the existing contract has been applied.
+   */
+  readonly outro: (message: string) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.types.ts#L39)
 
 ### PromptOption
 
+One declared prompt choice with a label and optional explanatory hint.
+
 **Signature**
 
 ```ts
-declare const PromptOption: PromptOption<Value>;
+export interface PromptOption<Value extends string = string> {
+  readonly value: Value;
+  readonly label: string;
+  readonly hint?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.types.ts#L5)
 
 ### TextPromptOptions
 
+Text question with optional initial input and native validation callback.
+
 **Signature**
 
 ```ts
-declare const TextPromptOptions: TextPromptOptions;
+export interface TextPromptOptions {
+  readonly message: string;
+  readonly placeholder?: string;
+  readonly initialValue?: string;
+  /**
+   * Returns a user-facing validation message for unacceptable native text input.
+   * @param value - Current native text input, possibly undefined.
+   * @returns A rejection message/Error, or undefined when the text is acceptable.
+   */
+  readonly validate?: (value: string | undefined) => string | Error | undefined;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/prompt-driver.types.ts#L14)
 
 ### createClackPromptDriver
 
@@ -3461,13 +3655,15 @@ Declares portable feature dependency metadata and selected SDK owners used by cr
 
 ### DependencySection
 
+Manifest section in which a scaffold introduces a supported dependency.
+
 **Signature**
 
 ```ts
-declare const DependencySection: DependencySection;
+type DependencySection = "dependencies" | "devDependencies";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.types.ts#L4)
 
 ### SCAFFOLD_DEPENDENCIES
 
@@ -3510,13 +3706,18 @@ declare const SCAFFOLD_DEPENDENCIES: Readonly<{
 
 ### ScaffoldDependency
 
+Concrete release-supported version and owning project manifest section.
+
 **Signature**
 
 ```ts
-declare const ScaffoldDependency: ScaffoldDependency;
+export interface ScaffoldDependency {
+  readonly version: string;
+  readonly section: DependencySection;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/scaffold-catalog.types.ts#L7)
 
 ### ScaffoldDependencyName
 
@@ -3764,13 +3965,19 @@ declare const isAncestorOrSame: (parent: string, child: string) => boolean;
 
 ### CreateValidationContext
 
+Existing read-only creation-validation context.
+
 **Signature**
 
 ```ts
-declare const CreateValidationContext: CreateValidationContext;
+export interface CreateValidationContext {
+  readonly cwd?: string;
+  readonly homeDirectory?: string;
+  readonly temporaryDirectory?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/validate.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/validate.types.ts#L4)
 
 ### CreateValidationError
 
@@ -3784,13 +3991,19 @@ declare const CreateValidationError: typeof CreateValidationError;
 
 ### ValidatedCreateOptions
 
+Existing validated creation result with inspected destination state.
+
 **Signature**
 
 ```ts
-declare const ValidatedCreateOptions: ValidatedCreateOptions;
+export interface ValidatedCreateOptions extends CreateOptions {
+  readonly destination: string;
+  readonly destinationExists: boolean;
+  readonly destinationEmpty: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/validate.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/create-relkit/src/validate.types.ts#L11)
 
 ### isValidPackageName
 

@@ -2,6 +2,7 @@
 import type { createDescriptorBase } from "relkit/contracts";
 import type { RawHttpHandler } from "relkit/routes";
 import type { Auth, BetterAuthOptions } from "better-auth";
+import type { BetterAuthAccess, BetterAuthAccessOf } from "./access.types.js";
 import { BETTER_AUTH_HANDLER } from "./symbols.js";
 
 /** Native options; activation supplies the database and route-derived base path. */
@@ -31,20 +32,32 @@ export interface BetterAuthRegistration {
   readonly service: BetterAuthServiceDescriptor<any>;
 }
 
-/** Native route handler retaining inferred session and user types. */
-export type BetterAuthHandler<Session = unknown> = RawHttpHandler & {
+/** Native route handler retaining the session type and the access control's names. */
+export type BetterAuthHandler<Session = unknown, Access = BetterAuthAccess> = RawHttpHandler & {
   readonly [BETTER_AUTH_HANDLER]: BetterAuthRegistration;
   readonly __session?: Session;
+  readonly __access?: Access;
 };
 
 /** Projects the session inferred by a lazy authentication handler. */
 export type InferBetterAuthSession<Handler> =
-  Handler extends BetterAuthHandler<infer Session> ? Session : never;
+  Handler extends BetterAuthHandler<infer Session, unknown> ? Session : never;
+
+/** Projects the role and permission names of a handler's access control; the generated context
+ * registry uses it to type function access rules.
+ * @example interface ApplicationAccess extends InferBetterAuthAccess<typeof service.handler> {}
+ */
+export type InferBetterAuthAccess<Handler> = Handler extends {
+  readonly __access?: infer Access extends BetterAuthAccess;
+}
+  ? Access
+  : BetterAuthAccess;
 
 /** Lazy authoring declaration whose identity survives isolated activation. */
 export interface BetterAuthServiceDescriptor<
   Options extends BetterAuthServiceOptions,
   Session = Auth<Options>["$Infer"]["Session"],
+  Access = BetterAuthAccessOf<Options>,
 > extends ReturnType<typeof createDescriptorBase<"service", string>> {
   readonly capability: {
     readonly kind: "better-auth";
@@ -55,7 +68,7 @@ export interface BetterAuthServiceDescriptor<
     /** `custom` when the instance brings its own database instead of the Drizzle service. */
     readonly database?: "drizzle" | "custom";
   };
-  readonly handler: BetterAuthHandler<Session>;
+  readonly handler: BetterAuthHandler<Session, Access>;
 }
 
 /** Database-independent state populated by the explicitly selected server bridge. */

@@ -19,6 +19,7 @@
 }
 
 .brand svg {
+  color: var(--page);
   background: var(--ink);
 }
 

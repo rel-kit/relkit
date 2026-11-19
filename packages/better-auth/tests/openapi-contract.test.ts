@@ -197,9 +197,10 @@ describe("correctAuthResponses", () => {
     expect(responses).toEqual({ "413": own, "415": own });
   });
 
-  test("components without a user schema gain only the Problem schema", () => {
+  test("components without a user schema gain only the error and Problem schemas", () => {
     const corrected = correctAuthResponses({ paths: {} }, "/api/auth");
     expect(Object.keys((corrected.components as Json).schemas as Json)).toEqual([
+      "BetterAuthError",
       "BetterAuthProblem",
     ]);
     const nullableAlready = correctAuthResponses(

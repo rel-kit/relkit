@@ -6,6 +6,7 @@ import { createAdaptorServer, type WebSocketServerLike } from "@hono/node-server
 import type { Server } from "node:http";
 import { WebSocketServer } from "ws";
 import type { RuntimeServeOptions, RuntimeServer } from "../runtime-adapter.types.js";
+import { answerClientErrors } from "./client-error.js";
 import { isClosing, lingerOnClose } from "./lingering-close.js";
 
 /**
@@ -54,6 +55,7 @@ export async function serve(options: RuntimeServeOptions): Promise<RuntimeServer
   });
   // Hono's Node server is an HTTP/1 `node:http` server here: no TLS or HTTP/2 option is passed.
   lingerOnClose(server as Server);
+  answerClientErrors(server as Server);
   await new Promise<void>((resolve, reject) => {
     server.once("error", reject);
     server.listen(options.port, options.hostname, () => {

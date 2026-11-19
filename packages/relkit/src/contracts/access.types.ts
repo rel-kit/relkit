@@ -2,6 +2,8 @@ declare global {
   namespace Relkit {
     /** Generated: the application's context types, including its Better Auth session. */
     interface ApplicationContextRegistry {}
+    /** Generated: the role and permission names of the application's access control. */
+    interface ApplicationAccess {}
   }
 }
 
@@ -11,6 +13,26 @@ export type AccessSession = Relkit.ApplicationContextRegistry extends {
 }
   ? Exclude<Session, null>
   : unknown;
+
+/** A role an access rule may name: one the application's access control declares, or any string
+ * when the generated registry carries none.
+ * @example const role: AccessRoleName = "admin";
+ */
+export type AccessRoleName = Relkit.ApplicationAccess extends {
+  readonly roles: infer Role extends string;
+}
+  ? Role
+  : string;
+
+/** A `resource:action` permission an access rule may name: one the application's access control
+ * declares, or any string when the generated registry carries none.
+ * @example const permission: AccessPermissionName = "orders:refund";
+ */
+export type AccessPermissionName = Relkit.ApplicationAccess extends {
+  readonly permissions: infer Permission extends string;
+}
+  ? Permission
+  : string;
 
 /** The application itself: runtime-handle calls, scripts and startup hooks.
  * @example const principal: SystemPrincipal = { kind: "system" };
@@ -59,9 +81,9 @@ export interface AccessRequest<Input = unknown, Session = AccessSession> {
  */
 export interface AccessRule<Input = unknown, Session = AccessSession> {
   /** The caller needs at least one of these roles. */
-  readonly roles?: readonly string[];
+  readonly roles?: readonly AccessRoleName[];
   /** The caller needs every one of these `resource:action` permissions. */
-  readonly permissions?: readonly string[];
+  readonly permissions?: readonly AccessPermissionName[];
   /** Custom decision over the session and validated input; return false to deny. */
   readonly allow?: (request: AccessRequest<Input, Session>) => boolean | Promise<boolean>;
 }

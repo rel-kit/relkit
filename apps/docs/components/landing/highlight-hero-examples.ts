@@ -17,6 +17,20 @@ const heroTheme: ThemeRegistration = {
   ],
 };
 
+const heroDarkTheme: ThemeRegistration = {
+  name: "relkit-hero-dark",
+  type: "dark",
+  colors: { "editor.background": "#0d0e10", "editor.foreground": "#e4e4ef" },
+  tokenColors: [
+    { scope: ["comment"], settings: { foreground: "#7c7c8a" } },
+    { scope: ["keyword", "storage"], settings: { foreground: "#e08af5" } },
+    { scope: ["string"], settings: { foreground: "#6cb6ff" } },
+    { scope: ["entity.name.function", "support.function"], settings: { foreground: "#b799ff" } },
+    { scope: ["constant.numeric"], settings: { foreground: "#f5f5f5", fontStyle: "italic" } },
+    { scope: ["entity.name.tag"], settings: { foreground: "#6cb6ff" } },
+  ],
+};
+
 export async function highlightHeroExamples(): Promise<readonly HeroExample[]> {
   const sourceRoot = resolve(process.cwd(), "components/landing/snippets");
   return Promise.all(
@@ -30,7 +44,9 @@ export async function highlightHeroExamples(): Promise<readonly HeroExample[]> {
           );
           const html = await codeToHtml(source.trim(), {
             lang: "tsx",
-            theme: heroTheme,
+            // Light colors are inline; the dark theme rides in --shiki-dark (see hero-examples.css).
+            themes: { light: heroTheme, dark: heroDarkTheme },
+            defaultColor: "light",
           });
           // Pre supplies the code surface; Shiki supplies its escaped code children.
           const highlightedCode = html.replace(/^<pre[^>]*>([\s\S]*)<\/pre>$/, "$1");

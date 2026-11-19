@@ -2084,7 +2084,7 @@ export interface BucketDescriptor<Id extends string> extends DescriptorBase<"buc
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L15)
 
 ### BucketDescriptorAny (type alias)
 
@@ -2102,7 +2102,7 @@ const bucket: BucketDescriptorAny = defineBucket({ id: "assets", visibility: "pr
 type BucketDescriptorAny = BucketDescriptor<string>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L25)
 
 ### BucketVisibility (type alias)
 
@@ -2120,7 +2120,7 @@ const visibility: BucketVisibility = "private";
 type BucketVisibility = "private" | "public";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L10)
 
 ### DefineBucketOptions (interface)
 
@@ -2136,15 +2136,20 @@ const options: DefineBucketOptions<"assets"> = { id: "assets", visibility: "priv
 
 ```ts
 export interface DefineBucketOptions<Id extends string> extends DescriptorMetadata {
+  /** Stable, unique name of the bucket; keep it when the file moves or is renamed. */
   readonly id: Id;
-  readonly profile?: string;
+  /** The bucket provider profile that stores the objects; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"bucket">;
+  /** Whether stored objects are `"private"` or readable by anyone (`"public"`). */
   readonly visibility: BucketVisibility;
+  /** Largest size of one stored object, in bytes. */
   readonly maxObjectBytes?: number;
+  /** Media types the bucket accepts, such as `image/*`; any type when omitted. */
   readonly allowedContentTypes?: readonly string[];
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/buckets/define-bucket.types.ts#L30)
 
 ## `index.ts`
 

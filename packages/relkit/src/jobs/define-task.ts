@@ -4,12 +4,14 @@ import { Effect, Result, Schema } from "effect";
 import { defineTaskValue, isTaskDescriptorValue } from "./define-task-value.js";
 import { observeJobs } from "./jobs-observability.js";
 import type {
+  DefineTaskCallOptions,
   DefineTaskOptions,
   PublishedEventName,
   TaskDependencies,
   TaskDescriptor,
   TaskDescriptorAny,
   TaskExecution,
+  TaskForm,
   TaskStreamSchemas,
 } from "./task-types.js";
 /** Expected task definition failure, retaining the original validation error.
@@ -34,9 +36,9 @@ export const defineTaskEffect = Effect.fn("Jobs.defineTask")(
     const Errors extends readonly ErrorDescriptorAny[] = readonly [],
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Streams extends TaskStreamSchemas = {},
-    const Execution extends TaskExecution = "durable",
+    const Execution extends TaskExecution = TaskExecution,
   >(
-    options: DefineTaskOptions<
+    options: DefineTaskCallOptions<
       Id,
       Version,
       InputSchema,
@@ -51,7 +53,21 @@ export const defineTaskEffect = Effect.fn("Jobs.defineTask")(
     observeJobs(
       "task.define",
       Effect.try({
-        try: () => defineTaskValue(options),
+        try: () =>
+          // The call options are the same object; only `execution` is declared apart.
+          defineTaskValue(
+            options as DefineTaskOptions<
+              Id,
+              Version,
+              InputSchema,
+              OutputSchema,
+              Dependencies,
+              Errors,
+              ProgressSchema,
+              Streams,
+              TaskForm<Execution>
+            >,
+          ),
         catch: (cause) => new TaskDefinitionFailure({ cause }),
       }),
     ),
@@ -81,9 +97,9 @@ export function defineTask<
   const Errors extends readonly ErrorDescriptorAny[] = readonly [],
   const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
   const Streams extends TaskStreamSchemas = {},
-  const Execution extends TaskExecution = "durable",
+  const Execution extends TaskExecution = TaskExecution,
 >(
-  options: DefineTaskOptions<
+  options: DefineTaskCallOptions<
     Id,
     Version,
     InputSchema,
@@ -103,7 +119,7 @@ export function defineTask<
   Errors,
   ProgressSchema,
   Streams,
-  Execution
+  TaskForm<Execution>
 > {
   const result = Effect.runSync(Effect.result(defineTaskEffect(options)));
   if (Result.isFailure(result)) throw result.failure.cause;

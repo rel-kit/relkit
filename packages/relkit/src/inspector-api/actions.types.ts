@@ -105,6 +105,8 @@ export interface InspectorEventActionsOptions {
     readonly id: string;
     readonly version: number;
     readonly profile: string;
+    /** Fields of the payload that a recorded publication shows as the redaction marker. */
+    readonly sensitiveFields?: readonly string[] | null;
   }[];
   /** Resolves the event provider of a profile, waiting for providers to be ready. */
   readonly provider: (profile: string) => MaybePromise<unknown>;

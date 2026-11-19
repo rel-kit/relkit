@@ -4,9 +4,9 @@ import { defineProviderCapability, normalizeProviderProfiles } from "../provider
 import { APP_PROVIDER_CAPABILITIES } from "./app-provider-capabilities.js";
 import { AppValidationFailure } from "./app-validation.js";
 import type {
+  AppProviderBindings,
   AppProviderCapability,
   AppProviderDefaults,
-  AppProviderInputs,
   NormalizedAppProviderDefaults,
 } from "./define-app.types.js";
 import type { NormalizedProviderProfiles, ProviderSourceInput } from "../provider/index.js";
@@ -17,7 +17,7 @@ import type { NormalizedProviderProfiles, ProviderSourceInput } from "../provide
  * @example Effect.runSync(normalizeProvidersEffect({}));
  */
 export const normalizeProvidersEffect = Effect.fn("App.normalizeProviders")(
-  (options: AppProviderInputs) =>
+  (options: AppProviderBindings) =>
     Effect.gen(function* () {
       const result: Partial<Record<AppProviderCapability, NormalizedProviderProfiles>> = {};
       for (const capability of APP_PROVIDER_CAPABILITIES) {
@@ -43,7 +43,7 @@ export const normalizeProvidersEffect = Effect.fn("App.normalizeProviders")(
  * @example Effect.runSync(normalizeDefaultsEffect({}, undefined));
  */
 export const normalizeDefaultsEffect = Effect.fn("App.normalizeDefaults")(
-  <Providers extends AppProviderInputs>(
+  <Providers extends AppProviderBindings>(
     providers: Partial<Record<AppProviderCapability, NormalizedProviderProfiles>>,
     defaults: AppProviderDefaults<Providers> | undefined,
   ) =>

@@ -341,6 +341,13 @@ export const compilerCodes = [
     fix: "Choose a jobs service that supports the feature named in the error, or remove that requirement from the task.",
   },
   {
+    code: "RELKIT_JOB_TASK_OPTION_UNSUPPORTED",
+    title: "Jobs backend does not enforce a task limit",
+    happened:
+      "A task declares `maxDuration` or `maxElapsed`, and the jobs backend of the profile that runs it does not enforce that limit. The message names the task, the limit, the backend and the profile. `relkit check` reports it as a warning, and the server logs the same warning when it starts; the check still passes and the task still runs, without the limit.",
+    fix: "Enforce the limit in the task's handler, for example with the `signal` and a timer, or remove the option. The local backend from `@relkit/local` enforces both limits.",
+  },
+  {
     code: "RELKIT_JOB_NAME_INVALID",
     title: "Job name is invalid or taken",
     happened: "A job's name is not valid, or another job already uses it.",

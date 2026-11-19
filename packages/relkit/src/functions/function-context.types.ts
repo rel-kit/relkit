@@ -32,14 +32,23 @@ import type {
  * @example const dependencies: FunctionDependencies = { functions: { priceOrder }, buckets: { uploads } };
  */
 export interface FunctionDependencies {
+  /** Functions the handler calls: `await context.functions.<name>(input)`. */
   readonly functions?: Readonly<Record<string, FunctionRefAny>>;
+  /** Events the handler publishes: `await context.events.<name>.publish(payload)`. */
   readonly events?: Readonly<Record<string, EventRefAny>>;
+  /** Realtime channels the handler triggers: `context.channels.<name>.trigger(...)`. */
   readonly channels?: Readonly<Record<string, ChannelRefAny>>;
+  /** Database services besides the default one; `context.databases.<name>` holds the models. */
   readonly databases?: Readonly<Record<string, DatabaseRefAny>>;
+  /** Tasks the handler starts: `context.tasks.<name>.trigger(input)` returns a run handle. */
   readonly tasks?: Readonly<Record<string, TaskRefAny>>;
+  /** Jobs the handler starts: `context.jobs.<name>.trigger(input)` returns a run handle. */
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
+  /** Buckets the handler reads and writes, such as `context.buckets.<name>.put(key, bytes)`. */
   readonly buckets?: Readonly<Record<string, BucketRefAny>>;
+  /** Caches the handler reads and writes, such as `context.cache.<name>.get(key)`. */
   readonly cache?: Readonly<Record<string, CacheRefAny>>;
+  /** Agents the handler runs: `await context.agents.<name>(input)`. */
   readonly agents?: Readonly<Record<string, AgentRefAny>>;
 }
 

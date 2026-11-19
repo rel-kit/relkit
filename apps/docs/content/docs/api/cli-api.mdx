@@ -605,53 +605,187 @@ readonly proxy: SupervisorProxy
 
 ### DevActivationFingerprint
 
+Full activation identity or an explicit foreign identity provider.
+
 **Signature**
 
 ```ts
-declare const DevActivationFingerprint: DevActivationFingerprint;
+type DevActivationFingerprint =
+  | RuntimeActivationFingerprint
+  | ((
+      candidate: StartedCandidate,
+    ) => RuntimeActivationFingerprint | PromiseLike<RuntimeActivationFingerprint>);
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L33)
 
 ### DevLocalServices
 
+Existing manually owned local service compatibility boundary.
+
 **Signature**
 
 ```ts
-declare const DevLocalServices: DevLocalServices;
+export interface DevLocalServices {
+  /**
+   * Joins native local resource cleanup before session shutdown completes.
+   * @returns Shared local owner release completion.
+   */
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L39)
 
 ### DevLog
 
+Synchronous native logging callback; failures cannot change session lifecycle.
+
 **Signature**
 
 ```ts
-declare const DevLog: DevLog;
+type DevLog = (event: DevLogEvent) => void;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L27)
 
 ### DevLogEvent
 
+One admitted development log, rendered by the existing terminal policy.
+
 **Signature**
 
 ```ts
-declare const DevLogEvent: DevLogEvent;
+export interface DevLogEvent {
+  readonly level: LogLevel;
+  readonly event: string;
+  readonly fields?: Readonly<Record<string, JsonValue>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L17)
 
 ### DevOptions
 
+Development host inputs; all process/session resources belong to one lifetime.
+
 **Signature**
 
 ```ts
-declare const DevOptions: DevOptions;
+export interface DevOptions {
+  readonly projectRoot?: string;
+  readonly compile: CandidateCompile;
+  /** Offers each save to the in-place handler swap before starting a new generation. */
+  readonly reload?: DevReload;
+  readonly activationFingerprint?: DevActivationFingerprint;
+  /**
+   * Reuses the prepared identity only for a child installed from that validated receipt.
+   * @param candidate - SDK child associated with one immutable preparation result.
+   * @returns Its accepted identity, or absence for an independently checked fallback child.
+   */
+  readonly preparedActivationFingerprint?: (
+    candidate: StartedCandidate,
+  ) => RuntimeActivationFingerprint | undefined;
+  /**
+   * Proves application readiness after mandatory SDK cohort verification.
+   * @param candidate - Unpublished child already matched to its graph/cohort.
+   * @param signal - Activation cancellation consumed by readiness HTTP work.
+   * @returns Joined proof or typed rejection before switching traffic.
+   */
+  readonly candidateVerificationEffect?: (
+    candidate: StartedCandidate,
+    signal: AbortSignal,
+  ) => Effect.Effect<void, CliAdapterError>;
+  /** Releases any request retained as the candidate's real route proof after publication. */
+  readonly candidateVerificationPublished?: (candidate: StartedCandidate) => void;
+  /** Releases a request retained by a candidate that could not be published. */
+  readonly candidateVerificationRejected?: (candidate: StartedCandidate) => void;
+  /**
+   * Checks the final input epoch in the atomic traffic-switch turn.
+   * @param candidate - Verified unpublished child.
+   * @returns False when its prepared input epoch is obsolete.
+   */
+  readonly candidateAdmission?: (candidate: StartedCandidate) => boolean;
+  readonly hostname?: string;
+  readonly candidateHostname?: string;
+  readonly stablePort?: number;
+  readonly generatedDirectory?: string;
+  readonly environment?: Readonly<Record<string, string | undefined>>;
+  readonly maxStartupOutputBytes?: number;
+  readonly candidateStopTimeoutMs?: number;
+  readonly healthTimeoutMs?: number;
+  /** Permits immutable prepared candidates to overlap independent health reads. */
+  readonly candidateVerificationConcurrentHealth?: boolean;
+  /** Native verification transport; prepared sessions restrict bearer credentials to internal probes. */
+  readonly candidateVerificationFetch?: typeof fetch;
+  readonly drainTimeoutMs?: number;
+  readonly inspector?: Pick<InspectionBridgeOptions, "host" | "port"> | false;
+  readonly inspectionRecords?: InspectionBridgeOptions["records"];
+  /** Bridge credentials shared by every generation; generated per session when omitted. */
+  readonly inspectionIdentity?: { readonly sessionId: string; readonly token: string };
+  /**
+   * Reads the bridge policy an accepted generation was built with.
+   * @param generationToken - Promoted generation.
+   * @returns Its policy, or undefined when the session keeps its current bridge.
+   */
+  readonly inspectionPolicy?: (generationToken: number) => DevInspectorPolicy | undefined;
+  /**
+   * Observes the bridge policy of every promoted generation, changed or not, once the
+   * retired generation has drained.
+   * @param policy - Bridge policy the session now serves.
+   * @returns Completion after policy-owned resources are released or retained.
+   */
+  readonly inspectionApplied?: (policy: DevInspectorPolicy) => Effect.Effect<void>;
+  /**
+   * Observes a generation that was not promoted.
+   * @param generationToken - Rejected, failed or superseded generation.
+   * @returns Completion after resources prepared for it are rolled back.
+   */
+  readonly inspectionRejected?: (generationToken: number) => Effect.Effect<void>;
+  /** Grace period after backend activation before optional inspector acquisition. */
+  readonly supportStartupDelayMs?: number;
+  readonly spawn?: RuntimeProcesses["spawn"];
+  readonly signal?: AbortSignal;
+  readonly installSignalHandlers?: boolean;
+  readonly logger?: Omit<LoggerOptions, "component">;
+  readonly onLog?: DevLog;
+  /**
+   * Consumes a projected native log envelope without lifecycle authority.
+   * @param record - Existing structured log record.
+   * @param origin - Declared process source.
+   * @returns No value after synchronous admission.
+   */
+  readonly onRecord?: (record: LogRecord, origin: "application" | "relkit" | "inspector") => void;
+  /**
+   * Optionally intercepts a stable-proxy request before application routing.
+   * @param request - Native incoming request.
+   * @returns A native response receipt or absence to delegate to the backend.
+   */
+  readonly intercept?: (request: Request) => Promise<Response> | undefined;
+  /**
+   * Closes callback admission when shutdown begins.
+   * @returns No value; resource cleanup remains with the session Scope.
+   */
+  readonly onStopping?: () => void;
+  readonly terminal?: {
+    readonly verbose?: boolean;
+    readonly color?: boolean;
+    readonly columns?: number;
+  };
+  readonly observability?: Omit<SupervisorObservabilityOptions, "activationFingerprint">;
+  readonly localServices?: DevLocalServices;
+  /** Native orchestration hook; acquired local owners close in the same session graph. */
+  readonly localServicesEffect?: Effect.Effect<void>;
+  /**
+   * Native invalidation hook, captured by the owning compiler/cache service.
+   * @param files - Admitted changed paths.
+   * @returns Lazy session cache invalidation before the next compilation.
+   */
+  readonly sourceChangedEffect?: (files: readonly string[]) => Effect.Effect<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/commands/dev.types.ts#L47)
 
 ### DevSession
 
@@ -2218,23 +2352,35 @@ declare class AddResolution
 
 ### ResolveAddContext
 
+Existing interactive-add resolution context.
+
 **Signature**
 
 ```ts
-declare const ResolveAddContext: ResolveAddContext;
+export interface ResolveAddContext {
+  readonly cwd?: string;
+  readonly interactive?: boolean;
+  readonly promptDriver?: PromptDriver;
+  readonly signal?: AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-resolver.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-resolver.types.ts#L13)
 
 ### ResolvedAddRequest
 
+Existing resolved add request and consent-relevant prompted flag.
+
 **Signature**
 
 ```ts
-declare const ResolvedAddRequest: ResolvedAddRequest;
+export interface ResolvedAddRequest {
+  readonly request: AddRequest;
+  readonly prompted: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-resolver.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-resolver.types.ts#L21)
 
 ### addResolutionLive
 
@@ -2369,23 +2515,39 @@ Acquires file and lock snapshots before applying an immutable scaffold plan; com
 
 ### AddCommandResult
 
+Existing command-runner result compatibility surface.
+
 **Signature**
 
 ```ts
-declare const AddCommandResult: AddCommandResult;
+export interface AddCommandResult extends GeneratorCommandResult {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-transaction.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-transaction.types.ts#L16)
 
 ### ApplyScaffoldContext
 
+Existing scaffold transaction settings, preserving all caller injection points.
+
 **Signature**
 
 ```ts
-declare const ApplyScaffoldContext: ApplyScaffoldContext;
+export interface ApplyScaffoldContext {
+  readonly commandRunner?: GeneratorCommandRunner;
+  readonly bunExecutable?: string;
+  readonly relkitExecutable?: string;
+  readonly signal?: AbortSignal;
+  /**
+   * Reports the current step through the caller's progress sink.
+   * @param message - User-facing progress text for the current step.
+   * @returns Completion after the sink receives one progress message.
+   */
+  readonly onProgress?: (message: string) => void;
+  readonly deferVerification?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-transaction.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/add-transaction.types.ts#L19)
 
 ### ScaffoldTransaction (class)
 
@@ -3069,13 +3231,19 @@ source publication; no database client or migration runs during this workflow.
 
 ### RenderedDatabase
 
+Validated discovered/planned native database and registered schema locations.
+
 **Signature**
 
 ```ts
-declare const RenderedDatabase: RenderedDatabase;
+export interface RenderedDatabase {
+  readonly dialect: Extract<AddRequest, { kind: "database" }>["dialect"];
+  readonly servicePath: string;
+  readonly schemaPath: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/cli/src/scaffolding/render-database.types.ts#L10)
 
 ### renderDatabase
 

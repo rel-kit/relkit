@@ -7,7 +7,7 @@
 .inspector {
   display: block;
   overflow: hidden;
-  border: 1px solid #d4d4d4;
+  border: 1px solid var(--line-strong);
   border-radius: 6px;
   background: var(--page);
   box-shadow: 0 12px 32px -20px #0003;
@@ -30,11 +30,27 @@
   font-size: 11px;
 }
 
+.inspectorBar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inspectorBar a:hover {
+  color: var(--ink);
+}
+
+.inspectorBar a:focus-visible,
+.carouselControls button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 .inspectorBar i {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #737373;
+  background: var(--mark);
 }
 
 .inspector img {
@@ -115,7 +131,7 @@
 }
 
 .guides > a:active {
-  background: #f2f2f2;
+  background: var(--fill);
 }
 
 .cta {
@@ -149,7 +165,7 @@
     background: var(--soft);
   }
   .inspector:hover {
-    border-color: #a3a3a3;
+    border-color: var(--line-hover);
   }
 }
 
@@ -215,5 +231,115 @@
   }
   .cta {
     padding: 64px 24px;
+  }
+}
+
+/* One screenshot per theme; the hidden one is not rendered or announced. */
+.inspector img.inspectorDark {
+  display: none;
+}
+
+:global(:root[data-theme="dark"]) .inspector img.inspectorDark {
+  display: block;
+}
+
+:global(:root[data-theme="dark"]) .inspector img.inspectorLight {
+  display: none;
+}
+
+/* Slides share one grid cell, so the frame keeps the screenshot's aspect while they crossfade. */
+.carousel {
+  display: grid;
+  gap: 16px;
+}
+
+.slides {
+  display: grid;
+  aspect-ratio: 1280 / 900;
+}
+
+.slide {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 280ms ease,
+    visibility 0s linear 280ms;
+}
+
+.slide[data-active="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 280ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide,
+  .slide[data-active="true"] {
+    transition: none;
+  }
+}
+
+.carouselControls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.carouselControls button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-family: var(--hero-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.carouselControls > button {
+  width: 32px;
+  padding: 0;
+  border-color: var(--line);
+}
+
+.carouselTabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.carouselTabs button[aria-current="true"] {
+  border-color: var(--line-strong);
+  color: var(--ink);
+  background: var(--soft);
+}
+
+@media (hover: hover) {
+  .carouselControls button:hover {
+    color: var(--ink);
+    background: var(--fill);
+  }
+}
+
+.carouselCaption {
+  min-height: 1.6em;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .carouselTabs {
+    display: none;
   }
 }

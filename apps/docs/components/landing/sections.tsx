@@ -88,7 +88,7 @@ export function Statistics() {
         <dl className={styles.statistics}>
           {[
             ["1", "Checked application graph"],
-            ["3", "Templates: minimal, API, agent"],
+            ["5", "Starter templates, minimal to full-stack"],
             ["0", "Cloud credentials to start locally"],
           ].map(([value, label]) => (
             <div key={label}>

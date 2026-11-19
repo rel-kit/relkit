@@ -158,6 +158,18 @@
       "@relkit/testing/drizzle": ["../../packages/testing/src/drizzle.ts"],
       "@relkit/testing/better-auth": ["../../packages/testing/src/better-auth.ts"],
       "@relkit/redis": ["../../integrations/packages/redis/src/index.ts"],
+      "@relkit/local": ["../../integrations/packages/local/src/index.ts"],
+      "@relkit/otlp": ["../../integrations/packages/otlp/src/index.ts"],
+      "@relkit/inngest": ["../../integrations/packages/inngest/src/index.ts"],
+      "better-auth/plugins/access": [
+        "../../packages/better-auth/node_modules/better-auth/dist/plugins/access/index.d.mts"
+      ],
+      "better-auth/plugins/organization": [
+        "../../packages/better-auth/node_modules/better-auth/dist/plugins/organization/index.d.mts"
+      ],
+      "better-auth/plugins/organization/access": [
+        "../../packages/better-auth/node_modules/better-auth/dist/plugins/organization/access/index.d.mts"
+      ],
       "@relkit/s3": ["../../integrations/packages/s3/src/index.ts"],
       "@orpc/contract": ["../../packages/client/node_modules/@orpc/contract/dist/index.d.ts"],
       "effect": ["../../packages/relkit/node_modules/effect/dist/index.d.ts"],

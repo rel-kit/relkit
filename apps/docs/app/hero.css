@@ -9,6 +9,15 @@
   --hero-muted: #737373;
   --hero-line: #e5e5e5;
   --hero-soft: #f9fafb;
+  --hero-dot: #c7c7c7;
+  --hero-on-ink: #fafafa;
+  --hero-ink-hover: #303030;
+  --hero-mark: #a3a3a3;
+  --hero-arrow: #525252;
+  --hero-control-hover: #eeeeee;
+  --hero-strong: #262626;
+  --hero-code-ink: #2e2e4b;
+  color-scheme: light;
   position: relative;
   isolation: isolate;
   color: var(--hero-ink);
@@ -22,7 +31,7 @@
   inset: 438px 0 auto;
   height: 940px;
   content: "";
-  background-image: radial-gradient(#c7c7c7 0.75px, transparent 0.75px);
+  background-image: radial-gradient(var(--hero-dot) 0.75px, transparent 0.75px);
   background-size: 20px 20px;
   mask-image: linear-gradient(transparent, #0003 22%, #0003 74%, transparent);
   pointer-events: none;
@@ -113,18 +122,18 @@
   gap: 12px;
   border-radius: 6px;
   background: var(--hero-ink);
-  color: #fafafa;
+  color: var(--hero-on-ink);
   font-size: 14px;
   font-weight: 400;
 }
 
 .hero-start:hover {
-  background: #303030;
+  background: var(--hero-ink-hover);
 }
 
 .hero-design a:focus-visible,
 .hero-design button:focus-visible {
-  outline: 2px solid #737373;
+  outline: 2px solid var(--hero-muted);
   outline-offset: 4px;
 }
 
@@ -185,4 +194,22 @@
       left 16px top,
       right 16px top;
   }
+}
+
+/* Blume's header toggle and theme script set data-theme on the document root. */
+:root[data-theme="dark"] .hero-design {
+  --hero-bg: #0d0e10;
+  --hero-ink: #f5f5f5;
+  --hero-muted: #a1a1a1;
+  --hero-line: #26272b;
+  --hero-soft: #141517;
+  --hero-dot: #34353a;
+  --hero-on-ink: #0d0e10;
+  --hero-ink-hover: #d4d4d4;
+  --hero-mark: #525252;
+  --hero-arrow: #d4d4d4;
+  --hero-control-hover: #26272b;
+  --hero-strong: #e5e5e5;
+  --hero-code-ink: #e4e4ef;
+  color-scheme: dark;
 }

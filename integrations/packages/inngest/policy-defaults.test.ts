@@ -16,7 +16,19 @@ test("omitted framework policy fields do not block an Inngest submission", () =>
       },
     }),
   ).toEqual({ retries: 2 });
-  expect(() => mapInngestPolicy({ maxElapsed: "1 hour" })).toThrow(
-    'Inngest cannot certify task policy field "maxElapsed".',
+});
+
+test("a limit Inngest does not enforce is left to the check and start warnings", () => {
+  // `relkit check` and the server's start report maxElapsed; a submission is not refused for it.
+  expect(mapInngestPolicy({ maxElapsed: "1 hour" })).toEqual({});
+});
+
+test("the deprecated logging option does not make Inngest refuse a run", () => {
+  expect(mapInngestPolicy({ logging: { level: "info", redact: ["input.token"] } })).toEqual({});
+});
+
+test("an option Inngest cannot map is refused with the backend and the option named", () => {
+  expect(() => mapInngestPolicy({ priority: 1 })).toThrow(
+    'The inngest jobs backend does not support the task option "priority". Remove it from the task.',
   );
 });

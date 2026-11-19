@@ -23,7 +23,6 @@ describe("event functions", () => {
       kind: "function",
       invocationMode: "event-only",
       delivery: "durable",
-      profile: "default",
       retry: { maxAttempts: 1, initialDelayMs: 0, maxDelayMs: 0, multiplier: 1, jitter: "none" },
     });
     expect(consumer).not.toHaveProperty("invoke");

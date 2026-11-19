@@ -43,9 +43,14 @@ export interface TelemetryExportSamplingPolicy {
 export interface TelemetryConfiguration<
   Exporters extends TelemetryExporterMap = TelemetryExporterMap,
 > {
+  /** Which signals are recorded; all of them when omitted. */
   readonly capture?: TelemetryCapturePolicy;
+  /** How recorded payloads are redacted, and the largest payload kept. */
   readonly redaction?: RedactionPolicy;
+  /** Limits of the local store: records, age and bytes. */
   readonly localRetention?: TelemetryLocalRetentionPolicy;
+  /** Share of traces and lowest log level sent to exporters. */
   readonly exportSampling?: TelemetryExportSamplingPolicy;
+  /** Exporters by name, such as `otlp()` or `sentry()`. */
   readonly exporters?: Exporters;
 }

@@ -119,6 +119,15 @@ Roles and permissions come from Better Auth. With the
 role in the session's active organization, and permissions are checked against the plugin's access control.
 Without it, roles come from the admin plugin's `user.role`, and no permission is granted.
 
+With the organization plugin, `roles` and `permissions` accept only the names of its access control:
+the keys of the plugin's `roles` and each `resource:action` pair of its statements, or the plugin's
+defaults when you pass neither. Your editor suggests them, and a misspelled name is a type error
+instead of a `403` for every caller. The names reach the rule through
+`.relkit/generated/context-registry.d.ts`, which `relkit dev` and `relkit check` write; run
+`relkit check` after you change the access control. With `dynamicAccessControl`, roles are created
+at run time and `roles` accepts any string. For a name you build in code, use the types
+`AccessRoleName` and `AccessPermissionName` from `relkit/contracts`.
+
 Jobs, tasks and event deliveries run without a session, so a function with an access rule fails with
 `unauthenticated` when they call it. Call it through `getRelkit()` to act as the application, or through
 `relkit.as(session)` to act as a user:

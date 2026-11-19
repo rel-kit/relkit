@@ -756,11 +756,19 @@ const policy: ChannelClientPolicy<ChannelGuard> = { public: true };
 
 ```ts
 type ChannelClientPolicy<Guard> =
-  | { readonly public: true; readonly authorize?: never }
-  | { readonly authorize: Guard; readonly public?: never };
+  | {
+      /** Lets any client that can reach the application subscribe. */
+      readonly public: true;
+      readonly authorize?: never;
+    }
+  | {
+      /** Decides on the server whether the caller may subscribe to the given partition. */
+      readonly authorize: Guard;
+      readonly public?: never;
+    };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L22)
 
 ### ChannelDescriptor (type alias)
 
@@ -791,7 +799,7 @@ type ChannelDescriptor<
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L69)
 
 ### ChannelDescriptorAny (type alias)
 
@@ -815,7 +823,7 @@ type ChannelDescriptorAny = ChannelDescriptor<
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L73)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L87)
 
 ### ChannelDescriptorData (type alias)
 
@@ -840,7 +848,7 @@ type ChannelDescriptorData = DescriptorBase<"channel", string> & {
 };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L84)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L98)
 
 ### ChannelGuard (type alias)
 
@@ -861,7 +869,7 @@ type ChannelGuard<Params = unknown, Context = unknown> = (
 ) => MaybePromise<boolean>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L14)
 
 ### ChannelPresence (type alias)
 
@@ -880,7 +888,7 @@ type ChannelPresence<Params = unknown, Context = unknown> =
   "count" | MemberPresenceDescriptor<StandardSchemaV1, Params, Context>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L53)
 
 ### ChannelReplay (interface)
 
@@ -896,12 +904,14 @@ const replay: ChannelReplay = { retentionMs: 60000, maxEvents: 100 };
 
 ```ts
 export interface ChannelReplay {
+  /** Longest age of an event that can be replayed, in milliseconds. */
   readonly retentionMs: number;
+  /** Most events kept for one partition of the channel. */
   readonly maxEvents: number;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L59)
 
 ### DefineChannelOptions (interface)
 
@@ -933,17 +943,24 @@ export interface DefineChannelOptions<
   Client extends ChannelClientPolicy<ChannelGuard<InferOutput<ParamsSchema>>> | undefined,
   Presence extends ChannelPresence<InferOutput<ParamsSchema>> | undefined,
 > extends DescriptorMetadata {
+  /** Stable channel name used by the backend and the generated client. */
   readonly id: Id;
+  /** Schema of the values that identify one partition of the channel, such as an `orderId`. */
   readonly params: ParamsSchema;
+  /** Event names mapped to the schemas of their payloads. */
   readonly events: Events;
-  readonly profile?: string;
+  /** The realtime provider profile that carries the channel; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"realtime">;
+  /** Browser access: omit for backend-only use, or set `public: true` or an `authorize` guard. */
   readonly client?: Client;
+  /** Keeps recent events so that a reconnecting client receives the ones it missed. */
   readonly replay?: ChannelReplay;
+  /** Reports who is connected: `"count"` for a connection count, or a member description. */
   readonly presence?: Presence;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L96)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L110)
 
 ### MemberPresenceDescriptor (interface)
 
@@ -967,13 +984,16 @@ export interface MemberPresenceDescriptor<
   Params = unknown,
   Context = unknown,
 > {
+  /** Schema of the public information shown for each connected member. */
   readonly member: MemberSchema;
+  /** Builds that information for a caller from the channel params and the server context. */
   readonly resolve: (params: Params, context: Context) => MaybePromise<InferInput<MemberSchema>>;
+  /** Most members returned in a presence list; it does not limit connections. */
   readonly maxMembers: number;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/realtime/channel.types.ts#L37)
 
 ## `dispatch.ts`
 

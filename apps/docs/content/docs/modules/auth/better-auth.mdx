@@ -262,12 +262,40 @@ user's `image` validates as `null`. The corrections also fix the success answers
 `organization/list-invitations` and `organization/list-members`. Every operation that takes a body
 also declares 413 and 415.
 
-These differences between the reference and the server remain:
+### Read an authentication error
+
+Better Auth answers every request under its mount, and its errors keep Better Auth's format. They
+are not [Problem Details](/docs/modules/http/responses#read-an-error-response):
+
+```json
+{ "message": "Invalid email or password", "code": "INVALID_EMAIL_OR_PASSWORD" }
+```
+
+- `message` is text for people. `code` is Better Auth's code for the error; branch on it. A few
+  errors carry `message` alone.
+- A validation failure has the code `VALIDATION_ERROR` and adds `issues`, one entry per failing
+  field with its `path` and `message`.
+- Some errors have no body, such as the 401 of an organization endpoint called without a session.
+  Read the status first.
+
+RelKit does not convert these errors, because Better Auth's own client reads this format. The
+reference declares it as the `BetterAuthError` schema on every error response of these operations.
+
+RelKit answers two cases itself, before Better Auth runs, and those are Problem Details:
 
 - State-changing operations, such as `POST /api/auth/organization/set-active`, answer 403 with
   `application/problem+json` (code `origin-denied` or `csrf-denied`) when the request comes from
-  another origin and transport security is on. RelKit sends that answer before Better Auth runs, so
-  the reference lists only Better Auth's own JSON 403.
+  another origin and transport security is on. The reference lists both media types for the 403 of
+  these operations.
+- A body over the server's limit answers 413 with the code `payload-too-large`.
+
+The reference lists an operation only when your configuration serves it. An endpoint of a plugin
+you did not add is absent, and so is `POST /api/auth/get-session` unless you set
+`session.deferSessionRefresh`, because Better Auth answers 405 to it otherwise. An endpoint that is
+served is listed whether or not your application calls it.
+
+These differences between the reference and the server remain:
+
 - Some operations declare no success answer, such as `organization/leave`,
   `organization/cancel-invitation` and `organization/get-active-member-role`.
 - A failed `organization/set-active` for an unknown organization clears the active organization;

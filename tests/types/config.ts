@@ -1,5 +1,6 @@
 import * as appExports from "relkit";
-import { defineApp, defineEnv, env } from "relkit/config";
+import { type ApplicationProfilesOf, defineApp, defineEnv, env } from "relkit/config";
+import type { ProviderProfileName } from "relkit/contracts";
 import { kv, r2 } from "@relkit/cloudflare";
 import { docker } from "@relkit/docker";
 import {
@@ -105,6 +106,59 @@ defineApp({
   cache: { requests: redis({ url: namedUrl }) },
   // @ts-expect-error defaults reference keys in the corresponding singular map
   defaults: { cache: "missing" },
+});
+
+// A single adapter is the profile `default`.
+const single = defineApp({
+  env: defineEnv({}),
+  cache: redis({ url: namedUrl }),
+  defaults: { cache: "default" },
+});
+const singleDefault: "default" | undefined = single.defaults.cache;
+void singleDefault;
+
+// The generated registry reads the profile names of each capability from the descriptor's type.
+type UnifiedProfiles = ApplicationProfilesOf<typeof unified>;
+const namedProfiles: UnifiedProfiles["cache"][] = ["requests", "timeline"];
+// @ts-expect-error not a profile of the cache capability
+const unknownProfile: UnifiedProfiles["cache"] = "missing";
+const soleProfile: ApplicationProfilesOf<typeof single>["cache"] = "default";
+void [namedProfiles, unknownProfile, soleProfile];
+// Without names in the registry, as in a library, a descriptor's profile is any string.
+const freeProfile: string extends ProviderProfileName<"bucket"> ? true : false = true;
+void freeProfile;
+
+defineApp({
+  env: defineEnv({}),
+  cache: redis({ url: namedUrl }),
+  // @ts-expect-error a single adapter has no profile other than default
+  defaults: { cache: "requests" },
+});
+
+defineApp({
+  env: defineEnv({}),
+  cache: { requests: redis({ url: namedUrl }) },
+  // @ts-expect-error a default needs a provider for its capability
+  defaults: { bucket: "assets" },
+});
+
+// One wrong default does not make the correct ones errors.
+defineApp({
+  env: defineEnv({}),
+  cache: { requests: redis({ url: namedUrl }) },
+  bucket: assets,
+  defaults: {
+    bucket: "default",
+    // @ts-expect-error only this entry names a profile that does not exist
+    cache: "missing",
+  },
+});
+
+defineApp({
+  env: defineEnv({}),
+  cache: { requests: redis({ url: namedUrl }) },
+  // @ts-expect-error an unknown option is rejected beside a real provider
+  caches: {},
 });
 
 defineApp({

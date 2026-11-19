@@ -106,10 +106,15 @@ export interface DefineServiceOptions<
   Tasks extends ServiceTaskMap = Readonly<Record<never, never>>,
   Jobs extends ServiceJobMap = Readonly<Record<never, never>>,
 > extends DescriptorMetadata {
+  /** Name of the service; inferred from its directory, and must equal it when set. */
   readonly id?: Id;
+  /** Functions that routes and other services may use, by public member name. */
   readonly functions?: Functions;
+  /** Events the service makes public, by member name. */
   readonly events?: Events;
+  /** Tasks the service makes public, by member name. */
   readonly tasks?: Tasks;
+  /** Jobs the service makes public, by member name. */
   readonly jobs?: Jobs;
 }
 

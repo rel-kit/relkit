@@ -2,6 +2,7 @@
 import { expect, test } from "vitest";
 import { Hono } from "hono";
 import type { RegistrationPlan } from "../../src/graph/index.js";
+import { SERVER_ANSWERS_DESCRIPTION } from "../../src/openapi/generate-description.js";
 import { mergeAuthDocument } from "../../src/runtime-hono/api-docs-auth.js";
 import { OPENAPI_PATH, API_REFERENCE_PATH } from "../../src/runtime-hono/api-docs.js";
 import { installScalarApiDocs as installApiDocs } from "../../src/runtime-hono/scalar.js";
@@ -89,4 +90,21 @@ test("preserves application servers, security and schemas and rejects conflictin
   expect(() => mergeAuthDocument(existing, { paths: { "/todos": {} } })).toThrow(
     "Duplicate authentication OpenAPI path",
   );
+});
+
+test("the Authentication section names the error format and keeps the application's description", () => {
+  const application = {
+    ...document,
+    info: { ...document.info, description: SERVER_ANSWERS_DESCRIPTION },
+  };
+  const merged = mergeAuthDocument(application, authDocument) as {
+    info: { description: string };
+  };
+  const [own, authentication] = merged.info.description.split("### Authentication");
+  expect(own?.trim()).toBe(SERVER_ANSWERS_DESCRIPTION);
+  expect(own).toContain("`431` before a route is chosen");
+  expect(authentication).toContain("Better Auth's format");
+  expect(authentication).toContain("`BetterAuthError`");
+  expect(authentication).toContain("not as Problem Details");
+  expect(authentication).toContain("`HEAD` and `OPTIONS`");
 });

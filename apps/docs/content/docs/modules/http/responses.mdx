@@ -52,6 +52,18 @@ Every error response is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) Probl
 - `requestId` and `traceId` identify the request; see [Find a request](#find-a-request).
 - A declared error that retries later, and a rate-limit rejection, also send `Retry-After` in seconds.
 
+Two kinds of answer are not Problem Details:
+
+- **Better Auth's endpoints.** Better Auth answers every request under its mount (`/api/auth` by
+  default), and its errors are `application/json` with `message` and, in most cases, `code`:
+  `{"message":"Invalid email or password","code":"INVALID_EMAIL_OR_PASSWORD"}`. RelKit does not
+  convert them, because Better Auth's own client reads that format. An answer RelKit sends before
+  Better Auth runs, such as `403` `origin-denied` or `413`, is Problem Details there too. The
+  [Better Auth page](/docs/modules/auth/better-auth#read-the-authentication-operations-in-the-api-reference)
+  has the details.
+- **Answers of the HTTP server.** They have no body; see
+  [Answers before a route is chosen](#answers-before-a-route-is-chosen).
+
 ## See what the framework sends by itself
 
 These answers come from RelKit, not from your function:
@@ -93,13 +105,33 @@ Some details that surprise people:
 - **`OPTIONS` and `HEAD` are automatic.** A plain `OPTIONS` request (not a CORS preflight) to a path
   that has routes answers `204` with an empty body and `Allow` listing the methods, `OPTIONS`
   included. A `405` also lists them. `HEAD` runs the `GET` handler and drops the body; its
-  `Content-Length` is the `GET` body's length.
+  `Content-Length` is the `GET` body's length. The OpenAPI document says this once in its
+  description instead of listing both methods on every path. Paths under the Better Auth mount are
+  the exception: Better Auth answers every method there, and `HEAD` and `OPTIONS` get its `404`.
 - **`500` and `502` say nothing about the cause.** Their `detail` is a generic sentence in every
   mode; see [Internal failures](#internal-failures).
 
+### Answers before a route is chosen
+
+The HTTP server refuses some requests before RelKit reads them. These answers have an empty body
+and `Connection: close`, and no operation of the OpenAPI document lists them:
+
+| Status | When                                                                                       |
+| ------ | ------------------------------------------------------------------------------------------ |
+| `400`  | The request line or a header is malformed, or `Host` is not a host                         |
+| `408`  | On Node, the client did not finish sending the request in time                             |
+| `431`  | The request's headers are larger than the server accepts: 16 KB by default on Node and Bun |
+
+On Node, RelKit writes the `431` and adds `x-request-id` to it. On Bun, the runtime writes the `431`
+before any RelKit code runs, so it carries no request ID. `relkit dev` answers as the runtime it
+runs on. No request is recorded for these answers: the ID on a `431` names that answer, and there
+is nothing to look up in the Inspector or the logs.
+
 ## Find a request
 
-Every response carries an `x-request-id` header, including the `/_relkit/v1/*` endpoints. A Problem
+Every response RelKit writes carries an `x-request-id` header, including the `/_relkit/v1/*`
+endpoints and the client's live update stream under `relkit dev`. The exceptions are the
+[answers before a route is chosen](#answers-before-a-route-is-chosen). A Problem
 Details body carries the same value as `requestId` and also a `traceId`. They are two different
 values: the request ID names the HTTP request, and the trace ID names the trace that the request's
 spans and logs belong to.

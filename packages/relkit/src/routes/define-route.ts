@@ -2,9 +2,10 @@ import type { FunctionRefAny } from "../functions/index.js";
 import { Effect } from "effect";
 import type { HttpRequestMapping } from "./http-dsl.types.js";
 import type {
-  FunctionRouteDescriptor,
+  DefinedRoute,
+  DefineRouteOptions,
   FunctionRouteOptions,
-  RawRouteDescriptor,
+  RawHttpHandler,
   RawRouteOptions,
   RouteDescriptor,
 } from "./route.types.js";
@@ -41,17 +42,12 @@ const defineRouteOperation = Effect.fn("routes.route.define")(
  */
 export function defineRouteEffect<
   const Id extends string,
-  const Handler extends RawRouteOptions<Id>["handler"],
->(
-  options: RawRouteOptions<Id, Handler>,
-): Effect.Effect<RawRouteDescriptor<Id, Handler>, RouteOperationError>;
-export function defineRouteEffect<
-  const Id extends string,
-  const Target extends FunctionRefAny,
+  const Target extends FunctionRefAny | undefined = undefined,
   const Request extends HttpRequestMapping | undefined = undefined,
+  const Handler extends RawHttpHandler = RawHttpHandler,
 >(
-  options: FunctionRouteOptions<Id, Target, Request>,
-): Effect.Effect<FunctionRouteDescriptor<Id, Target, Request>, RouteOperationError>;
+  options: DefineRouteOptions<Id, Target, Request, Handler>,
+): Effect.Effect<DefinedRoute<Id, Target, Request, Handler>, RouteOperationError>;
 export function defineRouteEffect(
   options:
     | FunctionRouteOptions<string, FunctionRefAny, HttpRequestMapping | undefined>
@@ -93,13 +89,12 @@ export function defineRouteEffect(
  */
 export function defineRoute<
   const Id extends string,
-  const Handler extends RawRouteOptions<Id>["handler"],
->(options: RawRouteOptions<Id, Handler>): RawRouteDescriptor<Id, Handler>;
-export function defineRoute<
-  const Id extends string,
-  const Target extends FunctionRefAny,
+  const Target extends FunctionRefAny | undefined = undefined,
   const Request extends HttpRequestMapping | undefined = undefined,
->(options: FunctionRouteOptions<Id, Target, Request>): FunctionRouteDescriptor<Id, Target, Request>;
+  const Handler extends RawHttpHandler = RawHttpHandler,
+>(
+  options: DefineRouteOptions<Id, Target, Request, Handler>,
+): DefinedRoute<Id, Target, Request, Handler>;
 export function defineRoute(
   options:
     | FunctionRouteOptions<string, FunctionRefAny, HttpRequestMapping | undefined>

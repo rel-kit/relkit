@@ -37,7 +37,7 @@ const events = localEvent();
 declare const localEvent: (options?: LocalProviderOptions) => LocalEventAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L45)
 
 Since v0.4.0
 
@@ -58,7 +58,7 @@ const jobs = localJob();
 declare const localJob: (options?: LocalProviderOptions) => LocalJobAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L60)
 
 Since v0.4.0
 
@@ -102,7 +102,7 @@ export * from "relkit/local-service";
 type LocalAgentStateAdapter = ProviderAdapter<typeof agentState, "local-agent-state">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L32)
 
 ### LocalEventAdapter (type alias)
 
@@ -112,7 +112,7 @@ type LocalAgentStateAdapter = ProviderAdapter<typeof agentState, "local-agent-st
 type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L29)
 
 ### LocalJobAdapter (type alias)
 
@@ -122,7 +122,7 @@ type LocalEventAdapter = ProviderAdapter<typeof event, "local-event">;
 type LocalJobAdapter = ProviderAdapter<typeof job, "local-job">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L30)
 
 ### LocalProviderOptions (interface)
 
@@ -134,7 +134,7 @@ export interface LocalProviderOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L25)
 
 ### LocalRealtimeAdapter (type alias)
 
@@ -144,7 +144,7 @@ export interface LocalProviderOptions {
 type LocalRealtimeAdapter = ProviderAdapter<typeof realtime, "local-realtime">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L31)
 
 ### localAgentState
 
@@ -154,7 +154,7 @@ type LocalRealtimeAdapter = ProviderAdapter<typeof realtime, "local-realtime">;
 declare const localAgentState: (options?: LocalProviderOptions) => LocalAgentStateAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L73)
 
 ### localRealtime
 
@@ -164,7 +164,7 @@ declare const localAgentState: (options?: LocalProviderOptions) => LocalAgentSta
 declare const localRealtime: (options?: LocalProviderOptions) => LocalRealtimeAdapter;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/integrations/packages/local/src/providers.ts#L69)
 
 ## `identity.ts`
 
@@ -2243,23 +2243,67 @@ declare const providerOverrideBindingValuesEffect: (
 
 ### NormalizedLocalServiceRecipe
 
+Canonical recipe used by local materializers.
+Units are ordered by dependency and ID and the root collections are frozen.
+
+**Example**
+
+```ts
+const normalized: NormalizedLocalServiceRecipe = normalizeLocalServiceRecipe(recipe);
+```
+
 **Signature**
 
 ```ts
-declare const NormalizedLocalServiceRecipe: NormalizedLocalServiceRecipe;
+export interface NormalizedLocalServiceRecipe {
+  readonly kind: "local-service-recipe";
+  readonly protocolVersion: 1 | typeof LOCAL_SERVICE_RECIPE_PROTOCOL_VERSION;
+  readonly integrationId: string;
+  readonly recipeId: string;
+  readonly recipeVersion: number;
+  readonly materializerId: "docker";
+  readonly units: readonly NormalizedLocalServiceUnit[];
+  readonly volumes: Readonly<Record<string, CompositeLocalServiceVolume>>;
+  readonly generatedSecrets: Readonly<Record<string, LocalServiceGeneratedSecret>>;
+  readonly environment: Readonly<
+    Record<string, LocalServiceSecretEnvironment | LocalServiceLiteralEnvironment>
+  >;
+  readonly network?: Readonly<{ readonly internal?: boolean }>;
+  readonly ownership: Readonly<{
+    readonly scope: "project" | "binding";
+    readonly retainVolumes: boolean;
+  }>;
+  readonly outputs: (
+    context: LocalServiceRecipeOutputContext,
+  ) => Readonly<Record<string, JsonValue>>;
+  readonly initialize?: (context: LocalServiceRecipeOutputContext) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.types.ts#L27)
 
 ### NormalizedLocalServiceUnit
 
+Validated unit with required frozen collections.
+
+**Example**
+
+```ts
+const ids = recipe.units.map((unit: NormalizedLocalServiceUnit) => unit.id);
+```
+
 **Signature**
 
 ```ts
-declare const NormalizedLocalServiceUnit: NormalizedLocalServiceUnit;
+export interface NormalizedLocalServiceUnit extends CompositeLocalServiceUnit {
+  readonly dependsOn: readonly string[];
+  readonly ports: Readonly<Record<string, number>>;
+  readonly volumes: readonly { readonly name: string; readonly mountPath: string }[];
+  readonly health?: LocalServiceHealthCheck;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/local-service/recipe-normalize.types.ts#L16)
 
 ### normalizeLocalServiceRecipe
 

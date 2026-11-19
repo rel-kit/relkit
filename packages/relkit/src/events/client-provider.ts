@@ -125,6 +125,19 @@ export const resolveValueEffect = Effect.fn("Events.resolveValue")(
     ),
 );
 
+/** The profile a client without one publishes to: the only profile of its source.
+ * @param source - Provider, or a collection of providers by profile name.
+ * @returns The single profile name, or undefined for a provider or several profiles.
+ * @example soleProfile({ local: provider }); // "local"
+ */
+export function soleProfile(source: unknown): string | undefined {
+  if (isProvider(source)) return undefined;
+  const value = isRecord(source) && source.capability === "events" ? source.value : source;
+  if (!isRecord(value) || isProvider(value)) return undefined;
+  const names = Object.keys(value);
+  return names.length === 1 ? names[0] : undefined;
+}
+
 function profileValue(source: unknown, profile: string): unknown {
   if (isProvider(source)) return source;
   const value = isRecord(source) && source.capability === "events" ? source.value : source;

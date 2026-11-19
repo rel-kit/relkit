@@ -854,13 +854,23 @@ declare const InspectorHistoryNativeLive: Layer<InspectorHistoryNative, never, n
 
 ### InspectorOptions
 
+Trusted launch inputs; none are accepted from a browser request.
+
 **Signature**
 
 ```ts
-declare const InspectorOptions: InspectorOptions;
+export interface InspectorOptions {
+  readonly projectRoot?: string;
+  readonly connectionFile?: string;
+  readonly credentialFile?: string;
+  readonly target?: string;
+  readonly historyDirectory?: string;
+  readonly hostname: string;
+  readonly port: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/options.types.ts#L2)
 
 ### InspectorRemote
 

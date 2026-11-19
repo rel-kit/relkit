@@ -33,9 +33,10 @@ describe("event functions", () => {
       id: "receipt.send",
       event: "orders.created",
       delivery: "durable",
-      profile: "default",
       retry: { maxAttempts: 1, jitter: "none" },
     });
+    // An omitted profile stays omitted, so the application's default event profile applies.
+    expect(descriptor).not.toHaveProperty("profile");
     expect(Object.isFrozen(descriptor)).toBe(true);
     expect(isEventFunctionDescriptor(descriptor)).toBe(true);
     expect(Effect.runSync(isEventFunctionDescriptorEffect(descriptor))).toBe(true);
@@ -51,6 +52,8 @@ describe("event functions", () => {
     );
     expect(defined.retry.maxAttempts).toBe(3);
     expect(defined.delivery).toBe("ephemeral");
+    expect(defined.profile).toBe("durable");
+    expect(isEventFunctionDescriptor(defined)).toBe(true);
   });
 
   test.each([

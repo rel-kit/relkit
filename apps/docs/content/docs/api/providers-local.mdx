@@ -19,13 +19,17 @@ Composes filesystem-backed agent-state operations and their Promise compatibilit
 
 ### LocalAgentStateProviderOptions
 
+Polling policy for observing updates from other agent-state processes.
+
 **Signature**
 
 ```ts
-declare const LocalAgentStateProviderOptions: LocalAgentStateProviderOptions;
+export interface LocalAgentStateProviderOptions {
+  readonly pollingMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/agent-state/provider.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/agent-state/provider.types.ts#L7)
 
 ### LocalAgentStateService (class)
 
@@ -845,13 +849,19 @@ declare const LocalStoredRun: {
 
 ### StoredReceipt
 
+Generic idempotency envelope used when selecting retained receipts.
+
 **Signature**
 
 ```ts
-declare const StoredReceipt: StoredReceipt<Value>;
+export interface StoredReceipt<Value> {
+  readonly semanticDigest: string;
+  readonly expiresAt: string;
+  readonly value: Value;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/agent-state/state.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/agent-state/state.types.ts#L12)
 
 ### emptyAgentState
 
@@ -1354,33 +1364,47 @@ readonly code: "RELKIT_BUCKET_KEY_INVALID"
 
 ### LocalBucketListOptions
 
+Optional cursor and bounded page size for lexical key listing.
+
 **Signature**
 
 ```ts
-declare const LocalBucketListOptions: LocalBucketListOptions;
+export interface LocalBucketListOptions {
+  readonly cursor?: string;
+  readonly limit?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/buckets.types.ts#L25)
 
 ### LocalBucketListPage
 
+Immutable bucket key page with continuation metadata.
+
 **Signature**
 
 ```ts
-declare const LocalBucketListPage: LocalBucketListPage;
+export interface LocalBucketListPage {
+  readonly items: readonly string[];
+  readonly nextCursor?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/buckets.types.ts#L31)
 
 ### LocalBucketObjectMetadata
 
+Verified content identity, size and optional application metadata.
+
 **Signature**
 
 ```ts
-declare const LocalBucketObjectMetadata: LocalBucketObjectMetadata;
+export interface LocalBucketObjectMetadata extends BucketObjectMetadata {
+  readonly contentHash: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/buckets.types.ts#L37)
 
 ### LocalBucketPaginationError (class)
 
@@ -1408,13 +1432,18 @@ readonly code: "RELKIT_BUCKET_CURSOR_INVALID"
 
 ### LocalBucketPolicy
 
+Size, content-type and metadata limits enforced before bucket writes.
+
 **Signature**
 
 ```ts
-declare const LocalBucketPolicy: LocalBucketPolicy;
+export interface LocalBucketPolicy {
+  readonly maxObjectBytes?: number;
+  readonly allowedContentTypes?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/buckets.types.ts#L11)
 
 ### LocalBucketPolicyError (class)
 
@@ -1433,23 +1462,70 @@ declare class LocalBucketPolicyError {
 
 ### LocalBucketProvider
 
+Public Promise bucket contract plus local inspection and lifecycle operations.
+
 **Signature**
 
 ```ts
-declare const LocalBucketProvider: LocalBucketProvider;
+type LocalBucketProvider = Omit<BucketProvider, "list"> & {
+  readonly capabilities: Readonly<BucketCapabilities>;
+  readonly root: string;
+  readonly policy: Readonly<LocalBucketPolicy>;
+  readonly list: {
+    (prefix?: string): Promise<readonly string[]>;
+    (prefix: string | undefined, options: LocalBucketListOptions): Promise<LocalBucketListPage>;
+  };
+  readonly listPage: (
+    prefix?: string,
+    options?: LocalBucketListOptions,
+  ) => Promise<LocalBucketListPage>;
+  readonly ready: () => Promise<void>;
+  readonly close: () => Promise<void>;
+  readonly inspector: {
+    readonly list: (request: {
+      readonly prefix?: string;
+      readonly cursor?: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<{
+      readonly items: readonly { readonly key: string; readonly metadata?: BucketObjectMetadata }[];
+      readonly nextCursor?: string;
+    }>;
+    readonly preview: (request: {
+      readonly key: string;
+      readonly offset: number;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<
+      | {
+          readonly bytes: Uint8Array;
+          readonly metadata: BucketObjectMetadata;
+          readonly totalBytes: number;
+        }
+      | undefined
+    >;
+  };
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/buckets.types.ts#L45)
 
 ### LocalBucketProviderOptions
 
+Owned root, object policy and default pagination settings for a local bucket.
+
 **Signature**
 
 ```ts
-declare const LocalBucketProviderOptions: LocalBucketProviderOptions;
+export interface LocalBucketProviderOptions extends LocalBucketPolicy {
+  readonly root?: string;
+  readonly stateRoot?: string;
+  readonly policy?: LocalBucketPolicy;
+  readonly pageSize?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/buckets.types.ts#L17)
 
 ### LocalBucketStateError (class)
 
@@ -1477,13 +1553,18 @@ readonly code: "RELKIT_BUCKET_STATE_INVALID"
 
 ### LocalBucketUnsupportedCapability
 
+Bucket capability that the filesystem implementation explicitly does not provide.
+
 **Signature**
 
 ```ts
-declare const LocalBucketUnsupportedCapability: LocalBucketUnsupportedCapability;
+type LocalBucketUnsupportedCapability = {
+  readonly capability: BucketCapability;
+  readonly operation: BucketOperation;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/buckets/buckets.types.ts#L86)
 
 ### StoredLocalBucketObject
 
@@ -1876,13 +1957,18 @@ declare const makeLocalCacheService: (
 
 ### LocalCacheRead
 
+Cache read result distinguishing absence from an expired value.
+
 **Signature**
 
 ```ts
-declare const LocalCacheRead: LocalCacheRead;
+export interface LocalCacheRead {
+  readonly value: unknown | typeof MISSING;
+  readonly expired: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.types.ts#L13)
 
 ### LocalCacheStore (class)
 
@@ -2011,33 +2097,54 @@ declare const evict: () => void;
 
 ### LocalCacheStoreEntry
 
+Serializable cache entry including expiration and recency metadata.
+
 **Signature**
 
 ```ts
-declare const LocalCacheStoreEntry: LocalCacheStoreEntry;
+export interface LocalCacheStoreEntry {
+  readonly key: string;
+  readonly value: unknown;
+  readonly bytes: number;
+  readonly expiresAt?: number;
+  readonly lastUsed: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.types.ts#L28)
 
 ### LocalCacheStoreSnapshot
 
+Safe counters maintained by the pure LRU state.
+
 **Signature**
 
 ```ts
-declare const LocalCacheStoreSnapshot: LocalCacheStoreSnapshot;
+export interface LocalCacheStoreSnapshot {
+  readonly entries: number;
+  readonly bytes: number;
+  readonly evictions: number;
+  readonly hits: number;
+  readonly misses: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.types.ts#L19)
 
 ### LocalCacheStoreState
 
+Complete cache snapshot used to restore counters and LRU ordering.
+
 **Signature**
 
 ```ts
-declare const LocalCacheStoreState: LocalCacheStoreState;
+export interface LocalCacheStoreState extends Omit<LocalCacheStoreSnapshot, "entries"> {
+  readonly sequence: number;
+  readonly entries: readonly LocalCacheStoreEntry[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/store.types.ts#L37)
 
 ### MISSING
 
@@ -2167,13 +2274,18 @@ declare const LOCAL_CACHE_DURABLE_CAPABILITIES: Readonly<{
 
 ### LocalCacheCapabilities
 
+Truthful persistence, atomicity and capacity guarantees for the local cache.
+
 **Signature**
 
 ```ts
-declare const LocalCacheCapabilities: LocalCacheCapabilities;
+export interface LocalCacheCapabilities extends CacheCapabilities {
+  readonly persistence: "memory-only" | "restart-recovery";
+  readonly singleFlight: "generation-local";
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/cache.types.ts#L53)
 
 ### LocalCacheEvictionPolicy
 
@@ -2211,13 +2323,21 @@ readonly code: "RELKIT_CACHE_KEY_INVALID"
 
 ### LocalCachePolicy
 
+Normalized TTL, encoded-value and total-cache limits.
+
 **Signature**
 
 ```ts
-declare const LocalCachePolicy: LocalCachePolicy;
+export interface LocalCachePolicy {
+  readonly defaultTtlMs?: number;
+  readonly maxTtlMs?: number;
+  readonly maxEntries: number;
+  readonly maxBytes: number;
+  readonly evictionPolicy: LocalCacheEvictionPolicy;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/cache.types.ts#L31)
 
 ### LocalCachePolicyError (class)
 
@@ -2245,33 +2365,108 @@ readonly code: "RELKIT_CACHE_POLICY_INVALID"
 
 ### LocalCacheProvider
 
+Public cache operations and local lifecycle/inspection surface.
+
 **Signature**
 
 ```ts
-declare const LocalCacheProvider: LocalCacheProvider;
+type LocalCacheProvider = Omit<CacheProvider, "capabilities"> & {
+  readonly capabilities: Readonly<LocalCacheCapabilities>;
+  readonly cacheId: string;
+  readonly schemaVersion: string | number;
+  readonly policy: Readonly<LocalCachePolicy>;
+  readonly snapshot: () => LocalCacheSnapshot;
+  readonly stateRoot?: string;
+  readonly ready: () => Promise<void>;
+  readonly close: () => Promise<void>;
+  readonly get: (key: unknown, context?: CacheOperationContext) => Promise<unknown | undefined>;
+  readonly set: (
+    key: unknown,
+    value: unknown,
+    options?: CacheOperationOptions,
+    context?: CacheOperationContext,
+  ) => Promise<void>;
+  readonly delete: (key: unknown, context?: CacheOperationContext) => Promise<void>;
+  readonly has: (key: unknown, context?: CacheOperationContext) => Promise<boolean>;
+  readonly getOrSet: (
+    key: unknown,
+    produce: () => unknown | Promise<unknown>,
+    options?: CacheOperationOptions,
+    context?: CacheOperationContext,
+  ) => Promise<unknown>;
+  readonly increment: (
+    key: unknown,
+    delta: number,
+    options?: CacheOperationOptions,
+    context?: CacheOperationContext,
+  ) => Promise<number>;
+  readonly inspector: {
+    readonly scan: (request: {
+      readonly search?: string;
+      readonly cursor?: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<{ readonly items: readonly unknown[]; readonly nextCursor?: string }>;
+    readonly value: (request: {
+      readonly key: string;
+      readonly limit: number;
+      readonly signal: AbortSignal;
+    }) => Promise<unknown | undefined>;
+  };
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/cache.types.ts#L59)
 
 ### LocalCacheProviderOptions
 
+Cache bounds, persistence, clock and safe observation hooks.
+
 **Signature**
 
 ```ts
-declare const LocalCacheProviderOptions: LocalCacheProviderOptions;
+export interface LocalCacheProviderOptions {
+  /** Provider-owned profile directory; enables atomic restart snapshots. */
+  readonly stateRoot?: string;
+  readonly cacheId?: string;
+  readonly schemaVersion?: string | number;
+  readonly defaultTtlMs?: number;
+  readonly maxTtlMs?: number;
+  readonly maxEntries?: number;
+  readonly maxBytes?: number;
+  readonly evictionPolicy?: LocalCacheEvictionPolicy;
+  /** Injectable clock used for TTL and deadline checks. */
+  readonly clock?: () => number;
+  /** Alias for clock, kept for small deterministic test seams. */
+  readonly now?: () => number;
+  /** Receives safe counters only; keys and values are never included. */
+  readonly onSnapshot?: (snapshot: LocalCacheSnapshot) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/cache.types.ts#L12)
 
 ### LocalCacheSnapshot
 
+Safe cache counters and effective policy without keys or values.
+
 **Signature**
 
 ```ts
-declare const LocalCacheSnapshot: LocalCacheSnapshot;
+export interface LocalCacheSnapshot {
+  readonly version: 1;
+  readonly cacheId: string;
+  readonly schemaVersion: string | number;
+  readonly entries: number;
+  readonly bytes: number;
+  readonly evictions: number;
+  readonly hits: number;
+  readonly misses: number;
+  readonly inFlight: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/types.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/cache/cache.types.ts#L40)
 
 ### LocalCacheStateError (class)
 
@@ -2355,143 +2550,260 @@ declare const EventAdminAction: "retry";
 
 ### EventAdminActionContract
 
+Versioned mutation response containing status and audit record.
+
 **Signature**
 
 ```ts
-declare const EventAdminActionContract: EventAdminActionContract;
+export interface EventAdminActionContract extends EventAdminVersion {
+  readonly action: EventAdminAction;
+  readonly status: EventDeliveryContract;
+  readonly record: EventAdminActionRecord;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L166)
 
 ### EventAdminActionOutcome
 
+Whether an event administration action was applied or rejected.
+
 **Signature**
 
 ```ts
-declare const EventAdminActionOutcome: EventAdminActionOutcome;
+type EventAdminActionOutcome = "applied" | "rejected";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L14)
 
 ### EventAdminActionRecord
 
+Immutable audit record for an applied or rejected event mutation.
+
 **Signature**
 
 ```ts
-declare const EventAdminActionRecord: EventAdminActionRecord;
+export interface EventAdminActionRecord extends EventAdminVersion {
+  readonly actionId: string;
+  readonly action: EventAdminAction;
+  readonly deliveryId: string;
+  readonly eventInstanceId?: string;
+  readonly triggerId?: string;
+  readonly mode: EventAdminMode;
+  readonly outcome: EventAdminActionOutcome;
+  readonly requestedAt: number;
+  readonly fromState?: Exclude<JobQueueState, "accepted">;
+  readonly toState?: Exclude<JobQueueState, "accepted">;
+  readonly errorCode?: string;
+  readonly reason?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L150)
 
 ### EventAdminActionRequest
 
+Event mutation request carrying delivery identity and optional audit reason.
+
 **Signature**
 
 ```ts
-declare const EventAdminActionRequest: EventAdminActionRequest;
+export interface EventAdminActionRequest {
+  readonly protocol?: typeof EVENT_ADMIN_PROTOCOL;
+  readonly version?: typeof EVENT_ADMIN_VERSION;
+  readonly deliveryId: string;
+  readonly reason?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L139)
 
 ### EventAdminActionSink
 
+Optional audit sink isolated from the event action outcome.
+
 **Signature**
 
 ```ts
-declare const EventAdminActionSink: EventAdminActionSink;
+type EventAdminActionSink = (record: EventAdminActionRecord) => MaybePromise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L173)
 
 ### EventAdminMode
 
+Environment mode controlling event administration mutations.
+
 **Signature**
 
 ```ts
-declare const EventAdminMode: EventAdminMode;
+type EventAdminMode = "development" | "test" | "production";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L8)
 
 ### EventAdminVersion
 
+Protocol identity carried by event administration contracts.
+
 **Signature**
 
 ```ts
-declare const EventAdminVersion: EventAdminVersion;
+export interface EventAdminVersion {
+  readonly protocol: typeof EVENT_ADMIN_PROTOCOL;
+  readonly version: typeof EVENT_ADMIN_VERSION;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L17)
 
 ### EventContract
 
+Versioned declared event identity and schema metadata for inspection.
+
 **Signature**
 
 ```ts
-declare const EventContract: EventContract;
+export interface EventContract extends EventVersioned, EventContractInput {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L38)
 
 ### EventContractInput
 
+The serializable event contract registered by the active graph.
+
 **Signature**
 
 ```ts
-declare const EventContractInput: EventContractInput;
+export interface EventContractInput {
+  readonly id: string;
+  readonly version: number;
+  readonly input: JsonValue;
+  readonly sensitiveFields?: readonly string[];
+  readonly source?: JsonValue;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L29)
 
 ### EventDeadLetterContract
 
+Versioned dead-letter status with safe retry/failure metadata.
+
 **Signature**
 
 ```ts
-declare const EventDeadLetterContract: EventDeadLetterContract;
+export interface EventDeadLetterContract extends EventDeliveryContract {
+  readonly state: "dead-lettered";
+  readonly failure: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L90)
 
 ### EventDeliveryContract
 
+Safe delivery state shared by current and dead-lettered attempts.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryContract: EventDeliveryContract;
+export interface EventDeliveryContract extends EventVersioned {
+  readonly cursor: number;
+  readonly sequence: number;
+  readonly deliveryId: string;
+  readonly eventInstanceId: string;
+  readonly eventId: string;
+  readonly version: number;
+  readonly triggerId: string;
+  readonly state: Exclude<JobQueueState, "accepted">;
+  readonly attempt: number;
+  readonly duplicate: boolean;
+  readonly timestamp: number;
+  readonly leaseExpiresAt?: number;
+  readonly failure?: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L73)
 
 ### EventPublicationContract
 
+Safe publication metadata; payload data is intentionally not projected.
+
 **Signature**
 
 ```ts
-declare const EventPublicationContract: EventPublicationContract;
+export interface EventPublicationContract extends EventVersioned {
+  readonly sequence: number;
+  readonly timestamp: number;
+  readonly accepted: true;
+  readonly instanceId: string;
+  readonly eventId: string;
+  readonly version: number;
+  readonly occurredAt: string;
+  readonly publishedAt: string;
+  readonly key?: string;
+  readonly correlationId?: string;
+  readonly originRequestId?: string;
+  readonly producerTraceId?: string;
+  readonly attributes: Readonly<Record<string, string | number | boolean>>;
+  /** The stored payload; present only when the query selected this publication by id. */
+  readonly payload?: UnknownEventEnvelope["payload"];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L54)
 
 ### EventQueryContract
 
+Versioned bounded event, publication and delivery inspection response.
+
 **Signature**
 
 ```ts
-declare const EventQueryContract: EventQueryContract;
+export interface EventQueryContract extends EventAdminVersion {
+  readonly events: readonly EventContract[];
+  readonly triggers: readonly EventTriggerContract[];
+  readonly capabilities: readonly EventTriggerCapabilityContract[];
+  readonly publications: readonly EventPublicationContract[];
+  readonly items: readonly EventDeliveryContract[];
+  readonly deliveries: readonly EventDeliveryContract[];
+  readonly deadLetters: readonly EventDeadLetterContract[];
+  readonly nextCursor?: string;
+  /** Deliveries that match the filters across all pages. */
+  readonly total?: number;
+  /** Deliveries that match the filters, by state; a state with none is absent. */
+  readonly counts?: Readonly<Partial<Record<EventDeliveryContract["state"], number>>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L123)
 
 ### EventQueryRequest
 
+Event, trigger, state and pagination filters for local inspection.
+
 **Signature**
 
 ```ts
-declare const EventQueryRequest: EventQueryRequest;
+export interface EventQueryRequest {
+  readonly protocol?: typeof EVENT_ADMIN_PROTOCOL;
+  readonly version?: typeof EVENT_ADMIN_VERSION;
+  readonly eventId?: string;
+  readonly eventVersion?: number;
+  readonly triggerId?: string;
+  /** Selects one publication by instance id and includes its stored payload. */
+  readonly publicationId?: string;
+  readonly state?: Exclude<JobQueueState, "accepted">;
+  readonly states?: readonly Exclude<JobQueueState, "accepted">[];
+  readonly cursor?: string;
+  readonly limit?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L108)
 
 ### EventRetryRequest
 
@@ -2505,33 +2817,61 @@ declare const EventRetryRequest: EventAdminActionRequest;
 
 ### EventTriggerCapabilityContract
 
+Versioned truthful delivery capabilities for a registered trigger.
+
 **Signature**
 
 ```ts
-declare const EventTriggerCapabilityContract: EventTriggerCapabilityContract;
+export interface EventTriggerCapabilityContract extends EventAdminVersion {
+  readonly triggerId: string;
+  readonly delivery: "ephemeral" | "durable";
+  readonly persistence: "none" | "restart-recovery";
+  readonly restartRecovery: boolean;
+  readonly atLeastOnce: boolean;
+  readonly exactlyOnce: false;
+  readonly ordering: "unsupported";
+  readonly orderedByKey: false;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L96)
 
 ### EventTriggerContract
 
+Exact event and delivery metadata for one generated event trigger.
+
 **Signature**
 
 ```ts
-declare const EventTriggerContract: EventTriggerContract;
+export interface EventTriggerContract extends EventAdminVersion {
+  readonly id: string;
+  readonly targetFunctionId?: string;
+  readonly eventId: string;
+  readonly eventVersion: number;
+  readonly delivery: "ephemeral" | "durable";
+  readonly profile?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L41)
 
 ### EventVersioned
 
+Protocol identity carried by public event inspection contracts.
+
 **Signature**
 
 ```ts
-declare const EventVersioned: EventVersioned;
+export interface EventVersioned {
+  readonly protocol: typeof EVENT_ADMIN_PROTOCOL;
+  readonly protocolVersion: typeof EVENT_ADMIN_VERSION;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin-contracts.types.ts#L23)
 
 ## `admin-contracts.types.ts`
 
@@ -2909,13 +3249,21 @@ export * from "./admin-contracts.js";
 
 ### EventAdmin
 
+Versioned event inspection and audited dead-letter retry interface.
+
 **Signature**
 
 ```ts
-declare const EventAdmin: EventAdmin;
+export interface EventAdmin {
+  readonly protocol: typeof EVENT_ADMIN_PROTOCOL;
+  readonly version: typeof EVENT_ADMIN_VERSION;
+  readonly query: (request?: EventQueryRequest) => EventQueryContract;
+  readonly retry: (request: string | EventAdminActionRequest) => Promise<EventAdminActionContract>;
+  readonly actions: () => readonly EventAdminActionRecord[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin.types.ts#L24)
 
 ### EventAdminError
 
@@ -2929,13 +3277,22 @@ declare const EventAdminError: typeof EventAdminError;
 
 ### EventAdminOptions
 
+Event administration mode plus isolated audit and clock hooks.
+
 **Signature**
 
 ```ts
-declare const EventAdminOptions: EventAdminOptions;
+export interface EventAdminOptions {
+  readonly mode?: EventAdminMode;
+  readonly environment?: EventAdminMode;
+  readonly enabled?: boolean;
+  readonly now?: () => number;
+  readonly createActionId?: () => string;
+  readonly onAction?: EventAdminActionSink;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/admin.types.ts#L14)
 
 ### createEventAdmin
 
@@ -3009,33 +3366,69 @@ declare const EVENT_DELIVERY_CAPABILITIES: Readonly<{
 
 ### EventDelivery
 
+Compatibility interface for accepting, executing and inspecting durable deliveries.
+
 **Signature**
 
 ```ts
-declare const EventDelivery: EventDelivery;
+export interface EventDelivery {
+  readonly triggerId: string;
+  readonly capabilities: EventDeliveryCapabilities;
+  /**
+   * Durably accepts a delivery of a publication. With `replayId` it accepts a replay: a new
+   * delivery of the same publication under that identity, which the runner marks as replayed.
+   */
+  readonly accept: (
+    envelope: UnknownEventEnvelope,
+    replayId?: string,
+  ) => Promise<EventDeliveryResult>;
+  readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EventDeliveryResult>;
+  readonly runNext: (deliveryId?: string) => Promise<EventDeliveryResult | undefined>;
+  readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled delivery; a running or finished one is refused. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
+  readonly drain: () => Promise<readonly EventDeliveryResult[]>;
+  readonly recover: (now?: number) => Promise<readonly EventDeliveryLedgerRecord[]>;
+  readonly snapshot: () => EventDeliverySnapshot;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L82)
 
 ### EventDeliveryBinding
 
+Trigger identity and executable target for a durable delivery owner.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryBinding: EventDeliveryBinding;
+export interface EventDeliveryBinding {
+  readonly id: string;
+  readonly invoke: (
+    envelope: UnknownEventEnvelope,
+    options?: EventDeliveryInvocationOptions,
+  ) => Promise<unknown>;
+  readonly profile?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L22)
 
 ### EventDeliveryBoundary
 
+Durable delivery commit milestones exposed to hooks.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryBoundary: EventDeliveryBoundary;
+type EventDeliveryBoundary = JobStoreBoundary | "handler-success-before-ack";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L12)
 
 ### EventDeliveryCapabilities
 
@@ -3056,53 +3449,107 @@ declare const EventDeliveryCapabilities: Readonly<{
 
 ### EventDeliveryInvocationOptions
 
+Attempt metadata and cancellation supplied to a delivery target.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryInvocationOptions: EventDeliveryInvocationOptions;
+export interface EventDeliveryInvocationOptions {
+  readonly attempt: number;
+  readonly replayed: boolean;
+  readonly timeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L15)
 
 ### EventDeliveryLedgerRecord
 
+Persisted delivery envelope joined with its latest queue state.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryLedgerRecord: EventDeliveryLedgerRecord;
+export interface EventDeliveryLedgerRecord extends EventDeliveryRecord {
+  readonly cursor: number;
+  readonly state: EventDeliveryResult["state"];
+  readonly attempt: number;
+  readonly duplicate: boolean;
+  readonly leaseOwner?: string;
+  readonly leaseExpiresAt?: number;
+  readonly failure?: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L62)
 
 ### EventDeliveryOptions
 
+Backlog, concurrency, retry and durable-boundary configuration.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryOptions: EventDeliveryOptions;
+export interface EventDeliveryOptions {
+  readonly now?: () => number;
+  readonly random?: () => number;
+  readonly ownerToken?: string;
+  readonly leaseDurationMs?: number;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly onBoundary?: (boundary: EventDeliveryBoundary) => void | Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L35)
 
 ### EventDeliveryResult
 
+Delivery outcome including acceptance and actual persistence guarantees.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryResult: EventDeliveryResult;
+export interface EventDeliveryResult {
+  readonly triggerId: string;
+  readonly delivery: "ephemeral" | "durable";
+  readonly deliveryId?: string;
+  readonly eventInstanceId?: string;
+  readonly accepted: boolean;
+  readonly persisted: boolean;
+  readonly status: "queued" | "completed" | "failed" | "dropped";
+  readonly state?: "available" | "leased" | "delayed" | "completed" | "dead-lettered";
+  readonly attempt?: number;
+  readonly duplicate?: boolean;
+  readonly capacity?: number;
+  readonly dropPolicy?: "drop-newest";
+  readonly restartRecovery?: false;
+  readonly dropReason?: "capacity";
+  readonly value?: unknown;
+  readonly error?: unknown;
+  readonly failure?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L13)
 
 ### EventDeliverySnapshot
 
+Safe delivery counters and durable ledger inspection.
+
 **Signature**
 
 ```ts
-declare const EventDeliverySnapshot: EventDeliverySnapshot;
+export interface EventDeliverySnapshot {
+  readonly cursor: number;
+  readonly records: readonly EventDeliveryRecord[];
+  readonly ledger: readonly EventDeliveryLedgerRecord[];
+  readonly counts: JobQueueCounts;
+  readonly capabilities: typeof EVENT_DELIVERY_CAPABILITIES;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery-types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L73)
 
 ## `delivery.ts`
 
@@ -3125,73 +3572,157 @@ declare const EVENT_DELIVERY_CAPABILITIES: Readonly<{
 
 ### EventDelivery
 
+Compatibility interface for accepting, executing and inspecting durable deliveries.
+
 **Signature**
 
 ```ts
-declare const EventDelivery: EventDelivery;
+export interface EventDelivery {
+  readonly triggerId: string;
+  readonly capabilities: EventDeliveryCapabilities;
+  /**
+   * Durably accepts a delivery of a publication. With `replayId` it accepts a replay: a new
+   * delivery of the same publication under that identity, which the runner marks as replayed.
+   */
+  readonly accept: (
+    envelope: UnknownEventEnvelope,
+    replayId?: string,
+  ) => Promise<EventDeliveryResult>;
+  readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EventDeliveryResult>;
+  readonly runNext: (deliveryId?: string) => Promise<EventDeliveryResult | undefined>;
+  readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled delivery; a running or finished one is refused. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
+  readonly drain: () => Promise<readonly EventDeliveryResult[]>;
+  readonly recover: (now?: number) => Promise<readonly EventDeliveryLedgerRecord[]>;
+  readonly snapshot: () => EventDeliverySnapshot;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L82)
 
 ### EventDeliveryBinding
 
+Trigger identity and executable target for a durable delivery owner.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryBinding: EventDeliveryBinding;
+export interface EventDeliveryBinding {
+  readonly id: string;
+  readonly invoke: (
+    envelope: UnknownEventEnvelope,
+    options?: EventDeliveryInvocationOptions,
+  ) => Promise<unknown>;
+  readonly profile?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L22)
 
 ### EventDeliveryBoundary
 
+Durable delivery commit milestones exposed to hooks.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryBoundary: EventDeliveryBoundary;
+type EventDeliveryBoundary = JobStoreBoundary | "handler-success-before-ack";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L12)
 
 ### EventDeliveryLedgerRecord
 
+Persisted delivery envelope joined with its latest queue state.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryLedgerRecord: EventDeliveryLedgerRecord;
+export interface EventDeliveryLedgerRecord extends EventDeliveryRecord {
+  readonly cursor: number;
+  readonly state: EventDeliveryResult["state"];
+  readonly attempt: number;
+  readonly duplicate: boolean;
+  readonly leaseOwner?: string;
+  readonly leaseExpiresAt?: number;
+  readonly failure?: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L62)
 
 ### EventDeliveryOptions
 
+Backlog, concurrency, retry and durable-boundary configuration.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryOptions: EventDeliveryOptions;
+export interface EventDeliveryOptions {
+  readonly now?: () => number;
+  readonly random?: () => number;
+  readonly ownerToken?: string;
+  readonly leaseDurationMs?: number;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly onBoundary?: (boundary: EventDeliveryBoundary) => void | Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L35)
 
 ### EventDeliveryResult
 
+Delivery outcome including acceptance and actual persistence guarantees.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryResult: EventDeliveryResult;
+export interface EventDeliveryResult {
+  readonly triggerId: string;
+  readonly delivery: "ephemeral" | "durable";
+  readonly deliveryId?: string;
+  readonly eventInstanceId?: string;
+  readonly accepted: boolean;
+  readonly persisted: boolean;
+  readonly status: "queued" | "completed" | "failed" | "dropped";
+  readonly state?: "available" | "leased" | "delayed" | "completed" | "dead-lettered";
+  readonly attempt?: number;
+  readonly duplicate?: boolean;
+  readonly capacity?: number;
+  readonly dropPolicy?: "drop-newest";
+  readonly restartRecovery?: false;
+  readonly dropReason?: "capacity";
+  readonly value?: unknown;
+  readonly error?: unknown;
+  readonly failure?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L13)
 
 ### EventDeliverySnapshot
 
+Safe delivery counters and durable ledger inspection.
+
 **Signature**
 
 ```ts
-declare const EventDeliverySnapshot: EventDeliverySnapshot;
+export interface EventDeliverySnapshot {
+  readonly cursor: number;
+  readonly records: readonly EventDeliveryRecord[];
+  readonly ledger: readonly EventDeliveryLedgerRecord[];
+  readonly counts: JobQueueCounts;
+  readonly capabilities: typeof EVENT_DELIVERY_CAPABILITIES;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L73)
 
 ### LocalEventDeliveryService (class)
 
@@ -3460,43 +3991,79 @@ declare const EPHEMERAL_DELIVERY_CAPABILITIES: Readonly<{
 
 ### EphemeralDelivery
 
+Public transient delivery interface with explicit drain and synchronous counters.
+
 **Signature**
 
 ```ts
-declare const EphemeralDelivery: EphemeralDelivery;
+export interface EphemeralDelivery {
+  readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EphemeralDeliveryResult>;
+  readonly drain: () => Promise<void>;
+  readonly snapshot: () => EphemeralDeliverySnapshot;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.types.ts#L31)
 
 ### EphemeralDeliveryEffects
 
+Effect contract for bounded transient delivery without a hidden backlog.
+
 **Signature**
 
 ```ts
-declare const EphemeralDeliveryEffects: EphemeralDeliveryEffects;
+export interface EphemeralDeliveryEffects {
+  readonly deliver: (envelope: UnknownEventEnvelope) => Effect.Effect<EphemeralDeliveryResult>;
+  readonly drain: () => Effect.Effect<void>;
+  readonly snapshot: () => Effect.Effect<EphemeralDeliverySnapshot>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.types.ts#L38)
 
 ### EphemeralDeliveryResult
 
+Transient handler outcome with explicit nonpersistent capacity guarantees.
+
 **Signature**
 
 ```ts
-declare const EphemeralDeliveryResult: EphemeralDeliveryResult;
+export interface EphemeralDeliveryResult {
+  readonly accepted: boolean;
+  readonly persisted: false;
+  readonly status: "completed" | "failed" | "dropped";
+  readonly capacity: number;
+  readonly dropPolicy: "drop-newest";
+  readonly restartRecovery: false;
+  readonly value?: unknown;
+  readonly error?: unknown;
+  readonly dropReason?: "capacity";
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.types.ts#L5)
 
 ### EphemeralDeliverySnapshot
 
+Safe admission, completion, failure and overflow counters.
+
 **Signature**
 
 ```ts
-declare const EphemeralDeliverySnapshot: EphemeralDeliverySnapshot;
+export interface EphemeralDeliverySnapshot {
+  readonly capacity: number;
+  readonly inFlight: number;
+  readonly admitted: number;
+  readonly completed: number;
+  readonly failed: number;
+  readonly dropped: number;
+  readonly persistence: "none";
+  readonly restartRecovery: false;
+  readonly dropPolicy: "drop-newest";
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.types.ts#L18)
 
 ### LocalEphemeralService (class)
 
@@ -3647,13 +4214,21 @@ declare const EVENT_LOG_VERSION: 1;
 
 ### EventLog
 
+Promise event log operations and synchronous recovered snapshot.
+
 **Signature**
 
 ```ts
-declare const EventLog: EventLog;
+export interface EventLog {
+  readonly root: string;
+  readonly paths: EventLogPaths;
+  readonly append: (envelope: EventLogInput) => Promise<EventLogRecord>;
+  readonly snapshot: () => EventLogSnapshot;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.types.ts#L38)
 
 ### EventLogBoundary
 
@@ -3667,23 +4242,27 @@ declare const EventLogBoundary: JobStoreBoundary;
 
 ### EventLogInput
 
+Event envelope input before journal sequence assignment.
+
 **Signature**
 
 ```ts
-declare const EventLogInput: EventLogInput;
+type EventLogInput = UnknownEventEnvelope | EventPublishResult<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.types.ts#L47)
 
 ### EventLogOptions
 
+Event-log validation and durable commit hook configuration.
+
 **Signature**
 
 ```ts
-declare const EventLogOptions: EventLogOptions;
+export interface EventLogOptions extends Pick<JobStoreOptions, "now" | "onBoundary"> {}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.types.ts#L18)
 
 ### EventLogPaths
 
@@ -3697,23 +4276,38 @@ declare const EventLogPaths: JobStorePaths;
 
 ### EventLogRecord
 
+Accepted event envelope with its durable journal identity.
+
 **Signature**
 
 ```ts
-declare const EventLogRecord: EventLogRecord;
+export interface EventLogRecord {
+  readonly version: typeof EVENT_LOG_VERSION;
+  readonly sequence: number;
+  readonly kind: "accepted";
+  readonly accepted: true;
+  readonly timestamp: number;
+  readonly envelope: UnknownEventEnvelope;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.types.ts#L21)
 
 ### EventLogSnapshot
 
+Immutable persisted event records and recovery metadata.
+
 **Signature**
 
 ```ts
-declare const EventLogSnapshot: EventLogSnapshot;
+export interface EventLogSnapshot {
+  readonly records: readonly EventLogRecord[];
+  readonly index: JobStoreIndex;
+  readonly checkpoint: JobStoreCheckpoint;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/log.types.ts#L31)
 
 ### EventLogStateError (class)
 
@@ -3873,23 +4467,61 @@ export interface EventLogSnapshot {
 
 ### LocalEventEffects
 
+Effect event methods owned by the provider scope.
+
 **Signature**
 
 ```ts
-declare const LocalEventEffects: LocalEventEffects;
+export interface LocalEventEffects {
+  readonly query: (
+    request?: EventQueryRequest,
+  ) => Effect.Effect<EventQueryContract, LocalOperationError>;
+  readonly registerContract: (contract: unknown) => Effect.Effect<void, LocalOperationError>;
+  readonly registerTrigger: (
+    binding: EventRouterTrigger,
+  ) => Effect.Effect<void, LocalOperationError>;
+  readonly publish: (
+    payload: unknown,
+    options: EventPublishOptions,
+    context: EventOperationContext,
+  ) => Effect.Effect<EventProviderResult, LocalOperationError>;
+  readonly health: () => Effect.Effect<void, LocalOperationError>;
+  readonly retry: (
+    target: DeliveryTarget,
+  ) => Effect.Effect<EventDeliveryContract, LocalOperationError>;
+  readonly cancel: (
+    target: DeliveryTarget,
+  ) => Effect.Effect<EventDeliveryContract, LocalOperationError>;
+  readonly replay: (
+    target: PublicationTarget,
+  ) => Effect.Effect<EventReplayResult, LocalOperationError>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L48)
 
 ### LocalEventProvider
 
+Public event registration, publication and explicit close operations.
+
 **Signature**
 
 ```ts
-declare const LocalEventProvider: LocalEventProvider;
+export interface LocalEventProvider extends EventProvider {
+  readonly registerContract: EventRouter["registerContract"];
+  readonly registerTrigger: EventRouter["registerTrigger"];
+  readonly query: (request?: EventQueryRequest) => Promise<EventQueryContract>;
+  /** Runs a dead-lettered delivery again; answers its status. */
+  readonly retry: (target: DeliveryTarget) => Promise<EventDeliveryContract>;
+  /** Cancels a pending or scheduled delivery; answers its status. */
+  readonly cancel: (target: DeliveryTarget) => Promise<EventDeliveryContract>;
+  /** Delivers a stored publication again, as a replay, keeping its identity. */
+  readonly replay: (target: PublicationTarget) => Promise<EventReplayResult>;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L34)
 
 ### LocalEventService (class)
 
@@ -4242,13 +4874,23 @@ declare const EVENT_DELIVERY_VERSION: 1;
 
 ### EventDeliveryRecord
 
+Durable acceptance record connecting one publication and trigger.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryRecord: EventDeliveryRecord;
+export interface EventDeliveryRecord {
+  readonly version: typeof EVENT_DELIVERY_VERSION;
+  readonly sequence: number;
+  readonly timestamp: number;
+  readonly deliveryId: string;
+  readonly eventInstanceId: string;
+  readonly triggerId: string;
+  readonly envelope: UnknownEventEnvelope;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.types.ts#L5)
 
 ### EventRouterStateError (class)
 
@@ -4444,83 +5086,164 @@ declare const EVENT_DELIVERY_VERSION: 1;
 
 ### EventDeliveryRecord
 
+Durable acceptance record connecting one publication and trigger.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryRecord: EventDeliveryRecord;
+export interface EventDeliveryRecord {
+  readonly version: typeof EVENT_DELIVERY_VERSION;
+  readonly sequence: number;
+  readonly timestamp: number;
+  readonly deliveryId: string;
+  readonly eventInstanceId: string;
+  readonly triggerId: string;
+  readonly envelope: UnknownEventEnvelope;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-records.types.ts#L5)
 
 ### EventDeliveryResult
 
+Delivery outcome including acceptance and actual persistence guarantees.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryResult: EventDeliveryResult;
+export interface EventDeliveryResult {
+  readonly triggerId: string;
+  readonly delivery: "ephemeral" | "durable";
+  readonly deliveryId?: string;
+  readonly eventInstanceId?: string;
+  readonly accepted: boolean;
+  readonly persisted: boolean;
+  readonly status: "queued" | "completed" | "failed" | "dropped";
+  readonly state?: "available" | "leased" | "delayed" | "completed" | "dead-lettered";
+  readonly attempt?: number;
+  readonly duplicate?: boolean;
+  readonly capacity?: number;
+  readonly dropPolicy?: "drop-newest";
+  readonly restartRecovery?: false;
+  readonly dropReason?: "capacity";
+  readonly value?: unknown;
+  readonly error?: unknown;
+  readonly failure?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L13)
 
 ### EventFanoutResult
 
+Publication result containing each matching trigger delivery outcome.
+
 **Signature**
 
 ```ts
-declare const EventFanoutResult: EventFanoutResult;
+export interface EventFanoutResult {
+  readonly event: UnknownEventEnvelope;
+  readonly matchedTriggerIds: readonly string[];
+  readonly deliveries: readonly EventDeliveryResult[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L92)
 
 ### EventRouter
 
+Compatibility router interface for registration, fanout, inspection and lifecycle.
+
 **Signature**
 
 ```ts
-declare const EventRouter: EventRouter;
+export interface EventRouter {
+  readonly root: string;
+  readonly registerContract: (contract: unknown) => Promise<void>;
+  readonly registerTrigger: (binding: EventRouterTrigger) => Promise<void>;
+  readonly route: (
+    event: EventRouterInput,
+    options?: EventRouterRouteOptions,
+  ) => Promise<EventFanoutResult>;
+  readonly runNext: (triggerId?: string) => Promise<EventDeliveryResult | undefined>;
+  readonly drain: () => Promise<readonly EventDeliveryResult[]>;
+  readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled durable delivery. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Delivers a routed publication again, as a replay, to every trigger of its event. */
+  readonly replay: (publicationId: string) => Promise<EventFanoutResult>;
+  readonly snapshot: () => EventRouterSnapshot;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L99)
 
 ### EventRouterInput
 
+Publication input accepted as a log record or event envelope.
+
 **Signature**
 
 ```ts
-declare const EventRouterInput: EventRouterInput;
+type EventRouterInput = EventLogRecord | EventLogInput;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L119)
 
 ### EventRouterOptions
 
+Storage and delivery construction settings for the local router.
+
 **Signature**
 
 ```ts
-declare const EventRouterOptions: EventRouterOptions;
+export interface EventRouterOptions {
+  readonly onBoundary?: (
+    boundary: EventDeliveryBoundary,
+    triggerId: string,
+  ) => void | Promise<void>;
+  readonly now?: () => number;
+  readonly random?: () => number;
+  readonly ownerToken?: string;
+  readonly leaseDurationMs?: number;
+  readonly ephemeralCapacity?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L51)
 
 ### EventRouterRouteOptions
 
+Fanout options controlling immediate worker execution.
+
 **Signature**
 
 ```ts
-declare const EventRouterRouteOptions: EventRouterRouteOptions;
+export interface EventRouterRouteOptions {
+  readonly run?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L64)
 
 ### EventRouterSnapshot
 
+Immutable contracts, triggers, publications and delivery status inspection.
+
 **Signature**
 
 ```ts
-declare const EventRouterSnapshot: EventRouterSnapshot;
+export interface EventRouterSnapshot {
+  readonly records: readonly EventDeliveryRecord[];
+  readonly contracts: readonly EventContractInput[];
+  readonly triggers: readonly EventTriggerSnapshot[];
+  readonly publications: readonly EventLogRecord[];
+  readonly deliveries: readonly EventDeliveryLedgerRecord[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L69)
 
 ### EventRouterStateError
 
@@ -4534,23 +5257,52 @@ declare const EventRouterStateError: typeof EventRouterStateError;
 
 ### EventRouterTrigger
 
+Declared trigger identity, event match and executable target binding.
+
 **Signature**
 
 ```ts
-declare const EventRouterTrigger: EventRouterTrigger;
+export interface EventRouterTrigger {
+  readonly id: string;
+  readonly targetFunctionId?: string;
+  readonly eventId: string;
+  readonly eventVersion: number;
+  readonly delivery: "ephemeral" | "durable";
+  readonly profile?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+  readonly invoke: (
+    envelope: UnknownEventEnvelope,
+    options?: EventDeliveryInvocationOptions,
+  ) => Promise<unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L34)
 
 ### EventTriggerSnapshot
 
+Safe trigger configuration and runtime delivery counters.
+
 **Signature**
 
 ```ts
-declare const EventTriggerSnapshot: EventTriggerSnapshot;
+export interface EventTriggerSnapshot {
+  readonly ephemeral?: import("./ephemeral.js").EphemeralDeliverySnapshot;
+  readonly id: string;
+  readonly targetFunctionId?: string;
+  readonly eventId: string;
+  readonly eventVersion: number;
+  readonly delivery: "ephemeral" | "durable";
+  readonly profile?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/router-model.types.ts#L78)
 
 ### createEventRouter
 
@@ -4766,93 +5518,187 @@ declare const EVENT_DELIVERY_CAPABILITIES: Readonly<{
 
 ### EphemeralDelivery
 
+Public transient delivery interface with explicit drain and synchronous counters.
+
 **Signature**
 
 ```ts
-declare const EphemeralDelivery: EphemeralDelivery;
+export interface EphemeralDelivery {
+  readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EphemeralDeliveryResult>;
+  readonly drain: () => Promise<void>;
+  readonly snapshot: () => EphemeralDeliverySnapshot;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.types.ts#L31)
 
 ### EphemeralDeliveryResult
 
+Transient handler outcome with explicit nonpersistent capacity guarantees.
+
 **Signature**
 
 ```ts
-declare const EphemeralDeliveryResult: EphemeralDeliveryResult;
+export interface EphemeralDeliveryResult {
+  readonly accepted: boolean;
+  readonly persisted: false;
+  readonly status: "completed" | "failed" | "dropped";
+  readonly capacity: number;
+  readonly dropPolicy: "drop-newest";
+  readonly restartRecovery: false;
+  readonly value?: unknown;
+  readonly error?: unknown;
+  readonly dropReason?: "capacity";
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.types.ts#L5)
 
 ### EphemeralDeliverySnapshot
 
+Safe admission, completion, failure and overflow counters.
+
 **Signature**
 
 ```ts
-declare const EphemeralDeliverySnapshot: EphemeralDeliverySnapshot;
+export interface EphemeralDeliverySnapshot {
+  readonly capacity: number;
+  readonly inFlight: number;
+  readonly admitted: number;
+  readonly completed: number;
+  readonly failed: number;
+  readonly dropped: number;
+  readonly persistence: "none";
+  readonly restartRecovery: false;
+  readonly dropPolicy: "drop-newest";
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/ephemeral.types.ts#L18)
 
 ### EventDelivery
 
+Compatibility interface for accepting, executing and inspecting durable deliveries.
+
 **Signature**
 
 ```ts
-declare const EventDelivery: EventDelivery;
+export interface EventDelivery {
+  readonly triggerId: string;
+  readonly capabilities: EventDeliveryCapabilities;
+  /**
+   * Durably accepts a delivery of a publication. With `replayId` it accepts a replay: a new
+   * delivery of the same publication under that identity, which the runner marks as replayed.
+   */
+  readonly accept: (
+    envelope: UnknownEventEnvelope,
+    replayId?: string,
+  ) => Promise<EventDeliveryResult>;
+  readonly deliver: (envelope: UnknownEventEnvelope) => Promise<EventDeliveryResult>;
+  readonly runNext: (deliveryId?: string) => Promise<EventDeliveryResult | undefined>;
+  readonly retry: (deliveryId: string) => Promise<EventDeliveryResult>;
+  /** Cancels a pending or scheduled delivery; a running or finished one is refused. */
+  readonly cancel: (deliveryId: string) => Promise<EventDeliveryResult>;
+  readonly drain: () => Promise<readonly EventDeliveryResult[]>;
+  readonly recover: (now?: number) => Promise<readonly EventDeliveryLedgerRecord[]>;
+  readonly snapshot: () => EventDeliverySnapshot;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L82)
 
 ### EventDeliveryBinding
 
+Trigger identity and executable target for a durable delivery owner.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryBinding: EventDeliveryBinding;
+export interface EventDeliveryBinding {
+  readonly id: string;
+  readonly invoke: (
+    envelope: UnknownEventEnvelope,
+    options?: EventDeliveryInvocationOptions,
+  ) => Promise<unknown>;
+  readonly profile?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L22)
 
 ### EventDeliveryBoundary
 
+Durable delivery commit milestones exposed to hooks.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryBoundary: EventDeliveryBoundary;
+type EventDeliveryBoundary = JobStoreBoundary | "handler-success-before-ack";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L12)
 
 ### EventDeliveryLedgerRecord
 
+Persisted delivery envelope joined with its latest queue state.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryLedgerRecord: EventDeliveryLedgerRecord;
+export interface EventDeliveryLedgerRecord extends EventDeliveryRecord {
+  readonly cursor: number;
+  readonly state: EventDeliveryResult["state"];
+  readonly attempt: number;
+  readonly duplicate: boolean;
+  readonly leaseOwner?: string;
+  readonly leaseExpiresAt?: number;
+  readonly failure?: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L62)
 
 ### EventDeliveryOptions
 
+Backlog, concurrency, retry and durable-boundary configuration.
+
 **Signature**
 
 ```ts
-declare const EventDeliveryOptions: EventDeliveryOptions;
+export interface EventDeliveryOptions {
+  readonly now?: () => number;
+  readonly random?: () => number;
+  readonly ownerToken?: string;
+  readonly leaseDurationMs?: number;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly onBoundary?: (boundary: EventDeliveryBoundary) => void | Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L35)
 
 ### EventDeliverySnapshot
 
+Safe delivery counters and durable ledger inspection.
+
 **Signature**
 
 ```ts
-declare const EventDeliverySnapshot: EventDeliverySnapshot;
+export interface EventDeliverySnapshot {
+  readonly cursor: number;
+  readonly records: readonly EventDeliveryRecord[];
+  readonly ledger: readonly EventDeliveryLedgerRecord[];
+  readonly counts: JobQueueCounts;
+  readonly capabilities: typeof EVENT_DELIVERY_CAPABILITIES;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/delivery.types.ts#L73)
 
 ### JobRecord
 
@@ -4873,33 +5719,50 @@ declare const JobRecord: {
 
 ### JobRecordInput
 
+Canonical JSON record input before sequence and timestamp assignment.
+
 **Signature**
 
 ```ts
-declare const JobRecordInput: JobRecordInput;
+export interface JobRecordInput {
+  readonly instanceId: string;
+  readonly kind: string;
+  readonly data: JsonValue;
+  readonly timestamp?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L25)
 
 ### JobStore
 
+Compatibility journal interface with durable append and explicit close.
+
 **Signature**
 
 ```ts
-declare const JobStore: JobStore;
+export interface JobStore {
+  readonly root: string;
+  readonly paths: Readonly<ReturnType<typeof createJobStorePaths>>;
+  readonly append: (input: JobRecordInput) => Promise<JobRecord>;
+  readonly snapshot: () => JobStoreSnapshot;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L52)
 
 ### JobStoreBoundary
 
+Durable commit milestones available to fault-injection and observation hooks.
+
 **Signature**
 
 ```ts
-declare const JobStoreBoundary: JobStoreBoundary;
+type JobStoreBoundary = "record-fsynced" | "index-committed" | "checkpoint-committed";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L13)
 
 ### JobStoreCheckpoint
 
@@ -4935,33 +5798,60 @@ declare const JobStoreIndex: {
 
 ### JobStoreOptions
 
+Clock, record validation and durable-boundary hooks for journal ownership.
+
 **Signature**
 
 ```ts
-declare const JobStoreOptions: JobStoreOptions;
+export interface JobStoreOptions {
+  readonly now?: () => number;
+  /** Test-only failure seam; an error rejects append before acknowledgement. */
+  readonly onBoundary?: (boundary: JobStoreBoundary) => void | Promise<void>;
+  /** Optional semantic guard used by durable stores layered on this record format. */
+  readonly validateData?: (data: JsonValue) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L16)
 
 ### JobStoreSnapshot
 
+Immutable recovered records, index and checkpoint.
+
 **Signature**
 
 ```ts
-declare const JobStoreSnapshot: JobStoreSnapshot;
+export interface JobStoreSnapshot {
+  readonly records: readonly JobRecord[];
+  readonly index: JobStoreIndex;
+  readonly checkpoint: JobStoreCheckpoint;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L45)
 
 ### LocalEventProvider
 
+Public event registration, publication and explicit close operations.
+
 **Signature**
 
 ```ts
-declare const LocalEventProvider: LocalEventProvider;
+export interface LocalEventProvider extends EventProvider {
+  readonly registerContract: EventRouter["registerContract"];
+  readonly registerTrigger: EventRouter["registerTrigger"];
+  readonly query: (request?: EventQueryRequest) => Promise<EventQueryContract>;
+  /** Runs a dead-lettered delivery again; answers its status. */
+  readonly retry: (target: DeliveryTarget) => Promise<EventDeliveryContract>;
+  /** Cancels a pending or scheduled delivery; answers its status. */
+  readonly cancel: (target: DeliveryTarget) => Promise<EventDeliveryContract>;
+  /** Delivers a stored publication again, as a replay, keeping its identity. */
+  readonly replay: (target: PublicationTarget) => Promise<EventReplayResult>;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/events/provider.types.ts#L34)
 
 ### createEphemeralDelivery
 
@@ -5037,83 +5927,122 @@ declare const JOB_ADMIN_VERSION: 1;
 
 ### JobActionContract
 
+Versioned job mutation result including status and audit record.
+
 **Signature**
 
 ```ts
-declare const JobActionContract: JobActionContract;
+export interface JobActionContract extends JobAdminVersion {
+  readonly action: JobAdminAction;
+  readonly status: JobStatusContract;
+  readonly record: JobAdminActionRecord;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L84)
 
 ### JobActionRequest
 
+Base job administration request with target identity and audit reason.
+
 **Signature**
 
 ```ts
-declare const JobActionRequest: JobActionRequest;
+export interface JobActionRequest {
+  readonly protocol?: typeof JOB_ADMIN_PROTOCOL;
+  readonly version?: typeof JOB_ADMIN_VERSION;
+  readonly instanceId: string;
+  readonly reason?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L53)
 
 ### JobAdminAction
 
+Supported audited queue administration action.
+
 **Signature**
 
 ```ts
-declare const JobAdminAction: JobAdminAction;
+type JobAdminAction = "retry" | "cancel" | "dead-letter";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L9)
 
 ### JobAdminActionOutcome
 
+Whether an administration action was applied or rejected.
+
 **Signature**
 
 ```ts
-declare const JobAdminActionOutcome: JobAdminActionOutcome;
+type JobAdminActionOutcome = "applied" | "rejected";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L12)
 
 ### JobAdminActionRecord
 
+Immutable audit record retained for each applied or rejected job action.
+
 **Signature**
 
 ```ts
-declare const JobAdminActionRecord: JobAdminActionRecord;
+export interface JobAdminActionRecord extends JobAdminVersion {
+  readonly actionId: string;
+  readonly action: JobAdminAction;
+  readonly instanceId: string;
+  readonly mode: JobAdminMode;
+  readonly outcome: JobAdminActionOutcome;
+  readonly requestedAt: number;
+  readonly fromState?: JobQueueState;
+  readonly toState?: JobQueueState;
+  readonly errorCode?: string;
+  readonly reason?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L70)
 
 ### JobAdminActionSink
 
+Optional notification sink whose rejection cannot change the action outcome.
+
 **Signature**
 
 ```ts
-declare const JobAdminActionSink: JobAdminActionSink;
+type JobAdminActionSink = (record: JobAdminActionRecord) => MaybePromise<void>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L91)
 
 ### JobAdminMode
 
+Environment mode controlling local administration mutations.
+
 **Signature**
 
 ```ts
-declare const JobAdminMode: JobAdminMode;
+type JobAdminMode = "development" | "test" | "production";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L6)
 
 ### JobAdminVersion
 
+Protocol identity carried by job administration contracts.
+
 **Signature**
 
 ```ts
-declare const JobAdminVersion: JobAdminVersion;
+export interface JobAdminVersion {
+  readonly protocol: typeof JOB_ADMIN_PROTOCOL;
+  readonly version: typeof JOB_ADMIN_VERSION;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L15)
 
 ### JobCancelRequest
 
@@ -5137,23 +6066,39 @@ declare const JobDeadLetterRequest: JobActionRequest;
 
 ### JobQueryContract
 
+Versioned bounded page of safe job status records.
+
 **Signature**
 
 ```ts
-declare const JobQueryContract: JobQueryContract;
+export interface JobQueryContract extends JobAdminVersion {
+  readonly items: readonly JobStatusContract[];
+  readonly counts: JobQueueCounts;
+  readonly nextCursor?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L46)
 
 ### JobQueryRequest
 
+Optional identity, state and pagination filters for job inspection.
+
 **Signature**
 
 ```ts
-declare const JobQueryRequest: JobQueryRequest;
+export interface JobQueryRequest {
+  readonly protocol?: typeof JOB_ADMIN_PROTOCOL;
+  readonly version?: typeof JOB_ADMIN_VERSION;
+  readonly instanceId?: string;
+  readonly state?: JobQueueState;
+  readonly states?: readonly JobQueueState[];
+  readonly cursor?: string;
+  readonly limit?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L35)
 
 ### JobRetryRequest
 
@@ -5167,13 +6112,26 @@ declare const JobRetryRequest: JobActionRequest;
 
 ### JobStatusContract
 
+Safe, versioned state returned to inspector consumers.
+
 **Signature**
 
 ```ts
-declare const JobStatusContract: JobStatusContract;
+export interface JobStatusContract extends JobAdminVersion {
+  readonly instanceId: string;
+  readonly state: JobQueueState;
+  readonly profile: string;
+  readonly attempt: number;
+  readonly acceptedAt: number;
+  readonly order: number;
+  readonly availableAt?: number;
+  readonly leaseExpiresAt?: number;
+  readonly idempotencyExpiresAt?: number;
+  readonly failure?: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin-contracts.types.ts#L21)
 
 ## `admin-contracts.types.ts`
 
@@ -5426,13 +6384,24 @@ export * from "./admin-contracts.js";
 
 ### JobAdmin
 
+Versioned job inspection and audited development mutation interface.
+
 **Signature**
 
 ```ts
-declare const JobAdmin: JobAdmin;
+export interface JobAdmin {
+  readonly protocol: typeof JOB_ADMIN_PROTOCOL;
+  readonly version: typeof JOB_ADMIN_VERSION;
+  readonly status: (instanceId: string) => JobStatusContract | undefined;
+  readonly query: (request?: JobQueryRequest) => JobQueryContract;
+  readonly retry: (request: string | JobActionRequest) => Promise<JobActionContract>;
+  readonly cancel: (request: string | JobActionRequest) => Promise<JobActionContract>;
+  readonly deadLetter: (request: string | JobActionRequest) => Promise<JobActionContract>;
+  readonly actions: () => readonly JobAdminActionRecord[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin.types.ts#L25)
 
 ### JobAdminError
 
@@ -5446,13 +6415,22 @@ declare const JobAdminError: typeof JobAdminError;
 
 ### JobAdminOptions
 
+Local administration mode and isolated audit/clock hooks.
+
 **Signature**
 
 ```ts
-declare const JobAdminOptions: JobAdminOptions;
+export interface JobAdminOptions {
+  readonly mode?: JobAdminMode;
+  readonly environment?: JobAdminMode;
+  readonly enabled?: boolean;
+  readonly now?: () => number;
+  readonly createActionId?: () => string;
+  readonly onAction?: JobAdminActionSink;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/admin.types.ts#L15)
 
 ### createJobAdmin
 
@@ -5529,93 +6507,163 @@ declare const JOB_QUEUE_STATES: readonly [
 
 ### JobFailureKind
 
+Public classification of a failed queue attempt.
+
 **Signature**
 
 ```ts
-declare const JobFailureKind: JobFailureKind;
+type JobFailureKind = "application" | "provider" | "cancellation" | "timeout" | "defect";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L54)
 
 ### JobFailureMetadata
 
+Public, JSON-safe failure data retained with a delayed or dead-lettered job.
+
 **Signature**
 
 ```ts
-declare const JobFailureMetadata: JobFailureMetadata;
+export interface JobFailureMetadata {
+  readonly kind: JobFailureKind;
+  readonly outcome: JobFailureOutcome;
+  readonly code: string;
+  readonly message: string;
+  readonly data?: JsonValue;
+  readonly status?: number;
+  readonly retry?: JobFailureRetry;
+  readonly afterMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L64)
 
 ### JobFailureOutcome
 
+Public terminal or retry outcome of a failed queue attempt.
+
 **Signature**
 
 ```ts
-declare const JobFailureOutcome: JobFailureOutcome;
+type JobFailureOutcome = "declared-error" | "provider-failure" | "cancelled" | "timeout" | "defect";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L57)
 
 ### JobFailureRetry
 
+Retry hint retained in safe failure metadata.
+
 **Signature**
 
 ```ts
-declare const JobFailureRetry: JobFailureRetry;
+type JobFailureRetry = "never" | "later";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L61)
 
 ### JobIdempotencyDefinition
 
+Caller deduplication identity and retention policy for a queue acceptance.
+
 **Signature**
 
 ```ts
-declare const JobIdempotencyDefinition: JobIdempotencyDefinition;
+export interface JobIdempotencyDefinition {
+  readonly key: string;
+  readonly retentionMs: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L11)
 
 ### JobIdempotencyRecord
 
+Persisted acceptance identity and expiry used for deduplication.
+
 **Signature**
 
 ```ts
-declare const JobIdempotencyRecord: JobIdempotencyRecord;
+export interface JobIdempotencyRecord {
+  readonly key: string;
+  readonly expiresAt: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L17)
 
 ### JobQueue
 
+Promise mutation and synchronous inspection contract for one durable queue.
+
 **Signature**
 
 ```ts
-declare const JobQueue: JobQueue;
+export interface JobQueue {
+  readonly ownerToken: string;
+  readonly ready: () => Promise<void>;
+  readonly enqueue: (input: JobQueueEnqueue) => Promise<JobQueueAcceptance>;
+  readonly acquire: (
+    instanceId?: string,
+    options?: JobQueueLeaseOptions,
+  ) => Promise<JobQueueEntry | undefined>;
+  readonly renew: (instanceId: string, options?: JobQueueLeaseOptions) => Promise<JobQueueEntry>;
+  readonly transition: (
+    instanceId: string,
+    state: JobQueueState,
+    options?: JobQueueTransitionOptions,
+  ) => Promise<JobQueueEntry>;
+  /** Requeues one dead letter as a fresh attempt without widening normal transitions. */
+  readonly adminRetry: (
+    instanceId: string,
+    options?: JobQueueAdminRetryOptions,
+  ) => Promise<JobQueueEntry>;
+  /** Moves one eligible nonterminal entry to a dead letter with safe metadata. */
+  readonly adminDeadLetter: (
+    instanceId: string,
+    failure: JobFailureMetadata,
+  ) => Promise<JobQueueEntry>;
+  readonly recover: (now?: number) => Promise<readonly JobQueueEntry[]>;
+  readonly expire: (now?: number) => Promise<readonly JobQueueEntry[]>;
+  readonly selectAvailable: (limit?: number, now?: number) => readonly JobQueueEntry[];
+  readonly get: (instanceId: string) => JobQueueEntry | undefined;
+  readonly counts: () => JobQueueCounts;
+  readonly snapshot: () => readonly JobQueueEntry[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L118)
 
 ### JobQueueAcceptance
 
+Durable acceptance information returned by queue admission.
+
 **Signature**
 
 ```ts
-declare const JobQueueAcceptance: JobQueueAcceptance;
+export interface JobQueueAcceptance extends JobQueueEntry {
+  readonly accepted: true;
+  readonly duplicate: boolean;
+  readonly idempotencyKey?: string;
+  readonly idempotencyExpiresAt?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L46)
 
 ### JobQueueAdminRetryOptions
 
+Administrative retry preconditions and next-availability settings.
+
 **Signature**
 
 ```ts
-declare const JobQueueAdminRetryOptions: JobQueueAdminRetryOptions;
+export interface JobQueueAdminRetryOptions {
+  readonly availableAt?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L101)
 
 ### JobQueueCounts
 
@@ -5631,43 +6679,81 @@ declare const JobQueueCounts: Readonly<
 
 ### JobQueueEnqueue
 
+Input required to accept a job into the local durable queue.
+
 **Signature**
 
 ```ts
-declare const JobQueueEnqueue: JobQueueEnqueue;
+export interface JobQueueEnqueue {
+  readonly input: JsonValue;
+  readonly profile?: string;
+  readonly instanceId?: string;
+  readonly acceptedAt?: number;
+  readonly idempotency?: JobIdempotencyDefinition;
+  readonly propagation?: TracePropagation;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L76)
 
 ### JobQueueEntry
 
+Durable queue state including acceptance, lease, retry and failure metadata.
+
 **Signature**
 
 ```ts
-declare const JobQueueEntry: JobQueueEntry;
+export interface JobQueueEntry {
+  readonly instanceId: string;
+  readonly state: JobQueueState;
+  readonly input: JsonValue;
+  readonly profile: string;
+  readonly attempt: number;
+  readonly acceptedAt: number;
+  readonly order: number;
+  readonly availableAt?: number;
+  readonly leaseOwner?: string;
+  readonly leaseExpiresAt?: number;
+  readonly idempotency?: JobIdempotencyRecord;
+  readonly failure?: JobFailureMetadata;
+  readonly propagation?: TracePropagation;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L23)
 
 ### JobQueueLeaseOptions
 
+Caller ownership and duration settings for acquiring a lease.
+
 **Signature**
 
 ```ts
-declare const JobQueueLeaseOptions: JobQueueLeaseOptions;
+export interface JobQueueLeaseOptions {
+  readonly leaseDurationMs?: number;
+  readonly leaseExpiresAt?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L86)
 
 ### JobQueueOptions
 
+Clock, persistence and policy options for a local queue.
+
 **Signature**
 
 ```ts
-declare const JobQueueOptions: JobQueueOptions;
+export interface JobQueueOptions {
+  readonly now?: () => number;
+  readonly createInstanceId?: () => string;
+  readonly ownerToken?: string;
+  readonly leaseDurationMs?: number;
+  readonly idempotency?: JobIdempotencyDefinition;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L109)
 
 ### JobQueueState
 
@@ -5706,13 +6792,21 @@ readonly code: "RELKIT_JOB_QUEUE_STATE_INVALID"
 
 ### JobQueueTransitionOptions
 
+Expected state, ownership and metadata for a durable transition.
+
 **Signature**
 
 ```ts
-declare const JobQueueTransitionOptions: JobQueueTransitionOptions;
+export interface JobQueueTransitionOptions extends JobQueueLeaseOptions {
+  readonly expectedState?: JobQueueState;
+  readonly attempt?: number;
+  readonly availableAt?: number;
+  readonly leaseOwner?: string;
+  readonly failure?: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L92)
 
 ### JobState
 
@@ -5727,13 +6821,18 @@ declare const JobState:
 
 ### MutableQueueState
 
+In-memory queue index and next acceptance order owned by serialized mutations.
+
 **Signature**
 
 ```ts
-declare const MutableQueueState: MutableQueueState;
+export interface MutableQueueState {
+  readonly entries: Map<string, JobQueueEntry>;
+  nextOrder: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/queue-utils.types.ts#L40)
 
 ### assertTime
 
@@ -6128,53 +7227,72 @@ declare const createJobQueue: (store: JobStore, options?: JobQueueOptions) => Jo
 
 ### RandomSource
 
+Replaceable source of values in [0, 1) for deterministic jitter.
+
 **Signature**
 
 ```ts
-declare const RandomSource: RandomSource;
+type RandomSource = () => number;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.types.ts#L10)
 
 ### RetryClassification
 
+Whether the normalized failure permits another attempt.
+
 **Signature**
 
 ```ts
-declare const RetryClassification: RetryClassification;
+type RetryClassification = "retryable" | "non-retryable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.types.ts#L4)
 
 ### RetryOptions
 
+Clock, jitter and transition options for applying retry policy.
+
 **Signature**
 
 ```ts
-declare const RetryOptions: RetryOptions;
+export interface RetryOptions {
+  readonly now?: () => number;
+  readonly random?: RandomSource;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.types.ts#L22)
 
 ### RetryPlan
 
+Validated retry classification, delay and safe failure metadata.
+
 **Signature**
 
 ```ts
-declare const RetryPlan: RetryPlan;
+export interface RetryPlan {
+  readonly classification: RetryClassification;
+  readonly state: RetryState;
+  readonly attempt: number;
+  readonly delayMs: number;
+  readonly failure: JobFailureMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.types.ts#L13)
 
 ### RetryState
 
+Durable queue outcome selected by retry policy.
+
 **Signature**
 
 ```ts
-declare const RetryState: RetryState;
+type RetryState = "delayed" | "dead-lettered";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/retry.types.ts#L7)
 
 ### applyRetry
 
@@ -6353,33 +7471,50 @@ declare const JobRecord: {
 
 ### JobRecordInput
 
+Canonical JSON record input before sequence and timestamp assignment.
+
 **Signature**
 
 ```ts
-declare const JobRecordInput: JobRecordInput;
+export interface JobRecordInput {
+  readonly instanceId: string;
+  readonly kind: string;
+  readonly data: JsonValue;
+  readonly timestamp?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L25)
 
 ### JobStore
 
+Compatibility journal interface with durable append and explicit close.
+
 **Signature**
 
 ```ts
-declare const JobStore: JobStore;
+export interface JobStore {
+  readonly root: string;
+  readonly paths: Readonly<ReturnType<typeof createJobStorePaths>>;
+  readonly append: (input: JobRecordInput) => Promise<JobRecord>;
+  readonly snapshot: () => JobStoreSnapshot;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L52)
 
 ### JobStoreBoundary
 
+Durable commit milestones available to fault-injection and observation hooks.
+
 **Signature**
 
 ```ts
-declare const JobStoreBoundary: JobStoreBoundary;
+type JobStoreBoundary = "record-fsynced" | "index-committed" | "checkpoint-committed";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L13)
 
 ### JobStoreCheckpoint
 
@@ -6399,13 +7534,21 @@ declare const JobStoreCheckpoint: {
 
 ### JobStoreEffects
 
+Effect operations for a durable journal and its committed snapshot.
+
 **Signature**
 
 ```ts
-declare const JobStoreEffects: JobStoreEffects;
+export interface JobStoreEffects {
+  readonly root: string;
+  readonly paths: JobStore["paths"];
+  readonly append: (input: JobRecordInput) => Effect.Effect<JobRecord, LocalOperationError>;
+  readonly snapshot: () => Effect.Effect<JobStoreSnapshot>;
+  readonly close: () => Effect.Effect<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L61)
 
 ### JobStoreIndex
 
@@ -6425,23 +7568,37 @@ declare const JobStoreIndex: {
 
 ### JobStoreOptions
 
+Clock, record validation and durable-boundary hooks for journal ownership.
+
 **Signature**
 
 ```ts
-declare const JobStoreOptions: JobStoreOptions;
+export interface JobStoreOptions {
+  readonly now?: () => number;
+  /** Test-only failure seam; an error rejects append before acknowledgement. */
+  readonly onBoundary?: (boundary: JobStoreBoundary) => void | Promise<void>;
+  /** Optional semantic guard used by durable stores layered on this record format. */
+  readonly validateData?: (data: JsonValue) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L16)
 
 ### JobStoreSnapshot
 
+Immutable recovered records, index and checkpoint.
+
 **Signature**
 
 ```ts
-declare const JobStoreSnapshot: JobStoreSnapshot;
+export interface JobStoreSnapshot {
+  readonly records: readonly JobRecord[];
+  readonly index: JobStoreIndex;
+  readonly checkpoint: JobStoreCheckpoint;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/jobs/store.types.ts#L45)
 
 ### JobStoreStateError (class)
 
@@ -6802,13 +7959,17 @@ declare const scopeGap: (
 
 ### LocalRealtimeProviderOptions
 
+Polling configuration for filesystem-shared realtime observations.
+
 **Signature**
 
 ```ts
-declare const LocalRealtimeProviderOptions: LocalRealtimeProviderOptions;
+export interface LocalRealtimeProviderOptions {
+  readonly pollingMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/realtime/provider.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/providers-local/realtime/provider.types.ts#L6)
 
 ### LocalRealtimeService (class)
 

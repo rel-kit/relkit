@@ -6,14 +6,23 @@ export interface InngestPolicyMapping {
   readonly concurrency?: number;
 }
 
-/** Maps only fields whose semantics are certified by the pinned Inngest profile. */
+/**
+ * Task options this backend does not act on and `relkit check` reports: `maxElapsed`, a limit it
+ * does not enforce, and `logging`, which is deprecated and has no effect on any backend.
+ */
+const REPORTED_LIMITS: ReadonlySet<string> = new Set(["maxElapsed", "logging"]);
+
+/** Maps the task options Inngest has an equivalent for and refuses the ones it cannot map. */
 export function mapInngestPolicy(value: unknown): InngestPolicyMapping {
   if (value === undefined) return Object.freeze({});
   const policy = record(value, "Inngest task policy");
   const allowed = new Set(["retry", "maxDuration", "concurrency"]);
   for (const [key, field] of Object.entries(policy)) {
-    if (field === null || field === undefined) continue;
-    if (!allowed.has(key)) throw new Error(`Inngest cannot certify task policy field "${key}".`);
+    if (field === null || field === undefined || REPORTED_LIMITS.has(key)) continue;
+    if (!allowed.has(key))
+      throw new Error(
+        `The inngest jobs backend does not support the task option "${key}". Remove it from the task.`,
+      );
   }
   const retry = policy.retry == null ? undefined : mapRetry(policy.retry);
   const timeoutSeconds = policy.maxDuration == null ? undefined : seconds(policy.maxDuration);

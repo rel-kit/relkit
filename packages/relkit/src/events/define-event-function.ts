@@ -1,4 +1,4 @@
-import { isDescriptor, normalizeId } from "../contracts/index.js";
+import { isDescriptor, normalizeId, type RejectUnknownOptions } from "../contracts/index.js";
 import { createFunctionDescriptor } from "../functions/descriptor-factory.js";
 import { z } from "../schema/index.js";
 import { Effect, Option } from "effect";
@@ -65,7 +65,8 @@ export function defineEventFunction<
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ): EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>> {
   try {
     return runEventSync(defineEventFunctionEffect(options));
@@ -89,7 +90,8 @@ export function defineEventFunctionEffect<
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ): Effect.Effect<
   EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
   EventDefinitionError
@@ -110,7 +112,10 @@ export function defineEventFunctionEffect<
           }),
       });
       const delivery = yield* eventDeliveryEffect(options.delivery);
-      const profile = yield* eventProfileEffect(options.profile);
+      // An omitted profile stays omitted: the compiler then selects the application's default
+      // event profile, or its only one, as it does for an event without a profile.
+      const profile =
+        options.profile === undefined ? undefined : yield* eventProfileEffect(options.profile);
       const retry = yield* eventRetryEffect(options.retry);
       return yield* Effect.try({
         try: () =>
@@ -120,7 +125,12 @@ export function defineEventFunctionEffect<
             invocationMode: "event-only",
             input: z.unknown(),
             output: z.void(),
-            descriptorFields: { event, delivery, profile, retry },
+            descriptorFields: {
+              event,
+              delivery,
+              ...(profile === undefined ? {} : { profile }),
+              retry,
+            },
           }) as EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
         catch: (cause) =>
           new EventDefinitionError({
@@ -166,7 +176,10 @@ export const isEventFunctionDescriptorEffect = Effect.fn("Events.isFunctionDescr
           }),
         );
         const delivery = yield* Effect.option(eventDeliveryEffect(value.delivery));
-        const profile = yield* Effect.option(eventProfileEffect(value.profile));
+        const profile =
+          value.profile === undefined
+            ? Option.some(undefined)
+            : yield* Effect.option(eventProfileEffect(value.profile));
         const retry = yield* Effect.option(eventRetryEffect(value.retry));
         return (
           Option.isSome(event) &&

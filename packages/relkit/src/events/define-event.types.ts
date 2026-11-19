@@ -1,4 +1,8 @@
-import type { DescriptorBase, DescriptorMetadata } from "../contracts/index.js";
+import type {
+  DescriptorBase,
+  DescriptorMetadata,
+  ProviderProfileName,
+} from "../contracts/index.js";
 import type { EventPublishResult, EventRef } from "../functions/index.js";
 import type { StandardSchemaV1 } from "../schema/index.js";
 export type { InferOutput, StandardSchemaV1 } from "../schema/index.js";
@@ -57,11 +61,20 @@ export interface DefineEventOptions<
   Version extends number,
   InputSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
+  /** Unique name of the event; publishers and consumers refer to the event by it. */
   readonly id: Id;
+  /** Version of the event's contract, a positive integer. Defaults to `1`. */
   readonly version?: Version;
+  /** Schema of the data sent with the event. */
   readonly input: InputSchema;
-  readonly profile?: string;
+  /** The event provider profile that delivers the event; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"event">;
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
   readonly sensitiveFields?: readonly string[];
+  /** Not an option of an event: consume the event with `defineEventFunction`. */
   readonly handler?: never;
+  /** Not an option of an event: an event returns nothing to its publisher. */
   readonly output?: never;
 }

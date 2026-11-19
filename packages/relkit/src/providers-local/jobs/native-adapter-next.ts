@@ -5,10 +5,13 @@ import type {
   TaskExecutionBinding,
   TaskExecutionEnvelope,
 } from "../../jobs/adapter.js";
+import { attemptLimit, pastElapsed } from "./native-adapter-limits.js";
 import { isSleepSuspension, sameNamespace, sleepSuspension } from "./native-adapter-support.js";
 import type { LocalNativeState } from "./native-adapter-types.js";
 
 /** Claims the first eligible scoped run and constructs its execution binding and sleep checkpoints.
+ * A run past its `maxElapsed` is claimed even while it sleeps or waits, with a deadline that has
+ * passed, so the engine settles it as timed out instead of running its handler.
  * @param state - Current service-owned state.
  * @param context - Caller scope, cancellation and operation metadata.
  * @returns The claimed task work, or undefined when no eligible work is available.
@@ -21,12 +24,15 @@ export async function nextRun(
     (candidate) =>
       sameNamespace(candidate, context) &&
       (candidate.status === "queued" || candidate.status === "sleeping") &&
-      due(candidate),
+      (due(candidate) || pastElapsed(candidate)),
   );
   if (run === undefined || context.signal.aborted) return undefined;
   const controller = new AbortController();
   run.status = "running";
   run.startedAt = new Date(nativeNow()).toISOString();
+  const limit = attemptLimit(run);
+  if (limit === undefined) delete run.limit;
+  else run.limit = limit;
   const scheduledFor = run.nextEligibleAt ?? run.request.scheduledFor;
   delete run.nextEligibleAt;
   run.controller = controller;
@@ -73,6 +79,7 @@ export async function nextRun(
       serviceGeneration: context.serviceGeneration,
       attempt: run.attempt,
       acceptedAt: run.acceptedAt,
+      ...(limit === undefined ? {} : { deadlineMs: limit.at }),
       ...(run.request.parentRunId === undefined ? {} : { parentRunId: run.request.parentRunId }),
       ...(run.request.inputSchemaHash === undefined
         ? {}

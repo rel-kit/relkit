@@ -14,8 +14,18 @@ Pause task execution through the provider's durable sleep capability when the se
   install the provider's native SDK.
 </Callout>
 
-Set `maxDuration` or `maxElapsed` on the task. Duration values are enforced by the runtime and should be
-shorter than the provider's own request timeout.
+Set `maxDuration` or `maxElapsed` on the task. `maxDuration` is the longest active time of one attempt;
+time asleep or waiting to retry does not count. `maxElapsed` is the longest total time from the
+acceptance of a run, with delays, sleep and retries.
+
+The local backend from `@relkit/local` enforces both. An attempt that reaches `maxDuration` fails with
+`RELKIT_TIMEOUT` and is retried while the task's `retry` allows it. A run that reaches `maxElapsed` is
+not retried. A run stopped by either limit ends with the status `timed-out`.
+
+The Inngest, Trigger.dev, Effect MQ and Postgres backends do not enforce these limits. `relkit check`
+reports each such task and limit with the warning
+[`RELKIT_JOB_TASK_OPTION_UNSUPPORTED`](/docs/errors/relkit-job-task-option-unsupported), and the
+server logs the same warning when it starts. On those backends, enforce the limit in the handler.
 
 <include
   source="examples/commerce/src/services/orders/tasks/export-orders.task.ts"

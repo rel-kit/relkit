@@ -72,6 +72,11 @@ export function bindFunctionEventsEffect<T extends FunctionWithEvents>(
                 ...(consumed === undefined
                   ? {}
                   : { input: { value: consumed.input, enumerable: true } }),
+                // The engine replaces these fields with the redaction marker where it records
+                // the function's input; the handler receives the payload unchanged.
+                ...(consumed?.sensitiveFields === undefined
+                  ? {}
+                  : { sensitiveInputFields: { value: consumed.sensitiveFields } }),
               },
             ),
           ) as T;

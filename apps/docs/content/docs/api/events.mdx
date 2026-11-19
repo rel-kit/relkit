@@ -104,7 +104,8 @@ declare const defineEventFunction: <
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ) => EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>;
 ```
 
@@ -557,6 +558,24 @@ declare const resolveValueEffect: (
 
 [Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L113)
 
+### soleProfile
+
+The profile a client without one publishes to: the only profile of its source.
+
+**Example**
+
+```ts
+soleProfile({ local: provider }); // "local"
+```
+
+**Signature**
+
+```ts
+declare const soleProfile: (source: unknown) => string | undefined;
+```
+
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-provider.ts#L133)
+
 ## `client-publish.ts`
 
 ### EventPublisher (class)
@@ -631,13 +650,36 @@ declare const publishEventEffect: <
 
 ### EventProvider
 
+Provider interface selected from a profile for publication.
+
+**Example**
+
+```ts
+const provider: EventProvider = {
+  publish: async () => ({ accepted: true, instanceId: "event-1" }),
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventProvider: EventProvider;
+export interface EventProvider {
+  /** Publishes one validated payload.
+   * @param payload - Decoded event payload.
+   * @param options - Validated publish options.
+   * @param context - Trace and cancellation context.
+   * @returns Provider acceptance and metadata, or a rejected Promise.
+   * @example await provider.publish(payload, {}, context)
+   */
+  readonly publish: (
+    payload: unknown,
+    options: EventPublishOptions,
+    context: EventOperationContext,
+  ) => MaybePromise<EventProviderResult>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L38)
 
 ### EventPublishFailure (type alias)
 
@@ -952,23 +994,53 @@ export interface EventIdentityService {
 
 ### EventOperationContext
 
+Context passed to the selected event provider for one publication.
+The signal remains valid until the publication settles.
+
+**Example**
+
+```ts
+const id = context.eventId;
+```
+
 **Signature**
 
 ```ts
-declare const EventOperationContext: EventOperationContext;
+export interface EventOperationContext {
+  readonly operation: "publish";
+  readonly eventId: string;
+  readonly version: number;
+  readonly signal: AbortSignal;
+  readonly profile: string;
+  readonly deadlineMs?: number;
+  readonly propagation?: TracePropagation;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L15)
 
 ### EventProviderResult
 
+Provider acknowledgement and optional envelope metadata.
+
+**Example**
+
+```ts
+const result: EventProviderResult = { accepted: true, instanceId: "event-1" };
+```
+
 **Signature**
 
 ```ts
-declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
+type EventProviderResult<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> = Pick<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted"> &
+  Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L28)
 
 ### EventPublishOptions
 
@@ -1498,33 +1570,110 @@ declare const EventAttributeValue: EventAttributeValue;
 
 ### EventClient
 
+Promise compatibility interface exposed to application handlers.
+
+**Example**
+
+```ts
+await client.publish({ orderId: "one" });
+```
+
 **Signature**
 
 ```ts
-declare const EventClient: EventClient<Input, Id, Version, Payload>;
+export interface EventClient<
+  Input = unknown,
+  Id extends string = string,
+  Version extends number = number,
+  Payload = Input,
+> {
+  /** Publishes a payload and returns the accepted envelope.
+   * @param payload - Event payload to decode.
+   * @param options - Optional key and attributes.
+   * @returns A Promise of the accepted envelope or a rejected domain error.
+   * @example await client.publish(payload, { key: "order-1" })
+   */
+  readonly publish: (
+    payload: Input,
+    options?: EventPublishOptions,
+  ) => Promise<EventPublishResult<Id, Version, Payload>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L112)
 
 ### EventClientOptions
 
+Dependencies and policy for a generated event publisher.
+Provider selection occurs once when the client is created.
+
+**Example**
+
+```ts
+const options: EventClientOptions = {
+  ownerId: "orders.create",
+  eventId: "orders.created",
+  version: 1,
+  source: provider,
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventClientOptions: EventClientOptions<Id, Version, PayloadSchema>;
+export interface EventClientOptions<
+  Id extends string = string,
+  Version extends number = number,
+  PayloadSchema extends StandardSchemaV1 = StandardSchemaV1,
+> {
+  readonly ownerId: string;
+  readonly eventId: Id;
+  readonly version: Version;
+  readonly source: unknown;
+  readonly payloadSchema?: PayloadSchema;
+  readonly profile?: string;
+  readonly resolveProfile?: (profile: string) => unknown;
+  /** What the publication's span records in place of the payload, such as a copy with the
+   * event's sensitive fields replaced. The provider and the caller receive the payload itself. */
+  readonly recordedPayload?: (payload: unknown) => unknown;
+  readonly bridge?: EventInvocationBridge;
+  readonly signal?: () => AbortSignal;
+  readonly deadline?: () => number | undefined;
+  readonly correlationId?: string | (() => string | undefined);
+  readonly now?: () => Date;
+  readonly declared?: boolean;
+  readonly onDeclaredEdge?: (edge: EventDeclaredEdge) => void;
+  readonly onObservedEdge?: (edge: EventObservedEdge) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L84)
 
 ### EventDeclaredEdge
 
+Static graph edge for a declared publication dependency.
+
+**Example**
+
+```ts
+const edge: EventDeclaredEdge = {
+  kind: "publishes-event",
+  from: "orders.create",
+  to: "orders.created",
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventDeclaredEdge: EventDeclaredEdge;
+export interface EventDeclaredEdge {
+  readonly kind: "publishes-event";
+  readonly from: string;
+  readonly to: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L133)
 
 ### EventDependencyError
 
@@ -1538,33 +1687,82 @@ declare const EventDependencyError: typeof EventDependencyError;
 
 ### EventInvocationBridge
 
+Optional invocation bridge that owns a publication span.
+
+**Example**
+
+```ts
+await bridge.run(() => provider.publish(payload, {}, context));
+```
+
 **Signature**
 
 ```ts
-declare const EventInvocationBridge: EventInvocationBridge;
+export interface EventInvocationBridge {
+  /** Runs publication within the invocation context.
+   * @param operation - Publication callback.
+   * @param options - Producer span metadata.
+   * @returns The operation result or rejection.
+   * @example await bridge.run(() => Promise.resolve(1))
+   */
+  readonly run: <A>(
+    operation: () => MaybePromise<A>,
+    options?: EventInvocationBridgeOptions,
+  ) => Promise<A>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L67)
 
 ### EventInvocationBridgeOptions
 
+Trace bridge metadata for a producer operation.
+
+**Example**
+
+```ts
+const name = options.name;
+```
+
 **Signature**
 
 ```ts
-declare const EventInvocationBridgeOptions: EventInvocationBridgeOptions;
+export interface EventInvocationBridgeOptions {
+  readonly name?: string;
+  readonly attributes?: Readonly<Record<string, unknown>>;
+  readonly signal?: AbortSignal;
+  readonly kind?: "producer";
+  readonly input?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L56)
 
 ### EventObservedEdge
 
+Runtime graph edge for an attempted publication.
+
+**Example**
+
+```ts
+const edge: EventObservedEdge = {
+  relationship: "publishes-event",
+  from: "orders.create",
+  to: "orders.created",
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventObservedEdge: EventObservedEdge;
+export interface EventObservedEdge {
+  readonly relationship: "publishes-event";
+  readonly from: string;
+  readonly to: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L142)
 
 ### EventOperationCancelledError
 
@@ -1578,13 +1776,30 @@ declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 
 ### EventOperationContext
 
+Context passed to the selected event provider for one publication.
+The signal remains valid until the publication settles.
+
+**Example**
+
+```ts
+const id = context.eventId;
+```
+
 **Signature**
 
 ```ts
-declare const EventOperationContext: EventOperationContext;
+export interface EventOperationContext {
+  readonly operation: "publish";
+  readonly eventId: string;
+  readonly version: number;
+  readonly signal: AbortSignal;
+  readonly profile: string;
+  readonly deadlineMs?: number;
+  readonly propagation?: TracePropagation;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L15)
 
 ### EventOperationTimeoutError
 
@@ -1618,13 +1833,36 @@ declare const EventProfileError: typeof EventProfileError;
 
 ### EventProvider
 
+Provider interface selected from a profile for publication.
+
+**Example**
+
+```ts
+const provider: EventProvider = {
+  publish: async () => ({ accepted: true, instanceId: "event-1" }),
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventProvider: EventProvider;
+export interface EventProvider {
+  /** Publishes one validated payload.
+   * @param payload - Decoded event payload.
+   * @param options - Validated publish options.
+   * @param context - Trace and cancellation context.
+   * @returns Provider acceptance and metadata, or a rejected Promise.
+   * @example await provider.publish(payload, {}, context)
+   */
+  readonly publish: (
+    payload: unknown,
+    options: EventPublishOptions,
+    context: EventOperationContext,
+  ) => MaybePromise<EventProviderResult>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L38)
 
 ### EventProviderError
 
@@ -1638,13 +1876,26 @@ declare const EventProviderError: typeof EventProviderError;
 
 ### EventProviderResult
 
+Provider acknowledgement and optional envelope metadata.
+
+**Example**
+
+```ts
+const result: EventProviderResult = { accepted: true, instanceId: "event-1" };
+```
+
 **Signature**
 
 ```ts
-declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
+type EventProviderResult<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> = Pick<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted"> &
+  Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L28)
 
 ### EventPublishOptions
 
@@ -1777,7 +2028,7 @@ export interface EventClient<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L109)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L112)
 
 ### EventClientOptions (interface)
 
@@ -1810,6 +2061,9 @@ export interface EventClientOptions<
   readonly payloadSchema?: PayloadSchema;
   readonly profile?: string;
   readonly resolveProfile?: (profile: string) => unknown;
+  /** What the publication's span records in place of the payload, such as a copy with the
+   * event's sensitive fields replaced. The provider and the caller receive the payload itself. */
+  readonly recordedPayload?: (payload: unknown) => unknown;
   readonly bridge?: EventInvocationBridge;
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;
@@ -1847,7 +2101,7 @@ export interface EventDeclaredEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L130)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L133)
 
 ### EventInvocationBridge (interface)
 
@@ -1926,7 +2180,7 @@ export interface EventObservedEdge {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L139)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L142)
 
 ### EventOperationContext (interface)
 
@@ -2087,14 +2341,15 @@ declare const defineEventFunctionEffect: <
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ) => Effect.Effect<
   EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
   EventDefinitionError
 >;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L83)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L84)
 
 ### isEventFunctionDescriptor
 
@@ -2112,7 +2367,7 @@ isEventFunctionDescriptor(candidate);
 declare const isEventFunctionDescriptor: (value: unknown) => value is EventFunctionDescriptorAny;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L143)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L153)
 
 ### isEventFunctionDescriptorEffect
 
@@ -2132,7 +2387,7 @@ declare const isEventFunctionDescriptorEffect: (
 ) => Effect.Effect<boolean, never, never>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L152)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.ts#L162)
 
 ## `define-event-function.types.ts`
 
@@ -2189,6 +2444,7 @@ type EventFunctionCallOptions<
   DefineEventFunctionOptions<Id, Event, Dependencies, readonly ErrorDescriptorAny[]>,
   "handler"
 > & {
+  /** Handles one delivery: receives the event's data and `context`, returns nothing. */
   readonly handler: (
     input: EventInputByName<Event>,
     context: EventFunctionContext<Event, Dependencies>,
@@ -2200,23 +2456,69 @@ type EventFunctionCallOptions<
 
 ### EventFunctionDescriptor
 
+Immutable descriptor emitted by defineEventFunction.
+
+**Example**
+
+```ts
+const descriptor = defineEventFunction(options);
+```
+
 **Signature**
 
 ```ts
-declare const EventFunctionDescriptor: EventFunctionDescriptor<Id, Event, Dependencies, Errors>;
+export interface EventFunctionDescriptor<
+  Id extends string = string,
+  Event extends EventName = EventName,
+  Dependencies extends FunctionDependencies = {},
+  Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
+> extends DescriptorBase<"function", Id> {
+  readonly invocationMode: "event-only";
+  readonly event: Event;
+  readonly delivery: EventDelivery;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
+  readonly retry: EventRetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+  readonly dependencies?: Dependencies;
+  readonly errors?: Errors;
+  readonly handler: EventFunctionHandler<Event, Dependencies, Errors>;
+  readonly invoke?: never;
+  readonly asTool?: never;
+  readonly __input?: InferOutput<EventDescriptorByName<Event>["input"]>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L128)
 
 ### EventFunctionDescriptorAny
 
+Event-only descriptor with erased event and dependency types.
+
+**Example**
+
+```ts
+const consumer: EventFunctionDescriptorAny = descriptor;
+```
+
 **Signature**
 
 ```ts
-declare const EventFunctionDescriptorAny: EventFunctionDescriptorAny;
+export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
+  readonly invocationMode: "event-only";
+  readonly event: string;
+  readonly delivery: EventDelivery;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
+  readonly retry: EventRetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+  readonly handler: (...args: never[]) => unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L153)
 
 ### EventFunctionValidation (type alias)
 
@@ -2235,7 +2537,7 @@ type EventFunctionValidation<Options extends { readonly handler: (...args: never
   FunctionHandlerValidation<Awaited<ReturnType<Options["handler"]>>, void, ErrorListOf<Options>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event-function.types.ts#L45)
 
 ### EventName
 
@@ -2261,63 +2563,156 @@ declare const FunctionDependencies: FunctionDependencies;
 
 ### DefineEventOptions
 
+Input accepted by the event descriptor factory.
+
+**Example**
+
+```ts
+const options: DefineEventOptions<"orders.created", 1, typeof schema> = {
+  id: "orders.created",
+  input: schema,
+};
+```
+
 **Signature**
 
 ```ts
-declare const DefineEventOptions: DefineEventOptions<Id, Version, InputSchema>;
+export interface DefineEventOptions<
+  Id extends string,
+  Version extends number,
+  InputSchema extends StandardSchemaV1,
+> extends DescriptorMetadata {
+  /** Unique name of the event; publishers and consumers refer to the event by it. */
+  readonly id: Id;
+  /** Version of the event's contract, a positive integer. Defaults to `1`. */
+  readonly version?: Version;
+  /** Schema of the data sent with the event. */
+  readonly input: InputSchema;
+  /** The event provider profile that delivers the event; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"event">;
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
+  readonly sensitiveFields?: readonly string[];
+  /** Not an option of an event: consume the event with `defineEventFunction`. */
+  readonly handler?: never;
+  /** Not an option of an event: an event returns nothing to its publisher. */
+  readonly output?: never;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L59)
 
 ### EventDescriptor
 
+Immutable, versioned event contract with no handler or output.
+
+**Example**
+
+```ts
+const created: EventDescriptor<"orders.created", 1, { orderId: string }> = defineEvent(options);
+```
+
 **Signature**
 
 ```ts
-declare const EventDescriptor: EventDescriptor<Id, Version, Input, InputSchema>;
+export interface EventDescriptor<
+  Id extends string,
+  Version extends number,
+  Input,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+>
+  extends DescriptorBase<"event", Id>, EventRef<Id, InputSchema> {
+  readonly version: Version;
+  readonly input: InputSchema;
+  readonly profile?: string;
+  readonly sensitiveFields?: readonly string[];
+  readonly handler?: never;
+  readonly output?: never;
+  readonly __input?: Input;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L35)
 
 ### EventDescriptorAny
 
+Event descriptor with erased contract parameters.
+
+**Example**
+
+```ts
+const registry: EventDescriptorAny[] = [created];
+```
+
 **Signature**
 
 ```ts
-declare const EventDescriptorAny: EventDescriptorAny;
+type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L54)
 
 ### EventEnvelope
 
+Published event data without the provider acceptance flag.
+
+**Example**
+
+```ts
+type Created = EventEnvelope<"orders.created", 1, { orderId: string }>;
+```
+
 **Signature**
 
 ```ts
-declare const EventEnvelope: EventEnvelope<Id, Version, Payload>;
+type EventEnvelope<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> = Omit<EventPublishResult<Id, Version, Payload>, "accepted">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L13)
 
 ### EventEnvelopeFor
 
+Resolves the envelope for a specific event descriptor.
+
+**Example**
+
+```ts
+type CreatedEnvelope = EventEnvelopeFor<typeof created>;
+```
+
 **Signature**
 
 ```ts
-declare const EventEnvelopeFor: EventEnvelopeFor<E>;
+type EventEnvelopeFor<E> =
+  E extends EventDescriptor<infer Id, infer Version, infer Input, StandardSchemaV1>
+    ? EventEnvelope<Id, Version, Input>
+    : UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L27)
 
 ### UnknownEventEnvelope
 
+Event data when its contract is not known statically.
+
+**Example**
+
+```ts
+const envelope: UnknownEventEnvelope = received;
+```
+
 **Signature**
 
 ```ts
-declare const UnknownEventEnvelope: UnknownEventEnvelope;
+type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L22)
 
 ### assertEventDescriptor
 
@@ -2447,17 +2842,26 @@ export interface DefineEventOptions<
   Version extends number,
   InputSchema extends StandardSchemaV1,
 > extends DescriptorMetadata {
+  /** Unique name of the event; publishers and consumers refer to the event by it. */
   readonly id: Id;
+  /** Version of the event's contract, a positive integer. Defaults to `1`. */
   readonly version?: Version;
+  /** Schema of the data sent with the event. */
   readonly input: InputSchema;
-  readonly profile?: string;
+  /** The event provider profile that delivers the event; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"event">;
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
   readonly sensitiveFields?: readonly string[];
+  /** Not an option of an event: consume the event with `defineEventFunction`. */
   readonly handler?: never;
+  /** Not an option of an event: an event returns nothing to its publisher. */
   readonly output?: never;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L59)
 
 ### EventDescriptor (interface)
 
@@ -2489,7 +2893,7 @@ export interface EventDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L35)
 
 ### EventDescriptorAny (type alias)
 
@@ -2507,7 +2911,7 @@ const registry: EventDescriptorAny[] = [created];
 type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L54)
 
 ### EventEnvelope (type alias)
 
@@ -2529,7 +2933,7 @@ type EventEnvelope<
 > = Omit<EventPublishResult<Id, Version, Payload>, "accepted">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L13)
 
 ### EventEnvelopeFor (type alias)
 
@@ -2550,7 +2954,7 @@ type EventEnvelopeFor<E> =
     : UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L27)
 
 ### InferOutput
 
@@ -2560,7 +2964,7 @@ type EventEnvelopeFor<E> =
 declare const InferOutput: InferOutput<S>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L8)
 
 ### StandardSchemaV1
 
@@ -2570,7 +2974,7 @@ declare const InferOutput: InferOutput<S>;
 declare const StandardSchemaV1: StandardSchemaV1<TInput, TOutput>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L8)
 
 ### UnknownEventEnvelope (type alias)
 
@@ -2588,7 +2992,7 @@ const envelope: UnknownEventEnvelope = received;
 type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L22)
 
 ## `effect.ts`
 
@@ -2634,23 +3038,72 @@ declare const EventIdentityLive: Layer<EventIdentity, never, never>;
 
 ### EventIdentityService
 
+Substitutable clock and identifier source for event envelopes.
+
+**Example**
+
+```ts
+const identity: EventIdentityService = { now: () => new Date(0), nextId: () => "event-1" };
+```
+
 **Signature**
 
 ```ts
-declare const EventIdentityService: EventIdentityService;
+export interface EventIdentityService {
+  /** Reads the current wall-clock time.
+   * @returns The current date.
+   * @example identity.now()
+   */
+  readonly now: () => Date;
+  /** Generates a unique event instance ID.
+   * @returns An opaque instance ID.
+   * @example identity.nextId()
+   */
+  readonly nextId: () => string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-result.types.ts#L4)
 
 ### EventOperation
 
+Fixed operation labels used by event authoring and publishing metrics.
+
+**Example**
+
+```ts
+const operation: EventOperation = "client.publish";
+```
+
 **Signature**
 
 ```ts
-declare const EventOperation: EventOperation;
+type EventOperation =
+  | "event.define"
+  | "event.isDescriptor"
+  | "event.assertDescriptor"
+  | "function.define"
+  | "function.isDescriptor"
+  | "function.bindEvents"
+  | "function.delivery"
+  | "function.profile"
+  | "function.retry"
+  | "function.rejectFields"
+  | "client.create"
+  | "client.publish"
+  | "client.parsePayload"
+  | "client.normalizeOptions"
+  | "client.normalizeAttributes"
+  | "client.normalizeResult"
+  | "client.resolveProvider"
+  | "client.notify"
+  | "client.resolveValue"
+  | "client.assertOptionalText"
+  | "client.assertVersion"
+  | "client.runAbortable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.types.ts#L6)
 
 ### EventPayloadValidationFailure
 
@@ -2664,23 +3117,56 @@ declare const EventPayloadValidationFailure: typeof EventPayloadValidationFailur
 
 ### EventPublishFailure
 
+Typed failures of an Effect event publication.
+
+**Example**
+
+```ts
+Effect.catchTag(publishEventEffect(setup, payload), "EventPayloadValidationFailure", handle);
+```
+
 **Signature**
 
 ```ts
-declare const EventPublishFailure: EventPublishFailure;
+type EventPublishFailure =
+  | EventClientValidationError
+  | EventDependencyError
+  | EventOperationCancelledError
+  | EventOperationTimeoutError
+  | EventPayloadValidationFailure
+  | EventWorkFailed;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L24)
 
 ### EventPublishSetup
 
+Validated state captured by a generated event client.
+
+**Example**
+
+```ts
+const setup: EventPublishSetup<"orders.created", 1, typeof schema> = validated;
+```
+
 **Signature**
 
 ```ts
-declare const EventPublishSetup: EventPublishSetup<Id, Version, PayloadSchema>;
+export interface EventPublishSetup<
+  Id extends string,
+  Version extends number,
+  PayloadSchema extends StandardSchemaV1,
+> {
+  readonly options: EventClientOptions<Id, Version, PayloadSchema>;
+  readonly ownerId: string;
+  readonly eventId: Id;
+  readonly version: Version;
+  readonly profile: string;
+  readonly declared: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L53)
 
 ### EventPublisher
 
@@ -2694,13 +3180,34 @@ declare const EventPublisher: typeof EventPublisher;
 
 ### EventPublisherService
 
+Provider operation supplied to an Effect publication.
+
+**Example**
+
+```ts
+const publisher: EventPublisherService = { publish: () => Effect.succeed(reply) };
+```
+
 **Signature**
 
 ```ts
-declare const EventPublisherService: EventPublisherService;
+export interface EventPublisherService {
+  /** Publishes a validated payload.
+   * @param payload - Decoded payload.
+   * @param options - Validated request options.
+   * @param context - Cancellation and trace context.
+   * @returns Provider metadata or EventWorkFailed.
+   * @example yield* publisher.publish(payload, {}, context)
+   */
+  readonly publish: (
+    payload: unknown,
+    options: EventPublishOptions,
+    context: EventOperationContext,
+  ) => Effect.Effect<EventProviderResult, EventWorkFailed>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client-publish.types.ts#L35)
 
 ### EventTelemetry
 
@@ -2724,13 +3231,33 @@ declare const EventTelemetryLive: Layer<EventTelemetry, never, never>;
 
 ### EventTelemetryService
 
+Substitutable observer for event operations.
+Implementations retain the original success and error channels.
+
+**Example**
+
+```ts
+const telemetry: EventTelemetryService = { observe: (_name, effect) => effect };
+```
+
 **Signature**
 
 ```ts
-declare const EventTelemetryService: EventTelemetryService;
+export interface EventTelemetryService {
+  /** Observes one event operation.
+   * @param operation - Fixed bounded operation label.
+   * @param effect - Operation to observe.
+   * @returns The same success and error channels.
+   * @example telemetry.observe("event.define", Effect.void)
+   */
+  readonly observe: <A, E, R>(
+    operation: EventOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/effect.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-observability.types.ts#L34)
 
 ### EventWorkFailed
 
@@ -2844,7 +3371,8 @@ declare const defineEventFunctionEffect: <
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ) => Effect<
   EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>,
   EventDefinitionError
@@ -3375,13 +3903,21 @@ const target: FunctionWithEvents = { id: "orders.on-created", event: "orders.cre
 
 ### EventDescriptorAny
 
+Event descriptor with erased contract parameters.
+
+**Example**
+
+```ts
+const registry: EventDescriptorAny[] = [created];
+```
+
 **Signature**
 
 ```ts
-declare const EventDescriptorAny: EventDescriptorAny;
+type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function-target.types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L54)
 
 ### FunctionWithEvents (interface)
 
@@ -3597,32 +4133,48 @@ export interface DefineEventFunctionOptions<
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
 > extends DescriptorMetadata {
+  /** Stable ID of the function; each consumer of the same event needs its own. */
   readonly id: Id;
+  /** ID of the event to consume, such as `orders.created`. */
   readonly event: Event;
+  /** `"durable"` (default) stores and retries each delivery; `"ephemeral"` keeps nothing. */
   readonly delivery?: EventDelivery;
-  readonly profile?: string;
+  /** The event provider profile whose deliveries the function handles. */
+  readonly profile?: ProviderProfileName<"event">;
+  /** Retry policy for failed durable deliveries. Defaults to one attempt, so no retry. */
   readonly retry?: Partial<EventRetryPolicy>;
+  /** Most deliveries of the event that this function handles at once. */
   readonly concurrency?: number;
+  /** Time limit in milliseconds for handling one delivery. */
   readonly timeoutMs?: number;
+  /** Everything the handler calls, by kind; each entry becomes a client on `context`. */
   readonly dependencies?: Dependencies;
+  /** Declared errors the handler may return. */
   readonly errors?: Errors;
+  /** Runs before the handler and may replace the event's data. */
   readonly onBefore?: (
     input: EventInputByName<Event>,
     context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<EventInputByName<Event>>;
+  /** Runs after the handler succeeds. */
   readonly onAfter?: (
     output: void,
     context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<void>;
+  /** Handles one delivery: receives the event's data and `context`, returns nothing. */
   readonly handler: EventFunctionHandler<Event, Dependencies, Errors>;
+  /** Not an option here: the input is the data of the consumed event. */
   readonly input?: never;
+  /** Not an option here: an event function returns nothing. */
   readonly output?: never;
+  /** Not an option here: an event function cannot become a tool. */
   readonly tool?: never;
+  /** Not an option here: `event` names what starts the function. */
   readonly trigger?: never;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L74)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L79)
 
 ### EventDelivery (type alias)
 
@@ -3640,7 +4192,7 @@ const delivery: EventDelivery = "durable";
 type EventDelivery = "ephemeral" | "durable";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L25)
 
 ### EventFunctionContext (interface)
 
@@ -3663,7 +4215,7 @@ export interface EventFunctionContext<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L57)
 
 ### EventFunctionDescriptor (interface)
 
@@ -3687,7 +4239,8 @@ export interface EventFunctionDescriptor<
   readonly invocationMode: "event-only";
   readonly event: Event;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -3700,7 +4253,7 @@ export interface EventFunctionDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L128)
 
 ### EventFunctionDescriptorAny (interface)
 
@@ -3719,7 +4272,8 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
   readonly invocationMode: "event-only";
   readonly event: string;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -3727,7 +4281,7 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L131)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L153)
 
 ### EventFunctionHandler (type alias)
 
@@ -3752,7 +4306,7 @@ type EventFunctionHandler<
 ) => MaybePromise<FunctionHandlerResult<void, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L67)
 
 ### EventFunctionTrigger (interface)
 
@@ -3787,7 +4341,7 @@ export interface EventFunctionTrigger<Event extends EventName = EventName> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L35)
 
 ### EventRetryPolicy (type alias)
 
@@ -3811,7 +4365,7 @@ const retry: EventRetryPolicy = {
 type EventRetryPolicy = RetryPolicy;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/event-function.types.ts#L30)
 
 ## `event-observability.ts`
 
@@ -4088,13 +4642,45 @@ export * from "./event-registry.js";
 
 ### DefineEventOptions
 
+Input accepted by the event descriptor factory.
+
+**Example**
+
+```ts
+const options: DefineEventOptions<"orders.created", 1, typeof schema> = {
+  id: "orders.created",
+  input: schema,
+};
+```
+
 **Signature**
 
 ```ts
-declare const DefineEventOptions: DefineEventOptions<Id, Version, InputSchema>;
+export interface DefineEventOptions<
+  Id extends string,
+  Version extends number,
+  InputSchema extends StandardSchemaV1,
+> extends DescriptorMetadata {
+  /** Unique name of the event; publishers and consumers refer to the event by it. */
+  readonly id: Id;
+  /** Version of the event's contract, a positive integer. Defaults to `1`. */
+  readonly version?: Version;
+  /** Schema of the data sent with the event. */
+  readonly input: InputSchema;
+  /** The event provider profile that delivers the event; the application's default when omitted. */
+  readonly profile?: ProviderProfileName<"event">;
+  /** Payload fields recorded as `[REDACTED]` in traces and the Inspector; handlers get the values.
+   * A name matches a key anywhere in the payload, a dotted path such as `customer.email` from its
+   * root. */
+  readonly sensitiveFields?: readonly string[];
+  /** Not an option of an event: consume the event with `defineEventFunction`. */
+  readonly handler?: never;
+  /** Not an option of an event: an event returns nothing to its publisher. */
+  readonly output?: never;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L59)
 
 ### EventAttributeValue
 
@@ -4108,33 +4694,110 @@ declare const EventAttributeValue: EventAttributeValue;
 
 ### EventClient
 
+Promise compatibility interface exposed to application handlers.
+
+**Example**
+
+```ts
+await client.publish({ orderId: "one" });
+```
+
 **Signature**
 
 ```ts
-declare const EventClient: EventClient<Input, Id, Version, Payload>;
+export interface EventClient<
+  Input = unknown,
+  Id extends string = string,
+  Version extends number = number,
+  Payload = Input,
+> {
+  /** Publishes a payload and returns the accepted envelope.
+   * @param payload - Event payload to decode.
+   * @param options - Optional key and attributes.
+   * @returns A Promise of the accepted envelope or a rejected domain error.
+   * @example await client.publish(payload, { key: "order-1" })
+   */
+  readonly publish: (
+    payload: Input,
+    options?: EventPublishOptions,
+  ) => Promise<EventPublishResult<Id, Version, Payload>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L112)
 
 ### EventClientOptions
 
+Dependencies and policy for a generated event publisher.
+Provider selection occurs once when the client is created.
+
+**Example**
+
+```ts
+const options: EventClientOptions = {
+  ownerId: "orders.create",
+  eventId: "orders.created",
+  version: 1,
+  source: provider,
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventClientOptions: EventClientOptions<Id, Version, PayloadSchema>;
+export interface EventClientOptions<
+  Id extends string = string,
+  Version extends number = number,
+  PayloadSchema extends StandardSchemaV1 = StandardSchemaV1,
+> {
+  readonly ownerId: string;
+  readonly eventId: Id;
+  readonly version: Version;
+  readonly source: unknown;
+  readonly payloadSchema?: PayloadSchema;
+  readonly profile?: string;
+  readonly resolveProfile?: (profile: string) => unknown;
+  /** What the publication's span records in place of the payload, such as a copy with the
+   * event's sensitive fields replaced. The provider and the caller receive the payload itself. */
+  readonly recordedPayload?: (payload: unknown) => unknown;
+  readonly bridge?: EventInvocationBridge;
+  readonly signal?: () => AbortSignal;
+  readonly deadline?: () => number | undefined;
+  readonly correlationId?: string | (() => string | undefined);
+  readonly now?: () => Date;
+  readonly declared?: boolean;
+  readonly onDeclaredEdge?: (edge: EventDeclaredEdge) => void;
+  readonly onObservedEdge?: (edge: EventObservedEdge) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L84)
 
 ### EventDeclaredEdge
 
+Static graph edge for a declared publication dependency.
+
+**Example**
+
+```ts
+const edge: EventDeclaredEdge = {
+  kind: "publishes-event",
+  from: "orders.create",
+  to: "orders.created",
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventDeclaredEdge: EventDeclaredEdge;
+export interface EventDeclaredEdge {
+  readonly kind: "publishes-event";
+  readonly from: string;
+  readonly to: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L133)
 
 ### EventDependencyError
 
@@ -4148,73 +4811,175 @@ declare const EventDependencyError: typeof EventDependencyError;
 
 ### EventDescriptor
 
+Immutable, versioned event contract with no handler or output.
+
+**Example**
+
+```ts
+const created: EventDescriptor<"orders.created", 1, { orderId: string }> = defineEvent(options);
+```
+
 **Signature**
 
 ```ts
-declare const EventDescriptor: EventDescriptor<Id, Version, Input, InputSchema>;
+export interface EventDescriptor<
+  Id extends string,
+  Version extends number,
+  Input,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+>
+  extends DescriptorBase<"event", Id>, EventRef<Id, InputSchema> {
+  readonly version: Version;
+  readonly input: InputSchema;
+  readonly profile?: string;
+  readonly sensitiveFields?: readonly string[];
+  readonly handler?: never;
+  readonly output?: never;
+  readonly __input?: Input;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L35)
 
 ### EventDescriptorAny
 
+Event descriptor with erased contract parameters.
+
+**Example**
+
+```ts
+const registry: EventDescriptorAny[] = [created];
+```
+
 **Signature**
 
 ```ts
-declare const EventDescriptorAny: EventDescriptorAny;
+type EventDescriptorAny = EventDescriptor<string, number, unknown, StandardSchemaV1>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L54)
 
 ### EventEnvelope
 
+Published event data without the provider acceptance flag.
+
+**Example**
+
+```ts
+type Created = EventEnvelope<"orders.created", 1, { orderId: string }>;
+```
+
 **Signature**
 
 ```ts
-declare const EventEnvelope: EventEnvelope<Id, Version, Payload>;
+type EventEnvelope<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> = Omit<EventPublishResult<Id, Version, Payload>, "accepted">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L13)
 
 ### EventEnvelopeFor
 
+Resolves the envelope for a specific event descriptor.
+
+**Example**
+
+```ts
+type CreatedEnvelope = EventEnvelopeFor<typeof created>;
+```
+
 **Signature**
 
 ```ts
-declare const EventEnvelopeFor: EventEnvelopeFor<E>;
+type EventEnvelopeFor<E> =
+  E extends EventDescriptor<infer Id, infer Version, infer Input, StandardSchemaV1>
+    ? EventEnvelope<Id, Version, Input>
+    : UnknownEventEnvelope;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L27)
 
 ### EventInvocationBridge
 
+Optional invocation bridge that owns a publication span.
+
+**Example**
+
+```ts
+await bridge.run(() => provider.publish(payload, {}, context));
+```
+
 **Signature**
 
 ```ts
-declare const EventInvocationBridge: EventInvocationBridge;
+export interface EventInvocationBridge {
+  /** Runs publication within the invocation context.
+   * @param operation - Publication callback.
+   * @param options - Producer span metadata.
+   * @returns The operation result or rejection.
+   * @example await bridge.run(() => Promise.resolve(1))
+   */
+  readonly run: <A>(
+    operation: () => MaybePromise<A>,
+    options?: EventInvocationBridgeOptions,
+  ) => Promise<A>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L67)
 
 ### EventInvocationBridgeOptions
 
+Trace bridge metadata for a producer operation.
+
+**Example**
+
+```ts
+const name = options.name;
+```
+
 **Signature**
 
 ```ts
-declare const EventInvocationBridgeOptions: EventInvocationBridgeOptions;
+export interface EventInvocationBridgeOptions {
+  readonly name?: string;
+  readonly attributes?: Readonly<Record<string, unknown>>;
+  readonly signal?: AbortSignal;
+  readonly kind?: "producer";
+  readonly input?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L56)
 
 ### EventObservedEdge
 
+Runtime graph edge for an attempted publication.
+
+**Example**
+
+```ts
+const edge: EventObservedEdge = {
+  relationship: "publishes-event",
+  from: "orders.create",
+  to: "orders.created",
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventObservedEdge: EventObservedEdge;
+export interface EventObservedEdge {
+  readonly relationship: "publishes-event";
+  readonly from: string;
+  readonly to: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L142)
 
 ### EventOperationCancelledError
 
@@ -4228,13 +4993,30 @@ declare const EventOperationCancelledError: typeof EventOperationCancelledError;
 
 ### EventOperationContext
 
+Context passed to the selected event provider for one publication.
+The signal remains valid until the publication settles.
+
+**Example**
+
+```ts
+const id = context.eventId;
+```
+
 **Signature**
 
 ```ts
-declare const EventOperationContext: EventOperationContext;
+export interface EventOperationContext {
+  readonly operation: "publish";
+  readonly eventId: string;
+  readonly version: number;
+  readonly signal: AbortSignal;
+  readonly profile: string;
+  readonly deadlineMs?: number;
+  readonly propagation?: TracePropagation;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L15)
 
 ### EventOperationTimeoutError
 
@@ -4268,13 +5050,36 @@ declare const EventProfileError: typeof EventProfileError;
 
 ### EventProvider
 
+Provider interface selected from a profile for publication.
+
+**Example**
+
+```ts
+const provider: EventProvider = {
+  publish: async () => ({ accepted: true, instanceId: "event-1" }),
+};
+```
+
 **Signature**
 
 ```ts
-declare const EventProvider: EventProvider;
+export interface EventProvider {
+  /** Publishes one validated payload.
+   * @param payload - Decoded event payload.
+   * @param options - Validated publish options.
+   * @param context - Trace and cancellation context.
+   * @returns Provider acceptance and metadata, or a rejected Promise.
+   * @example await provider.publish(payload, {}, context)
+   */
+  readonly publish: (
+    payload: unknown,
+    options: EventPublishOptions,
+    context: EventOperationContext,
+  ) => MaybePromise<EventProviderResult>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L28)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L38)
 
 ### EventProviderError
 
@@ -4288,13 +5093,26 @@ declare const EventProviderError: typeof EventProviderError;
 
 ### EventProviderResult
 
+Provider acknowledgement and optional envelope metadata.
+
+**Example**
+
+```ts
+const result: EventProviderResult = { accepted: true, instanceId: "event-1" };
+```
+
 **Signature**
 
 ```ts
-declare const EventProviderResult: EventProviderResult<Id, Version, Payload>;
+type EventProviderResult<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> = Pick<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted"> &
+  Partial<Omit<EventPublishResult<Id, Version, Payload>, "instanceId" | "accepted">>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/client.types.ts#L28)
 
 ### EventPublishOptions
 
@@ -4318,13 +5136,21 @@ declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
 
 ### UnknownEventEnvelope
 
+Event data when its contract is not known statically.
+
+**Example**
+
+```ts
+const envelope: UnknownEventEnvelope = received;
+```
+
 **Signature**
 
 ```ts
-declare const UnknownEventEnvelope: UnknownEventEnvelope;
+type UnknownEventEnvelope = EventEnvelope<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/events/define-event.types.ts#L22)
 
 ### assertEventDescriptor
 
@@ -4395,7 +5221,8 @@ declare const defineEventFunction: <
 >(
   options: EventFunctionCallOptions<Id, Event, Dependencies> &
     Options &
-    EventFunctionValidation<NoInfer<Options>>,
+    EventFunctionValidation<NoInfer<Options>> &
+    RejectUnknownOptions<NoInfer<Options>, keyof EventFunctionCallOptions<Id, Event, Dependencies>>,
 ) => EventFunctionDescriptor<Id, Event, Dependencies, ErrorListOf<Options>>;
 ```
 

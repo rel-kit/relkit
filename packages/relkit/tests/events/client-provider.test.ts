@@ -8,6 +8,7 @@ import {
   resolveValue,
   resolveValueEffect,
 } from "../../src/events/client-provider.js";
+import { createEventClient } from "../../src/events/client.js";
 import { normalizeOptionsEffect } from "../../src/events/client-validation.js";
 import {
   EventClientValidationError,
@@ -42,6 +43,33 @@ describe("provider resolution and telemetry", () => {
     );
     expect(failure).toBeInstanceOf(EventClientValidationError);
     expect(failure.message).toBe("resolver offline");
+  });
+
+  test("a client without a profile publishes to the only profile of its source", async () => {
+    let published = 0;
+    const named = {
+      publish: async () => {
+        published += 1;
+        return { accepted: true as const, instanceId: "event-1" };
+      },
+    };
+    const client = createEventClient({
+      ownerId: "orders.create",
+      eventId: "orders.created",
+      version: 1,
+      source: { local: named },
+    });
+    await client.publish({ orderId: "1" } as never);
+    expect(published).toBe(1);
+    // With several profiles and none named, the client cannot choose one.
+    expect(() =>
+      createEventClient({
+        ownerId: "orders.create",
+        eventId: "orders.created",
+        version: 1,
+        source: { local: named, audit: named },
+      }),
+    ).toThrow(EventProfileError);
   });
 
   test("keeps edge notification best effort and resolves lazy correlation IDs", () => {

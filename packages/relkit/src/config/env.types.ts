@@ -47,7 +47,9 @@ export interface EnvRef<Name extends string = string, Value = unknown> {
  * @example const field: EnvBuilderBase = env.string();
  */
 export interface EnvBuilderBase {
+  /** Marks the value as an environment field declaration; always `"env-builder"`. */
   readonly kind: "env-builder";
+  /** The field's type, requirements and description as plain data; never its value or default. */
   readonly metadata: EnvMetadata;
   /** Parse a raw string through the field's Effect-backed compatibility adapter.
    * @param value - Raw environment value.

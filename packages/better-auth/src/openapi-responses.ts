@@ -5,6 +5,12 @@
  */
 import type { JsonValue } from "relkit/contracts";
 import { problemSchema } from "relkit/openapi";
+import {
+  AUTH_ERROR,
+  authErrorReference,
+  authErrorSchema,
+  declareAuthErrors,
+} from "./openapi-errors.js";
 
 type JsonObject = { [key: string]: JsonValue };
 
@@ -67,8 +73,8 @@ const SUCCESS: Readonly<Record<string, JsonObject>> = {
  * Applies the corrections to an already mounted and renamed document.
  * @param document - Document with `paths` and `components`.
  * @param basePath - Mount of the auth endpoints, without a trailing slash.
- * @returns A copy with corrected success answers, nullable `user.image`, and the 413 and 415 answers
- * of operations that take a body.
+ * @returns A copy with corrected success answers, nullable `user.image`, the 413 and 415 answers
+ * of operations that take a body, and the error body the endpoints send.
  */
 export function correctAuthResponses(document: JsonObject, basePath: string): JsonObject {
   const paths = record(document.paths);
@@ -79,7 +85,11 @@ export function correctAuthResponses(document: JsonObject, basePath: string): Js
         Object.entries(record(item)).map(([method, operation]) => [
           method,
           isOperation(operation)
-            ? correctOperation(operation, `${method.toUpperCase()} ${path.slice(basePath.length)}`)
+            ? correctOperation(
+                operation,
+                `${method.toUpperCase()} ${path.slice(basePath.length)}`,
+                method,
+              )
             : operation,
         ]),
       ),
@@ -89,7 +99,7 @@ export function correctAuthResponses(document: JsonObject, basePath: string): Js
 }
 
 /** Corrects one operation, keyed by method and unmounted path. */
-function correctOperation(operation: JsonObject, key: string): JsonObject {
+function correctOperation(operation: JsonObject, key: string, method: string): JsonObject {
   const responses = { ...record(operation.responses) };
   const success = SUCCESS[key];
   if (success !== undefined && wrongSuccess(responses["200"], key)) responses["200"] = success;
@@ -101,12 +111,13 @@ function correctOperation(operation: JsonObject, key: string): JsonObject {
       description: "The request body exceeds the server's byte limit",
       content: { [PROBLEM_TYPE]: { schema: { $ref: `#/components/schemas/${PROBLEM}` } } },
     };
-    responses["415"] ??= jsonBody("The Content-Type is not one the operation accepts", {
-      type: "object",
-      properties: { code: { type: "string" }, message: { type: "string" } },
-    });
+    responses["415"] ??= jsonBody(
+      "The Content-Type is not one the operation accepts",
+      authErrorReference(),
+    );
   }
-  return { ...operation, responses };
+  const problem = { $ref: `#/components/schemas/${PROBLEM}` };
+  return { ...operation, responses: declareAuthErrors(responses, method, problem) };
 }
 
 /** Whether an operation's 200 is missing or still the form the generator got wrong. */
@@ -135,7 +146,7 @@ function schemaOf(response: JsonValue | undefined): JsonObject | undefined {
   return Object.keys(schema).length === 0 ? undefined : schema;
 }
 
-/** Components: `user.image` is `string | null | undefined` in the SDK; add the 413 problem schema. */
+/** Components: `user.image` is `string | null | undefined` in the SDK; add the error and problem schemas. */
 function correctComponents(components: JsonValue | undefined): JsonObject {
   const schemas = record(record(components).schemas);
   const user = record(schemas[`${PREFIX}User`]);
@@ -152,6 +163,7 @@ function correctComponents(components: JsonValue | undefined): JsonObject {
     schemas: {
       ...schemas,
       ...(Object.keys(user).length === 0 ? {} : { [`${PREFIX}User`]: patched }),
+      [AUTH_ERROR]: authErrorSchema(),
       [PROBLEM]: problemSchema(),
     },
   };

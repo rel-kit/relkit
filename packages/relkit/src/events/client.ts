@@ -11,7 +11,7 @@ import {
 import { EventWorkFailed } from "./client-operation.js";
 import { eventPublisherLayer, publishEventEffect } from "./client-publish.js";
 import type { EventPublishSetup } from "./client-publish.types.js";
-import { notifyEffect, resolveProviderEffect } from "./client-provider.js";
+import { notifyEffect, resolveProviderEffect, soleProfile } from "./client-provider.js";
 import { assertVersionEffect } from "./client-validation.js";
 import { observeEvent, runEventSync } from "./event-observability.js";
 import type {
@@ -92,7 +92,9 @@ export function createEventClientEffect<
       const ownerId = yield* stableId(options.ownerId);
       const eventId = (yield* stableId(options.eventId)) as Id;
       const version = (yield* assertVersionEffect(options.version)) as Version;
-      const profile = yield* stableId(options.profile ?? "default");
+      // Without a profile the client uses the only one its source has; "default" is the name
+      // of a source that is a single provider.
+      const profile = yield* stableId(options.profile ?? soleProfile(options.source) ?? "default");
       const declared = options.declared !== false;
       const provider = declared
         ? yield* resolveProviderEffect(options.source, profile, options.resolveProfile)

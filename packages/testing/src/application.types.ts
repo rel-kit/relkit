@@ -12,9 +12,13 @@ import type { TestServiceActivator } from "./application-services.types.js";
 
 /** Explicit test application project, environment and native platform inputs. */
 export type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
+  /** Directory of the application to load. Defaults to the current working directory. */
   readonly projectRoot?: string;
+  /** Values for the names that provider bindings reference, such as `CACHE_URL`. */
   readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** `"fake"` gives each bucket and cache profile without a replacement a test fake. */
   readonly resourceProviders?: "configured" | "fake";
+  /** Starts the application's services for the test, such as its database and auth. */
   readonly services?: TestServiceActivator;
 };
 

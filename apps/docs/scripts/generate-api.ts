@@ -8,6 +8,7 @@ import {
 } from "./documentation-catalog.js";
 import { authoringNames, referenceLinks } from "./api-related.js";
 import { leadWithCommonApis } from "./api-curation.js";
+import { expandReExports } from "./api-reexports.js";
 import { withFrontendExample } from "./api-frontend.js";
 import type { ReferenceSource } from "./public-api.types.js";
 import { nativeDocgen } from "./docgen-process.js";
@@ -34,7 +35,10 @@ export async function renderApi(
   for (const source of supporting)
     modules.push(await renderSource(source.directory, exampleConfiguration, source.files));
   const labs = (await packageMaturity(directory)) === "labs" ? "labs: true\n" : "";
-  const { lead, rest } = leadWithCommonApis(modules.join("\n\n"), authoringNames(slug));
+  const { lead, rest } = leadWithCommonApis(
+    expandReExports(modules.join("\n\n")),
+    authoringNames(slug),
+  );
   const curated = lead
     ? `## Most-used APIs\n\nThese entries carry each API's contract and example. The complete reference follows.\n\n${lead}\n\n## Complete reference\n\n`
     : "";

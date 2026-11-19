@@ -69,7 +69,7 @@ void welcome;
 declare const defineFunction: DefineFunction;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L132)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L133)
 
 Since v0.1.0
 
@@ -1012,83 +1012,181 @@ readonly http: ErrorHttpMapping | undefined
 
 ### DefineErrorOptions
 
+Options for constructing a declared error descriptor.
+
+**Example**
+
+```ts
+defineError({ id: "orders.not-found", data: z.object({ id: z.string() }), message: "Missing" });
+```
+
 **Signature**
 
 ```ts
-declare const DefineErrorOptions: DefineErrorOptions<Id, DataSchema>;
+export interface DefineErrorOptions<
+  Id extends string,
+  DataSchema extends StandardSchemaV1,
+> extends DescriptorMetadata {
+  /** The error's public code; required because it must not change when the file moves. */
+  readonly id: Id;
+  /** Schema of the details callers receive with the error. */
+  readonly data: DataSchema;
+  /** Text of the error: a string, or a function that builds it from `data`. */
+  readonly message: string | ((data: InferOutput<DataSchema>) => string);
+  /** How a route answers with the error; `status` is the HTTP status code. */
+  readonly http?: ErrorHttpMapping;
+  /** Whether durable work tries again: `"never"` (default), `"later"` or a minimum delay. */
+  readonly retry?: ErrorRetryInput;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L48)
 
 ### ErrorDescriptor
 
+Callable descriptor for creating a declared error.
+
+**Example**
+
+```ts
+const error = new NotFound({ id: "one" });
+```
+
 **Signature**
 
 ```ts
-declare const ErrorDescriptor: ErrorDescriptor<Id, Data, DataSchema>;
+export interface ErrorDescriptor<
+  Id extends string,
+  Data,
+  DataSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends DescriptorMetadata {
+  readonly kind: "error";
+  readonly id: Id;
+  readonly ref: ErrorRef<Id>;
+  readonly data: DataSchema;
+  readonly message: string | ((data: Data) => string);
+  readonly http?: ErrorHttpMapping;
+  readonly retry: ErrorRetry;
+  readonly afterMs?: number;
+  readonly create: (input: InferInput<DataSchema>) => DeclaredError<Id, Data>;
+  new (input: InferInput<DataSchema>): DeclaredError<Id, Data>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L25)
 
 ### ErrorDescriptorAny
 
+Any declared error descriptor for heterogeneous collections.
+
 **Signature**
 
 ```ts
-declare const ErrorDescriptorAny: ErrorDescriptorAny;
+type ErrorDescriptorAny = ErrorDescriptor<string, any, StandardSchemaV1<any, any>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L43)
 
 ### ErrorHttpMapping
 
+HTTP mapping for a declared error.
+
+**Example**
+
+```ts
+const http: ErrorHttpMapping = { status: 404 };
+```
+
 **Signature**
 
 ```ts
-declare const ErrorHttpMapping: ErrorHttpMapping;
+export interface ErrorHttpMapping {
+  /** Status code a route answers with when a function returns the error. */
+  readonly status: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L38)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L9)
 
 ### ErrorRef
 
+Stable reference to an application error.
+
+**Example**
+
+```ts
+const ref: ErrorRef = { kind: "error", id: "orders.not-found" };
+```
+
 **Signature**
 
 ```ts
-declare const ErrorRef: ErrorRef<Id>;
+export interface ErrorRef<Id extends string = string> {
+  readonly kind: "error";
+  readonly id: Id;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L17)
 
 ### ErrorRetry
 
+Retry policy for a declared application error.
+
+**Example**
+
+```ts
+const retry: ErrorRetry = "later";
+```
+
 **Signature**
 
 ```ts
-declare const ErrorRetry: ErrorRetry;
+type ErrorRetry = "never" | "later";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L4)
 
 ### ErrorRetryInput
 
+Accepted retry policy input.
+Normalization validates the optional delay and freezes the result.
+
+**Example**
+
+```ts
+const retry: ErrorRetryInput = { kind: "later", afterMs: 500 };
+```
+
 **Signature**
 
 ```ts
-declare const ErrorRetryInput: ErrorRetryInput;
+type ErrorRetryInput = ErrorRetry | ErrorRetryLater;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L19)
 
 ### NormalizedErrorRetry
 
+Canonical immutable retry policy.
+Normalization removes a delay when retry is never.
+
+**Example**
+
+```ts
+const policy = normalizeErrorRetry("later", 500);
+```
+
 **Signature**
 
 ```ts
-declare const NormalizedErrorRetry: NormalizedErrorRetry;
+export interface NormalizedErrorRetry {
+  readonly retry: ErrorRetry;
+  readonly afterMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/invocation/error-retry.types.ts#L25)
 
 ### isErrorDescriptor
 
@@ -1133,14 +1231,18 @@ export interface DefineErrorOptions<
 > extends DescriptorMetadata {
   /** The error's public code; required because it must not change when the file moves. */
   readonly id: Id;
+  /** Schema of the details callers receive with the error. */
   readonly data: DataSchema;
+  /** Text of the error: a string, or a function that builds it from `data`. */
   readonly message: string | ((data: InferOutput<DataSchema>) => string);
+  /** How a route answers with the error; `status` is the HTTP status code. */
   readonly http?: ErrorHttpMapping;
+  /** Whether durable work tries again: `"never"` (default), `"later"` or a minimum delay. */
   readonly retry?: ErrorRetryInput;
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L48)
 
 ### ErrorDescriptor (interface)
 
@@ -1173,7 +1275,7 @@ export interface ErrorDescriptor<
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L25)
 
 ### ErrorDescriptorAny (type alias)
 
@@ -1185,7 +1287,7 @@ Any declared error descriptor for heterogeneous collections.
 type ErrorDescriptorAny = ErrorDescriptor<string, any, StandardSchemaV1<any, any>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L43)
 
 ### ErrorHttpMapping (interface)
 
@@ -1201,6 +1303,7 @@ const http: ErrorHttpMapping = { status: 404 };
 
 ```ts
 export interface ErrorHttpMapping {
+  /** Status code a route answers with when a function returns the error. */
   readonly status: number;
 }
 ```
@@ -1226,7 +1329,7 @@ export interface ErrorRef<Id extends string = string> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-error.types.ts#L17)
 
 ## `define-function-validation.ts`
 
@@ -1443,53 +1546,108 @@ declare const validateLimitEffect: (
 
 ### AgentClientFor
 
+Typed callable client for an agent descriptor.
+
+**Example**
+
+```ts
+const invoke: AgentClientFor<typeof agent> = async (input) => output;
+```
+
 **Signature**
 
 ```ts
-declare const AgentClientFor: AgentClientFor<T>;
+type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L53)
 
 ### AgentClients
 
+Named agent clients projected from dependencies.
+
+**Example**
+
+```ts
+const agents: AgentClients<typeof dependencies.agents> = context.agents;
+```
+
 **Signature**
 
 ```ts
-declare const AgentClients: AgentClients<M>;
+type AgentClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: AgentClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L146)
 
 ### AgentRef
 
+Input and output schemas for an agent reference.
+
+**Example**
+
+```ts
+const ref: AgentRef = agent;
+```
+
 **Signature**
 
 ```ts
-declare const AgentRef: AgentRef<Id, InputSchema, OutputSchema>;
+export interface AgentRef<
+  Id extends string = string,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends DescriptorRef<"agent", Id> {
+  readonly input: InputSchema;
+  readonly output: OutputSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L62)
 
 ### AgentRefAny
 
+Broad agent reference for heterogeneous collections.
+
+**Example**
+
+```ts
+const ref: AgentRefAny = agent;
+```
+
 **Signature**
 
 ```ts
-declare const AgentRefAny: AgentRefAny;
+type AgentRefAny = AgentRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L90)
 
 ### AuthContext
 
+Session lookup available to a handler.
+
+**Example**
+
+```ts
+const session = await context.auth.getSession();
+```
+
 **Signature**
 
 ```ts
-declare const AuthContext: AuthContext<Session>;
+export interface AuthContext<Session = unknown> {
+  /** Looks up the current session.
+   * @returns The session or null when unauthenticated.
+   * @example const session = await context.auth.getSession();
+   */
+  readonly getSession: () => Promise<Session | null>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L108)
 
 ### BucketClient
 
@@ -1513,13 +1671,23 @@ declare const BucketClientFor: BucketClient;
 
 ### BucketClients
 
+Named bucket clients projected from dependencies.
+
+**Example**
+
+```ts
+const buckets: BucketClients<typeof dependencies.buckets> = context.buckets;
+```
+
 **Signature**
 
 ```ts
-declare const BucketClients: BucketClients<M>;
+type BucketClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: BucketClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L134)
 
 ### BucketObjectMetadata
 
@@ -1533,23 +1701,39 @@ declare const BucketObjectMetadata: BucketObjectMetadata;
 
 ### BucketRef
 
+Stable reference to a bucket.
+
+**Example**
+
+```ts
+const ref: BucketRef = bucket;
+```
+
 **Signature**
 
 ```ts
-declare const BucketRef: BucketRef<Id>;
+type BucketRef<Id extends string = string> = DescriptorRef<"bucket", Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L45)
 
 ### BucketRefAny
 
+Broad bucket reference for heterogeneous collections.
+
+**Example**
+
+```ts
+const ref: BucketRefAny = bucket;
+```
+
 **Signature**
 
 ```ts
-declare const BucketRefAny: BucketRefAny;
+type BucketRefAny = BucketRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L82)
 
 ### CacheClient
 
@@ -1563,23 +1747,41 @@ declare const CacheClient: CacheClient<Key, Value>;
 
 ### CacheClientFor
 
+Key and value typed cache client.
+
+**Example**
+
+```ts
+const client: CacheClientFor<typeof cache> = caches.sessions;
+```
+
 **Signature**
 
 ```ts
-declare const CacheClientFor: CacheClientFor<T>;
+type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L111)
 
 ### CacheClients
 
+Named cache clients projected from dependencies.
+
+**Example**
+
+```ts
+const cache: CacheClients<typeof dependencies.cache> = context.cache;
+```
+
 **Signature**
 
 ```ts
-declare const CacheClients: CacheClients<M>;
+type CacheClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: CacheClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L140)
 
 ### CacheOperationOptions
 
@@ -1593,43 +1795,92 @@ declare const CacheOperationOptions: CacheOperationOptions;
 
 ### CacheRef
 
+Key and value schemas for a cache reference.
+
+**Example**
+
+```ts
+const ref: CacheRef = cache;
+```
+
 **Signature**
 
 ```ts
-declare const CacheRef: CacheRef<Id, KeySchema, ValueSchema>;
+export interface CacheRef<
+  Id extends string = string,
+  KeySchema extends StandardSchemaV1 = StandardSchemaV1,
+  ValueSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends DescriptorRef<"cache", Id> {
+  readonly key: KeySchema;
+  readonly value: ValueSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L29)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L50)
 
 ### CacheRefAny
 
+Broad cache reference for heterogeneous collections.
+
+**Example**
+
+```ts
+const ref: CacheRefAny = cache;
+```
+
 **Signature**
 
 ```ts
-declare const CacheRefAny: CacheRefAny;
+type CacheRefAny = CacheRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L30)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L86)
 
 ### ChannelRef
 
+Parameter and event schemas for a channel reference.
+
+**Example**
+
+```ts
+const ref: ChannelRef = channel;
+```
+
 **Signature**
 
 ```ts
-declare const ChannelRef: ChannelRef<Id, ParamsSchema, Events>;
+export interface ChannelRef<
+  Id extends string = string,
+  ParamsSchema extends StandardSchemaV1 = StandardSchemaV1,
+  Events extends Readonly<Record<string, StandardSchemaV1>> = Readonly<
+    Record<string, StandardSchemaV1>
+  >,
+> extends DescriptorRef<"channel", Id> {
+  readonly params: ParamsSchema;
+  readonly events: Events;
+  readonly presence?: unknown;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L31)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L95)
 
 ### ChannelRefAny
 
+Broad channel reference for heterogeneous collections.
+
+**Example**
+
+```ts
+const ref: ChannelRefAny = channel;
+```
+
 **Signature**
 
 ```ts
-declare const ChannelRefAny: ChannelRefAny;
+type ChannelRefAny = ChannelRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L115)
 
 ### DatabaseClientFor
 
@@ -1643,33 +1894,59 @@ declare const DatabaseClientFor: Readonly<Record<string, unknown>>;
 
 ### DatabaseClients
 
+Named database contexts projected from dependencies.
+
+**Example**
+
+```ts
+const databases: DatabaseClients<typeof dependencies.databases> = context.databases;
+```
+
 **Signature**
 
 ```ts
-declare const DatabaseClients: DatabaseClients<M>;
+type DatabaseClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: DatabaseClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L34)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L174)
 
 ### DatabaseRef
 
+Stable reference to a database service whose context the handler receives.
+
+**Example**
+
+```ts
+const ref: DatabaseRef = database;
+```
+
 **Signature**
 
 ```ts
-declare const DatabaseRef: DatabaseRef<Id>;
+type DatabaseRef<Id extends string = string> = DescriptorRef<"service", Id>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L35)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L110)
 
 ### DatabaseRefAny
 
+Broad database reference for heterogeneous collections.
+
+**Example**
+
+```ts
+const ref: DatabaseRefAny = database;
+```
+
 **Signature**
 
 ```ts
-declare const DatabaseRefAny: DatabaseRefAny;
+type DatabaseRefAny = DatabaseRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L36)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L119)
 
 ### DefineFunctionOptions
 
@@ -1690,123 +1967,276 @@ declare const DefineFunctionOptions: DefineFunctionOptions<
 
 ### DescriptorRef
 
+Stable reference carried by a descriptor.
+
+**Example**
+
+```ts
+const ref: DescriptorRef<"function"> = { ref: { kind: "function", id: "orders.get" } };
+```
+
 **Signature**
 
 ```ts
-declare const DescriptorRef: DescriptorRef<Kind, Id>;
+export interface DescriptorRef<Kind extends DescriptorKind, Id extends string = string> {
+  readonly ref: Ref<Kind, Id>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L8)
 
 ### EventAttributeValue
 
+Scalar value accepted in event attributes.
+
+**Example**
+
+```ts
+const value: EventAttributeValue = true;
+```
+
 **Signature**
 
 ```ts
-declare const EventAttributeValue: EventAttributeValue;
+type EventAttributeValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L6)
 
 ### EventClientFor
 
+Typed publish client for an event descriptor.
+
+**Example**
+
+```ts
+const client: EventClientFor<typeof event> = events.created;
+```
+
 **Signature**
 
 ```ts
-declare const EventClientFor: EventClientFor<T>;
+type EventClientFor<T> = {
+  /** Publishes an event.
+   * @param payload - Event payload.
+   * @param options - Optional key and attributes.
+   * @returns Accepted event envelope.
+   * @example await events.created.publish(payload);
+   */
+  publish(
+    payload: EventInputOf<T>,
+    options?: EventPublishOptions,
+  ): Promise<EventPublishResult<EventIdOf<T>, EventVersionOf<T>, EventOutputOf<T>>>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L39)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L92)
 
 ### EventClients
 
+Named event clients projected from published events.
+
+**Example**
+
+```ts
+const events: EventClients<typeof published> = context.events;
+```
+
 **Signature**
 
 ```ts
-declare const EventClients: EventClients<M>;
+type EventClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: EventClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L128)
 
 ### EventPublishOptions
 
+Metadata supplied with an event publication.
+
+**Example**
+
+```ts
+await events.publish(payload, { key: "order-1" });
+```
+
 **Signature**
 
 ```ts
-declare const EventPublishOptions: EventPublishOptions;
+export interface EventPublishOptions {
+  readonly key?: string;
+  readonly attributes?: Readonly<Record<string, EventAttributeValue>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L27)
 
 ### EventPublishResult
 
+Accepted event envelope returned by publication.
+
+**Example**
+
+```ts
+const published: EventPublishResult = await events.publish(payload);
+```
+
 **Signature**
 
 ```ts
-declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
+export interface EventPublishResult<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> extends EventEnvelope<Id, Version, Payload> {
+  readonly accepted: true;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L35)
 
 ### EventRef
 
+Schema and version view of a declared event.
+
+**Example**
+
+```ts
+const ref: EventRef = event;
+```
+
 **Signature**
 
 ```ts
-declare const EventRef: EventRef<Id, InputSchema>;
+export interface EventRef<
+  Id extends string = string,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends DescriptorRef<"event", Id> {
+  readonly version: number;
+  readonly input: InputSchema;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L34)
 
 ### EventRefAny
 
+Broad event reference for heterogeneous collections.
+
+**Example**
+
+```ts
+const ref: EventRefAny = event;
+```
+
 **Signature**
 
 ```ts
-declare const EventRefAny: EventRefAny;
+type EventRefAny = EventRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L78)
 
 ### FunctionClientFor
 
+Typed callable client for a function declared under `dependencies.functions`.
+
+**Example**
+
+```ts
+const price: FunctionClientFor<typeof priceOrder> = context.functions.priceOrder;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionClientFor: FunctionClientFor<T>;
+type FunctionClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L155)
 
 ### FunctionClients
 
+Named function clients projected from dependencies.
+
+**Example**
+
+```ts
+const functions: FunctionClients<typeof dependencies.functions> = context.functions;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionClients: FunctionClients<M>;
+type FunctionClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: FunctionClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L159)
 
 ### FunctionContext
 
+Handler context with declared resources and optional progress.
+
+**Example**
+
+```ts
+const run = async (_input: unknown, context: FunctionContext) => context.time.now();
+```
+
 **Signature**
 
 ```ts
-declare const FunctionContext: FunctionContext<D, Progress>;
+type FunctionContext<
+  D extends FunctionDependencies = {},
+  Progress = never,
+> = FunctionContextBase<D> &
+  ([Progress] extends [never]
+    ? {}
+    : { readonly progress: import("../invocation/index.js").ProgressEmitter<Progress> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L149)
 
 ### FunctionDependencies
 
+Everything a function may call, declared once; handlers reach each through `ctx.<kind>.<name>`.
+
+**Example**
+
+```ts
+const dependencies: FunctionDependencies = { functions: { priceOrder }, buckets: { uploads } };
+```
+
 **Signature**
 
 ```ts
-declare const FunctionDependencies: FunctionDependencies;
+export interface FunctionDependencies {
+  /** Functions the handler calls: `await context.functions.<name>(input)`. */
+  readonly functions?: Readonly<Record<string, FunctionRefAny>>;
+  /** Events the handler publishes: `await context.events.<name>.publish(payload)`. */
+  readonly events?: Readonly<Record<string, EventRefAny>>;
+  /** Realtime channels the handler triggers: `context.channels.<name>.trigger(...)`. */
+  readonly channels?: Readonly<Record<string, ChannelRefAny>>;
+  /** Database services besides the default one; `context.databases.<name>` holds the models. */
+  readonly databases?: Readonly<Record<string, DatabaseRefAny>>;
+  /** Tasks the handler starts: `context.tasks.<name>.trigger(input)` returns a run handle. */
+  readonly tasks?: Readonly<Record<string, TaskRefAny>>;
+  /** Jobs the handler starts: `context.jobs.<name>.trigger(input)` returns a run handle. */
+  readonly jobs?: Readonly<Record<string, JobRefAny>>;
+  /** Buckets the handler reads and writes, such as `context.buckets.<name>.put(key, bytes)`. */
+  readonly buckets?: Readonly<Record<string, BucketRefAny>>;
+  /** Caches the handler reads and writes, such as `context.cache.<name>.get(key)`. */
+  readonly cache?: Readonly<Record<string, CacheRefAny>>;
+  /** Agents the handler runs: `await context.agents.<name>(input)`. */
+  readonly agents?: Readonly<Record<string, AgentRefAny>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L34)
 
 ### FunctionDescriptor
 
@@ -1830,63 +2260,135 @@ declare const FunctionDescriptor: FunctionDescriptor<
 
 ### FunctionRef
 
+Schema and identity view of a callable function.
+
+**Example**
+
+```ts
+const ref: FunctionRef = descriptor;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionRef: FunctionRef<Id, Input, Output, Errors, InputSchema, OutputSchema>;
+export interface FunctionRef<
+  Id extends string = string,
+  Input = unknown,
+  Output = unknown,
+  Errors extends readonly ErrorDescriptorAny[] = readonly ErrorDescriptorAny[],
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+  OutputSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends DescriptorRef<"function", Id> {
+  readonly invocationMode?: "callable";
+  readonly input: InputSchema;
+  readonly output: OutputSchema;
+  readonly errors?: Errors;
+  readonly __input?: Input;
+  readonly __output?: Output;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L15)
 
 ### FunctionRefAny
 
+Broad function reference for heterogeneous collections.
+
+**Example**
+
+```ts
+const ref: FunctionRefAny = descriptor;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionRefAny: FunctionRefAny;
+type FunctionRefAny = FunctionRef;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L52)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-ref.types.ts#L74)
 
 ### InvocationMetadata
 
+Trace and identity metadata for one invocation.
+
+**Example**
+
+```ts
+const metadata: InvocationMetadata = context.invocation;
+```
+
 **Signature**
 
 ```ts
-declare const InvocationMetadata: InvocationMetadata;
+type InvocationMetadata = SharedInvocationMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L62)
 
 ### InvocationSource
 
+Source category of a function invocation.
+
+**Example**
+
+```ts
+const source: InvocationSource = "tool";
+```
+
 **Signature**
 
 ```ts
-declare const InvocationSource: InvocationSource;
+type InvocationSource = SharedInvocationSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L58)
 
 ### JobClientFor
 
+Typed trigger client for a job descriptor.
+
+**Example**
+
+```ts
+const client: JobClientFor<typeof job> = jobs.sendReceipt;
+```
+
 **Signature**
 
 ```ts
-declare const JobClientFor: JobClientFor<T>;
+type JobClientFor<T> = {
+  /** Triggers a run of the job's task.
+   * @param input - Task input.
+   * @param options - Optional scheduling and idempotency controls.
+   * @returns Handle for the new run.
+   * @example await jobs.sendReceipt.trigger(input);
+   */
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L55)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L57)
 
 ### JobClients
 
+Named job clients projected from dependencies.
+
+**Example**
+
+```ts
+const jobs: JobClients<typeof dependencies.jobs> = context.jobs;
+```
+
 **Signature**
 
 ```ts
-declare const JobClients: JobClients<M>;
+type JobClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: JobClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L56)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L116)
 
 ### JobRef
 
@@ -1910,23 +2412,39 @@ declare const JobRefAny: JobRefAny;
 
 ### PublicClock
 
+Clock exposed to application handlers.
+
+**Example**
+
+```ts
+const clock: PublicClock = context.time;
+```
+
 **Signature**
 
 ```ts
-declare const PublicClock: PublicClock;
+type PublicClock = SharedPublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L62)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L77)
 
 ### PublicLogger
 
+Logger exposed to application handlers.
+
+**Example**
+
+```ts
+const logger: PublicLogger = context.log;
+```
+
 **Signature**
 
 ```ts
-declare const PublicLogger: PublicLogger;
+type PublicLogger = SharedPublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L73)
 
 ### ResolvedApplicationEnv
 
@@ -1940,33 +2458,74 @@ declare const ResolvedApplicationEnv: Readonly<Record<string, unknown>>;
 
 ### TaskClientFor
 
+Typed trigger client for a task descriptor.
+
+**Example**
+
+```ts
+const client: TaskClientFor<typeof task> = tasks.send;
+```
+
 **Signature**
 
 ```ts
-declare const TaskClientFor: TaskClientFor<T>;
+type TaskClientFor<T> = {
+  /** Triggers a task run.
+   * @param input - Task input.
+   * @param options - Optional scheduling and idempotency controls.
+   * @returns Handle for the new run.
+   * @example await tasks.send.trigger(input);
+   */
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L59)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L80)
 
 ### TaskClients
 
+Named task clients projected from dependencies.
+
+**Example**
+
+```ts
+const tasks: TaskClients<typeof dependencies.tasks> = context.tasks;
+```
+
 **Signature**
 
 ```ts
-declare const TaskClients: TaskClients<M>;
+type TaskClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: TaskClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L122)
 
 ### TaskTriggerOptions
 
+Scheduling and idempotency options for a task.
+
+**Example**
+
+```ts
+await tasks.send.trigger(input, { operationId: "send-1" });
+```
+
 **Signature**
 
 ```ts
-declare const TaskTriggerOptions: TaskTriggerOptions;
+export interface TaskTriggerOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly delay?: string;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L61)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L69)
 
 ### defineFunctionEffect
 
@@ -1984,13 +2543,14 @@ Effect.runSync(defineFunctionEffect({ input, output, handler }));
 declare const defineFunctionEffect: DefineFunctionEffect;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.ts#L95)
 
 ## `define-function.types.ts`
 
 ### DefineFunction (interface)
 
-Overloaded public function constructor preserving schema inference.
+Public function constructor preserving schema inference. It is one signature, not an
+overload per form, so a mistake in the options is reported once and where it is.
 
 **Example**
 
@@ -2002,37 +2562,7 @@ const greet = defineFunction({ input, output, handler });
 
 ```ts
 export interface DefineFunction {
-  /** Defines a function without declared dependencies.
-   * @param options - Schemas, handler, and function metadata.
-   * @returns A callable descriptor with inferred input and output types.
-   * @example const greet = defineFunction({ input, output, handler });
-   */
-  <
-    const Id extends string,
-    const InputSchema extends StandardSchemaV1,
-    const OutputSchema extends StandardSchemaV1,
-    const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
-      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
-  >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
-      Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
-        readonly dependencies?: never;
-      },
-  ): FunctionDescriptor<
-    Id,
-    InferOutput<InputSchema>,
-    InferOutput<OutputSchema>,
-    {},
-    ErrorListOf<Options>,
-    InputSchema,
-    OutputSchema,
-    ToolMetadataOf<Options>,
-    ProgressSchema
-  >;
-
-  /** Defines a function with declared dependencies.
+  /** Defines a function; `dependencies` is optional and types the handler's context.
    * @param options - Schemas, handler, dependency map, and function metadata.
    * @returns A callable descriptor whose context includes the declared dependencies.
    * @example const lookup = defineFunction({ input, output, dependencies, handler });
@@ -2041,7 +2571,7 @@ export interface DefineFunction {
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
-    const Dependencies extends FunctionDependencies,
+    const Dependencies extends FunctionDependencies = {},
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Options extends FunctionCallOptions<
       Id,
@@ -2053,7 +2583,11 @@ export interface DefineFunction {
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> &
+      FunctionUnknownOptions<
+        NoInfer<Options>,
+        keyof FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>
+      >,
   ): FunctionDescriptor<
     Id,
     InferOutput<InputSchema>,
@@ -2068,7 +2602,7 @@ export interface DefineFunction {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L27)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L29)
 
 ### DefineFunctionEffect (interface)
 
@@ -2082,35 +2616,7 @@ export interface DefineFunctionEffect {
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
-    const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
-      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
-  >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
-      Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
-        readonly dependencies?: never;
-      },
-  ): Effect.Effect<
-    FunctionDescriptor<
-      Id,
-      InferOutput<InputSchema>,
-      InferOutput<OutputSchema>,
-      {},
-      ErrorListOf<Options>,
-      InputSchema,
-      OutputSchema,
-      ToolMetadataOf<Options>,
-      ProgressSchema
-    >,
-    FunctionOperationError
-  >;
-
-  <
-    const Id extends string,
-    const InputSchema extends StandardSchemaV1,
-    const OutputSchema extends StandardSchemaV1,
-    const Dependencies extends FunctionDependencies,
+    const Dependencies extends FunctionDependencies = {},
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Options extends FunctionCallOptions<
       Id,
@@ -2122,7 +2628,11 @@ export interface DefineFunctionEffect {
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> &
+      FunctionUnknownOptions<
+        NoInfer<Options>,
+        keyof FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>
+      >,
   ): Effect.Effect<
     FunctionDescriptor<
       Id,
@@ -2140,7 +2650,7 @@ export interface DefineFunctionEffect {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L94)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/define-function.types.ts#L70)
 
 ### FunctionImplementationOptions (type alias)
 
@@ -2360,7 +2870,7 @@ type Registry = ApplicationContextRegistry;
 type ApplicationContextRegistry = Relkit.ApplicationContextRegistry;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L87)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L96)
 
 ### AuthContext (interface)
 
@@ -2384,7 +2894,7 @@ export interface AuthContext<Session = unknown> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L99)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L108)
 
 ### FunctionContext (type alias)
 
@@ -2408,7 +2918,7 @@ type FunctionContext<
     : { readonly progress: import("../invocation/index.js").ProgressEmitter<Progress> });
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L140)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L149)
 
 ### FunctionContextBase (interface)
 
@@ -2446,7 +2956,7 @@ export interface FunctionContextBase<D extends FunctionDependencies = {}> {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L115)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L124)
 
 ### FunctionDependencies (interface)
 
@@ -2462,14 +2972,23 @@ const dependencies: FunctionDependencies = { functions: { priceOrder }, buckets:
 
 ```ts
 export interface FunctionDependencies {
+  /** Functions the handler calls: `await context.functions.<name>(input)`. */
   readonly functions?: Readonly<Record<string, FunctionRefAny>>;
+  /** Events the handler publishes: `await context.events.<name>.publish(payload)`. */
   readonly events?: Readonly<Record<string, EventRefAny>>;
+  /** Realtime channels the handler triggers: `context.channels.<name>.trigger(...)`. */
   readonly channels?: Readonly<Record<string, ChannelRefAny>>;
+  /** Database services besides the default one; `context.databases.<name>` holds the models. */
   readonly databases?: Readonly<Record<string, DatabaseRefAny>>;
+  /** Tasks the handler starts: `context.tasks.<name>.trigger(input)` returns a run handle. */
   readonly tasks?: Readonly<Record<string, TaskRefAny>>;
+  /** Jobs the handler starts: `context.jobs.<name>.trigger(input)` returns a run handle. */
   readonly jobs?: Readonly<Record<string, JobRefAny>>;
+  /** Buckets the handler reads and writes, such as `context.buckets.<name>.put(key, bytes)`. */
   readonly buckets?: Readonly<Record<string, BucketRefAny>>;
+  /** Caches the handler reads and writes, such as `context.cache.<name>.get(key)`. */
   readonly cache?: Readonly<Record<string, CacheRefAny>>;
+  /** Agents the handler runs: `await context.agents.<name>(input)`. */
   readonly agents?: Readonly<Record<string, AgentRefAny>>;
 }
 ```
@@ -2492,7 +3011,7 @@ type Allowed = FunctionDependencyOptions<FunctionDependencies>;
 type FunctionDependencyOptions<D extends FunctionDependencies> = D;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L110)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L119)
 
 ### InvocationMetadata (type alias)
 
@@ -2510,7 +3029,7 @@ const metadata: InvocationMetadata = context.invocation;
 type InvocationMetadata = SharedInvocationMetadata;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L53)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L62)
 
 ### InvocationSource (type alias)
 
@@ -2528,7 +3047,7 @@ const source: InvocationSource = "tool";
 type InvocationSource = SharedInvocationSource;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L58)
 
 ### PublicClock (type alias)
 
@@ -2546,7 +3065,7 @@ const clock: PublicClock = context.time;
 type PublicClock = SharedPublicClock;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L77)
 
 ### PublicLogger (type alias)
 
@@ -2564,7 +3083,7 @@ const logger: PublicLogger = context.log;
 type PublicLogger = SharedPublicLogger;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L73)
 
 ### PublicTrace (type alias)
 
@@ -2582,7 +3101,7 @@ const trace: PublicTrace = context.trace;
 type PublicTrace = SharedPublicTrace;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L72)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L81)
 
 ### ResolvedApplicationEnv (type alias)
 
@@ -2602,7 +3121,7 @@ type ResolvedApplicationEnv = keyof Relkit.ApplicationEnv extends never
   : Readonly<Relkit.ApplicationEnv>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L57)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-context.types.ts#L66)
 
 ## `function-dependency-copy.ts`
 
@@ -2676,13 +3195,37 @@ declare const rejectPublishes: (publishes: unknown) => void;
 
 ### FunctionDescriptorFactoryOptions
 
+Inputs for a function descriptor shared by authoring packages.
+
+**Example**
+
+```ts
+createFunctionDescriptor({ id: "orders.get", input, output, invocationMode: "callable", handler });
+```
+
 **Signature**
 
 ```ts
-declare const FunctionDescriptorFactoryOptions: FunctionDescriptorFactoryOptions;
+export interface FunctionDescriptorFactoryOptions extends DescriptorMetadata {
+  readonly id: string;
+  readonly input: StandardSchemaV1;
+  readonly output: StandardSchemaV1;
+  readonly progress?: StandardSchemaV1;
+  readonly invocationMode: "callable" | "event-only";
+  readonly handler: (...args: any[]) => unknown;
+  readonly errors?: readonly ErrorDescriptorAny[];
+  readonly dependencies?: FunctionDependencies;
+  readonly access?: AccessRule<never, unknown>;
+  readonly timeoutMs?: number;
+  readonly concurrency?: number;
+  readonly tool?: FunctionToolMetadata;
+  readonly onBefore?: (...args: any[]) => unknown;
+  readonly onAfter?: (...args: any[]) => unknown;
+  readonly descriptorFields?: Readonly<Record<string, unknown>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor-factory.types.ts#L10)
 
 ### createFunctionDescriptor
 
@@ -2870,19 +3413,31 @@ export interface DefineFunctionOptions<
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > extends DescriptorMetadata {
+  /** Stable ID, such as `orders.get-order`; the compiler derives it when omitted. */
   readonly id?: Id;
+  /** Schema of the input; the handler receives the validated value. */
   readonly input: InputSchema;
+  /** Schema of the result; the handler's return value is validated against it. */
   readonly output: OutputSchema;
+  /** Declared errors the handler may return, which callers are expected to handle. */
   readonly errors?: Errors;
+  /** Everything the handler calls, by kind; each entry becomes a client on `context`. */
   readonly dependencies?: Dependencies;
   /** Who may call the function: roles, permissions or a predicate, checked for every caller. */
   readonly access?: AccessRule<InferOutput<InputSchema>>;
+  /** Schema of progress values; setting it adds `context.progress.emit(value)` to the handler. */
   readonly progress?: ProgressSchema;
+  /** Time limit of one call in milliseconds; past it the call fails with `RELKIT_TIMEOUT`. */
   readonly timeoutMs?: number;
+  /** Most invocations that run at once in one process; further ones wait in order. */
   readonly concurrency?: number;
+  /** Tool description and policy that `.asTool()` uses when called without options. */
   readonly tool?: FunctionToolMetadata;
+  /** Runs before the handler and may replace the validated input. */
   readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, ProgressSchema>;
+  /** Runs after the handler succeeds and may replace the output before it is validated. */
   readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, ProgressSchema>;
+  /** The function's logic: receives the validated input and `context`, returns the output. */
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,
@@ -2978,17 +3533,32 @@ type FunctionHandler<
 ) => MaybePromise<FunctionHandlerResult<Output, Errors>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L119)
 
 ### FunctionLifecycleHook
+
+Hook called before or after a function invocation.
+
+**Example**
+
+```ts
+const hook: FunctionLifecycleHook<Input, {}, []> = (value) => value;
+```
 
 **Signature**
 
 ```ts
-declare const FunctionLifecycleHook: FunctionLifecycleHook<Value, Dependencies, ProgressSchema>;
+type FunctionLifecycleHook<
+  Value,
+  Dependencies extends FunctionDependencies = {},
+  ProgressSchema extends StandardSchemaV1 | undefined = undefined,
+> = (
+  value: Value,
+  context: FunctionContext<Dependencies, ProgressValue<ProgressSchema>>,
+) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-descriptor.types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-lifecycle.types.ts#L17)
 
 ## `function-graph-node.ts`
 
@@ -3031,23 +3601,45 @@ declare const FunctionGraphNodeDescriptor: FunctionGraphNodeDescriptor<
 
 ### FunctionGraphNodeInvokeEffect
 
+Effect form of a graph node's invoke adapter. It stays off `FunctionGraphNodeDescriptor` so the
+descriptor type carries no Effect types; `callGraphNodeEffect` in `relkit/effect` calls it.
+
+**Example**
+
+```ts
+const run: FunctionGraphNodeInvokeEffect = (input) => callGraphNodeEffect(node, input);
+```
+
 **Signature**
 
 ```ts
-declare const FunctionGraphNodeInvokeEffect: FunctionGraphNodeInvokeEffect<Output, InputSchema>;
+type FunctionGraphNodeInvokeEffect<
+  Output = unknown,
+  InputSchema extends StandardSchemaV1 = StandardSchemaV1,
+> = (input: InferInput<InputSchema>) => Effect.Effect<Output, FunctionOperationError>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L51)
 
 ### FunctionGraphNodeOptions
 
+Optional graph node identity override.
+
+**Example**
+
+```ts
+const options: FunctionGraphNodeOptions = { id: "lookup" };
+```
+
 **Signature**
 
 ```ts
-declare const FunctionGraphNodeOptions: FunctionGraphNodeOptions<Id>;
+export interface FunctionGraphNodeOptions<Id extends string = string> {
+  readonly id?: Id;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.ts#L33)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-graph-node.types.ts#L12)
 
 ### RELKIT_FUNCTION_GRAPH_NODE
 
@@ -3416,13 +4008,59 @@ type ProgressValue<Schema extends StandardSchemaV1 | undefined> = Schema extends
 
 ### FunctionOperation
 
+Fixed operation name used as a bounded telemetry label.
+
+**Example**
+
+```ts
+const operation: FunctionOperation = "tool.invoke";
+```
+
 **Signature**
 
 ```ts
-declare const FunctionOperation: FunctionOperation;
+type FunctionOperation =
+  | "error.define"
+  | "error.create"
+  | "error.is-descriptor"
+  | "error.validate-http"
+  | "error.assert-schema"
+  | "error.is-record"
+  | "function.define"
+  | "function.invoke"
+  | "function.invoke-target"
+  | "function.as-tool"
+  | "function.as-graph-node"
+  | "function.create-descriptor"
+  | "function.graph-node"
+  | "function.graph-node-invoke"
+  | "function.is-graph-node"
+  | "function.fail"
+  | "function.copy-dependencies"
+  | "function.copy-publishes"
+  | "function.validate-limit"
+  | "function.assert-hook"
+  | "function.assert-schema"
+  | "function.target-for-receiver"
+  | "stream.create"
+  | "stream.validate"
+  | "stream.is-output"
+  | "tool.create"
+  | "tool.copy-metadata"
+  | "tool.invoke"
+  | "tool.invoker-create"
+  | "tool.is-target"
+  | "tool.is-error-descriptor"
+  | "tool.is-record"
+  | "tool.has-own"
+  | "tool.validate-side-effect"
+  | "tool.validate-approval"
+  | "tool.required-text"
+  | "tool.positive-integer"
+  | "tool.copy-hooks";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.types.ts#L6)
 
 ### FunctionOperationError (class)
 
@@ -3483,13 +4121,32 @@ declare const FunctionTelemetryLive: Layer.Layer<FunctionTelemetry, never, never
 
 ### FunctionTelemetryService
 
+Substitutable observer for function authoring operations.
+
+**Example**
+
+```ts
+const observer: FunctionTelemetryService = { observe: (_operation, effect) => effect };
+```
+
 **Signature**
 
 ```ts
-declare const FunctionTelemetryService: FunctionTelemetryService;
+export interface FunctionTelemetryService {
+  /** Measures one operation while preserving the original Effect channels.
+   * @param operation - Fixed operation name.
+   * @param effect - Work to measure.
+   * @returns Effect with the same success, error, and requirement channels.
+   * @example observer.observe("tool.invoke", Effect.succeed(1));
+   */
+  readonly observe: <A, E, R>(
+    operation: FunctionOperation,
+    effect: Effect.Effect<A, E, R>,
+  ) => Effect.Effect<A, E, R>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-observability.types.ts#L49)
 
 ### functionAttempt
 
@@ -5697,33 +6354,54 @@ declare const ApplicationNotRunningError: typeof ApplicationNotRunningError;
 
 ### CreateRelkitOptions
 
+Options for `createRelkit`.
+
 **Signature**
 
 ```ts
-declare const CreateRelkitOptions: CreateRelkitOptions;
+export interface CreateRelkitOptions {
+  /** Project root that holds `.relkit/build`; defaults to the current directory. */
+  readonly root?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/create-relkit.ts#L10)
 
 ### FunctionToolApproval
 
+Approval policy applied before tool dispatch.
+
+**Example**
+
+```ts
+const policy: FunctionToolApproval = "on-write";
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolApproval: FunctionToolApproval;
+type FunctionToolApproval = "never" | "on-write" | "always";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L22)
 
 ### FunctionToolApprovalDecision
 
+Decision returned by an approval resolver.
+
+**Example**
+
+```ts
+const decision: FunctionToolApprovalDecision = "approved";
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolApprovalDecision: FunctionToolApprovalDecision;
+type FunctionToolApprovalDecision = "approved" | "denied" | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L73)
 
 ### FunctionToolApprovalDeniedError
 
@@ -5747,13 +6425,29 @@ declare const FunctionToolApprovalDeniedFailure: typeof FunctionToolApprovalDeni
 
 ### FunctionToolApprovalRequest
 
+Request shown to an approval resolver.
+
+**Example**
+
+```ts
+const request: FunctionToolApprovalRequest = {
+  toolId: "orders.lookup",
+  sideEffect: "read",
+  policy: "always",
+};
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolApprovalRequest: FunctionToolApprovalRequest;
+export interface FunctionToolApprovalRequest {
+  readonly toolId: string;
+  readonly sideEffect: FunctionToolSideEffect;
+  readonly policy: FunctionToolApproval;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L65)
 
 ### FunctionToolApprovalRequiredError
 
@@ -5777,13 +6471,24 @@ declare const FunctionToolApprovalRequiredFailure: typeof FunctionToolApprovalRe
 
 ### FunctionToolApprovalResolver
 
+Callback that decides whether a tool may execute.
+
+**Example**
+
+```ts
+const approve: FunctionToolApprovalResolver = async () => "approved";
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolApprovalResolver: FunctionToolApprovalResolver;
+type FunctionToolApprovalResolver = (
+  approval: FunctionToolApprovalRequest,
+  signal?: AbortSignal,
+) => MaybePromise<FunctionToolApprovalDecision>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L80)
 
 ### FunctionToolArgumentFailure
 
@@ -5817,63 +6522,162 @@ declare const FunctionToolCancelledFailure: typeof FunctionToolCancelledFailure;
 
 ### FunctionToolContext
 
+Restricted invocation context passed to tool hooks.
+
+**Example**
+
+```ts
+const time = context.time;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolContext: FunctionToolContext;
+type FunctionToolContext = Pick<FunctionContext, "invocation" | "signal" | "env" | "log" | "time">;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L36)
 
 ### FunctionToolDescriptor
 
+Frozen tool descriptor with a Promise invoke adapter.
+
+**Example**
+
+```ts
+const tool: FunctionToolDescriptor<"lookup", typeof fn> = createFunctionTool(options);
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolDescriptor: FunctionToolDescriptor<Id, Target>;
+export interface FunctionToolDescriptor<
+  Id extends string,
+  Target extends FunctionRefAny = FunctionRefAny,
+> extends DescriptorBase<"tool", Id> {
+  readonly ref: { readonly kind: "tool"; readonly id: Id };
+  readonly target: FunctionToolTarget<Target>;
+  readonly description: string;
+  readonly sideEffect: FunctionToolSideEffect;
+  readonly approval: FunctionToolApproval;
+  readonly timeoutMs?: number;
+  readonly mcp: boolean;
+  readonly onBefore?: FunctionToolHook<InferInput<Target["input"]>>;
+  readonly onAfter?: FunctionToolHook<InferOutput<Target["output"]>>;
+  /** Invokes the target through the common tool and function runtime.
+   * @param input - Tool argument value.
+   * @param options - Optional cancellation and approval controls.
+   * @returns Validated output, rejecting with a tool error on failure.
+   * @example await tool.invoke({ id: "one" });
+   */
+  readonly invoke: (
+    input: InferInput<Target["input"]>,
+    options?: FunctionToolInvokeOptions,
+  ) => Promise<InferOutput<Target["output"]>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L105)
 
 ### FunctionToolHook
 
+Optional input or output transform for a tool.
+
+**Example**
+
+```ts
+const hook: FunctionToolHook<string> = (value) => value.trim();
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolHook: FunctionToolHook<Value>;
+type FunctionToolHook<Value = unknown> = (
+  value: Value,
+  context: FunctionToolContext,
+) => MaybePromise<Value>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L46)
 
 ### FunctionToolInvokeEffect
 
+Effect form of a tool's invoke adapter. It stays off `FunctionToolDescriptor` so the descriptor
+type carries no Effect types; `callToolEffect` in `relkit/effect` calls it.
+
+**Example**
+
+```ts
+const run: FunctionToolInvokeEffect<typeof fn> = (input) => callToolEffect(tool, input);
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolInvokeEffect: FunctionToolInvokeEffect<Target>;
+type FunctionToolInvokeEffect<Target extends FunctionRefAny = FunctionRefAny> = (
+  input: InferInput<Target["input"]>,
+  options?: FunctionToolInvokeOptions,
+) => Effect.Effect<
+  InferOutput<Target["output"]>,
+  | FunctionOperationError
+  | FunctionToolArgumentFailure
+  | FunctionToolCancelledFailure
+  | FunctionToolApprovalRequiredFailure
+  | FunctionToolApprovalDeniedFailure,
+  SchemaValidator
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L133)
 
 ### FunctionToolInvokeOptions
 
+Per-call signal and approval resolver.
+
+**Example**
+
+```ts
+await tool.invoke(input, { signal: controller.signal });
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolInvokeOptions: FunctionToolInvokeOptions;
+export interface FunctionToolInvokeOptions {
+  readonly signal?: AbortSignal;
+  readonly approval?: FunctionToolApprovalResolver;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L87)
 
 ### FunctionToolMetadata
 
+Display and policy metadata for a tool.
+
+**Example**
+
+```ts
+const metadata: FunctionToolMetadata = {
+  description: "Lookup",
+  sideEffect: "read",
+  approval: "never",
+};
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolMetadata: FunctionToolMetadata;
+export interface FunctionToolMetadata extends DescriptorMetadata {
+  readonly description: string;
+  readonly sideEffect: FunctionToolSideEffect;
+  readonly approval: FunctionToolApproval;
+  readonly timeoutMs?: number;
+  readonly mcp?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L26)
 
 ### FunctionToolOperationCancelledError
 
@@ -5887,43 +6691,101 @@ declare const FunctionToolOperationCancelledError: typeof FunctionToolOperationC
 
 ### FunctionToolOptions
 
+Options used when creating a tool view.
+
+**Example**
+
+```ts
+const options: FunctionToolOptions = {
+  description: "Lookup",
+  sideEffect: "read",
+  approval: "never",
+};
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolOptions: FunctionToolOptions<Id, Input, Output>;
+export interface FunctionToolOptions<
+  Id extends string = string,
+  Input = unknown,
+  Output = unknown,
+> extends FunctionToolMetadata {
+  readonly id?: Id;
+  readonly onBefore?: FunctionToolHook<Input>;
+  readonly onAfter?: FunctionToolHook<Output>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L53)
 
 ### FunctionToolSideEffect
 
+Bounded side effect category for a tool.
+
+**Example**
+
+```ts
+const effect: FunctionToolSideEffect = "read";
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolSideEffect: FunctionToolSideEffect;
+type FunctionToolSideEffect = "none" | "read" | "write" | "external";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L18)
 
 ### FunctionToolTarget
 
+Function contract copied into a tool view.
+
+**Example**
+
+```ts
+const target: FunctionToolTarget<typeof fn> = tool.target;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionToolTarget: FunctionToolTarget<Target>;
+type FunctionToolTarget<Target extends FunctionRefAny> = FunctionRef<
+  Target["ref"]["id"],
+  Target extends { readonly __input?: infer Input } ? Input : unknown,
+  Target extends { readonly __output?: infer Output } ? Output : unknown,
+  TargetErrors<Target>,
+  Target["input"],
+  Target["output"]
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/function-tool.types.ts#L94)
 
 ### StandaloneRelkitHandle
 
+A runtime handle that owns its providers until `close()` releases them.
+
+**Example**
+
+```ts
+const relkit = await createRelkit(config);
+await relkit.close();
+```
+
 **Signature**
 
 ```ts
-declare const StandaloneRelkitHandle: StandaloneRelkitHandle;
+type StandaloneRelkitHandle = RelkitHandle & {
+  /** Releases the providers the handle started; calling it again does nothing.
+   * @returns Completion after every provider is released.
+   * @example await relkit.close();
+   */
+  readonly close: () => Promise<void>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/index.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/create-relkit.ts#L18)
 
 ### callGraphNodeEffect
 
@@ -6281,13 +7143,32 @@ export interface RuntimeHandleOptions {
 
 ### StreamOutputSchema
 
+Standard Schema contract for an asynchronous sequence of validated items.
+
+**Example**
+
+```ts
+const output: StreamOutputSchema = streamOf(z.string());
+```
+
 **Signature**
 
 ```ts
-declare const StreamOutputSchema: StreamOutputSchema<ItemSchema>;
+export interface StreamOutputSchema<
+  ItemSchema extends StandardSchemaV1 = StandardSchemaV1,
+> extends StandardSchemaV1<
+  AsyncIterable<InferInput<ItemSchema>>,
+  AsyncIterable<InferOutput<ItemSchema>>
+> {
+  readonly kind: "stream";
+  readonly item: ItemSchema;
+  readonly relkit: {
+    readonly jsonSchema: () => { readonly kind: "stream"; readonly item: object };
+  };
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/stream.types.ts#L6)
 
 ### isStreamOutputSchema
 
@@ -6466,23 +7347,41 @@ export * from "./function-ref.types.js";
 
 ### AgentClientFor
 
+Typed callable client for an agent descriptor.
+
+**Example**
+
+```ts
+const invoke: AgentClientFor<typeof agent> = async (input) => output;
+```
+
 **Signature**
 
 ```ts
-declare const AgentClientFor: AgentClientFor<T>;
+type AgentClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L53)
 
 ### AgentClients
 
+Named agent clients projected from dependencies.
+
+**Example**
+
+```ts
+const agents: AgentClients<typeof dependencies.agents> = context.agents;
+```
+
 **Signature**
 
 ```ts
-declare const AgentClients: AgentClients<M>;
+type AgentClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: AgentClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L146)
 
 ### BucketClient
 
@@ -6506,13 +7405,23 @@ declare const BucketClientFor: BucketClient;
 
 ### BucketClients
 
+Named bucket clients projected from dependencies.
+
+**Example**
+
+```ts
+const buckets: BucketClients<typeof dependencies.buckets> = context.buckets;
+```
+
 **Signature**
 
 ```ts
-declare const BucketClients: BucketClients<M>;
+type BucketClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: BucketClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L134)
 
 ### BucketObjectMetadata
 
@@ -6536,23 +7445,41 @@ declare const CacheClient: CacheClient<Key, Value>;
 
 ### CacheClientFor
 
+Key and value typed cache client.
+
+**Example**
+
+```ts
+const client: CacheClientFor<typeof cache> = caches.sessions;
+```
+
 **Signature**
 
 ```ts
-declare const CacheClientFor: CacheClientFor<T>;
+type CacheClientFor<T> = CacheClient<KeyOf<T>, ValueOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L111)
 
 ### CacheClients
 
+Named cache clients projected from dependencies.
+
+**Example**
+
+```ts
+const cache: CacheClients<typeof dependencies.cache> = context.cache;
+```
+
 **Signature**
 
 ```ts
-declare const CacheClients: CacheClients<M>;
+type CacheClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: CacheClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L140)
 
 ### CacheOperationOptions
 
@@ -6576,103 +7503,219 @@ declare const DatabaseClientFor: Readonly<Record<string, unknown>>;
 
 ### DatabaseClients
 
+Named database contexts projected from dependencies.
+
+**Example**
+
+```ts
+const databases: DatabaseClients<typeof dependencies.databases> = context.databases;
+```
+
 **Signature**
 
 ```ts
-declare const DatabaseClients: DatabaseClients<M>;
+type DatabaseClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: DatabaseClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L174)
 
 ### EventAttributeValue
 
+Scalar value accepted in event attributes.
+
+**Example**
+
+```ts
+const value: EventAttributeValue = true;
+```
+
 **Signature**
 
 ```ts
-declare const EventAttributeValue: EventAttributeValue;
+type EventAttributeValue = string | number | boolean;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L6)
 
 ### EventClientFor
 
+Typed publish client for an event descriptor.
+
+**Example**
+
+```ts
+const client: EventClientFor<typeof event> = events.created;
+```
+
 **Signature**
 
 ```ts
-declare const EventClientFor: EventClientFor<T>;
+type EventClientFor<T> = {
+  /** Publishes an event.
+   * @param payload - Event payload.
+   * @param options - Optional key and attributes.
+   * @returns Accepted event envelope.
+   * @example await events.created.publish(payload);
+   */
+  publish(
+    payload: EventInputOf<T>,
+    options?: EventPublishOptions,
+  ): Promise<EventPublishResult<EventIdOf<T>, EventVersionOf<T>, EventOutputOf<T>>>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L92)
 
 ### EventClients
 
+Named event clients projected from published events.
+
+**Example**
+
+```ts
+const events: EventClients<typeof published> = context.events;
+```
+
 **Signature**
 
 ```ts
-declare const EventClients: EventClients<M>;
+type EventClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: EventClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L128)
 
 ### EventPublishOptions
 
+Metadata supplied with an event publication.
+
+**Example**
+
+```ts
+await events.publish(payload, { key: "order-1" });
+```
+
 **Signature**
 
 ```ts
-declare const EventPublishOptions: EventPublishOptions;
+export interface EventPublishOptions {
+  readonly key?: string;
+  readonly attributes?: Readonly<Record<string, EventAttributeValue>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L27)
 
 ### EventPublishResult
 
+Accepted event envelope returned by publication.
+
+**Example**
+
+```ts
+const published: EventPublishResult = await events.publish(payload);
+```
+
 **Signature**
 
 ```ts
-declare const EventPublishResult: EventPublishResult<Id, Version, Payload>;
+export interface EventPublishResult<
+  Id extends string = string,
+  Version extends number = number,
+  Payload = unknown,
+> extends EventEnvelope<Id, Version, Payload> {
+  readonly accepted: true;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/clients.types.ts#L35)
 
 ### FunctionClientFor
 
+Typed callable client for a function declared under `dependencies.functions`.
+
+**Example**
+
+```ts
+const price: FunctionClientFor<typeof priceOrder> = context.functions.priceOrder;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionClientFor: FunctionClientFor<T>;
+type FunctionClientFor<T> = (input: InputOf<T>) => Promise<OutputOf<T>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L155)
 
 ### FunctionClients
 
+Named function clients projected from dependencies.
+
+**Example**
+
+```ts
+const functions: FunctionClients<typeof dependencies.functions> = context.functions;
+```
+
 **Signature**
 
 ```ts
-declare const FunctionClients: FunctionClients<M>;
+type FunctionClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: FunctionClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L159)
 
 ### JobClientFor
 
+Typed trigger client for a job descriptor.
+
+**Example**
+
+```ts
+const client: JobClientFor<typeof job> = jobs.sendReceipt;
+```
+
 **Signature**
 
 ```ts
-declare const JobClientFor: JobClientFor<T>;
+type JobClientFor<T> = {
+  /** Triggers a run of the job's task.
+   * @param input - Task input.
+   * @param options - Optional scheduling and idempotency controls.
+   * @returns Handle for the new run.
+   * @example await jobs.sendReceipt.trigger(input);
+   */
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L57)
 
 ### JobClients
 
+Named job clients projected from dependencies.
+
+**Example**
+
+```ts
+const jobs: JobClients<typeof dependencies.jobs> = context.jobs;
+```
+
 **Signature**
 
 ```ts
-declare const JobClients: JobClients<M>;
+type JobClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: JobClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L116)
 
 ### JobRef
 
@@ -6696,23 +7739,49 @@ declare const JobRefAny: JobRefAny;
 
 ### TaskClientFor
 
+Typed trigger client for a task descriptor.
+
+**Example**
+
+```ts
+const client: TaskClientFor<typeof task> = tasks.send;
+```
+
 **Signature**
 
 ```ts
-declare const TaskClientFor: TaskClientFor<T>;
+type TaskClientFor<T> = {
+  /** Triggers a task run.
+   * @param input - Task input.
+   * @param options - Optional scheduling and idempotency controls.
+   * @returns Handle for the new run.
+   * @example await tasks.send.trigger(input);
+   */
+  trigger(input: InputOf<T>, options?: TaskTriggerOptions): Promise<RunHandle>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L80)
 
 ### TaskClients
 
+Named task clients projected from dependencies.
+
+**Example**
+
+```ts
+const tasks: TaskClients<typeof dependencies.tasks> = context.tasks;
+```
+
 **Signature**
 
 ```ts
-declare const TaskClients: TaskClients<M>;
+type TaskClients<M> = {
+  readonly [Name in keyof NonNullable<M> & string]: TaskClientFor<NonNullable<M>[Name]>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L122)
 
 ### TaskRef
 
@@ -6736,13 +7805,28 @@ declare const TaskRefAny: TaskRefAny;
 
 ### TaskTriggerOptions
 
+Scheduling and idempotency options for a task.
+
+**Example**
+
+```ts
+await tasks.send.trigger(input, { operationId: "send-1" });
+```
+
 **Signature**
 
 ```ts
-declare const TaskTriggerOptions: TaskTriggerOptions;
+export interface TaskTriggerOptions {
+  readonly operationId?: string;
+  readonly idempotencyKey?: string;
+  readonly delay?: string;
+  readonly at?: string;
+  readonly tags?: readonly string[];
+  readonly correlationId?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/types.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/functions/client-maps.types.ts#L69)
 
 ## `error-retry.types.ts`
 

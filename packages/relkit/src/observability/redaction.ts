@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { JsonValue } from "../contracts/index.js";
+import { redactNamedFields as redactFields } from "./redaction-core.js";
 import type {
   NormalizedRedactionPolicy,
   RedactedCapture,
@@ -71,4 +72,17 @@ export function captureRedacted(
   policy: RedactionPolicy,
 ): RedactedCapture | undefined {
   return run(captureRedactedEffect(value, policy));
+}
+/**
+ * Replaces the named fields of a value with the redaction marker, before the value is recorded.
+ * A name matches a key anywhere in the value; a dotted path such as `customer.email` matches from
+ * the value's root. An event's `sensitiveFields` are applied to its payload with this function.
+ * @param value - The value about to be recorded; it is not changed.
+ * @param fields - Field names or dotted paths.
+ * @returns A JSON copy with the marker in place of each named field, or the value when no field is named.
+ * @example
+ * const safe = redactNamedFields({ cardNumber: "4111" }, ["cardNumber"]); // { cardNumber: "[REDACTED]" }
+ */
+export function redactNamedFields(value: unknown, fields: readonly string[]): unknown {
+  return redactFields(value, fields);
 }

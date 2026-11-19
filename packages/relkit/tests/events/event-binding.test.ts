@@ -20,6 +20,19 @@ const consumer = () =>
   });
 
 describe("event contract binding", () => {
+  test("a bound function carries the sensitive fields of its event for the engine", () => {
+    const sensitive = defineEvent({
+      id: "orders.created",
+      input: z.object({ orderId: z.string(), cardNumber: z.string() }),
+      sensitiveFields: ["cardNumber"],
+    });
+    const bound = bindFunctionEvents(consumer(), sensitive) as { sensitiveInputFields?: unknown };
+    expect(bound.sensitiveInputFields).toEqual(["cardNumber"]);
+    // It is not an authored field of the descriptor, so it is not enumerable.
+    expect(Object.keys(bound)).not.toContain("sensitiveInputFields");
+    expect(bindFunctionEvents(consumer(), event)).not.toHaveProperty("sensitiveInputFields");
+  });
+
   test("binds the consumed contract without losing identity", () => {
     const bound = bindFunctionEvents(consumer(), event);
     expect(bound.input).toBe(event.input);

@@ -105,12 +105,13 @@ test("service excerpt exposes its members through real service routes", async ()
     searchOrders,
     createOrder,
   });
-  const { GET, POST } = await evaluateSnippet("service-routes", {
+  const {
+    default: { GET, POST },
+  } = await evaluateSnippet("service-routes", {
     defineServiceRoutes,
     orders,
   });
   expect(GET.target).toBe(searchOrders);
-  expect(GET.client.operation).toBe("query");
   expect(POST.target).toBe(createOrder);
   expect(POST.successStatus).toBe(201);
 });

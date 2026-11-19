@@ -191,3 +191,34 @@ test("canonical Effect submission uses the injected digest through native accept
   expect(receipt.runId).toBe("run-layer");
   expect(inputHash).toBe(`sha256:${"0".repeat(64)}`);
 });
+
+test("the deprecated logging option of a task is not sent to the backend", async () => {
+  let nativeRequest: Parameters<JobsAdapterRuntime["submit"]>[0] | undefined;
+  const adapter = fixture(async (request) => {
+    nativeRequest = request;
+    return {
+      accepted: true,
+      runId: "run-1",
+      jobId: request.jobId,
+      taskId: request.taskId,
+      taskVersion: request.taskVersion,
+      acceptedAt: "2026-01-01T00:00:00.000Z",
+    };
+  });
+  const logged = defineTask({
+    id: "orders.logged",
+    version: "1",
+    input: z.string(),
+    output: z.string(),
+    maxDuration: "30 seconds",
+    logging: { level: "info", redact: ["input.token"] },
+    handler: async (input) => input,
+  });
+  // The descriptor keeps what the task declares; the graph and the Inspector read it there.
+  expect(logged.logging).toEqual({ level: "info", redact: ["input.token"] });
+  const job = defineJob({ name: "loggedOrders", task: logged });
+  const runtime = createJobsRuntime({ adapter, jobs: [job] });
+  await Effect.runPromise(submitJobEffect(job, "hello", { operationId: "op-1" }, runtime));
+  expect(nativeRequest?.policy).toMatchObject({ maxDuration: "30 seconds" });
+  expect(nativeRequest?.policy).not.toHaveProperty("logging");
+});

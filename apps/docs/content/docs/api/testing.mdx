@@ -595,13 +595,20 @@ Loads fresh generated modules with their original native import ancestry and gua
 
 ### TestApplicationArtifacts
 
+Compiled graph, registry and native integration evidence acquired by an application.
+
 **Signature**
 
 ```ts
-declare const TestApplicationArtifacts: TestApplicationArtifacts;
+export interface TestApplicationArtifacts {
+  readonly graph: FunctionRegistryOptions["graph"];
+  readonly publicFingerprint: string;
+  readonly registry: FunctionRegistry;
+  readonly runtimeIntegrationModules: readonly LoadedRuntimeIntegrationModule[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-registry.ts#L3)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-registry.types.ts#L8)
 
 ### loadTestApplicationArtifacts
 
@@ -653,42 +660,76 @@ declare const createApplicationRequest: (
   applicationRuntime: TestRuntime,
   services: TestApplicationServices,
   context: Record<string, unknown>,
+  overrides?: Readonly<Record<string, unknown>>,
 ) => TestHttpApplication;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-request.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-request.ts#L21)
 
 ## `application-routes.ts`
 
 ### TestFunctionRoute
 
+Native function-backed HTTP route and its declared exposure/validation contract.
+
 **Signature**
 
 ```ts
-declare const TestFunctionRoute: TestFunctionRoute;
+type TestFunctionRoute = {
+  readonly method: string;
+  readonly path: string;
+  readonly request: unknown;
+  readonly target: Parameters<TestRuntime["invoke"]>[0] & {
+    readonly input: StandardSchemaV1;
+    readonly output: StandardSchemaV1;
+    readonly errors?: readonly {
+      readonly id: string;
+      readonly data: StandardSchemaV1;
+      readonly http?: { readonly status: number };
+    }[];
+  };
+  readonly responses: readonly {
+    readonly kind?: string;
+    readonly id?: string;
+    readonly status?: number;
+    readonly errorId?: string;
+  }[];
+  /** The route's `response` option, applied to successful responses. */
+  readonly response?: (output: never) => unknown;
+  readonly auth?: "required";
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L5)
 
 ### TestRawRoute
 
+Raw native HTTP route preserving its original handler and method contract.
+
 **Signature**
 
 ```ts
-declare const TestRawRoute: TestRawRoute;
+type TestRawRoute = {
+  readonly method: "ALL";
+  readonly path: string;
+  readonly handler: (request: Request) => Response | Promise<Response>;
+  readonly auth?: { readonly kind: "better-auth" };
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L30)
 
 ### TestRoute
 
+Supported native function or raw HTTP route declaration.
+
 **Signature**
 
 ```ts
-declare const TestRoute: TestRoute;
+type TestRoute = TestFunctionRoute | TestRawRoute;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-routes.types.ts#L38)
 
 ### loadTestRoutes
 
@@ -853,7 +894,8 @@ declare const acquireApplicationAuth: (
             name: string;
             image?: string | null | undefined;
           };
-        }
+        },
+        BetterAuthAccess<string, string>
       >
     | undefined,
   database: DrizzleActivation<DrizzleServiceDescriptor<any, any, any, any>> | undefined,
@@ -920,23 +962,40 @@ Owns scoped database/auth activation for a test application in either service la
 
 ### ApplicationServicesPlatform
 
+Native dependencies substituted by test Layers without replacing ownership.
+
 **Signature**
 
 ```ts
-declare const ApplicationServicesPlatform: ApplicationServicesPlatform;
+export interface ApplicationServicesPlatform {
+  readonly load: (
+    root: string,
+  ) => Effect.Effect<readonly DescriptorAny[], Error | SourceLocationError>;
+  readonly database: typeof activateDrizzleService;
+  readonly auth: typeof activateBetterAuthService;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-native-services.types.ts#L13)
 
 ### TestApplicationServices
 
+Acquired owner-specific authorities; auth borrows the sole database.
+
 **Signature**
 
 ```ts
-declare const TestApplicationServices: TestApplicationServices;
+export interface TestApplicationServices {
+  readonly context: NonNullable<TestRuntimeOptions["context"]>;
+  readonly auth?: HttpAuthRuntime;
+  readonly authHandler?: (request: Request) => Promise<Response>;
+  /** Where the auth handler is mounted: its route's base path, or the service's own. */
+  readonly authBasePath?: string;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application-services.types.ts#L10)
 
 ### TestServices (class)
 
@@ -1063,13 +1122,22 @@ General test application ownership with explicitly selected capability helpers.
 
 ### TestApplication
 
+Owned compiled test application, direct HTTP facade and complete release boundary.
+
 **Signature**
 
 ```ts
-declare const TestApplication: TestApplication;
+export interface TestApplication {
+  readonly runtime: TestRuntime;
+  readonly http: TestHttpClient;
+  readonly clock: TestClock;
+  readonly fakes: TestFakes;
+  readonly observability: TestObservability;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L26)
 
 ### TestApplicationHarness
 
@@ -1083,13 +1151,24 @@ declare const TestApplicationHarness: typeof TestApplicationHarness;
 
 ### TestApplicationOptions
 
+Explicit test application project, environment and native platform inputs.
+
 **Signature**
 
 ```ts
-declare const TestApplicationOptions: TestApplicationOptions;
+type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
+  /** Directory of the application to load. Defaults to the current working directory. */
+  readonly projectRoot?: string;
+  /** Values for the names that provider bindings reference, such as `CACHE_URL`. */
+  readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** `"fake"` gives each bucket and cache profile without a replacement a test fake. */
+  readonly resourceProviders?: "configured" | "fake";
+  /** Starts the application's services for the test, such as its database and auth. */
+  readonly services?: TestServiceActivator;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L14)
 
 ### TestApplicationPlatform
 
@@ -1144,7 +1223,7 @@ export interface ApplicationHarness {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L44)
 
 ### ApplicationPlatform (interface)
 
@@ -1161,7 +1240,7 @@ export interface ApplicationPlatform {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L36)
 
 ### TestApplication (interface)
 
@@ -1180,7 +1259,7 @@ export interface TestApplication {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L26)
 
 ### TestApplicationOptions (type alias)
 
@@ -1190,9 +1269,13 @@ Explicit test application project, environment and native platform inputs.
 
 ```ts
 type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
+  /** Directory of the application to load. Defaults to the current working directory. */
   readonly projectRoot?: string;
+  /** Values for the names that provider bindings reference, such as `CACHE_URL`. */
   readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** `"fake"` gives each bucket and cache profile without a replacement a test fake. */
   readonly resourceProviders?: "configured" | "fake";
+  /** Starts the application's services for the test, such as its database and auth. */
   readonly services?: TestServiceActivator;
 };
 ```
@@ -1205,23 +1288,43 @@ Explicit database-backed authentication test application facade.
 
 ### TestApplication
 
+Owned compiled test application, direct HTTP facade and complete release boundary.
+
 **Signature**
 
 ```ts
-declare const TestApplication: TestApplication;
+export interface TestApplication {
+  readonly runtime: TestRuntime;
+  readonly http: TestHttpClient;
+  readonly clock: TestClock;
+  readonly fakes: TestFakes;
+  readonly observability: TestObservability;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/better-auth.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L26)
 
 ### TestApplicationOptions
 
+Explicit test application project, environment and native platform inputs.
+
 **Signature**
 
 ```ts
-declare const TestApplicationOptions: TestApplicationOptions;
+type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
+  /** Directory of the application to load. Defaults to the current working directory. */
+  readonly projectRoot?: string;
+  /** Values for the names that provider bindings reference, such as `CACHE_URL`. */
+  readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** `"fake"` gives each bucket and cache profile without a replacement a test fake. */
+  readonly resourceProviders?: "configured" | "fake";
+  /** Starts the application's services for the test, such as its database and auth. */
+  readonly services?: TestServiceActivator;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/better-auth.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L14)
 
 ### createTestApplication
 
@@ -1611,33 +1714,64 @@ export * from "./buckets.types.js";
 
 ### TestBucketFake
 
+Owned native bucket client with deterministic transfer and inspection controls.
+
 **Signature**
 
 ```ts
-declare const TestBucketFake: TestBucketFake;
+export interface TestBucketFake extends BucketClient {
+  readonly capabilities: { readonly signedReadUrl: false; readonly signedWriteUrl: false };
+  readonly provider: BucketProvider;
+  readonly client: BucketClient;
+  readonly stateRoot: string;
+  readonly seed: (key: string, bytes: Uint8Array, options?: BucketPutOptions) => Promise<void>;
+  readonly read: (key: string) => Promise<Uint8Array | undefined>;
+  readonly inspect: () => readonly TestBucketObject[];
+  readonly snapshot: () => import("./bucket-storage.types.js").BucketStorageSnapshot;
+  readonly restore: (snapshot: unknown) => void;
+  readonly clear: () => void;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L29)
 
 ### TestBucketFakeOptions
 
+Bucket write policy and explicit clock, root and failure dependencies.
+
 **Signature**
 
 ```ts
-declare const TestBucketFakeOptions: TestBucketFakeOptions;
+export interface TestBucketFakeOptions {
+  readonly bucketId?: string;
+  readonly ownerId?: string;
+  readonly stateRoot?: string;
+  readonly clock?: () => number;
+  readonly failures?: TestFailureControls;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly maxObjectBytes?: number;
+  readonly allowedContentTypes?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L10)
 
 ### TestBucketObject
 
+Detached native bucket bytes and metadata selected by a stable key.
+
 **Signature**
 
 ```ts
-declare const TestBucketObject: TestBucketObject;
+export interface TestBucketObject {
+  readonly key: string;
+  readonly bytes: Uint8Array;
+  readonly metadata: BucketObjectMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L22)
 
 ### createTestBucket
 
@@ -2078,33 +2212,76 @@ export * from "./cache.types.js";
 
 ### TestCacheFake
 
+Authoritative writable native cache facade with detached transfer and release controls.
+
 **Signature**
 
 ```ts
-declare const TestCacheFake: TestCacheFake<Key, Value>;
+type TestCacheFake<Key, Value> = CacheClient<Key, Value> & {
+  readonly provider: CacheProvider;
+  readonly client: CacheClient<Key, Value>;
+  readonly capabilities: { readonly increment: true };
+  readonly stateRoot: string;
+  readonly seed: (key: Key, value: Value, options?: CacheOperationOptions) => Promise<void>;
+  readonly read: (key: Key) => Promise<Value | undefined>;
+  readonly increment: (
+    key: Key,
+    delta?: number,
+    options?: CacheOperationOptions,
+  ) => Promise<number>;
+  readonly inspect: () => TestCacheSnapshot;
+  readonly snapshot: () => import("./cache-storage.types.js").CacheStorageSnapshot;
+  readonly restore: (snapshot: unknown) => void;
+  readonly clear: () => void;
+  readonly close: () => Promise<void>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L40)
 
 ### TestCacheFakeOptions
 
+Native key/value schemas, TTL policy and explicit fake-owner dependencies.
+
 **Signature**
 
 ```ts
-declare const TestCacheFakeOptions: TestCacheFakeOptions<KeySchema, ValueSchema>;
+export interface TestCacheFakeOptions<
+  KeySchema extends StandardSchemaV1 = StandardSchemaV1,
+  ValueSchema extends StandardSchemaV1 = StandardSchemaV1,
+> {
+  readonly cacheId?: string;
+  readonly ownerId?: string;
+  readonly stateRoot?: string;
+  readonly clock?: () => number;
+  readonly failures?: TestFailureControls;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly keySchema?: KeySchema;
+  readonly valueSchema?: ValueSchema;
+  readonly defaultTtlMs?: number;
+  readonly maxTtlMs?: number;
+  readonly schemaVersion?: string | number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L10)
 
 ### TestCacheSnapshot
 
+Native cache occupancy and identity evidence without memoization eviction.
+
 **Signature**
 
 ```ts
-declare const TestCacheSnapshot: TestCacheSnapshot;
+export interface TestCacheSnapshot {
+  readonly cacheId: string;
+  readonly schemaVersion: string | number;
+  readonly entries: number;
+  readonly inFlight: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L28)
 
 ### createTestCache
 
@@ -2578,23 +2755,43 @@ Selected database application harness; database ownership remains scoped to each
 
 ### TestApplication
 
+Owned compiled test application, direct HTTP facade and complete release boundary.
+
 **Signature**
 
 ```ts
-declare const TestApplication: TestApplication;
+export interface TestApplication {
+  readonly runtime: TestRuntime;
+  readonly http: TestHttpClient;
+  readonly clock: TestClock;
+  readonly fakes: TestFakes;
+  readonly observability: TestObservability;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/drizzle.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L26)
 
 ### TestApplicationOptions
 
+Explicit test application project, environment and native platform inputs.
+
 **Signature**
 
 ```ts
-declare const TestApplicationOptions: TestApplicationOptions;
+type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
+  /** Directory of the application to load. Defaults to the current working directory. */
+  readonly projectRoot?: string;
+  /** Values for the names that provider bindings reference, such as `CACHE_URL`. */
+  readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** `"fake"` gives each bucket and cache profile without a replacement a test fake. */
+  readonly resourceProviders?: "configured" | "fake";
+  /** Starts the application's services for the test, such as its database and auth. */
+  readonly services?: TestServiceActivator;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/drizzle.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L14)
 
 ### createTestApplication
 
@@ -2876,23 +3073,56 @@ declare const eventLifecycle: (
 
 ### TestEventControlState
 
+Native authorities and Effect workflows owned by one event service Layer.
+
 **Signature**
 
 ```ts
-declare const TestEventControlState: TestEventControlState;
+export interface TestEventControlState {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly router: () => EventRouter;
+  readonly log: () => { readonly close: () => Promise<void> };
+  readonly open: Effect.Effect<void, unknown>;
+  readonly release: Effect.Effect<void, unknown>;
+  readonly work: WorkOwnershipState;
+  readonly openFanout: (envelope: UnknownEventEnvelope) => Effect.Effect<void, unknown>;
+  readonly owner: TestStateRoot;
+  readonly failures: TestFailureControls;
+  readonly triggers: readonly {
+    readonly id: string;
+    readonly eventId: string;
+    readonly eventVersion: number;
+  }[];
+  readonly envelopes: readonly UnknownEventEnvelope[];
+  readonly unfanned: Map<string, UnknownEventEnvelope>;
+  readonly remember: (result: EventDeliveryResult, envelope: UnknownEventEnvelope) => void;
+  readonly publish: (
+    ...args: Parameters<EventProvider["publish"]>
+  ) => Effect.Effect<Awaited<ReturnType<EventProvider["publish"]>>, unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.types.ts#L10)
 
 ### TestEventControls
 
+Native Promise facade preserving publication, inspection and delivery signatures.
+
 **Signature**
 
 ```ts
-declare const TestEventControls: TestEventControls;
+export interface TestEventControls {
+  readonly publishNative: EventProvider["publish"];
+  readonly pending: (triggerId?: string) => number;
+  readonly runNext: (triggerId?: string) => Promise<EventDeliveryResult | undefined>;
+  readonly drain: () => Promise<readonly EventDeliveryResult[]>;
+  readonly completed: (triggerId?: string) => number;
+  readonly restart: () => Promise<void>;
+  readonly close: (options?: TestEventCloseOptions) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-controls.types.ts#L34)
 
 ### TestEventExecution (class)
 
@@ -2991,13 +3221,28 @@ export interface TestEventControls {
 
 ### OpenTestEventRuntimeOptions
 
+Native log/router acquisition inputs and deterministic generation identity.
+
 **Signature**
 
 ```ts
-declare const OpenTestEventRuntimeOptions: OpenTestEventRuntimeOptions;
+export interface OpenTestEventRuntimeOptions {
+  readonly profile: string;
+  readonly plan: Parameters<typeof materializeEvents>[0]["plan"];
+  readonly owner: TestStateRoot;
+  readonly options: TestEventOptions<unknown, unknown>;
+  readonly now: () => number;
+  readonly random: () => number;
+  readonly failures: TestFailureControls;
+  readonly runner: InvocationRunner;
+  readonly idSource: Parameters<typeof createEventInvoker>[4];
+  readonly targets: ReadonlyMap<string, InvocationTarget<unknown, unknown>>;
+  readonly generation: number;
+  readonly ownerSignal?: () => AbortSignal;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-open.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime-open.types.ts#L10)
 
 ### openTestEventRuntime
 
@@ -3120,13 +3365,28 @@ declare const toEnvelope: (value: Record<string, unknown>) => UnknownEventEnvelo
 
 ### TestEventRuntimeOptions
 
+Dependencies required to acquire one event log/router generation.
+
 **Signature**
 
 ```ts
-declare const TestEventRuntimeOptions: TestEventRuntimeOptions<Payload, Output>;
+export interface TestEventRuntimeOptions<Payload, Output> {
+  readonly eventId: string;
+  readonly version: number;
+  readonly profile: string;
+  readonly triggers: readonly TestTrigger<Output>[];
+  readonly plan: Parameters<typeof materializeEvents>[0]["plan"];
+  readonly owner: TestStateRoot;
+  readonly deterministic: ReturnType<typeof createDeterministicClock>;
+  readonly failures: TestFailureControls;
+  readonly random: () => number;
+  readonly runner: InvocationRunner;
+  readonly idSource: InvocationIdSource;
+  readonly options: TestEventOptions<Payload, Output>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events-runtime.types.ts#L48)
 
 ### createTestEventRuntime
 
@@ -3428,13 +3688,18 @@ export interface TestEventTriggerOptions<Output = unknown> {
 
 ### TestFakeRoot
 
+Owned native storage subdirectory and idempotent temporary-parent cleanup.
+
 **Signature**
 
 ```ts
-declare const TestFakeRoot: TestFakeRoot;
+export interface TestFakeRoot {
+  readonly stateRoot: string;
+  readonly cleanup: (failed: boolean) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fake-utils.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fake-utils.types.ts#L2)
 
 ### assertFailurePoint
 
@@ -3560,13 +3825,20 @@ export interface TestFakeRoot {
 
 ### TestFailureControls
 
+Owner-local native failure injection with explicit one-shot and persistent boundaries.
+
 **Signature**
 
 ```ts
-declare const TestFailureControls: TestFailureControls;
+export interface TestFailureControls {
+  readonly failAt: (point: string, cause?: unknown) => void;
+  readonly once?: (point: string, cause?: unknown) => void;
+  readonly clear: (point?: string) => void;
+  readonly check: (point: string) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.types.ts#L7)
 
 ### TestFakeProviders (class)
 
@@ -3582,23 +3854,49 @@ declare class TestFakeProviders
 
 ### TestFakes
 
+Owned native dependency sources and authoritative writable storage fixtures.
+
 **Signature**
 
 ```ts
-declare const TestFakes: TestFakes;
+export interface TestFakes {
+  readonly stateRoot: string;
+  readonly clients: DependencyClientSources;
+  readonly buckets: Readonly<Record<string, TestBucketFake>>;
+  readonly cache: Readonly<Record<string, TestCacheFake<unknown, unknown>>>;
+  readonly providers: TestProviderReplacements;
+  readonly createBucket: (
+    id: string,
+    options?: Omit<TestBucketFakeOptions, "bucketId" | "stateRoot" | "failures" | "clock">,
+  ) => TestBucketFake;
+  readonly createCache: (
+    id: string,
+    options?: Omit<TestCacheFakeOptions, "cacheId" | "stateRoot" | "failures" | "clock">,
+  ) => TestCacheFake<unknown, unknown>;
+  readonly setClient: (category: DependencyCategory, name: string, client: unknown) => void;
+  readonly removeClient: (category: DependencyCategory, name: string) => void;
+  readonly failures: TestFailureControls;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.types.ts#L22)
 
 ### TestFakesOptions
 
+Explicit clock, logger and provider replacement policy for one fake owner.
+
 **Signature**
 
 ```ts
-declare const TestFakesOptions: TestFakesOptions;
+export interface TestFakesOptions {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly clock?: () => number;
+  readonly providers?: TestProviderReplacements;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.types.ts#L15)
 
 ### createTestFakes
 
@@ -3696,33 +3994,51 @@ export interface TestFakesOptions {
 
 ### RealListenerPurpose
 
+Native behavior requiring a real Bun listener in compatibility acceptance.
+
 **Signature**
 
 ```ts
-declare const RealListenerPurpose: RealListenerPurpose;
+type RealListenerPurpose = "disconnect" | "stream" | "proxy";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L4)
 
 ### TestHttpListener
 
+Owned real Bun server handle and native request/release boundary.
+
 **Signature**
 
 ```ts
-declare const TestHttpListener: TestHttpListener;
+export interface TestHttpListener {
+  readonly purpose: RealListenerPurpose;
+  readonly url: URL;
+  readonly server: Bun.Server<undefined>;
+  readonly request: TestHttpRequest;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L16)
 
 ### TestHttpListenerOptions
 
+Explicit native socket identity, timeout and disconnect test policy.
+
 **Signature**
 
 ```ts
-declare const TestHttpListenerOptions: TestHttpListenerOptions;
+export interface TestHttpListenerOptions {
+  readonly purpose?: RealListenerPurpose;
+  readonly hostname?: string;
+  readonly port?: number;
+  readonly idleTimeout?: number;
+  readonly closeTimeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L7)
 
 ### createBunHttpListener
 
@@ -3924,123 +4240,201 @@ declare const toRequestInit: (init: TestHttpRequestInit | undefined) => RequestI
 
 ### RealListenerPurpose
 
+Native behavior requiring a real Bun listener in compatibility acceptance.
+
 **Signature**
 
 ```ts
-declare const RealListenerPurpose: RealListenerPurpose;
+type RealListenerPurpose = "disconnect" | "stream" | "proxy";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L106)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L4)
 
 ### TestHttpApplication
 
+The app request/fetch methods satisfy this boundary without leaking framework types.
+
 **Signature**
 
 ```ts
-declare const TestHttpApplication: TestHttpApplication;
+export interface TestHttpApplication {
+  readonly request?: (input: TestHttpInput, init?: RequestInit) => Response | Promise<Response>;
+  readonly fetch?: (request: Request) => Response | Promise<Response>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L22)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L42)
 
 ### TestHttpClient
 
+Owned HTTP test facade exposing direct requests and optional real listeners.
+
 **Signature**
 
 ```ts
-declare const TestHttpClient: TestHttpClient;
+export interface TestHttpClient {
+  readonly request: TestHttpRequest;
+  readonly get: TestHttpRequest;
+  readonly post: TestHttpRequest;
+  readonly put: TestHttpRequest;
+  readonly patch: TestHttpRequest;
+  readonly delete: TestHttpRequest;
+  readonly listen: (options?: TestHttpListenerOptions) => Promise<TestHttpListener>;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L58)
 
 ### TestHttpClientOptions
 
+Explicit test origin, listener close policy and ownership callbacks.
+
 **Signature**
 
 ```ts
-declare const TestHttpClientOptions: TestHttpClientOptions;
+export interface TestHttpClientOptions {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly baseUrl?: string | URL;
+  /** Registers client shutdown with the owning test runtime/application. */
+  readonly registerClose?: (close: () => Promise<void>) => void;
+  readonly onClose?: () => MaybePromise<void>;
+  readonly closeTimeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L23)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L48)
 
 ### TestHttpInput
 
+Native Request, URL or relative path accepted by direct HTTP fixtures.
+
 **Signature**
 
 ```ts
-declare const TestHttpInput: TestHttpInput;
+type TestHttpInput = Request | string | URL;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L17)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L6)
 
 ### TestHttpListener
 
+Owned real Bun server handle and native request/release boundary.
+
 **Signature**
 
 ```ts
-declare const TestHttpListener: TestHttpListener;
+export interface TestHttpListener {
+  readonly purpose: RealListenerPurpose;
+  readonly url: URL;
+  readonly server: Bun.Server<undefined>;
+  readonly request: TestHttpRequest;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L107)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L16)
 
 ### TestHttpListenerOptions
 
+Explicit native socket identity, timeout and disconnect test policy.
+
 **Signature**
 
 ```ts
-declare const TestHttpListenerOptions: TestHttpListenerOptions;
+export interface TestHttpListenerOptions {
+  readonly purpose?: RealListenerPurpose;
+  readonly hostname?: string;
+  readonly port?: number;
+  readonly idleTimeout?: number;
+  readonly closeTimeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L108)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L7)
 
 ### TestHttpRequest
 
+Native in-memory request operation that types the request and response JSON.
+
 **Signature**
 
 ```ts
-declare const TestHttpRequest: TestHttpRequest;
+type TestHttpRequest = <Body = unknown, Json = unknown>(
+  input: TestHttpInput,
+  init?: TestHttpRequestInit<Json>,
+) => Promise<TestHttpResponse<Body>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L36)
 
 ### TestHttpRequestInit
 
+`RequestInit` with a `json` shorthand for the request body.
+
 **Signature**
 
 ```ts
-declare const TestHttpRequestInit: TestHttpRequestInit<Json>;
+export interface TestHttpRequestInit<Json = unknown> extends RequestInit {
+  /** Serialized as the body, with `content-type: application/json` unless a header already sets one. */
+  readonly json?: Json;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L19)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L26)
 
 ### TestHttpResponse
 
+Native `Response` whose JSON body has the type the test declares.
+
+**Example**
+
+```ts
+const response = await app.http.get<{ message: string }>("/hello");
+const { message } = await response.json();
+```
+
 **Signature**
 
 ```ts
-declare const TestHttpResponse: TestHttpResponse<Body>;
+export interface TestHttpResponse<Body = unknown> extends Response {
+  readonly json: () => Promise<Body>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L15)
 
 ### TestObservability
 
+Native engine event capture with ordered protocol/version assertions.
+
 **Signature**
 
 ```ts
-declare const TestObservability: TestObservability;
+export interface TestObservability {
+  readonly hooks: InspectableObservabilityHooks;
+  readonly read: () => readonly ObservabilityHookEvent[];
+  readonly types: () => readonly ObservabilityHookEvent["type"][];
+  readonly assertTypes: (
+    expected: readonly ObservabilityHookEvent["type"][],
+  ) => readonly ObservabilityHookEvent[];
+  readonly clear: () => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L25)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L70)
 
 ### TestProblemResponse
 
+Problem Details response that RelKit routes return for validation and declared errors.
+
 **Signature**
 
 ```ts
-declare const TestProblemResponse: TestProblemResponse;
+type TestProblemResponse = TestHttpResponse<ProblemDetails>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.ts#L21)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L20)
 
 ### assertObservabilityHookTypes
 
@@ -4384,43 +4778,73 @@ Exposes generic application test owners and fakes; native helpers have feature e
 
 ### FunctionContextOf
 
+Context inferred from the native handler, preserving required cancellation.
+
 **Signature**
 
 ```ts
-declare const FunctionContextOf: FunctionContextOf<Target>;
+type FunctionContextOf<Target> =
+  Target extends Record<"handler", (input: infer _Input, context: infer Context) => unknown>
+    ? Context extends { readonly signal: AbortSignal }
+      ? Context
+      : InvocationContext
+    : InvocationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L4)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L45)
 
 ### FunctionInput
 
+Input inferred from the target's native schema authority.
+
 **Signature**
 
 ```ts
-declare const FunctionInput: FunctionInput<Target>;
+type FunctionInput<Target extends { readonly input: StandardSchemaV1 }> = InferInput<
+  Target["input"]
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L5)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L29)
 
 ### FunctionOutput
 
+Output inferred from the target's native schema authority.
+
 **Signature**
 
 ```ts
-declare const FunctionOutput: FunctionOutput<Target>;
+type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }> = InferOutput<
+  Target["output"]
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L6)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L37)
 
 ### InvokeFunctionOptions
 
+Direct invocation dependencies and native hooks without process environment reads.
+
 **Signature**
 
 ```ts
-declare const InvokeFunctionOptions: InvokeFunctionOptions<Context>;
+export interface InvokeFunctionOptions<Context extends { readonly signal: AbortSignal }> {
+  readonly registry?: FunctionRegistry;
+  readonly env?: Readonly<Record<string, unknown>>;
+  readonly clients?: DependencyClientSources;
+  readonly signal?: AbortSignal;
+  readonly now?: () => number;
+  readonly idSource?: InvocationIdSource;
+  readonly context?: InvocationHooks<Context>["context"];
+  readonly hooks?: InvocationHooks<Context>;
+  /** The caller that access rules see. Without it, the caller is read from the context's
+   * `auth.getSession()` session, which has no session (an anonymous caller) unless the
+   * context supplies one, and which carries no permissions. */
+  readonly principal?: AccessPrincipalSource;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L7)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L56)
 
 ### JOBS_CONFORMANCE_FIXTURES
 
@@ -4434,353 +4858,676 @@ declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 
 ### JobsConformanceFixture
 
+Native adapter fixture inputs for reusable jobs contract assertions.
+
 **Signature**
 
 ```ts
-declare const JobsConformanceFixture: JobsConformanceFixture;
+export interface JobsConformanceFixture {
+  readonly id: string;
+  readonly description: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L7)
 
 ### JobsConformanceHarness
 
+Owned native jobs conformance operations and completion controls.
+
 **Signature**
 
 ```ts
-declare const JobsConformanceHarness: JobsConformanceHarness;
+export interface JobsConformanceHarness {
+  readonly adapter: TestJobsAdapter;
+  readonly context: OperationContext;
+  readonly fixtures: typeof JOBS_CONFORMANCE_FIXTURES;
+  readonly run: (fixtureId: string) => Promise<RunHandle | undefined>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L60)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L13)
 
 ### RealListenerPurpose
 
+Native behavior requiring a real Bun listener in compatibility acceptance.
+
 **Signature**
 
 ```ts
-declare const RealListenerPurpose: RealListenerPurpose;
+type RealListenerPurpose = "disconnect" | "stream" | "proxy";
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L40)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L4)
 
 ### StandaloneFunctionTarget
 
+Native function descriptor retaining input, output and dependency validation.
+
 **Signature**
 
 ```ts
-declare const StandaloneFunctionTarget: StandaloneFunctionTarget;
+export interface StandaloneFunctionTarget {
+  readonly id: string;
+  readonly input: StandardSchemaV1;
+  readonly output: StandardSchemaV1;
+  readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
+  readonly dependencies?: import("relkit/engine").DependencyDeclarations;
+  readonly publications?: Readonly<Record<string, import("relkit/engine").DependencyRefLike>>;
+  readonly timeoutMs?: number;
+  readonly concurrency?: number;
+  readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L13)
 
 ### TestApplication
 
+Owned compiled test application, direct HTTP facade and complete release boundary.
+
 **Signature**
 
 ```ts
-declare const TestApplication: TestApplication;
+export interface TestApplication {
+  readonly runtime: TestRuntime;
+  readonly http: TestHttpClient;
+  readonly clock: TestClock;
+  readonly fakes: TestFakes;
+  readonly observability: TestObservability;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L26)
 
 ### TestApplicationOptions
 
+Explicit test application project, environment and native platform inputs.
+
 **Signature**
 
 ```ts
-declare const TestApplicationOptions: TestApplicationOptions;
+type TestApplicationOptions = Omit<TestRuntimeOptions, "app"> & {
+  /** Directory of the application to load. Defaults to the current working directory. */
+  readonly projectRoot?: string;
+  /** Values for the names that provider bindings reference, such as `CACHE_URL`. */
+  readonly bindingValues?: Readonly<Record<string, JsonValue>>;
+  /** `"fake"` gives each bucket and cache profile without a replacement a test fake. */
+  readonly resourceProviders?: "configured" | "fake";
+  /** Starts the application's services for the test, such as its database and auth. */
+  readonly services?: TestServiceActivator;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L18)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/application.types.ts#L14)
 
 ### TestBucketFake
 
+Owned native bucket client with deterministic transfer and inspection controls.
+
 **Signature**
 
 ```ts
-declare const TestBucketFake: TestBucketFake;
+export interface TestBucketFake extends BucketClient {
+  readonly capabilities: { readonly signedReadUrl: false; readonly signedWriteUrl: false };
+  readonly provider: BucketProvider;
+  readonly client: BucketClient;
+  readonly stateRoot: string;
+  readonly seed: (key: string, bytes: Uint8Array, options?: BucketPutOptions) => Promise<void>;
+  readonly read: (key: string) => Promise<Uint8Array | undefined>;
+  readonly inspect: () => readonly TestBucketObject[];
+  readonly snapshot: () => import("./bucket-storage.types.js").BucketStorageSnapshot;
+  readonly restore: (snapshot: unknown) => void;
+  readonly clear: () => void;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L29)
 
 ### TestBucketFakeOptions
 
+Bucket write policy and explicit clock, root and failure dependencies.
+
 **Signature**
 
 ```ts
-declare const TestBucketFakeOptions: TestBucketFakeOptions;
+export interface TestBucketFakeOptions {
+  readonly bucketId?: string;
+  readonly ownerId?: string;
+  readonly stateRoot?: string;
+  readonly clock?: () => number;
+  readonly failures?: TestFailureControls;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly maxObjectBytes?: number;
+  readonly allowedContentTypes?: readonly string[];
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L10)
 
 ### TestBucketObject
 
+Detached native bucket bytes and metadata selected by a stable key.
+
 **Signature**
 
 ```ts
-declare const TestBucketObject: TestBucketObject;
+export interface TestBucketObject {
+  readonly key: string;
+  readonly bytes: Uint8Array;
+  readonly metadata: BucketObjectMetadata;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L24)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/buckets.types.ts#L22)
 
 ### TestCacheFake
 
+Authoritative writable native cache facade with detached transfer and release controls.
+
 **Signature**
 
 ```ts
-declare const TestCacheFake: TestCacheFake<Key, Value>;
+type TestCacheFake<Key, Value> = CacheClient<Key, Value> & {
+  readonly provider: CacheProvider;
+  readonly client: CacheClient<Key, Value>;
+  readonly capabilities: { readonly increment: true };
+  readonly stateRoot: string;
+  readonly seed: (key: Key, value: Value, options?: CacheOperationOptions) => Promise<void>;
+  readonly read: (key: Key) => Promise<Value | undefined>;
+  readonly increment: (
+    key: Key,
+    delta?: number,
+    options?: CacheOperationOptions,
+  ) => Promise<number>;
+  readonly inspect: () => TestCacheSnapshot;
+  readonly snapshot: () => import("./cache-storage.types.js").CacheStorageSnapshot;
+  readonly restore: (snapshot: unknown) => void;
+  readonly clear: () => void;
+  readonly close: () => Promise<void>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L40)
 
 ### TestCacheFakeOptions
 
+Native key/value schemas, TTL policy and explicit fake-owner dependencies.
+
 **Signature**
 
 ```ts
-declare const TestCacheFakeOptions: TestCacheFakeOptions<KeySchema, ValueSchema>;
+export interface TestCacheFakeOptions<
+  KeySchema extends StandardSchemaV1 = StandardSchemaV1,
+  ValueSchema extends StandardSchemaV1 = StandardSchemaV1,
+> {
+  readonly cacheId?: string;
+  readonly ownerId?: string;
+  readonly stateRoot?: string;
+  readonly clock?: () => number;
+  readonly failures?: TestFailureControls;
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly keySchema?: KeySchema;
+  readonly valueSchema?: ValueSchema;
+  readonly defaultTtlMs?: number;
+  readonly maxTtlMs?: number;
+  readonly schemaVersion?: string | number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L10)
 
 ### TestCacheSnapshot
 
+Native cache occupancy and identity evidence without memoization eviction.
+
 **Signature**
 
 ```ts
-declare const TestCacheSnapshot: TestCacheSnapshot;
+export interface TestCacheSnapshot {
+  readonly cacheId: string;
+  readonly schemaVersion: string | number;
+  readonly entries: number;
+  readonly inFlight: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L26)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/cache.types.ts#L28)
 
 ### TestClock
 
+Deterministic native time facade advanced only by explicit test commands.
+
 **Signature**
 
 ```ts
-declare const TestClock: TestClock;
+export interface TestClock {
+  readonly now: () => Date;
+  readonly currentTimeMs: () => number;
+  readonly advance: (milliseconds: number) => Promise<void>;
+  readonly setTime: (timestamp: number) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L46)
 
 ### TestEventCloseOptions
 
+Explicit failed-test state retention policy for event shutdown.
+
 **Signature**
 
 ```ts
-declare const TestEventCloseOptions: TestEventCloseOptions;
+export interface TestEventCloseOptions {
+  readonly failed?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L63)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L69)
 
 ### TestEventDeliveryAttempt
 
+Native delivery outcome paired with its canonical persisted event envelope.
+
 **Signature**
 
 ```ts
-declare const TestEventDeliveryAttempt: TestEventDeliveryAttempt;
+export interface TestEventDeliveryAttempt extends EventDeliveryResult {
+  readonly envelope: UnknownEventEnvelope;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L64)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L74)
 
 ### TestEventFake
 
+Owned native publication/delivery facade with truthful deterministic ledgers.
+
 **Signature**
 
 ```ts
-declare const TestEventFake: TestEventFake<Payload, Output>;
+export interface TestEventFake<Payload = unknown, Output = unknown> extends EventClient<
+  Payload,
+  string,
+  number,
+  Payload
+> {
+  readonly id: string;
+  readonly eventId: string;
+  readonly version: number;
+  readonly client: EventClient<Payload, string, number, Payload>;
+  readonly provider: EventProvider;
+  readonly stateRoot: string;
+  readonly clock: TestClock;
+  readonly failures: TestFailureControls;
+  readonly pending: (triggerId?: string) => number;
+  readonly runNext: (triggerId?: string) => Promise<EventDeliveryResult | undefined>;
+  readonly drain: () => Promise<readonly EventDeliveryResult[]>;
+  readonly completed: (triggerId?: string) => number;
+  readonly restart: () => Promise<void>;
+  readonly envelopes: readonly UnknownEventEnvelope[];
+  readonly attempts: readonly TestEventDeliveryAttempt[];
+  readonly deliveries: readonly EventDeliveryLedgerRecord[];
+  readonly close: (options?: TestEventCloseOptions) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L65)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L83)
 
 ### TestEventOptions
 
+Event publication contract, native consumers and deterministic fixture dependencies.
+
 **Signature**
 
 ```ts
-declare const TestEventOptions: TestEventOptions<Payload, Output>;
+export interface TestEventOptions<Payload = unknown, Output = unknown> {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly event?: EventDescriptorAny;
+  readonly eventId?: string;
+  readonly version?: number;
+  readonly payloadSchema?: StandardSchemaV1;
+  readonly target?: EventFunctionDescriptorAny;
+  readonly triggers?: readonly TestEventTriggerOptions<Output>[];
+  readonly triggerId?: string;
+  readonly delivery?: "ephemeral" | "durable";
+  readonly profile?: string;
+  readonly ownerId?: string;
+  readonly correlationId?: string;
+  readonly causationInvocationId?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly stateRoot?: string;
+  readonly startTimeMs?: number;
+  readonly leaseDurationMs?: number;
+  readonly ephemeralCapacity?: number;
+  readonly random?: () => number;
+  readonly randomValues?: readonly number[];
+  readonly failures?: TestFailureControls;
+  readonly env?: Readonly<Record<string, unknown>>;
+  readonly clients?: DependencyClientSources;
+  readonly hooks?: InvocationHooks;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L66)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L40)
 
 ### TestEventPublishResult
 
+Native accepted publication receipt retained by the public event fixture.
+
 **Signature**
 
 ```ts
-declare const TestEventPublishResult: TestEventPublishResult;
+type TestEventPublishResult = EventPublishResult<string, number, unknown>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L67)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L109)
 
 ### TestEventTriggerOptions
 
+Native target and per-trigger delivery, retry and worker concurrency policy.
+
 **Signature**
 
 ```ts
-declare const TestEventTriggerOptions: TestEventTriggerOptions<Output>;
+export interface TestEventTriggerOptions<Output = unknown> {
+  readonly id: string;
+  readonly target: EventFunctionDescriptorAny;
+  readonly delivery?: "ephemeral" | "durable";
+  readonly profile?: string;
+  readonly retry?: RetryPolicy;
+  readonly concurrency?: number;
+  readonly timeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L68)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/events.types.ts#L25)
 
 ### TestFailureControls
 
+Owner-local native failure injection with explicit one-shot and persistent boundaries.
+
 **Signature**
 
 ```ts
-declare const TestFailureControls: TestFailureControls;
+export interface TestFailureControls {
+  readonly failAt: (point: string, cause?: unknown) => void;
+  readonly once?: (point: string, cause?: unknown) => void;
+  readonly clear: (point?: string) => void;
+  readonly check: (point: string) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.types.ts#L7)
 
 ### TestFakes
 
+Owned native dependency sources and authoritative writable storage fixtures.
+
 **Signature**
 
 ```ts
-declare const TestFakes: TestFakes;
+export interface TestFakes {
+  readonly stateRoot: string;
+  readonly clients: DependencyClientSources;
+  readonly buckets: Readonly<Record<string, TestBucketFake>>;
+  readonly cache: Readonly<Record<string, TestCacheFake<unknown, unknown>>>;
+  readonly providers: TestProviderReplacements;
+  readonly createBucket: (
+    id: string,
+    options?: Omit<TestBucketFakeOptions, "bucketId" | "stateRoot" | "failures" | "clock">,
+  ) => TestBucketFake;
+  readonly createCache: (
+    id: string,
+    options?: Omit<TestCacheFakeOptions, "cacheId" | "stateRoot" | "failures" | "clock">,
+  ) => TestCacheFake<unknown, unknown>;
+  readonly setClient: (category: DependencyCategory, name: string, client: unknown) => void;
+  readonly removeClient: (category: DependencyCategory, name: string) => void;
+  readonly failures: TestFailureControls;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.types.ts#L22)
 
 ### TestFakesOptions
 
+Explicit clock, logger and provider replacement policy for one fake owner.
+
 **Signature**
 
 ```ts
-declare const TestFakesOptions: TestFakesOptions;
+export interface TestFakesOptions {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly clock?: () => number;
+  readonly providers?: TestProviderReplacements;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L20)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/fakes.types.ts#L15)
 
 ### TestHttpApplication
 
+The app request/fetch methods satisfy this boundary without leaking framework types.
+
 **Signature**
 
 ```ts
-declare const TestHttpApplication: TestHttpApplication;
+export interface TestHttpApplication {
+  readonly request?: (input: TestHttpInput, init?: RequestInit) => Response | Promise<Response>;
+  readonly fetch?: (request: Request) => Response | Promise<Response>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L41)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L42)
 
 ### TestHttpClient
 
+Owned HTTP test facade exposing direct requests and optional real listeners.
+
 **Signature**
 
 ```ts
-declare const TestHttpClient: TestHttpClient;
+export interface TestHttpClient {
+  readonly request: TestHttpRequest;
+  readonly get: TestHttpRequest;
+  readonly post: TestHttpRequest;
+  readonly put: TestHttpRequest;
+  readonly patch: TestHttpRequest;
+  readonly delete: TestHttpRequest;
+  readonly listen: (options?: TestHttpListenerOptions) => Promise<TestHttpListener>;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L42)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L58)
 
 ### TestHttpClientOptions
 
+Explicit test origin, listener close policy and ownership callbacks.
+
 **Signature**
 
 ```ts
-declare const TestHttpClientOptions: TestHttpClientOptions;
+export interface TestHttpClientOptions {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly baseUrl?: string | URL;
+  /** Registers client shutdown with the owning test runtime/application. */
+  readonly registerClose?: (close: () => Promise<void>) => void;
+  readonly onClose?: () => MaybePromise<void>;
+  readonly closeTimeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L43)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L48)
 
 ### TestHttpInput
 
+Native Request, URL or relative path accepted by direct HTTP fixtures.
+
 **Signature**
 
 ```ts
-declare const TestHttpInput: TestHttpInput;
+type TestHttpInput = Request | string | URL;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L44)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L6)
 
 ### TestHttpListener
 
+Owned real Bun server handle and native request/release boundary.
+
 **Signature**
 
 ```ts
-declare const TestHttpListener: TestHttpListener;
+export interface TestHttpListener {
+  readonly purpose: RealListenerPurpose;
+  readonly url: URL;
+  readonly server: Bun.Server<undefined>;
+  readonly request: TestHttpRequest;
+  readonly close: () => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L16)
 
 ### TestHttpListenerOptions
 
+Explicit native socket identity, timeout and disconnect test policy.
+
 **Signature**
 
 ```ts
-declare const TestHttpListenerOptions: TestHttpListenerOptions;
+export interface TestHttpListenerOptions {
+  readonly purpose?: RealListenerPurpose;
+  readonly hostname?: string;
+  readonly port?: number;
+  readonly idleTimeout?: number;
+  readonly closeTimeoutMs?: number;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L46)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http-listener.types.ts#L7)
 
 ### TestHttpRequest
 
+Native in-memory request operation that types the request and response JSON.
+
 **Signature**
 
 ```ts
-declare const TestHttpRequest: TestHttpRequest;
+type TestHttpRequest = <Body = unknown, Json = unknown>(
+  input: TestHttpInput,
+  init?: TestHttpRequestInit<Json>,
+) => Promise<TestHttpResponse<Body>>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L47)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L36)
 
 ### TestHttpRequestInit
 
+`RequestInit` with a `json` shorthand for the request body.
+
 **Signature**
 
 ```ts
-declare const TestHttpRequestInit: TestHttpRequestInit<Json>;
+export interface TestHttpRequestInit<Json = unknown> extends RequestInit {
+  /** Serialized as the body, with `content-type: application/json` unless a header already sets one. */
+  readonly json?: Json;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L48)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L26)
 
 ### TestHttpResponse
 
+Native `Response` whose JSON body has the type the test declares.
+
+**Example**
+
+```ts
+const response = await app.http.get<{ message: string }>("/hello");
+const { message } = await response.json();
+```
+
 **Signature**
 
 ```ts
-declare const TestHttpResponse: TestHttpResponse<Body>;
+export interface TestHttpResponse<Body = unknown> extends Response {
+  readonly json: () => Promise<Body>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L49)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L15)
 
 ### TestJobsAdapter
 
+Owned native jobs adapter with deterministic worker and snapshot test controls.
+
 **Signature**
 
 ```ts
-declare const TestJobsAdapter: TestJobsAdapter;
+export interface TestJobsAdapter extends JobsAdapterRuntime {
+  readonly clock: TestClock;
+  readonly runNext: () => Promise<import("relkit/jobs/adapter").NativeTaskWork | undefined>;
+  readonly snapshot: (runId: string) => RunSnapshot;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter.types.ts#L15)
 
 ### TestJobsAdapterOptions
 
+Deterministic native adapter time, failure injection and unknown-outcome policy.
+
 **Signature**
 
 ```ts
-declare const TestJobsAdapterOptions: TestJobsAdapterOptions;
+export interface TestJobsAdapterOptions {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly clock?: TestClock;
+  readonly startTimeMs?: number;
+  readonly service?: string;
+  readonly unknown?: Partial<Record<"submit" | "cancel" | "retry", boolean>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L54)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter.types.ts#L6)
 
 ### TestObservability
 
+Native engine event capture with ordered protocol/version assertions.
+
 **Signature**
 
 ```ts
-declare const TestObservability: TestObservability;
+export interface TestObservability {
+  readonly hooks: InspectableObservabilityHooks;
+  readonly read: () => readonly ObservabilityHookEvent[];
+  readonly types: () => readonly ObservabilityHookEvent["type"][];
+  readonly assertTypes: (
+    expected: readonly ObservabilityHookEvent["type"][],
+  ) => readonly ObservabilityHookEvent[];
+  readonly clear: () => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L50)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L70)
 
 ### TestProblemResponse
 
+Problem Details response that RelKit routes return for validation and declared errors.
+
 **Signature**
 
 ```ts
-declare const TestProblemResponse: TestProblemResponse;
+type TestProblemResponse = TestHttpResponse<ProblemDetails>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L51)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/http.types.ts#L20)
 
 ### TestProviderReplacements
 
@@ -4801,33 +5548,74 @@ declare const TestProviderReplacements: Readonly<
 
 ### TestRuntime
 
+Owned direct invocation runtime with native dependency fakes and complete shutdown.
+
 **Signature**
 
 ```ts
-declare const TestRuntime: TestRuntime;
+export interface TestRuntime {
+  readonly stateRoot: string;
+  readonly fakes: TestFakes;
+  readonly providers: TestProviderReplacements;
+  readonly env: Readonly<Record<string, unknown>>;
+  readonly clock: TestClock;
+  readonly invoke: <Target extends StandaloneFunctionTarget>(
+    target: Target,
+    input: FunctionInput<Target>,
+    options?: Omit<InvokeFunctionOptions<FunctionContextOf<Target>>, "env" | "now" | "idSource">,
+  ) => Promise<FunctionOutput<Target>>;
+  readonly close: (options?: TestRuntimeCloseOptions) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L54)
 
 ### TestRuntimeCloseOptions
 
+Explicit failed-test state retention policy for runtime shutdown.
+
 **Signature**
 
 ```ts
-declare const TestRuntimeCloseOptions: TestRuntimeCloseOptions;
+export interface TestRuntimeCloseOptions {
+  readonly failed?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L41)
 
 ### TestRuntimeOptions
 
+Runtime options retaining the concrete application's environment shape.
+
 **Signature**
 
 ```ts
-declare const TestRuntimeOptions: TestRuntimeOptions<S>;
+export interface TestRuntimeOptions<S extends EnvShape = EnvShape> {
+  /** Function registry to use; `createTestApplication` loads the project's when omitted. */
+  readonly registry?: FunctionRegistry;
+  /** Logger sinks and minimum level; logs are not printed when omitted. */
+  readonly logger?: LoggerOptions;
+  /** The application whose `env` declarations check and parse the values of `env`. */
+  readonly app?: { readonly env: EnvDefinition<S> };
+  /** Environment name used to resolve `env`. Defaults to `"test"`. */
+  readonly environment?: string;
+  /** Values for the application's environment variables; `process.env` is not read. */
+  readonly env?: Readonly<Record<string, unknown>>;
+  /** Starting time of the test clock, in milliseconds since the epoch. Defaults to `0`. */
+  readonly startTimeMs?: number;
+  /** Time `close` waits for running work, in milliseconds. Defaults to `1000`. */
+  readonly closeTimeoutMs?: number;
+  /** Fields that replace the handler context's defaults, such as `auth` or `database`. */
+  readonly context?: Readonly<Record<string, unknown>>;
+  /** Replacements for provider profiles, by capability then profile name, such as test fakes. */
+  readonly providers?: TestProviderReplacements;
+  /** Caller-owned roots enable explicit restart tests; omitted roots are temporary. */
+  readonly stateRoot?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/index.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L17)
 
 ### assertObservabilityHookTypes
 
@@ -5142,53 +5930,95 @@ declare const runJobsConformance: (
 
 ### FunctionContextOf
 
+Context inferred from the native handler, preserving required cancellation.
+
 **Signature**
 
 ```ts
-declare const FunctionContextOf: FunctionContextOf<Target>;
+type FunctionContextOf<Target> =
+  Target extends Record<"handler", (input: infer _Input, context: infer Context) => unknown>
+    ? Context extends { readonly signal: AbortSignal }
+      ? Context
+      : InvocationContext
+    : InvocationContext;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L45)
 
 ### FunctionInput
 
+Input inferred from the target's native schema authority.
+
 **Signature**
 
 ```ts
-declare const FunctionInput: FunctionInput<Target>;
+type FunctionInput<Target extends { readonly input: StandardSchemaV1 }> = InferInput<
+  Target["input"]
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L29)
 
 ### FunctionOutput
 
+Output inferred from the target's native schema authority.
+
 **Signature**
 
 ```ts
-declare const FunctionOutput: FunctionOutput<Target>;
+type FunctionOutput<Target extends { readonly output: StandardSchemaV1 }> = InferOutput<
+  Target["output"]
+>;
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L37)
 
 ### InvokeFunctionOptions
 
+Direct invocation dependencies and native hooks without process environment reads.
+
 **Signature**
 
 ```ts
-declare const InvokeFunctionOptions: InvokeFunctionOptions<Context>;
+export interface InvokeFunctionOptions<Context extends { readonly signal: AbortSignal }> {
+  readonly registry?: FunctionRegistry;
+  readonly env?: Readonly<Record<string, unknown>>;
+  readonly clients?: DependencyClientSources;
+  readonly signal?: AbortSignal;
+  readonly now?: () => number;
+  readonly idSource?: InvocationIdSource;
+  readonly context?: InvocationHooks<Context>["context"];
+  readonly hooks?: InvocationHooks<Context>;
+  /** The caller that access rules see. Without it, the caller is read from the context's
+   * `auth.getSession()` session, which has no session (an anonymous caller) unless the
+   * context supplies one, and which carries no permissions. */
+  readonly principal?: AccessPrincipalSource;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L56)
 
 ### StandaloneFunctionTarget
 
+Native function descriptor retaining input, output and dependency validation.
+
 **Signature**
 
 ```ts
-declare const StandaloneFunctionTarget: StandaloneFunctionTarget;
+export interface StandaloneFunctionTarget {
+  readonly id: string;
+  readonly input: StandardSchemaV1;
+  readonly output: StandardSchemaV1;
+  readonly errors?: readonly { readonly id: string; readonly data: StandardSchemaV1 }[];
+  readonly dependencies?: import("relkit/engine").DependencyDeclarations;
+  readonly publications?: Readonly<Record<string, import("relkit/engine").DependencyRefLike>>;
+  readonly timeoutMs?: number;
+  readonly concurrency?: number;
+  readonly handler: (...arguments_: readonly never[]) => MaybePromise<unknown>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/invoke-function.types.ts#L13)
 
 ### invokeFunctionWithRunner
 
@@ -5318,43 +6148,69 @@ declare const JOBS_CONFORMANCE_FIXTURES: ReadonlyArray<JobsConformanceFixture>;
 
 ### JobsConformanceFixture
 
+Native adapter fixture inputs for reusable jobs contract assertions.
+
 **Signature**
 
 ```ts
-declare const JobsConformanceFixture: JobsConformanceFixture;
+export interface JobsConformanceFixture {
+  readonly id: string;
+  readonly description: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L7)
 
 ### JobsConformanceHarness
 
+Owned native jobs conformance operations and completion controls.
+
 **Signature**
 
 ```ts
-declare const JobsConformanceHarness: JobsConformanceHarness;
+export interface JobsConformanceHarness {
+  readonly adapter: TestJobsAdapter;
+  readonly context: OperationContext;
+  readonly fixtures: typeof JOBS_CONFORMANCE_FIXTURES;
+  readonly run: (fixtureId: string) => Promise<RunHandle | undefined>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L13)
 
 ### JobsConformanceProvider
 
+A jobs adapter under test; `close` runs after each case when present.
+
 **Signature**
 
 ```ts
-declare const JobsConformanceProvider: JobsConformanceProvider;
+type JobsConformanceProvider = JobsAdapterRuntime & {
+  readonly close?: () => Promise<unknown>;
+};
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L21)
 
 ### JobsProviderConformanceOptions
 
+What a jobs provider supplies to run the shared suite.
+
 **Signature**
 
 ```ts
-declare const JobsProviderConformanceOptions: JobsProviderConformanceOptions;
+export interface JobsProviderConformanceOptions {
+  /** Creates an adapter for one case. */
+  readonly create: () => JobsConformanceProvider;
+  /**
+   * Failure injection: an adapter that commits a submission but loses the response, so the
+   * submission's outcome is unknown. The `unknown-acknowledgement` case is skipped without it.
+   */
+  readonly faulty?: () => JobsConformanceProvider;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/jobs-conformance.types.ts#L26)
 
 ### createDeterministicJobsAdapter
 
@@ -6257,43 +7113,91 @@ declare const validateRuntimeTimeout: (value: number) => void;
 
 ### TestClock
 
+Deterministic native time facade advanced only by explicit test commands.
+
 **Signature**
 
 ```ts
-declare const TestClock: TestClock;
+export interface TestClock {
+  readonly now: () => Date;
+  readonly currentTimeMs: () => number;
+  readonly advance: (milliseconds: number) => Promise<void>;
+  readonly setTime: (timestamp: number) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L10)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L46)
 
 ### TestRuntime
 
+Owned direct invocation runtime with native dependency fakes and complete shutdown.
+
 **Signature**
 
 ```ts
-declare const TestRuntime: TestRuntime;
+export interface TestRuntime {
+  readonly stateRoot: string;
+  readonly fakes: TestFakes;
+  readonly providers: TestProviderReplacements;
+  readonly env: Readonly<Record<string, unknown>>;
+  readonly clock: TestClock;
+  readonly invoke: <Target extends StandaloneFunctionTarget>(
+    target: Target,
+    input: FunctionInput<Target>,
+    options?: Omit<InvokeFunctionOptions<FunctionContextOf<Target>>, "env" | "now" | "idSource">,
+  ) => Promise<FunctionOutput<Target>>;
+  readonly close: (options?: TestRuntimeCloseOptions) => Promise<void>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L11)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L54)
 
 ### TestRuntimeCloseOptions
 
+Explicit failed-test state retention policy for runtime shutdown.
+
 **Signature**
 
 ```ts
-declare const TestRuntimeCloseOptions: TestRuntimeCloseOptions;
+export interface TestRuntimeCloseOptions {
+  readonly failed?: boolean;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L9)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L41)
 
 ### TestRuntimeOptions
 
+Runtime options retaining the concrete application's environment shape.
+
 **Signature**
 
 ```ts
-declare const TestRuntimeOptions: TestRuntimeOptions<S>;
+export interface TestRuntimeOptions<S extends EnvShape = EnvShape> {
+  /** Function registry to use; `createTestApplication` loads the project's when omitted. */
+  readonly registry?: FunctionRegistry;
+  /** Logger sinks and minimum level; logs are not printed when omitted. */
+  readonly logger?: LoggerOptions;
+  /** The application whose `env` declarations check and parse the values of `env`. */
+  readonly app?: { readonly env: EnvDefinition<S> };
+  /** Environment name used to resolve `env`. Defaults to `"test"`. */
+  readonly environment?: string;
+  /** Values for the application's environment variables; `process.env` is not read. */
+  readonly env?: Readonly<Record<string, unknown>>;
+  /** Starting time of the test clock, in milliseconds since the epoch. Defaults to `0`. */
+  readonly startTimeMs?: number;
+  /** Time `close` waits for running work, in milliseconds. Defaults to `1000`. */
+  readonly closeTimeoutMs?: number;
+  /** Fields that replace the handler context's defaults, such as `auth` or `database`. */
+  readonly context?: Readonly<Record<string, unknown>>;
+  /** Replacements for provider profiles, by capability then profile name, such as test fakes. */
+  readonly providers?: TestProviderReplacements;
+  /** Caller-owned roots enable explicit restart tests; omitted roots are temporary. */
+  readonly stateRoot?: string;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.ts#L8)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L17)
 
 ### createTestRuntime
 
@@ -6346,7 +7250,7 @@ export interface TestClock {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L37)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L46)
 
 ### TestRuntime (interface)
 
@@ -6370,7 +7274,7 @@ export interface TestRuntime {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L45)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L54)
 
 ### TestRuntimeCloseOptions (interface)
 
@@ -6384,7 +7288,7 @@ export interface TestRuntimeCloseOptions {
 }
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L32)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/runtime.types.ts#L41)
 
 ### TestRuntimeOptions (interface)
 
@@ -6394,14 +7298,23 @@ Runtime options retaining the concrete application's environment shape.
 
 ```ts
 export interface TestRuntimeOptions<S extends EnvShape = EnvShape> {
+  /** Function registry to use; `createTestApplication` loads the project's when omitted. */
   readonly registry?: FunctionRegistry;
+  /** Logger sinks and minimum level; logs are not printed when omitted. */
   readonly logger?: LoggerOptions;
+  /** The application whose `env` declarations check and parse the values of `env`. */
   readonly app?: { readonly env: EnvDefinition<S> };
+  /** Environment name used to resolve `env`. Defaults to `"test"`. */
   readonly environment?: string;
+  /** Values for the application's environment variables; `process.env` is not read. */
   readonly env?: Readonly<Record<string, unknown>>;
+  /** Starting time of the test clock, in milliseconds since the epoch. Defaults to `0`. */
   readonly startTimeMs?: number;
+  /** Time `close` waits for running work, in milliseconds. Defaults to `1000`. */
   readonly closeTimeoutMs?: number;
+  /** Fields that replace the handler context's defaults, such as `auth` or `database`. */
   readonly context?: Readonly<Record<string, unknown>>;
+  /** Replacements for provider profiles, by capability then profile name, such as test fakes. */
   readonly providers?: TestProviderReplacements;
   /** Caller-owned roots enable explicit restart tests; omitted roots are temporary. */
   readonly stateRoot?: string;
@@ -6442,13 +7355,18 @@ declare const createTestRealtimeProvider: (root: string) => RealtimeProvider;
 
 ### TestStateRoot
 
+Native temporary or caller-owned persistence path with idempotent cleanup.
+
 **Signature**
 
 ```ts
-declare const TestStateRoot: TestStateRoot;
+export interface TestStateRoot {
+  readonly path: string;
+  readonly cleanup: (failed: boolean) => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-root.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/state-root.types.ts#L2)
 
 ### createTestStateRoot
 
@@ -6555,13 +7473,29 @@ declare const unknown: (
 
 ### TestNativeRun
 
+Mutable deterministic native run state with owned worker cancellation.
+
 **Signature**
 
 ```ts
-declare const TestNativeRun: TestNativeRun;
+export interface TestNativeRun {
+  readonly request: NativeSubmission;
+  readonly runId: string;
+  readonly acceptedAt: string;
+  status: RunSnapshot["status"];
+  attempt: number;
+  startedAt?: string;
+  completedAt?: string;
+  output?: unknown;
+  error?: JobErrorEnvelope;
+  retryOfRunId?: string;
+  readonly canonicalInput: JobWireEnvelope;
+  controller?: AbortController;
+  disposeSignal?: () => void;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter-support.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter-support.types.ts#L5)
 
 ### detachedNativeSnapshot
 
@@ -6757,23 +7691,37 @@ declare const next: (
 
 ### TestJobsAdapter
 
+Owned native jobs adapter with deterministic worker and snapshot test controls.
+
 **Signature**
 
 ```ts
-declare const TestJobsAdapter: TestJobsAdapter;
+export interface TestJobsAdapter extends JobsAdapterRuntime {
+  readonly clock: TestClock;
+  readonly runNext: () => Promise<import("relkit/jobs/adapter").NativeTaskWork | undefined>;
+  readonly snapshot: (runId: string) => RunSnapshot;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter.types.ts#L15)
 
 ### TestJobsAdapterOptions
 
+Deterministic native adapter time, failure injection and unknown-outcome policy.
+
 **Signature**
 
 ```ts
-declare const TestJobsAdapterOptions: TestJobsAdapterOptions;
+export interface TestJobsAdapterOptions {
+  readonly logger?: import("relkit/runtime-effect").LoggerOptions;
+  readonly clock?: TestClock;
+  readonly startTimeMs?: number;
+  readonly service?: string;
+  readonly unknown?: Partial<Record<"submit" | "cancel" | "retry", boolean>>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter.ts#L2)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/testing/src/test-jobs-adapter.types.ts#L6)
 
 ### createDeterministicJobsAdapter
 

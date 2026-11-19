@@ -6,6 +6,12 @@ import type { RunSnapshot, RunWatchFrame } from "../../contracts/jobs.js";
 import type { NativeWatchRequest, OperationContext } from "../../jobs/adapter.js";
 import { durationToMillis } from "../../jobs/index.js";
 import {
+  limitError,
+  pastElapsed,
+  reachedLimit,
+  recordActiveTime,
+} from "./native-adapter-limits.js";
+import {
   failureOf,
   isSleepSuspension,
   sameNamespace,
@@ -80,6 +86,8 @@ export async function completeRun(
 }
 
 /** Settles a native failure or schedules a policy-bounded retry, releasing the attempt listener.
+ * An attempt stopped by `maxDuration` is retried like any failure; a run past `maxElapsed` is not.
+ * A run whose last attempt was stopped by a limit settles as `timed-out` with the limit's error.
  * @param state - Current service-owned state.
  * @param runId - Run identity within its namespace.
  * @param error - Failure value to normalize or audit.
@@ -96,23 +104,29 @@ export async function failRun(
   if (run === undefined || terminal(run.status)) return;
   if (!sameNamespace(run, context)) throw new Error("Native run is outside the operation scope");
   const failure = failureOf(error);
-  const delay = retryDelay(run, failure);
+  const limit = reachedLimit(run, failure);
+  const retry = retryDelay(run, failure);
+  const expired = pastElapsed(run) && (limit !== undefined || retry !== undefined);
+  const delay = expired ? undefined : retry;
   run.controllerCleanup?.();
   delete run.controllerCleanup;
+  delete run.limit;
   if (delay !== undefined) {
     run.status = "queued";
     run.attempt += 1;
     run.nextEligibleAt = new Date(nativeNow() + delay).toISOString();
+    delete run.activeMs;
     delete run.error;
     delete run.completedAt;
     return;
   }
-  run.status = "failed";
-  run.error = failure;
+  const stoppedBy = expired ? "maxElapsed" : limit;
+  run.status = stoppedBy === undefined ? "failed" : "timed-out";
+  run.error = stoppedBy === undefined ? failure : limitError(run, stoppedBy);
   run.completedAt = new Date(nativeNow()).toISOString();
 }
 
-/** Persists the next wake instant and releases the completed attempt controller.
+/** Persists the next wake instant and the time worked so far, and releases the attempt controller.
  * @param state - Current service-owned state.
  * @param runId - Run identity within its namespace.
  * @param value - Value to validate, normalize or project.
@@ -130,6 +144,8 @@ export async function suspendRun(
   if (!sameNamespace(run, context)) throw new Error("Native run is outside the operation scope");
   if (!isSleepSuspension(value)) throw new TypeError("Local native suspension is invalid");
   run.completedSleeps.add(value.key);
+  recordActiveTime(run);
+  delete run.limit;
   run.status = "sleeping";
   run.nextEligibleAt = value.wakeAt;
   run.controllerCleanup?.();

@@ -4,6 +4,11 @@
   --muted: #686868;
   --line: #e5e5e5;
   --soft: #fafafa;
+  --fill: #f2f2f2;
+  --line-strong: #d4d4d4;
+  --line-hover: #a3a3a3;
+  --mark: #737373;
+  --ink-hover: #303030;
   position: relative;
   isolation: isolate;
   color-scheme: light;
@@ -146,7 +151,7 @@
     text-underline-offset: 4px;
   }
   .page .button:hover {
-    background: #303030;
+    background: var(--ink-hover);
   }
 }
 
@@ -178,4 +183,18 @@
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+:global(:root[data-theme="dark"]) .page {
+  --page: #0d0e10;
+  --ink: #f5f5f5;
+  --muted: #a1a1a1;
+  --line: #26272b;
+  --soft: #141517;
+  --fill: #1c1d21;
+  --line-strong: #34353a;
+  --line-hover: #525252;
+  --mark: #8a8a8a;
+  --ink-hover: #d4d4d4;
+  color-scheme: dark;
 }

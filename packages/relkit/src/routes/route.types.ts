@@ -24,6 +24,7 @@ export type RouteClientPolicy = false | { readonly operation?: "query" | "mutati
 export type NativeStreamFormat = "sse" | "text" | "bytes";
 
 interface RouteSharedOptions<Id extends string> extends DescriptorMetadata {
+  /** Stable route ID; derived from the method and path when omitted. */
   readonly id?: Id;
 }
 
@@ -35,16 +36,27 @@ export interface FunctionRouteOptions<
   Target extends FunctionRefAny,
   Request extends HttpRequestMapping | undefined = undefined,
 > extends RouteSharedOptions<Id> {
+  /** The function the route calls with the mapped request. */
   readonly target: Target;
+  /** Not allowed with `target`: a route has a target function or a raw handler, not both. */
   readonly handler?: never;
+  /** Media type of the request body; set `"multipart/form-data"` to receive file uploads. */
   readonly accept?: HttpRequestContentType;
+  /** Explicit mapping from the request to the function's input; replaces the inferred one. */
   readonly request?: Request;
+  /** The complete response contract; replaces the responses inferred from the function. */
   readonly responses?: readonly HttpResponseMapping[];
+  /** Status of a successful response when the inferred one does not fit, such as `201`. */
   readonly successStatus?: number;
+  /** Largest request body in bytes for this route; a larger one is answered `413`. */
   readonly maxBodyBytes?: number;
+  /** Limits requests per key in a time window, before input mapping and the function call. */
   readonly rateLimit?: RouteRateLimit;
+  /** Time limit of the function call in milliseconds for requests to this route. */
   readonly timeoutMs?: number;
+  /** `false` hides the route from the generated client; `operation` sets query or mutation. */
   readonly client?: RouteClientPolicy;
+  /** Sends a `streamOf` output in a native format: `"sse"`, `"text"` or `"bytes"`. */
   readonly stream?: { readonly format: NativeStreamFormat };
   /** Sets the success status, headers and cookies from the function's output. */
   readonly response?: RouteResponseFor<Target>;
@@ -59,7 +71,9 @@ export interface RawRouteOptions<
   Id extends string,
   Handler extends RawHttpHandler = RawHttpHandler,
 > extends RouteSharedOptions<Id> {
+  /** Receives the raw `Request` and returns the `Response`; no function is called. */
   readonly handler: Handler;
+  /** Not allowed with `handler`: a route has a raw handler or a target function, not both. */
   readonly target?: never;
 }
 
@@ -105,6 +119,32 @@ export interface RawRouteDescriptor<
     readonly service: { readonly ref: { readonly kind: "service"; readonly id: string } };
   };
 }
+
+/** The options of one `defineRoute` call: those of a function route when the call has a
+ * `target`, those of a raw route otherwise. One signature takes both forms, so a mistake in an
+ * option is reported on that option.
+ * @example type Options = DefineRouteOptions<"orders.get", typeof getOrder, undefined, RawHttpHandler>;
+ */
+export type DefineRouteOptions<
+  Id extends string,
+  Target extends FunctionRefAny | undefined,
+  Request extends HttpRequestMapping | undefined,
+  Handler extends RawHttpHandler,
+> = [Target] extends [undefined]
+  ? RawRouteOptions<Id, Handler>
+  : FunctionRouteOptions<Id, Extract<Target, FunctionRefAny>, Request>;
+
+/** The descriptor a `defineRoute` call returns for its form.
+ * @example type Route = DefinedRoute<"orders.get", typeof getOrder, undefined, RawHttpHandler>;
+ */
+export type DefinedRoute<
+  Id extends string,
+  Target extends FunctionRefAny | undefined,
+  Request extends HttpRequestMapping | undefined,
+  Handler extends RawHttpHandler,
+> = [Target] extends [undefined]
+  ? RawRouteDescriptor<Id, Handler>
+  : FunctionRouteDescriptor<Id, Extract<Target, FunctionRefAny>, Request>;
 
 /** Union of function-backed and raw route descriptors.
  * @example type Route = RouteDescriptor<"orders.get">;

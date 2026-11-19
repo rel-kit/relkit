@@ -93,6 +93,8 @@ function authInstructions(paths: Record<string, JsonValue>): string {
       ? "Use the Authentication endpoints to sign in."
       : `Send **POST ${signIn}** with email and password to log in.`,
     "Use **Test Request** in this reference. The browser stores the session cookie and sends it with subsequent requests to protected endpoints. Keep this reference and requests on the same origin; no token copying is needed.",
+    "The Authentication operations answer errors in Better Auth's format, `application/json` with `message` and usually `code` (the `BetterAuthError` schema), and not as Problem Details. Only an answer RelKit sends before Better Auth runs, such as `403` for a request from another origin or `413` for an oversized body, is Problem Details.",
+    "Better Auth answers `HEAD` and `OPTIONS` on these paths itself; the two answers every other route gives do not apply to them.",
   ]
     .filter(Boolean)
     .join("\n\n");

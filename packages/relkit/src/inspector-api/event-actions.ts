@@ -11,6 +11,7 @@
  */
 import { PROTOCOL_VERSION } from "relkit/contracts";
 import { createEventClient } from "relkit/events";
+import { redactNamedFields } from "relkit/observability";
 import { InspectorActionError } from "./actions-errors.js";
 import type {
   InspectorEventActionRequest,
@@ -61,6 +62,10 @@ export function createInspectorEventActions(
       profile: node.profile,
       source: await options.provider(node.profile),
       payloadSchema,
+      // A span of this publication records the marker for the event's sensitive fields.
+      ...(Array.isArray(node.sensitiveFields) && node.sensitiveFields.length > 0
+        ? { recordedPayload: (value: unknown) => redactNamedFields(value, sensitive(node)) }
+        : {}),
     });
     const result = await client.publish(payload as never, publishOptions as never);
     return {
@@ -123,4 +128,11 @@ async function administer(
 /** @returns The coded refusal for an action the event provider does not offer. */
 function unsupported(): InspectorActionError {
   return new InspectorActionError("RELKIT_INSPECTOR_ACTION_UNSUPPORTED", 501);
+}
+
+/** The sensitive field names of an event node; the graph holds `null` when it declares none. */
+function sensitive(node: {
+  readonly sensitiveFields?: readonly string[] | null;
+}): readonly string[] {
+  return node.sensitiveFields ?? [];
 }

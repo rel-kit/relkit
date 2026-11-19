@@ -54,7 +54,7 @@ export interface TaskObservation<
   readonly streams?: Readonly<{ [Name in keyof Streams & string]?: "live" | "history" }>;
 }
 
-/** Log level and fields to redact during task execution. */
+/** Value of the deprecated `logging` option of a task; nothing reads it. */
 export interface TaskLogging {
   readonly level?: "trace" | "debug" | "info" | "warn" | "error";
   readonly redact?: readonly string[];

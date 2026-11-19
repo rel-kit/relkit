@@ -14,48 +14,20 @@ import type {
   ErrorListOf,
   FunctionCallOptions,
   FunctionCallValidation,
+  FunctionUnknownOptions,
   ToolMetadataOf,
 } from "./define-function-inference.types.js";
 import type { FunctionOperationError } from "./function-observability.js";
 import type { FunctionDependencies, FunctionDescriptor } from "./types.js";
 
-/** Overloaded public function constructor preserving schema inference.
+/** Public function constructor preserving schema inference. It is one signature, not an
+ * overload per form, so a mistake in the options is reported once and where it is.
  * @param options - Schemas, handler, dependencies, and function metadata.
  * @returns A frozen callable descriptor with inferred input and output types.
  * @example const greet = defineFunction({ input, output, handler });
  */
 export interface DefineFunction {
-  /** Defines a function without declared dependencies.
-   * @param options - Schemas, handler, and function metadata.
-   * @returns A callable descriptor with inferred input and output types.
-   * @example const greet = defineFunction({ input, output, handler });
-   */
-  <
-    const Id extends string,
-    const InputSchema extends StandardSchemaV1,
-    const OutputSchema extends StandardSchemaV1,
-    const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
-      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
-  >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
-      Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
-        readonly dependencies?: never;
-      },
-  ): FunctionDescriptor<
-    Id,
-    InferOutput<InputSchema>,
-    InferOutput<OutputSchema>,
-    {},
-    ErrorListOf<Options>,
-    InputSchema,
-    OutputSchema,
-    ToolMetadataOf<Options>,
-    ProgressSchema
-  >;
-
-  /** Defines a function with declared dependencies.
+  /** Defines a function; `dependencies` is optional and types the handler's context.
    * @param options - Schemas, handler, dependency map, and function metadata.
    * @returns A callable descriptor whose context includes the declared dependencies.
    * @example const lookup = defineFunction({ input, output, dependencies, handler });
@@ -64,7 +36,7 @@ export interface DefineFunction {
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
-    const Dependencies extends FunctionDependencies,
+    const Dependencies extends FunctionDependencies = {},
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Options extends FunctionCallOptions<
       Id,
@@ -76,7 +48,11 @@ export interface DefineFunction {
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> &
+      FunctionUnknownOptions<
+        NoInfer<Options>,
+        keyof FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>
+      >,
   ): FunctionDescriptor<
     Id,
     InferOutput<InputSchema>,
@@ -96,35 +72,7 @@ export interface DefineFunctionEffect {
     const Id extends string,
     const InputSchema extends StandardSchemaV1,
     const OutputSchema extends StandardSchemaV1,
-    const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
-    const Options extends FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> =
-      FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema>,
-  >(
-    options: FunctionCallOptions<Id, InputSchema, OutputSchema, {}, ProgressSchema> &
-      Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> & {
-        readonly dependencies?: never;
-      },
-  ): Effect.Effect<
-    FunctionDescriptor<
-      Id,
-      InferOutput<InputSchema>,
-      InferOutput<OutputSchema>,
-      {},
-      ErrorListOf<Options>,
-      InputSchema,
-      OutputSchema,
-      ToolMetadataOf<Options>,
-      ProgressSchema
-    >,
-    FunctionOperationError
-  >;
-
-  <
-    const Id extends string,
-    const InputSchema extends StandardSchemaV1,
-    const OutputSchema extends StandardSchemaV1,
-    const Dependencies extends FunctionDependencies,
+    const Dependencies extends FunctionDependencies = {},
     const ProgressSchema extends StandardSchemaV1 | undefined = undefined,
     const Options extends FunctionCallOptions<
       Id,
@@ -136,7 +84,11 @@ export interface DefineFunctionEffect {
   >(
     options: FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema> &
       Options &
-      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>>,
+      FunctionCallValidation<NoInfer<Options>, InferOutput<OutputSchema>> &
+      FunctionUnknownOptions<
+        NoInfer<Options>,
+        keyof FunctionCallOptions<Id, InputSchema, OutputSchema, Dependencies, ProgressSchema>
+      >,
   ): Effect.Effect<
     FunctionDescriptor<
       Id,

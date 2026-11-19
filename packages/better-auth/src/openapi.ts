@@ -15,6 +15,7 @@ import { Cause, Context, Effect, Exit, Layer } from "effect";
 import { AuthFailure } from "./auth.errors.js";
 import { projectAuthOpenApi } from "./openapi-projection.js";
 import { documentQueryParameters } from "./openapi-query.js";
+import { withoutUnservedOperations } from "./openapi-served.js";
 
 /** Native metadata projection with no request identity or database ownership. */
 export class AuthOpenApi extends Context.Service<
@@ -48,9 +49,12 @@ export class AuthOpenApi extends Context.Service<
               asResponse: true,
             });
             const { api } = getEndpoints(context, context.options);
+            const native = withoutUnservedOperations((await response.json()) as JsonValue, {
+              sessionByPost: context.options.session?.deferSessionRefresh === true,
+            });
             return projectAuthOpenApi(
               // Projection asserts the JSON shape before publishing.
-              documentQueryParameters((await response.json()) as JsonValue, Object.values(api)),
+              documentQueryParameters(native, Object.values(api)),
               context.options.basePath,
             );
           }).pipe(

@@ -1,4 +1,9 @@
-import type { DescriptorBase, DescriptorMetadata, MaybePromise } from "../contracts/index.js";
+import type {
+  DescriptorBase,
+  DescriptorMetadata,
+  MaybePromise,
+  ProviderProfileName,
+} from "../contracts/index.js";
 import type {
   ErrorDescriptorAny,
   FunctionContext,
@@ -77,27 +82,43 @@ export interface DefineEventFunctionOptions<
   Dependencies extends FunctionDependencies = {},
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
 > extends DescriptorMetadata {
+  /** Stable ID of the function; each consumer of the same event needs its own. */
   readonly id: Id;
+  /** ID of the event to consume, such as `orders.created`. */
   readonly event: Event;
+  /** `"durable"` (default) stores and retries each delivery; `"ephemeral"` keeps nothing. */
   readonly delivery?: EventDelivery;
-  readonly profile?: string;
+  /** The event provider profile whose deliveries the function handles. */
+  readonly profile?: ProviderProfileName<"event">;
+  /** Retry policy for failed durable deliveries. Defaults to one attempt, so no retry. */
   readonly retry?: Partial<EventRetryPolicy>;
+  /** Most deliveries of the event that this function handles at once. */
   readonly concurrency?: number;
+  /** Time limit in milliseconds for handling one delivery. */
   readonly timeoutMs?: number;
+  /** Everything the handler calls, by kind; each entry becomes a client on `context`. */
   readonly dependencies?: Dependencies;
+  /** Declared errors the handler may return. */
   readonly errors?: Errors;
+  /** Runs before the handler and may replace the event's data. */
   readonly onBefore?: (
     input: EventInputByName<Event>,
     context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<EventInputByName<Event>>;
+  /** Runs after the handler succeeds. */
   readonly onAfter?: (
     output: void,
     context: EventFunctionContext<Event, Dependencies>,
   ) => MaybePromise<void>;
+  /** Handles one delivery: receives the event's data and `context`, returns nothing. */
   readonly handler: EventFunctionHandler<Event, Dependencies, Errors>;
+  /** Not an option here: the input is the data of the consumed event. */
   readonly input?: never;
+  /** Not an option here: an event function returns nothing. */
   readonly output?: never;
+  /** Not an option here: an event function cannot become a tool. */
   readonly tool?: never;
+  /** Not an option here: `event` names what starts the function. */
   readonly trigger?: never;
 }
 
@@ -113,7 +134,8 @@ export interface EventFunctionDescriptor<
   readonly invocationMode: "event-only";
   readonly event: Event;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;
@@ -132,7 +154,8 @@ export interface EventFunctionDescriptorAny extends DescriptorBase<"function"> {
   readonly invocationMode: "event-only";
   readonly event: string;
   readonly delivery: EventDelivery;
-  readonly profile: string;
+  /** The profile the definition names; absent when the application's default applies. */
+  readonly profile?: string;
   readonly retry: EventRetryPolicy;
   readonly concurrency?: number;
   readonly timeoutMs?: number;

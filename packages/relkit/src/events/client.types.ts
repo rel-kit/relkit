@@ -93,6 +93,9 @@ export interface EventClientOptions<
   readonly payloadSchema?: PayloadSchema;
   readonly profile?: string;
   readonly resolveProfile?: (profile: string) => unknown;
+  /** What the publication's span records in place of the payload, such as a copy with the
+   * event's sensitive fields replaced. The provider and the caller receive the payload itself. */
+  readonly recordedPayload?: (payload: unknown) => unknown;
   readonly bridge?: EventInvocationBridge;
   readonly signal?: () => AbortSignal;
   readonly deadline?: () => number | undefined;

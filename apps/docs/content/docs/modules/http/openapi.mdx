@@ -37,8 +37,12 @@ The commerce example uses `4000` and also includes `/orders/{orderId}`.
 The served document is larger than the generated file. It adds the operations of a mounted
 [Better Auth service](/docs/modules/auth/better-auth), such as `POST /api/auth/sign-in/email`, under
 the Authentication tag. Do not compare the two expecting the same paths: the generated file has
-only your routes. `HEAD`
-and `OPTIONS` operations are in neither; see
+only your routes.
+
+`HEAD` and `OPTIONS` operations are in neither, unless a route declares one. Both documents say
+once, in `info.description`, that every `GET` route also answers `HEAD`, that `OPTIONS` answers
+`204` with `Allow`, and that the HTTP server answers `431` before a route is chosen. Listing them
+on every path would double the document and add two methods to every generated client. See
 [what the framework sends by itself](/docs/modules/http/responses#see-what-the-framework-sends-by-itself).
 
 ### Open the interactive reference
@@ -62,6 +66,10 @@ Error responses use the `application/problem+json` media type. Each declared err
 problem schema, with its `code` and `type` fixed to the error's ID and `data` set to the error's data
 schema. The validation and rate-limit problems have schemas too. See
 [Read an error response](/docs/modules/http/responses#read-an-error-response).
+
+The Better Auth operations are the exception. Their error responses refer to the `BetterAuthError`
+schema, which is Better Auth's own format (`message`, usually `code`), and list Problem Details only
+for the answers RelKit sends before Better Auth runs.
 
 ## What the contract lists
 

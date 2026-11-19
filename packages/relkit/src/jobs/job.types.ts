@@ -58,7 +58,9 @@ export interface RetryPolicy {
 
 /** Policy for late schedules and idempotent submissions. */
 export interface JobAdmission<Input = unknown> {
+  /** Whether a trigger whose start time is already past is run or rejected. */
   readonly pastAt?: "run" | "reject";
+  /** Repeated triggers with the same value of the input field `key` reuse the first run. */
   readonly idempotency?: {
     readonly key?: Extract<keyof Input, string>;
     readonly retention?: DurationInput;
@@ -79,24 +81,33 @@ export interface JobAuthorizationContext {
 /** Public or policy-guarded operations and fields exposed to clients. */
 export type JobClientAccess<Streams extends TaskStreamSchemas = TaskStreamSchemas> =
   | {
+      /** Exposes the listed operations to every caller. */
       readonly public: true;
+      /** Operations the client may call, such as `"trigger"`, `"watch"` and `"cancel"`. */
       readonly operations: readonly JobClientOperation[];
+      /** Run fields the client may read, such as `"status"`, `"progress"` and `"output"`. */
       readonly fields?: readonly JobClientField[];
+      /** Names of the task's streams the client may read. */
       readonly streams?: readonly (keyof Streams & string)[];
     }
   | {
+      /** Called for each client request; returns the caller's scope, or throws to deny access. */
       readonly authorize: (
         request: JobAccessRequest,
         context: JobAuthorizationContext,
       ) => MaybePromise<JobAccessGrant>;
       readonly public?: never;
+      /** Operations the client may call, such as `"trigger"`, `"watch"` and `"cancel"`. */
       readonly operations: readonly JobClientOperation[];
+      /** Run fields the client may read, such as `"status"`, `"progress"` and `"output"`. */
       readonly fields?: readonly JobClientField[];
+      /** Names of the task's streams the client may read. */
       readonly streams?: readonly (keyof Streams & string)[];
     };
 
 /** Jobs service that runs the job. */
 export interface JobServiceSelection {
+  /** Name of the jobs service that runs the job; the application's default when omitted. */
   readonly service?: string;
 }
 
@@ -113,12 +124,19 @@ export type DefineJobOptions<
   Id extends string = Name,
 > = DescriptorMetadata &
   JobServiceSelection & {
+    /** Public name of the job; the generated client calls it as `client.jobs.<name>`. */
     readonly name: Name & ValidJobName<Name>;
+    /** Stable ID of the job. Defaults to `name`. */
     readonly id?: Id;
+    /** The task that every run of the job executes. */
     readonly task: Task;
+    /** Marks the job that a trigger of the task itself uses when the task has several jobs. */
     readonly default?: boolean;
+    /** Schedules that start runs, each with its `input` and a cron rule or an interval. */
     readonly schedules?: readonly ScheduleDefinition<InferInput<Task["input"]>>[];
+    /** How a run is accepted: a start time in the past, and the input field that deduplicates. */
     readonly admission?: JobAdmission<InferOutput<Task["input"]>>;
+    /** What the generated client may do with the job; the job is private when omitted. */
     readonly client?: JobClientAccess<StreamsOf<Task>>;
   };
 

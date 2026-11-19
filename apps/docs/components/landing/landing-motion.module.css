@@ -106,7 +106,7 @@
 
 @media (hover: hover) {
   .control:hover:not(:disabled) {
-    background: #eee;
+    background: var(--fill);
   }
   .technology:hover .track {
     animation-play-state: paused;

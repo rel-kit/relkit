@@ -9,6 +9,12 @@ export interface LocalNativeNamespace {
   readonly scope: string;
 }
 
+/** The task limit that stops the current attempt, with its absolute instant. */
+export interface LocalRunLimit {
+  readonly name: "maxDuration" | "maxElapsed";
+  readonly at: number;
+}
+
 /** Mutable native run state including persisted metadata and attempt-owned resources. */
 export interface LocalNativeRun {
   request: NativeSubmission;
@@ -26,6 +32,9 @@ export interface LocalNativeRun {
   readonly retryOfRunId?: string;
   readonly canonicalInput: JobWireEnvelope;
   readonly completedSleeps: Set<string>;
+  /** Time the current attempt worked before its sleeps, in milliseconds. */
+  activeMs?: number;
+  limit?: LocalRunLimit;
   controller?: AbortController;
   controllerCleanup?: () => void;
 }

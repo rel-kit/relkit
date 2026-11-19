@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import {
   captureRedacted,
   createRedactionPolicy,
+  redactNamedFields,
   redactRecord,
 } from "../../src/observability/index.ts";
 
@@ -80,5 +81,33 @@ test("keeps service context out of default records while allowing bounded captur
   });
   expect(capture?.content).toEqual({
     service: { principal: "user-1", tenant: "tenant-1", token: "[REDACTED]" },
+  });
+});
+
+test("named fields are replaced by the marker with the rules a capture uses", () => {
+  const value = {
+    orderId: "order-1",
+    cardNumber: "4111",
+    customer: { email: "ada@example.test", name: "Ada" },
+    items: [{ sku: "a", note: "gift" }],
+    shipping: { card_number: "4222", name: "Home" },
+  };
+  expect(redactNamedFields(value, ["cardNumber", "customer.email", "items.0.note"])).toEqual({
+    orderId: "order-1",
+    cardNumber: "[REDACTED]",
+    // A dotted path matches from the root of the value.
+    customer: { email: "[REDACTED]", name: "Ada" },
+    // An array index is a segment of the path.
+    items: [{ sku: "a", note: "[REDACTED]" }],
+    // A name matches a key anywhere, whatever its case and separators.
+    shipping: { card_number: "[REDACTED]", name: "Home" },
+  });
+  // The value itself is not changed, and without names it is returned as it is.
+  expect(value.cardNumber).toBe("4111");
+  expect(redactNamedFields(value, [])).toBe(value);
+  expect(redactNamedFields(undefined, ["cardNumber"])).toBeUndefined();
+  // A path that is not from the root does not match.
+  expect(redactNamedFields({ order: value }, ["customer.email"])).toMatchObject({
+    order: { customer: { email: "ada@example.test" } },
   });
 });

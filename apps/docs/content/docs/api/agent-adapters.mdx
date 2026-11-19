@@ -565,23 +565,48 @@ declare const AgentAdapterError: typeof AgentAdapterError;
 
 ### AgentLoopOptions
 
+Options for `createAgentAdapterRuntime`. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentLoopOptions: AgentLoopOptions<AdapterId>;
+export interface AgentLoopOptions<AdapterId extends string> {
+  readonly adapterId: AdapterId;
+  /**
+   * Runs one model turn with the adapter's SDK.
+   * @param request - Resolved model, thread messages, bridged tool definitions and cancellation.
+   * @returns Text and tool calls the model produced.
+   */
+  readonly turn: (request: AgentModelTurnRequest) => Promise<AgentModelTurn>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agent-adapters/adapter.ts#L16)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agent-adapters/adapter-loop.types.ts#L11)
 
 ### AgentToolBridgeOptions
 
+Options for `createAgentToolBridge`. @experimental
+
 **Signature**
 
 ```ts
-declare const AgentToolBridgeOptions: AgentToolBridgeOptions;
+export interface AgentToolBridgeOptions {
+  readonly agentId: string;
+  /** Invocation identity copied into approval records. */
+  readonly invocationId: string;
+  /** Tool descriptors the agent declared, in declaration order. */
+  readonly tools: readonly ToolDescriptor<string>[];
+  /** Common function engine every tool call runs through. */
+  readonly engine: ToolEngine;
+  /** Engine access check run before each tool; group 18's access rules plug in here. */
+  readonly access?: AgentAccessCheck;
+  /** Caller principal forwarded to the access check. */
+  readonly principal?: unknown;
+  readonly trace?: AgentTraceHooks;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agent-adapters/adapter.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/agent-adapters/adapter-bridge.types.ts#L6)
 
 ### DefineAgentRuntimeOptions (interface)
 

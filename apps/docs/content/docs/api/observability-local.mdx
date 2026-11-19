@@ -611,13 +611,31 @@ handles and worker lifetimes remain owned by this storage package.
 
 ### LocalWorkerEffects
 
+Effect operations for a live local telemetry worker process.
+The owning Layer or caller must close the worker after its final call.
+
+**Example**
+
+```ts
+const worker = Effect.runSync(startLocalWorkerEffect());
+await Effect.runPromise(worker.close());
+```
+
 **Signature**
 
 ```ts
-declare const LocalWorkerEffects: LocalWorkerEffects;
+export interface LocalWorkerEffects {
+  readonly pid: number | undefined;
+  /** @param command - Worker IPC command. @returns Its response or a tagged worker error. */
+  readonly call: (
+    command: LocalWorkerCommand,
+  ) => Effect.Effect<Schema.Json | undefined, LocalWorkerError>;
+  /** @returns Completion after the worker process and pending calls are released. */
+  readonly close: () => Effect.Effect<void, LocalWorkerError>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker-client.ts#L15)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client.types.ts#L14)
 
 ### LocalWorkerError
 
@@ -702,33 +720,84 @@ retains the transport's explicit close operation and physical child identity.
 
 ### LocalWorkerCommand
 
+Commands sent through the local worker IPC channel.
+
 **Signature**
 
 ```ts
-declare const LocalWorkerCommand: LocalWorkerCommand;
+type LocalWorkerCommand =
+  | {
+      readonly type: "open";
+      readonly root: string;
+      readonly retention?: TelemetryLocalRetentionPolicy;
+      readonly redaction?: RedactionPolicy;
+    }
+  | { readonly type: "append"; readonly records: readonly LocalRecord[] }
+  | {
+      readonly type: "query";
+      readonly kind: "logs" | "requests" | "traces";
+      readonly query: ObservabilityQueryRequest;
+    }
+  | { readonly type: "detail"; readonly kind: "log" | "request" | "trace"; readonly id: string }
+  | {
+      readonly type: "retention";
+      readonly retention: TelemetryLocalRetentionPolicy;
+      readonly redaction?: RedactionPolicy;
+    }
+  | { readonly type: "flush" | "close" };
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L14)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/types.types.ts#L31)
 
 ### LocalWorkerEffects
 
+Effect operations for a live local telemetry worker process.
+The owning Layer or caller must close the worker after its final call.
+
+**Example**
+
+```ts
+const worker = Effect.runSync(startLocalWorkerEffect());
+await Effect.runPromise(worker.close());
+```
+
 **Signature**
 
 ```ts
-declare const LocalWorkerEffects: LocalWorkerEffects;
+export interface LocalWorkerEffects {
+  readonly pid: number | undefined;
+  /** @param command - Worker IPC command. @returns Its response or a tagged worker error. */
+  readonly call: (
+    command: LocalWorkerCommand,
+  ) => Effect.Effect<Schema.Json | undefined, LocalWorkerError>;
+  /** @returns Completion after the worker process and pending calls are released. */
+  readonly close: () => Effect.Effect<void, LocalWorkerError>;
+}
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L12)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client.types.ts#L14)
 
 ### LocalWorkerError
 
+A local worker creation, IPC, timeout, or response failure.
+
+**Example**
+
+```ts
+Effect.runPromise(
+  worker
+    .call(command)
+    .pipe(Effect.catchTag("LocalWorkerError", (error) => Effect.succeed(error.reason))),
+);
+```
+
 **Signature**
 
 ```ts
-declare const LocalWorkerError: LocalWorkerError;
+declare class LocalWorkerError
 ```
 
-[Source](https://github.com/rel-kit/relkit/blob/main/packages/inspector/src/observability-local/local/worker.ts#L13)
+[Source](https://github.com/rel-kit/relkit/blob/main/packages/relkit/src/observability/local/worker-client-error.ts#L13)
 
 ### startLocalWorkerEffect
 

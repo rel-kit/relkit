@@ -1,7 +1,7 @@
 "use client";
 
 export function OrderReview() {
-  const review = useAgent("orders.review");
+  const review = useAgent("orders.order-review");
   const threadId = "order-1-review";
 
   const start = () =>

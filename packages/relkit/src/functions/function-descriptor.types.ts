@@ -76,19 +76,31 @@ export interface DefineFunctionOptions<
   Errors extends readonly ErrorDescriptorAny[] = readonly [],
   ProgressSchema extends StandardSchemaV1 | undefined = undefined,
 > extends DescriptorMetadata {
+  /** Stable ID, such as `orders.get-order`; the compiler derives it when omitted. */
   readonly id?: Id;
+  /** Schema of the input; the handler receives the validated value. */
   readonly input: InputSchema;
+  /** Schema of the result; the handler's return value is validated against it. */
   readonly output: OutputSchema;
+  /** Declared errors the handler may return, which callers are expected to handle. */
   readonly errors?: Errors;
+  /** Everything the handler calls, by kind; each entry becomes a client on `context`. */
   readonly dependencies?: Dependencies;
   /** Who may call the function: roles, permissions or a predicate, checked for every caller. */
   readonly access?: AccessRule<InferOutput<InputSchema>>;
+  /** Schema of progress values; setting it adds `context.progress.emit(value)` to the handler. */
   readonly progress?: ProgressSchema;
+  /** Time limit of one call in milliseconds; past it the call fails with `RELKIT_TIMEOUT`. */
   readonly timeoutMs?: number;
+  /** Most invocations that run at once in one process; further ones wait in order. */
   readonly concurrency?: number;
+  /** Tool description and policy that `.asTool()` uses when called without options. */
   readonly tool?: FunctionToolMetadata;
+  /** Runs before the handler and may replace the validated input. */
   readonly onBefore?: FunctionLifecycleHook<InferOutput<InputSchema>, Dependencies, ProgressSchema>;
+  /** Runs after the handler succeeds and may replace the output before it is validated. */
   readonly onAfter?: FunctionLifecycleHook<InferOutput<OutputSchema>, Dependencies, ProgressSchema>;
+  /** The function's logic: receives the validated input and `context`, returns the output. */
   readonly handler: FunctionHandler<
     InferOutput<InputSchema>,
     InferOutput<OutputSchema>,

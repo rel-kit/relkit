@@ -15,6 +15,7 @@ import { requestPrincipal } from "./application-access.js";
  * @param applicationRuntime Runtime bound to this application's realtime providers.
  * @param services Database and authentication resources already acquired by the owner.
  * @param context Context patch used by the runtime's lazy context factory.
+ * @param overrides The test's own `context` option; its fields replace the application's.
  * @returns The native in-memory HTTP boundary owned by the application Layer.
  */
 export function createApplicationRequest(
@@ -22,18 +23,26 @@ export function createApplicationRequest(
   applicationRuntime: TestRuntime,
   services: TestApplicationServices,
   context: Record<string, unknown>,
+  overrides: Readonly<Record<string, unknown>> = {},
 ): TestHttpApplication {
   const requests = new AsyncLocalStorage<Request>();
-  Object.assign(context, services.context, {
-    auth: Object.freeze({
-      getSession: () => {
-        const request = requests.getStore();
-        return request === undefined || services.auth === undefined
-          ? Promise.resolve(null)
-          : services.auth.contextFor(request).getSession();
-      },
-    }),
-  });
+  Object.assign(
+    context,
+    services.context,
+    {
+      auth: Object.freeze({
+        getSession: () => {
+          const request = requests.getStore();
+          return request === undefined || services.auth === undefined
+            ? Promise.resolve(null)
+            : services.auth.contextFor(request).getSession();
+        },
+      }),
+    },
+    // As in `createTestRuntime`: a field the test passes replaces the default, here also the
+    // database and the session reader that the application's services supply.
+    overrides,
+  );
   return {
     request: async (input: TestHttpInput, init: RequestInit | undefined) => {
       const request =

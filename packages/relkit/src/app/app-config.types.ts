@@ -10,7 +10,9 @@ import type { InspectorConfigurationInput } from "../contracts/index.js";
 export interface ApiDocsConfig {
   /** Explicitly selects Scalar; omitted/false keeps JSON OpenAPI only. */
   readonly ui?: "scalar" | false;
+  /** Serves the OpenAPI document and the reference in production too. Defaults to `false`. */
   readonly enabledInProduction?: boolean;
+  /** Services left out of the served document; their routes still answer. */
   readonly excludeDomains?: readonly string[];
 }
 
@@ -18,9 +20,13 @@ export interface ApiDocsConfig {
  * @example const server: ServerConfig = { port: 3000, apiDocs: { enabledInProduction: false } };
  */
 export interface ServerConfig {
+  /** Port the HTTP server listens on. */
   readonly port?: number;
+  /** Largest request body in bytes; a larger one is answered `413`. A route can set its own. */
   readonly maxBodyBytes?: number;
+  /** The served OpenAPI document and its reference page. */
   readonly apiDocs?: ApiDocsConfig;
+  /** Serves the contract that the generated client reads. */
   readonly clientContract?: boolean;
   /** Enables the MCP endpoint; `{ auth: "required" }` limits it to signed-in callers. */
   readonly mcp?: boolean | { readonly auth?: "required" };
@@ -36,4 +42,11 @@ export interface ServerConfig {
 /** Development bridge selection; installing or running the UI is independent.
  * @example const inspector: InspectorConfig = { enabled: true };
  */
-export interface InspectorConfig extends InspectorConfigurationInput {}
+export interface InspectorConfig extends InspectorConfigurationInput {
+  /** Starts the bridge the Inspector connects to. Defaults to `false`. */
+  readonly enabled?: boolean;
+  /** Address the bridge listens on; port `0` takes a free port. */
+  readonly connection?: { readonly host?: string; readonly port?: number };
+  /** Largest payload preview the bridge returns, in bytes. Defaults to 1,048,576. */
+  readonly maxPreviewBytes?: number;
+}
