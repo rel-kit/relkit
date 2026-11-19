@@ -1,5 +1,5 @@
 # @relkit/postgres
 
-## 0.9.1
+## 0.9.2
 
 See the root CHANGELOG.md for this release batch.

@@ -1,6 +1,6 @@
 {
   "name": "@relkit/testing",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Testing utilities and local providers for RelKit applications.",
   "license": "MIT",
   "repository": {
