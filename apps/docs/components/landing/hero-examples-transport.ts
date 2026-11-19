@@ -58,7 +58,7 @@ export const transportExamples = [
     panels: [
       {
         label: "Backend",
-        file: "src/services/auth/service.ts + auth route",
+        file: "src/services/auth/ + orders route",
         source: "auth-be",
       },
       {

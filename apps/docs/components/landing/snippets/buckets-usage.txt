@@ -1,15 +1,16 @@
 import receipts from "receipts.bucket.js";
 
 export default defineFunction({
-  input: z.object({
-    orderId: z.string(),
-    file: z.file({
+  input: s.object({
+    orderId: s.string(),
+    file: s.file({
+      maxBytes: 5_000_000,
       mediaTypes: ["application/pdf"],
     }),
   }),
 
-  output: z.object({
-    key: z.string(),
+  output: s.object({
+    key: s.string(),
   }),
 
   dependencies: { buckets: { receipts } },

@@ -1,7 +1,8 @@
 "use client";
 
 export function OrderDetails() {
-  const order = useRoute("GET /orders/:orderId", {
+  // Input, output and errors come from the route.
+  const order = useRoute(api.orders.getOrder, {
     input: { orderId: "order-1" },
     staleTime: 30_000,
   });

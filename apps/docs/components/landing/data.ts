@@ -8,35 +8,35 @@ export const exampleDefinitions = [
     title: "Service",
     description: "Organize a domain around one focused public boundary.",
     source: "examples/commerce/src/services/orders/service.ts",
-    guide: "/docs/service",
+    guide: "/docs/modules/service",
   },
   {
     id: "route",
     title: "Routes",
     description: "Map HTTP requests to a service's validated functions.",
     source: "examples/commerce/src/routes/orders/route.ts",
-    guide: "/docs/http/routes",
+    guide: "/docs/modules/http/routes",
   },
   {
     id: "function",
     title: "Functions",
     description: "Run schema-checked business logic with explicit dependencies.",
     source: "examples/commerce/src/services/orders/functions/create-order.function.ts",
-    guide: "/docs/fundamentals/functions",
+    guide: "/docs/learn/concepts/functions",
   },
   {
     id: "event",
     title: "Events",
     description: "Define typed facts that independent functions can publish and consume.",
     source: "apps/docs/examples/events/order-created.event.ts",
-    guide: "/docs/events",
+    guide: "/docs/modules/events",
   },
   {
     id: "observability",
     title: "Observability",
     description: "Keep complete redacted local evidence before sampling Sentry and OTLP exports.",
     source: "apps/docs/examples/landing/telemetry.ts",
-    guide: "/docs/operations/observability",
+    guide: "/docs/modules/operations/observability",
   },
 ] as const satisfies readonly LandingExample[];
 
@@ -45,31 +45,31 @@ export const primaryCapabilities = [
     id: "service",
     title: "Service",
     summary: "Organize functions and resources behind a focused domain boundary.",
-    guide: "service",
+    guide: "modules/service",
   },
   {
     id: "routes",
     title: "Routes",
     summary: "Expose service functions through explicit, validated HTTP mappings.",
-    guide: "http",
+    guide: "modules/http",
   },
   {
     id: "functions",
     title: "Functions",
     summary: "Write transport-independent business logic with checked input and output.",
-    guide: "fundamentals/functions",
+    guide: "learn/concepts/functions",
   },
   {
     id: "events",
     title: "Events",
     summary: "Publish typed facts and process them with independent functions.",
-    guide: "events",
+    guide: "modules/events",
   },
   {
     id: "observability",
     title: "Observability",
     summary: "Correlate requests, logs, spans, events, and failures in one timeline.",
-    guide: "operations/observability",
+    guide: "modules/operations/observability",
   },
 ] as const;
 
@@ -124,7 +124,7 @@ export const observabilityFeatures = [
     description:
       "Inspect the route, target function, response status, duration, and graph identity together.",
     points: ["Route and function identity", "Status and duration", "Correlated execution"],
-    href: "/docs/operations/inspector",
+    href: "/docs/modules/operations/inspector",
     action: "Inspect requests",
   },
   {
@@ -133,7 +133,7 @@ export const observabilityFeatures = [
     description:
       "Keep complete bounded local logs before minimum-level filtering sends records to exporters.",
     points: ["Structured fields", "Automatic correlation", "Redaction before persistence"],
-    href: "/docs/operations/observability",
+    href: "/docs/modules/operations/observability",
     action: "Explore logs",
   },
   {
@@ -142,7 +142,7 @@ export const observabilityFeatures = [
     description:
       "Follow complete local spans even when root-consistent sampling omits a remote trace.",
     points: ["Parent-child spans", "Exporter health", "Failure isolation"],
-    href: "/docs/operations/observability",
+    href: "/docs/modules/operations/observability",
     action: "Explore traces",
   },
 ] as const;

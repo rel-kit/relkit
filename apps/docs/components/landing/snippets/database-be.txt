@@ -6,10 +6,7 @@ const orders = sqliteTable("orders", {
 export default defineDrizzleService({
   schema: { orders },
 
-  client: ({ env }) => {
-    const sqlite = new Database(env.DATABASE_PATH);
-    return drizzle({ client: sqlite });
-  },
-
+  // Opened when the server starts, closed when it stops.
+  client: ({ env }) => openSqliteDatabase(env.DATABASE_PATH),
   dispose: (database) => database.$client.close(),
 });

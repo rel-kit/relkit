@@ -8,10 +8,10 @@ export function LandingFooter() {
     <footer className={`${system.frame} ${styles.footer}`}>
       <div className={styles.footerTop}>
         <Link className={styles.brand} href="/" aria-label="RelKit home">
-          <Grid2X2 size={28} viewBox="3 3 18 18" stroke="#fff" strokeWidth={2} aria-hidden="true" />
+          <Grid2X2 size={28} viewBox="3 3 18 18" strokeWidth={2} aria-hidden="true" />
           RelKit
         </Link>
-        <p>The TypeScript application kit.</p>
+        <p>The TypeScript backend framework.</p>
         <nav aria-label="Footer navigation">
           <Link href="/docs">Docs</Link>
           <Link href="/docs/api/cli">CLI</Link>

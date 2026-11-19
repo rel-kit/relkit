@@ -1,7 +1,7 @@
 "use client";
 
 export function OrderReport() {
-  const report = useStream("GET /reports/:reportId");
+  const report = useStream(api.orders.streamOrderReport);
 
   const start = () =>
     void report.start({ reportId: "daily-orders" });

@@ -2,7 +2,6 @@ import * as store from "order-agent-persistence.js";
 
 // Order state and review/finish nodes are defined above.
 export default defineGraph({
-  id: "orders.review",
   state,
   input: z.object({ orderId: z.string() }),
   output: z.object({ result: z.string() }),
@@ -15,6 +14,6 @@ export default defineGraph({
 
   // Persist the review while waiting for approval.
   checkpointer: store.orderCheckpoints,
-  stateProfile: "default",
+  limits: { maxSteps: 10, maxToolCalls: 0, timeoutMs: 20_000 },
   client: { public: true },
 });
