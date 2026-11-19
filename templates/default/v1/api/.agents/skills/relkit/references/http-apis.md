@@ -1,6 +1,6 @@
 # HTTP routes and request policy
 
-Routes live under `src/routes/**/route.ts`. The file path supplies the URL, and named exports supply methods. Import route APIs from `@relkit/app/routes`. Use a public service function as the target for ordinary application endpoints.
+Routes live under `src/routes/**/route.ts`. The file path supplies the URL, and named exports supply methods. Import route APIs from `relkit/routes`. Use a public service function as the target for ordinary application endpoints.
 
 ## `defineRoute`: one function-backed method
 
@@ -27,13 +27,19 @@ export const GET = defineRoute({
 });
 ```
 
-A raw handler has a generic OpenAPI response. The recognized Better Auth mount also uses a raw route:
+A raw handler has a generic OpenAPI response. RelKit mounts a Better Auth service at `/api/auth` itself; you add no route file for it. Only a service declared with `mount: false` needs its own raw route:
 
 ```ts
 import { defineRoute } from "relkit/routes";
 import auth from "@app/services/auth/service.js";
 
 export const ALL = defineRoute({ handler: auth.handler });
+```
+
+To require a signed-in caller on a function-backed route, set `auth: "required"`:
+
+```ts
+export const GET = defineRoute({ target: account.session, auth: "required" });
 ```
 
 ## `defineServiceRoutes`: methods on one service
