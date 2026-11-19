@@ -4,7 +4,7 @@ export function TopologyFallback() {
     <svg viewBox="0 0 560 360" fill="none" aria-hidden="true">
       <g transform="translate(280 170) scale(1 .55) rotate(-30)">
         {Array.from({ length: 15 }, (_, index) => (
-          <g key={index} stroke="#e3e3e3" strokeWidth="1">
+          <g key={index} style={{ stroke: "var(--topo-grid)" }} strokeWidth="1">
             <path d={`M${index * 28 - 196} -196V196`} />
             <path d={`M-196 ${index * 28 - 196}H196`} />
           </g>
@@ -17,21 +17,23 @@ export function TopologyFallback() {
           [84, 84],
         ].map(([x, y], index) => (
           <g key={index}>
-            <path d={`M0 0H${x}V${y}`} stroke="#a3a3a3" />
+            <path d={`M0 0H${x}V${y}`} style={{ stroke: "var(--topo-wire)" }} />
             <rect
               x={x! - 20}
               y={y! - 20}
               width="40"
               height="40"
-              fill={index === 2 ? "#262626" : "#f0f0f0"}
-              stroke="#737373"
+              style={{
+                fill: index === 2 ? "var(--topo-center)" : "var(--topo-node)",
+                stroke: "var(--topo-node-line)",
+              }}
             />
             <rect
               x={x! - 12}
               y={y! - 12}
               width="24"
               height="24"
-              stroke={index === 2 ? "#fff" : "#b0b0b0"}
+              style={{ stroke: index === 2 ? "var(--topo-center-inner)" : "var(--topo-inner)" }}
             />
           </g>
         ))}
@@ -40,10 +42,22 @@ export function TopologyFallback() {
           [112, 140],
           [28, -168],
         ].map(([x, y], index) => (
-          <rect key={index} x={x} y={y} width="28" height="28" stroke="#a3a3a3" />
+          <rect
+            key={index}
+            x={x}
+            y={y}
+            width="28"
+            height="28"
+            style={{ stroke: "var(--topo-wire)" }}
+          />
         ))}
       </g>
-      <g fill="#737373" fontFamily="monospace" fontSize="10" textAnchor="middle">
+      <g
+        style={{ fill: "var(--topo-label)" }}
+        fontFamily="monospace"
+        fontSize="10"
+        textAnchor="middle"
+      >
         <text x="181" y="112">
           ROUTES
         </text>

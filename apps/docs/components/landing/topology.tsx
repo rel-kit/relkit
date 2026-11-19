@@ -1,18 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Pause, Play } from "lucide-react";
-import { connectTopology, type TopologyStatus } from "./topology-controller";
+import { connectTopology, type TopologyStatus, type TopologyTheme } from "./topology-controller";
 import { TopologyFallback } from "./topology-fallback";
 import styles from "./topology.module.css";
 
 const preferenceKey = "relkit:topology-paused";
+
+/** Follows the data-theme attribute that Blume's theme script and header toggle set. */
+function subscribeTheme(change: () => void) {
+  const observer = new MutationObserver(change);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  return () => observer.disconnect();
+}
+const readTheme = (): TopologyTheme =>
+  document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+const serverTheme = (): TopologyTheme => "light";
 
 export function Topology() {
   const host = useRef<HTMLDivElement>(null);
   const controller = useRef<ReturnType<typeof connectTopology> | null>(null);
   const [paused, setPaused] = useState(false);
   const [status, setStatus] = useState<TopologyStatus>("idle");
+  const theme = useSyncExternalStore(subscribeTheme, readTheme, serverTheme);
 
   useEffect(() => {
     if (!host.current) return;
@@ -28,7 +39,7 @@ export function Topology() {
       onStatus: setStatus,
       load: async (element) => {
         const { createTopologyScene } = await import("./topology-scene");
-        return createTopologyScene(element);
+        return createTopologyScene(element, theme);
       },
     });
     controller.current = connection;
@@ -36,7 +47,8 @@ export function Topology() {
       connection.dispose();
       controller.current = null;
     };
-  }, []);
+    // The scene is rebuilt in the new palette when the theme changes.
+  }, [theme]);
 
   const toggle = () => {
     const next = !paused;

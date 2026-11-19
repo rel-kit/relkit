@@ -20,8 +20,9 @@ import styles from "./landing-system.module.css";
  */
 export function LandingPage({ examples }: { readonly examples: readonly HeroExample[] }) {
   return (
-    // The landing is light-only; forcing it keeps the shared docs header on the same tokens.
-    <RootProvider theme={{ forcedTheme: "light" }} search={{ enabled: false }}>
+    // Blume's theme script and header toggle own the theme (data-theme on <html>); the landing
+    // styles follow that attribute, so next-themes stays off.
+    <RootProvider theme={{ enabled: false }} search={{ enabled: false }}>
       <Container className="landing-root">
         <HeroDesign
           className={`${heroSans.variable} ${heroMono.variable} ${heroNeon.variable} ${heroCode.variable}`}

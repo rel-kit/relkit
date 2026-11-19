@@ -18,13 +18,47 @@ import {
   Vector3,
   WebGLRenderer,
 } from "three";
-import type { TopologyScene } from "./topology-controller";
+import type { TopologyScene, TopologyTheme } from "./topology-controller";
 import styles from "./topology.module.css";
+
+/** Scene colors per document theme; light matches the section's --soft surface. */
+const palettes = {
+  light: {
+    clear: 0xfafafa,
+    gridCenter: 0xd4d4d4,
+    grid: 0xe5e5e5,
+    tile: 0.92,
+    edge: 0x929292,
+    node: 0xf5f5f5,
+    center: 0x262626,
+    mark: 0xffffff,
+    connection: 0xa3a3a3,
+    packet: 0x525252,
+    outline: 0x737373,
+  },
+  dark: {
+    clear: 0x141517,
+    gridCenter: 0x34353a,
+    grid: 0x26272b,
+    tile: 0.07,
+    edge: 0x6b6b6b,
+    node: 0x1f2023,
+    center: 0xe5e5e5,
+    mark: 0x141517,
+    connection: 0x5a5a5a,
+    packet: 0xd4d4d4,
+    outline: 0x8a8a8a,
+  },
+} as const;
 
 /** Original RelKit topology; sparse cell outlines are inspired by ns-ui's
  * Delta Frame Macroblock. No reference implementation or assets are copied.
  */
-export function createTopologyScene(host: HTMLDivElement): TopologyScene {
+export function createTopologyScene(
+  host: HTMLDivElement,
+  theme: TopologyTheme = "light",
+): TopologyScene {
+  const palette = palettes[theme];
   const renderer = new WebGLRenderer({
     antialias: true,
     alpha: false,
@@ -44,7 +78,7 @@ export function createTopologyScene(host: HTMLDivElement): TopologyScene {
     materials.add(material);
     return material;
   };
-  renderer.setClearColor(0xfafafa);
+  renderer.setClearColor(palette.clear);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   camera.position.set(10, 12, 14);
   camera.lookAt(0, 0, 0);
@@ -53,7 +87,7 @@ export function createTopologyScene(host: HTMLDivElement): TopologyScene {
   camera.updateProjectionMatrix();
 
   try {
-    const grid = new GridHelper(10.8, 18, 0xd4d4d4, 0xe5e5e5);
+    const grid = new GridHelper(10.8, 18, palette.gridCenter, palette.grid);
     geometries.add(grid.geometry);
     for (const material of Array.isArray(grid.material) ? grid.material : [grid.material])
       materials.add(material);
@@ -67,7 +101,7 @@ export function createTopologyScene(host: HTMLDivElement): TopologyScene {
       matrix.makeRotationX(-Math.PI / 2);
       matrix.setPosition((index % 18) * 0.6 - 5.1, -0.01, Math.floor(index / 18) * 0.6 - 5.1);
       tiles.setMatrixAt(index, matrix);
-      const tone = 0.92 + ((index * 37) % 13) / 180;
+      const tone = palette.tile + ((index * 37) % 13) / 180;
       tiles.setColorAt(index, color.setRGB(tone, tone, tone));
     }
     scene.add(tiles);
@@ -82,9 +116,9 @@ export function createTopologyScene(host: HTMLDivElement): TopologyScene {
     ];
     const nodeGeometry = ownGeometry(new BoxGeometry(1.05, 0.42, 1.05));
     const edges = ownGeometry(new EdgesGeometry(nodeGeometry));
-    const edgeMaterial = ownMaterial(new LineBasicMaterial({ color: 0x929292 }));
-    const nodeMaterial = ownMaterial(new MeshBasicMaterial({ color: 0xf5f5f5 }));
-    const centerMaterial = ownMaterial(new MeshBasicMaterial({ color: 0x262626 }));
+    const edgeMaterial = ownMaterial(new LineBasicMaterial({ color: palette.edge }));
+    const nodeMaterial = ownMaterial(new MeshBasicMaterial({ color: palette.node }));
+    const centerMaterial = ownMaterial(new MeshBasicMaterial({ color: palette.center }));
     for (const [index, position] of nodes.entries()) {
       const node = new Group();
       node.add(new Mesh(nodeGeometry, index === 2 ? centerMaterial : nodeMaterial));
@@ -93,7 +127,7 @@ export function createTopologyScene(host: HTMLDivElement): TopologyScene {
       scene.add(node);
     }
     const markGeometry = ownGeometry(new PlaneGeometry(0.2, 0.2));
-    const markMaterial = ownMaterial(new MeshBasicMaterial({ color: 0xffffff }));
+    const markMaterial = ownMaterial(new MeshBasicMaterial({ color: palette.mark }));
     for (const [x, z] of [
       [-0.15, -0.15],
       [-0.15, 0.15],
@@ -114,10 +148,13 @@ export function createTopologyScene(host: HTMLDivElement): TopologyScene {
     }
     const connections = ownGeometry(new BufferGeometry().setFromPoints(connectionPoints));
     scene.add(
-      new LineSegments(connections, ownMaterial(new LineBasicMaterial({ color: 0xa3a3a3 }))),
+      new LineSegments(
+        connections,
+        ownMaterial(new LineBasicMaterial({ color: palette.connection })),
+      ),
     );
     const packetGeometry = ownGeometry(new BoxGeometry(0.1, 0.1, 0.1));
-    const packetMaterial = ownMaterial(new MeshBasicMaterial({ color: 0x525252 }));
+    const packetMaterial = ownMaterial(new MeshBasicMaterial({ color: palette.packet }));
     const packets = endpoints.map(() => {
       const packet = new Mesh(packetGeometry, packetMaterial);
       scene.add(packet);
@@ -134,7 +171,7 @@ export function createTopologyScene(host: HTMLDivElement): TopologyScene {
     const outlines = Array.from({ length: 3 }, () => {
       const outline = new LineLoop(
         outlineGeometry,
-        ownMaterial(new LineBasicMaterial({ color: 0x737373, transparent: true })),
+        ownMaterial(new LineBasicMaterial({ color: palette.outline, transparent: true })),
       );
       scene.add(outline);
       return outline;

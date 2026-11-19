@@ -4,6 +4,14 @@
   flex-direction: column;
   justify-content: center;
   padding: 32px 24px;
+  --topo-grid: #e3e3e3;
+  --topo-wire: #a3a3a3;
+  --topo-node: #f0f0f0;
+  --topo-node-line: #737373;
+  --topo-center: #262626;
+  --topo-center-inner: #fff;
+  --topo-inner: #b0b0b0;
+  --topo-label: #737373;
   border-left: 1px solid var(--line);
   background: var(--soft);
 }
@@ -47,7 +55,7 @@
 
 .nodeLabel {
   position: absolute;
-  color: #686868;
+  color: var(--muted);
   font-family: var(--hero-mono), monospace;
   font-size: 9px;
   text-transform: uppercase;
@@ -96,4 +104,15 @@
     max-width: 560px;
     align-self: center;
   }
+}
+
+:global(:root[data-theme="dark"]) .topology {
+  --topo-grid: #26272b;
+  --topo-wire: #5a5a5a;
+  --topo-node: #1f2023;
+  --topo-node-line: #8a8a8a;
+  --topo-center: #e5e5e5;
+  --topo-center-inner: #141517;
+  --topo-inner: #525252;
+  --topo-label: #8a8a8a;
 }

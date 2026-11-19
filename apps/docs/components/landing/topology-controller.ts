@@ -2,6 +2,9 @@ import { createTopologyLoop } from "./topology-loop";
 
 export type TopologyStatus = "idle" | "ready" | "reduced" | "unavailable";
 
+/** The document theme the scene paints for. */
+export type TopologyTheme = "light" | "dark";
+
 export interface TopologyScene {
   readonly render: (elapsed: number) => void;
   readonly resize: () => void;
