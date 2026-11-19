@@ -1,6 +1,7 @@
-import { Image, Link } from "fumadocs-core/framework";
+import { Link } from "fumadocs-core/framework";
 import { Activity, ArrowRight, ArrowUpRight, Braces, Terminal } from "lucide-react";
 import { observabilityFeatures } from "./data";
+import { InspectorCarousel } from "./inspector-carousel";
 import { SectionHeading } from "./sections";
 import { landingCommunityStack, StackIcon } from "./stack-icons";
 import { MotionRegion } from "./motion-region";
@@ -45,28 +46,7 @@ export function InspectorShowcase() {
           description="Follow requests, functions, events, and async work through the local Inspector. The same graph identity connects the whole execution."
         />
         <div className={styles.inspectorStage}>
-          <Link
-            className={styles.inspector}
-            href="/docs/modules/operations/inspector"
-            aria-label="Explore the RelKit Inspector guide"
-          >
-            <div className={styles.inspectorBar}>
-              <span>
-                <i /> localhost:3210
-              </span>
-              <span>
-                RelKit Inspector <ArrowUpRight size={14} aria-hidden="true" />
-              </span>
-            </div>
-            <Image
-              src="/inspector-light.png"
-              alt="RelKit Inspector with its navigation sidebar and routes workspace"
-              width={1280}
-              height={900}
-              loading="lazy"
-              sizes="(max-width: 560px) 90vw, (max-width: 1200px) 85vw, 992px"
-            />
-          </Link>
+          <InspectorCarousel />
           <p className={system.label}>Local evidence. Redacted before persistence.</p>
         </div>
         <div className={styles.observability}>
