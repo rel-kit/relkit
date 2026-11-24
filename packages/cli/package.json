@@ -1,6 +1,6 @@
 {
   "name": "@relkit/cli",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "The RelKit CLI: compiler, development server, client generator, build, inspection and deployment.",
   "license": "MIT",
   "repository": {
