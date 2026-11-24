@@ -2,6 +2,10 @@
 name: Release
 
 on:
+  # A merge starts Release at once: the merged pull request's CI already tested the same Git tree.
+  push:
+    branches: [main]
+  # Fallback for a commit without such a run, for example a merge from a fork.
   workflow_run:
     workflows: [CI]
     branches: [main]
@@ -37,6 +41,7 @@ jobs:
   select-release-mode:
     name: Select release mode
     if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'workflow_run' &&
        github.event.workflow_run.conclusion == 'success' &&
        github.event.workflow_run.head_branch == 'main' &&
@@ -53,6 +58,8 @@ jobs:
       sha: ${{ steps.select.outputs.sha }}
       artifact_id: ${{ steps.select.outputs.artifact_id }}
       artifact_run_id: ${{ steps.select.outputs.artifact_run_id }}
+      ci_run_id: ${{ steps.select.outputs.ci_run_id }}
+      evidence_run_id: ${{ steps.select.outputs.evidence_run_id }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -205,7 +212,16 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           pattern: "{release-evidence-*,create-capability-table-*}"
-          run-id: ${{ github.event.workflow_run.id || inputs.ci_run_id }}
+          run-id: ${{ needs.select-release-mode.outputs.ci_run_id }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/evidence
+      - name: Download the creation measurements of the commit this batch was versioned from
+        # The release pull request runs a reduced suite; the full run of its base measured creation.
+        if: needs.select-release-mode.outputs.evidence_run_id != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: "create-capability-table-*"
+          run-id: ${{ needs.select-release-mode.outputs.evidence_run_id }}
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/evidence
       - name: Bundle full reports and summaries as a release asset
@@ -313,6 +329,21 @@ jobs:
             make_latest=false
           fi
           gh release edit "$tag" --draft=false --latest="$make_latest"
+      - name: Report the release lead time against the 30-minute budget
+        # Measures every release; it never fails one. See docs/maintainers/releasing.md.
+        if: needs.select-release-mode.outputs.mode == 'publish'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: ${{ needs.select-release-mode.outputs.sha }}
+        run: |
+          base="$(gh api "repos/$GITHUB_REPOSITORY/commits/$RELEASE_SHA" --jq '.parents[0].sha')"
+          merged="$(gh api "repos/$GITHUB_REPOSITORY/commits/$base" --jq '.commit.committer.date')"
+          minutes="$(( ($(date -u +%s) - $(date -u -d "$merged" +%s)) / 60 ))"
+          echo "Release lead time: $minutes min since $base, the commit this batch was versioned from, reached main. Budget: 30 min." | tee -a "$GITHUB_STEP_SUMMARY"
+          if test "$minutes" -gt 30; then
+            echo "::warning::This release took $minutes minutes from the merge of $base; the budget is 30."
+          fi
 
   reconcile:
     name: Reconcile newer main changes

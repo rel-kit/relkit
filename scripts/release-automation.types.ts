@@ -16,4 +16,14 @@ export interface ReleaseDecision {
   readonly sha: string;
   readonly artifact_id?: string;
   readonly artifact_run_id?: string;
+  /** CI run that verified `sha`; its reports become release evidence. */
+  readonly ci_run_id?: string;
+  /** Full CI run of the commit the batch was versioned from, when `ci_run_id` ran the reduced release suite. */
+  readonly evidence_run_id?: string;
+}
+
+/** The CI run that verified a main commit, and whether it ran on main or on the merged pull request. */
+export interface ReleaseAuthority {
+  readonly run: string;
+  readonly source: "main" | "pull_request";
 }

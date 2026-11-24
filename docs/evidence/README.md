@@ -6,7 +6,9 @@ GitHub release assets:
 - Scripts that measure releases write full reports under the ignored `test-results/evidence`
   directory. CI uploads that directory as a workflow artifact kept for 90 days.
 - Each GitHub release carries `evidence-<version>.tar.gz` with the reports from the CI run that
-  verified it, plus these summaries. `bun scripts/release-evidence.ts bundle` builds the archive.
+  verified it, plus these summaries. When that run is the release pull request's reduced suite,
+  the creation capability table comes from the full run on the commit the batch was versioned
+  from. `bun scripts/release-evidence.ts bundle` builds the archive.
 - `create-capabilities/<release>.md` summarizes the creation measurement for each `create-relkit`
   release.
 

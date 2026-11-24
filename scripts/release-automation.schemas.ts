@@ -60,3 +60,27 @@ export const ReleaseState = Schema.Struct({
 
 /** Live main is used only for the versioning lease and follow-up dispatch. */
 export const MainReference = Schema.Struct({ object: Schema.Struct({ sha: Schema.String }) });
+
+/** Only a merged pull request of this repository can lend its CI to the main commit it produced. */
+export const CommitPulls = Schema.Array(
+  Schema.Struct({
+    merged_at: Schema.NullOr(Schema.String),
+    merge_commit_sha: Schema.NullOr(Schema.String),
+    base: Schema.Struct({
+      ref: Schema.String,
+      repo: Schema.Struct({ full_name: Schema.String }),
+    }),
+    head: Schema.Struct({
+      sha: Schema.String,
+      repo: Schema.NullOr(Schema.Struct({ full_name: Schema.String })),
+    }),
+  }),
+);
+
+/** The open release pull request, read to avoid versioning the same main commit twice. */
+export const OpenPulls = Schema.Array(
+  Schema.Struct({ head: Schema.Struct({ ref: Schema.String, sha: Schema.String }) }),
+);
+
+/** Ancestry between main and the release branch, as GitHub computes it. */
+export const Comparison = Schema.Struct({ ahead_by: Schema.Number, behind_by: Schema.Number });

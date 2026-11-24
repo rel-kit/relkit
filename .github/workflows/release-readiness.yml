@@ -2,6 +2,13 @@ name: Release readiness
 
 on:
   workflow_call:
+    inputs:
+      version_only:
+        description: >-
+          The generated release pull request with only version-derived changes. Skips the
+          benchmark and creation measurements that the commit it was versioned from already ran.
+        type: boolean
+        default: false
     outputs:
       agent-eval-pass-rate:
         description: Percentage of graded agent evaluation runs that passed
@@ -153,6 +160,7 @@ jobs:
 
   dev-loop-benchmark:
     name: Benchmark the development loop
+    if: ${{ !inputs.version_only }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -206,6 +214,7 @@ jobs:
 
   creation-capability:
     name: Measure creation (${{ matrix.template }}, ${{ matrix.runtime }})
+    if: ${{ !inputs.version_only }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
@@ -243,7 +252,7 @@ jobs:
   creation-capability-table:
     name: Write the creation capability table
     needs: creation-capability
-    if: always()
+    if: ${{ always() && !inputs.version_only }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -319,7 +328,7 @@ jobs:
   release-evidence:
     name: Attach evidence to the rehearsed release
     needs: [pack, creation-capability-table]
-    if: ${{ !cancelled() && needs.pack.result == 'success' }}
+    if: ${{ !cancelled() && needs.pack.result == 'success' && !inputs.version_only }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:

@@ -3,7 +3,7 @@ import { expect, test } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
-test("CI gates merges and only green main runs start releases", async () => {
+test("CI gates merges and only verified main commits start releases", async () => {
   const root = resolve(import.meta.dir, "../..");
   const [checks, release, verify, testAll] = await Promise.all([
     readFile(resolve(root, ".github/workflows/checks.yml"), "utf8"),
@@ -25,6 +25,7 @@ test("CI gates merges and only green main runs start releases", async () => {
   expect(checks).not.toContain("bun run test:scaffold");
   expect(checks).not.toContain("aws-cloud");
   expect(release).toContain("workflows: [CI]");
+  expect(release).toContain("(github.event_name == 'push' && github.ref == 'refs/heads/main') ||");
   expect(release).toContain("github.event.workflow_run.conclusion == 'success'");
   expect(release).toContain("github.event.workflow_run.head_branch == 'main'");
   expect(release).toContain(
@@ -155,4 +156,85 @@ test("PR code cannot obtain preparation write credentials and rehearsal uses sep
   expect(JSON.stringify(rehearsal.jobs.pack)).toContain(
     "bun run release:pack --ci-pack --allow-dirty",
   );
+});
+
+test("a merge releases on its pull request run only through the recorded tree", async () => {
+  const root = resolve(import.meta.dir, "../..");
+  const [checks, release, authority] = await Promise.all([
+    readFile(resolve(root, ".github/workflows/checks.yml"), "utf8"),
+    readFile(resolve(root, ".github/workflows/ci.yml"), "utf8"),
+    readFile(resolve(root, "scripts/release-pull-authority.ts"), "utf8"),
+  ]);
+  const jobs = Bun.YAML.parse(checks).jobs;
+  const record = jobs["tested-tree"];
+  expect(record.if).toBeUndefined();
+  expect(record.permissions).toEqual({ contents: "read" });
+  expect(JSON.stringify(record.steps)).toContain("git rev-parse 'HEAD^{tree}'");
+  expect(record.steps.at(-1).with.name).toBe("tested-tree-${{ steps.tree.outputs.tree }}");
+  expect(authority).toContain('TESTED_TREE_PREFIX = "tested-tree-"');
+  expect(jobs["ci-gate"].needs).toContain("tested-tree");
+  expect(jobs["ci-gate"].steps[0].run).toContain('test "$TESTED_TREE_RESULT" = success');
+  const workflow = Bun.YAML.parse(release);
+  expect(workflow.on.push).toEqual({ branches: ["main"] });
+  expect(workflow.on.workflow_run).toEqual({
+    workflows: ["CI"],
+    branches: ["main"],
+    types: ["completed"],
+  });
+  const select = workflow.jobs["select-release-mode"];
+  expect(select.outputs.ci_run_id).toBe("${{ steps.select.outputs.ci_run_id }}");
+  expect(select.outputs.evidence_run_id).toBe("${{ steps.select.outputs.evidence_run_id }}");
+  const downloads = workflow.jobs.pack.steps.filter((step: { uses?: string }) =>
+    step.uses?.startsWith("actions/download-artifact"),
+  );
+  expect(downloads.map((step: { with: { "run-id": string } }) => step.with["run-id"])).toEqual([
+    "${{ needs.select-release-mode.outputs.ci_run_id }}",
+    "${{ needs.select-release-mode.outputs.evidence_run_id }}",
+  ]);
+  expect(downloads[1].if).toBe("needs.select-release-mode.outputs.evidence_run_id != ''");
+  expect(downloads[1].with.pattern).toBe("create-capability-table-*");
+  // The lead time is reported for every release and can never fail one.
+  const leadTime = workflow.jobs.publish.steps.at(-1);
+  expect(leadTime.name).toBe("Report the release lead time against the 30-minute budget");
+  expect(leadTime["continue-on-error"]).toBe(true);
+});
+
+test("only a version-only release pull request skips the slow measurements", async () => {
+  const root = resolve(import.meta.dir, "../..");
+  const [checks, readiness] = await Promise.all(
+    ["checks.yml", "release-readiness.yml"].map(async (name) =>
+      Bun.YAML.parse(await readFile(resolve(root, ".github/workflows", name), "utf8")),
+    ),
+  );
+  const jobs = checks.jobs;
+  const versionOnly = "needs.release-scope.outputs.version_only";
+  expect(jobs["release-scope"].if).toBe("github.event_name == 'pull_request'");
+  expect(jobs["release-scope"].permissions).toEqual({ contents: "read" });
+  expect(JSON.stringify(jobs["release-scope"].steps)).toContain("scripts/release-pr-scope.ts");
+  expect(jobs["docs-installations"].needs).toBe("release-scope");
+  expect(jobs["docs-installations"].if).toBe(`\${{ !cancelled() && ${versionOnly} != 'true' }}`);
+  expect(jobs["contributor-quickstart"].needs).toEqual(["quickstart-changes", "release-scope"]);
+  // Main always runs the quickstart; a pull request runs it unless it is the version-only release.
+  expect(jobs["contributor-quickstart"].if).toContain("github.event_name != 'pull_request' ||");
+  expect(jobs["contributor-quickstart"].if).toContain(`${versionOnly} != 'true'`);
+  expect(jobs["release-readiness"].with).toEqual({
+    version_only: `\${{ ${versionOnly} == 'true' }}`,
+  });
+  const gate = jobs["ci-gate"];
+  expect(gate.needs).toContain("release-scope");
+  expect(gate.env.VERSION_ONLY).toBe(`\${{ ${versionOnly} }}`);
+  expect(gate.steps[0].run).toContain(
+    'if test "$VERSION_ONLY" = true; then\n  test "$DOCS_INSTALLATIONS_RESULT" = skipped\nelse\n  test "$DOCS_INSTALLATIONS_RESULT" = success\nfi',
+  );
+  expect(readiness.on.workflow_call.inputs.version_only).toMatchObject({
+    type: "boolean",
+    default: false,
+  });
+  const skipped = ["dev-loop-benchmark", "creation-capability", "creation-capability-table"];
+  for (const [name, job] of Object.entries<{ if?: string }>(readiness.jobs)) {
+    if (skipped.includes(name) || name === "release-evidence")
+      expect(job.if).toContain("!inputs.version_only");
+    // Versioning, packaging, the beta rehearsal, agent evaluations and MCP always run.
+    else expect(job.if).toBeUndefined();
+  }
 });

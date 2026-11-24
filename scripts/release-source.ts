@@ -1,4 +1,4 @@
-/** Resolves immutable batch source and exact successful CI; current main only controls versioning and follow-up work. */
+/** Resolves immutable batch source and the CI run that verified it; current main only controls versioning and follow-up work. */
 import assert from "node:assert/strict";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -10,8 +10,9 @@ import {
   ReleaseRuns,
   ReleaseState,
 } from "./release-automation.schemas.js";
-import type { ReleaseApi } from "./release-automation.types.js";
+import type { ReleaseApi, ReleaseAuthority } from "./release-automation.types.js";
 import { verifyReleaseCi } from "./release-ci-verification.js";
+import { pullRequestReleaseCi } from "./release-pull-authority.js";
 import { validateReleasePlan, type ReleasePlan } from "./release-plan.js";
 
 /**
@@ -160,4 +161,28 @@ export async function successfulReleaseCi(repository: string, sha: string, read:
     ),
   );
   return id;
+}
+
+/**
+ * Finds the CI run that verified a main commit: its own main run, or the run of the pull request
+ * merged as that commit when it recorded the same Git tree.
+ * @param root - Immutable workflow checkout that holds the commit.
+ * @param repository - Validated repository context.
+ * @param sha - Exact main commit.
+ * @param read - Bounded authenticated API adapter.
+ * @param signal - Owning cancellation.
+ * @returns The verifying run and where it ran, or undefined while neither exists.
+ */
+export async function releaseAuthority(
+  root: string,
+  repository: string,
+  sha: string,
+  read: ReleaseApi,
+  signal: AbortSignal,
+): Promise<ReleaseAuthority | undefined> {
+  const main = await successfulReleaseCi(repository, sha, read);
+  if (main) return { run: main, source: "main" };
+  const tree = await releaseGit(root, ["rev-parse", `${sha}^{tree}`], signal);
+  const pull = await pullRequestReleaseCi(repository, sha, tree, read);
+  return pull ? { run: pull, source: "pull_request" } : undefined;
 }
