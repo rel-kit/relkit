@@ -1,6 +1,6 @@
 {
   "name": "@relkit/app",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Deprecated: RelKit is now the relkit package. This release re-exports relkit.",
   "license": "MIT",
   "repository": {
