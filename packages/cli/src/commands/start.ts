@@ -10,7 +10,7 @@ import {
   retainCliCleanupFailures,
 } from "../cli-cleanup-evidence.js";
 import { CliStart, startLiveLayer } from "./start.service.js";
-import type { StartedProject, StartOptions } from "./start.types.js";
+import type { ScopedStartedProject, StartedProject, StartOptions } from "./start.types.js";
 export type { StartedProject, StartOptions } from "./start.types.js";
 export { CliStart, startLive, startLiveLayer } from "./start.service.js";
 
@@ -27,6 +27,7 @@ export const startProjectEffect = Effect.fn("Start.project")(
 /**
  * Runs production until native exit with one scope owning the complete lifetime.
  * @param options - Build, port, health and cancellation settings.
+ * @param onReady - Called once the server passes its health checks, before waiting for exit.
  * @returns The child's native exit status after process/reader cleanup.
  * @example
  * ```ts
@@ -35,14 +36,16 @@ export const startProjectEffect = Effect.fn("Start.project")(
  * ```
  */
 export const runStartEffect = Effect.fn("Start.command")(
-  (options: StartOptions = {}) =>
+  (options: StartOptions = {}, onReady?: (server: ScopedStartedProject) => void) =>
     Effect.scoped(
       Effect.gen(function* () {
         const server = yield* startProjectEffect(options);
+        onReady?.(server);
         return yield* cliPromise("start.wait", () => server.exited);
       }),
     ),
-  (effect, _options: StartOptions = {}) => observeCli("start.command", effect),
+  (effect, _options: StartOptions = {}, _onReady?: (server: ScopedStartedProject) => void) =>
+    observeCli("start.command", effect),
 );
 
 /**

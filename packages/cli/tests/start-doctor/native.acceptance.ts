@@ -38,6 +38,20 @@ const suite = Effect.scoped(
     assert.equal(yield* Effect.promise(() => first.exited), 0);
     assert.throws(() => process.kill(first.process.pid, 0));
 
+    // The server's own output reaches the caller's sinks, split into lines.
+    const printed: { stdout: string[]; stderr: string[] } = { stdout: [], stderr: [] };
+    const forwarded = yield* Effect.promise(() =>
+      startProject({
+        ...options,
+        output: {
+          stdout: (line) => printed.stdout.push(line),
+          stderr: (line) => printed.stderr.push(line),
+        },
+      }),
+    );
+    yield* Effect.promise(() => forwarded.stop());
+    assert.deepEqual(printed, { stdout: ["owned-output"], stderr: ["owned-error-output"] });
+
     const capture = Promise.withResolvers<Bun.Subprocess>();
     // Proxy preserves all actual native overloads while observing their returned handle.
     const spawn = captureSpawn(capture.resolve);

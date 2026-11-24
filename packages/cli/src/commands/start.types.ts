@@ -1,6 +1,7 @@
 import type { RuntimeProcesses, RuntimeSubprocess } from "relkit/runtime";
 import type { Effect, Scope } from "effect";
 import type { CliAdapterError } from "../cli-errors.js";
+import type { CliIo } from "../main-support-types.js";
 
 /** Existing production-start options, including native adapter overrides. */
 export interface StartOptions {
@@ -14,6 +15,8 @@ export interface StartOptions {
   readonly signal?: AbortSignal;
   readonly fetch?: typeof fetch;
   readonly spawn?: RuntimeProcesses["spawn"];
+  /** Line sinks for the server's own output; without them its output is discarded. */
+  readonly output?: CliIo;
 }
 
 /** Caller-owned production handle; stop settles process and response drains exactly once. */
@@ -54,6 +57,8 @@ export interface StartProcessRequest {
   readonly cwd: string;
   readonly environment: Readonly<Record<string, string>>;
   readonly stopTimeoutMs: number;
+  /** Line sinks for the child's stdout and stderr; absent sinks discard the output. */
+  readonly output?: CliIo;
 }
 
 /** Native process boundary with physical pipe and child settlement. */
