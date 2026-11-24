@@ -21,7 +21,7 @@ function admitRun(repository: string, run: ReleaseRunRecord): void {
   assert.equal(run.path, ".github/workflows/ci.yml");
   assert.equal(run.head_branch, "main");
   assert.equal(run.head_repository.full_name, repository);
-  assert.ok(["workflow_run", "workflow_dispatch"].includes(run.event));
+  assert.ok(["push", "workflow_run", "workflow_dispatch"].includes(run.event));
   assert.match(run.head_sha, /^[a-f0-9]{40}$/);
   assert.ok(Number.isSafeInteger(run.run_attempt) && run.run_attempt > 0);
 }

@@ -13,6 +13,18 @@ test("legacy partially failed releases recover the original artifact ID", async 
   expect(f.requests).toContain("/repos/rel-kit/relkit/actions/runs/42/attempts/1");
 });
 
+test("a Release run started by a merge, by main CI or by dispatch can own the original pack", async () => {
+  for (const event of ["push", "workflow_run", "workflow_dispatch"]) {
+    const f = recoveryFixture();
+    f.run.event = f.attempt.event = event;
+    expect(await findReleaseRecovery("rel-kit/relkit", f.sha, async () => true, f.read)).toEqual({
+      sha: f.sha,
+      artifactId: "123",
+      runId: "42",
+    });
+  }
+});
+
 test("a rerun reuses its completed earlier attempt even with a different execution SHA", async () => {
   const f = recoveryFixture();
   f.run.head_sha = f.attempt.head_sha = "b".repeat(40);

@@ -40,12 +40,12 @@ test(
   () =>
     withReleaseFixture(async (f) => {
       const source = await f.plan();
-      expect((await f.run()).output).toBe(`mode=publish\nsha=${source}\n`);
+      expect((await f.run()).output).toBe(`mode=publish\nsha=${source}\nci_run_id=900\n`);
       await f.change();
       const advanced = f.commit();
       const selected = await f.run({ sha: source, mainSha: advanced });
       expect(selected.code, selected.diagnostics).toBe(0);
-      expect(selected.output).toBe(`mode=publish\nsha=${source}\n`);
+      expect(selected.output).toBe(`mode=publish\nsha=${source}\nci_run_id=900\n`);
       expect((await f.run({ sha: source, noCi: true })).output).toContain("mode=none");
       const next = await f.run({ complete: true, mainSha: advanced, ciSha: advanced });
       expect(next.output).toBe(`mode=version\nsha=${advanced}\n`);
@@ -76,6 +76,14 @@ test(
       expect(
         (await f.run({ sha: source, executionSha: newer }, { RECOVERY_RUN_ID: "42" })).output,
       ).toContain("mode=recover");
+      // A Release run started by the merge itself is listed in the same history.
+      const merge = await f.run({
+        sha: source,
+        executionSha: newer,
+        previous: true,
+        previousEvent: "push",
+      });
+      expect(merge.output).toContain(`mode=recover\nsha=${source}\nartifact_id=123`);
     }),
   30_000,
 );
@@ -89,7 +97,9 @@ test(
       const plan = JSON.parse(await readFile(path, "utf8"));
       await writeFile(path, JSON.stringify(plan, null, 2));
       f.commit();
-      expect((await f.run({ sha: source })).output).toBe(`mode=publish\nsha=${source}\n`);
+      expect((await f.run({ sha: source })).output).toBe(
+        `mode=publish\nsha=${source}\nci_run_id=900\n`,
+      );
       plan.packages[0].version = "0.7.11";
       await writeFile(path, JSON.stringify(plan));
       f.commit();
@@ -121,6 +131,50 @@ test(
       expect((await f.run(state, {}, ["--reconcile"])).calls).toContain(
         `inputs[verified_sha]=${main}`,
       );
+    }),
+  30_000,
+);
+
+test(
+  "a merged pull request run that recorded the same tree releases before main CI finishes",
+  () =>
+    withReleaseFixture(async (f) => {
+      await f.change();
+      const base = f.commit();
+      const tree = (sha: string) => f.git("rev-parse", `${sha}^{tree}`);
+      const pull = { id: 902, tree: tree(base) };
+      const pending = { noCi: true, pullRuns: { [base]: pull } };
+      expect((await f.run(pending)).output).toBe(`mode=version\nsha=${base}\n`);
+      for (const refused of [
+        { ...pull, tree: "b".repeat(40) },
+        { ...pull, fork: true },
+        { ...pull, conclusion: "failure" },
+      ])
+        expect((await f.run({ noCi: true, pullRuns: { [base]: refused } })).output).toBe(
+          `mode=none\nsha=${base}\n`,
+        );
+      const source = await f.plan();
+      const release = { id: 901, tree: tree(source) };
+      const published = await f.run({ noCi: true, pullRuns: { [source]: release, [base]: pull } });
+      expect(published.code, published.diagnostics).toBe(0);
+      expect(published.output).toBe(
+        `mode=publish\nsha=${source}\nci_run_id=901\nevidence_run_id=902\n`,
+      );
+      expect((await f.run({ noCi: true, pullRuns: { [source]: release } })).output).toBe(
+        `mode=publish\nsha=${source}\nci_run_id=901\n`,
+      );
+    }),
+  30_000,
+);
+
+test(
+  "a commit already versioned by an open release pull request is not versioned again",
+  () =>
+    withReleaseFixture(async (f) => {
+      await f.change();
+      const head = f.commit();
+      expect((await f.run({ releasePull: "current" })).output).toBe(`mode=none\nsha=${head}\n`);
+      expect((await f.run({ releasePull: "stale" })).output).toBe(`mode=version\nsha=${head}\n`);
     }),
   30_000,
 );

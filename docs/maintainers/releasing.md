@@ -66,10 +66,54 @@ The certification step has a shorter deadline than its job so failure artifacts
 can still upload when a native setup operation stalls.
 
 The release GitHub App creates and updates release PRs and enables auto-merge.
-Normal pull-request CI must pass before merging; the App's merge then triggers
-normal main CI. Successful main CI starts Release for the exact verified commit.
+Normal pull-request CI must pass before merging. Every merge to `main` starts
+Release at once and still triggers normal main CI. Release acts on a main commit
+only when a CI run verified it; see [Release lead time](#release-lead-time).
 Superseded CI commits are skipped. Manually dispatched main CI can also explicitly
 start Release, which verifies the CI run's actual successful conclusion.
+
+### Release lead time
+
+The budget from merging a change to its packages reaching npm is 30 minutes.
+Three rules keep the chain short without publishing anything CI did not test.
+
+1. **A merge releases on its pull request's CI run.** `main` accepts only squash
+   merges of up-to-date branches, so the merged commit has the same Git tree the
+   pull request's run checked out. The **Record the tested tree** job uploads an
+   artifact named `tested-tree-<tree hash>`. Release accepts a pull request run for
+   a main commit only when all of these hold: the pull request was merged as that
+   exact commit, its head belongs to this repository, the run of `checks.yml` on
+   that head succeeded, and the run recorded the commit's tree hash. Otherwise
+   Release does nothing and the later successful main CI starts it, as before.
+   A merge from a fork always takes that slower path.
+2. **A version-only release pull request skips the contributor quickstart.** The
+   **Detect a version-only release pull request** job compares the changed paths
+   with the list in `scripts/release-pr-scope.ts`, which names every file
+   `bun run version:packages` writes. Only `changeset-release/main` with such a
+   diff is version-only. Any other changed path keeps the full suite.
+3. **A version-only release pull request runs a reduced suite.** CI also skips the
+   documentation installation journeys, the creation measurements and the
+   development loop benchmark. The commit the batch was versioned from ran all of
+   them, and versioning itself certified the generator.
+
+Main CI still runs the full suite, quickstart included, after every merge. It no
+longer delays a release, so a failure there shows up after the publish and needs a
+follow-up fix.
+
+The merge and its later main CI both start Release. The second run does nothing:
+a published batch is complete, and a main commit that an open release pull request
+already contains is not versioned again.
+
+Release evidence follows the same split. `evidence-<version>.tar.gz` carries the
+reports of the run that verified the version commit, plus the creation capability
+table of the full run on the commit the batch was versioned from.
+
+The publish job writes the measured lead time to its summary: the minutes from
+the merge of the commit the batch was versioned from to the published GitHub
+release. More than 30 raises a warning and never fails the release. No timeout
+enforces the budget, because stopping a publish midway leaves a partial release
+to recover. GitHub runner queues and npm's registry propagation are outside the
+workflow's control; the publisher alone waits up to fifteen minutes for npm.
 
 `CI Gate` also requires release rehearsal. One read-only job installs frozen,
 runs the real versioning command (including generator certification when needed),
@@ -141,7 +185,8 @@ Repeated CI and rerun attempts automatically reuse the earlier successful pack.
 Selection uses the workflow's immutable main snapshot. An unfinished batch belongs
 to the first main commit introducing its version, even if later merges add more
 Changesets or reformat the plan. Its first pack requires successful CI for that
-exact source; later attempts require the original archives. A semantic plan edit
+exact source, from main or from the merged pull request that recorded the same
+tree; later attempts require the original archives. A semantic plan edit
 without a new batch version is rejected. A new batch cannot be versioned while the
 preceding recorded batch remains unfinished. New release archives and npm diagnostics are retained
 for 30 days. Missing,

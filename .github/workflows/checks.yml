@@ -140,6 +140,60 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
+  tested-tree:
+    name: Record the tested tree
+    # Release accepts a merged pull request's run only when this record names the main commit's tree.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: tree
+        name: Name the Git tree this run checks out
+        run: |
+          tree="$(git rev-parse 'HEAD^{tree}')"
+          echo "$tree" > "$RUNNER_TEMP/tested-tree"
+          echo "tree=$tree" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: tested-tree-${{ steps.tree.outputs.tree }}
+          path: ${{ runner.temp }}/tested-tree
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 30
+
+  release-scope:
+    name: Detect a version-only release pull request
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      version_only: ${{ steps.scope.outputs.version_only }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+      - id: scope
+        name: Check whether the release branch changes only files that versioning derives
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" > "$RUNNER_TEMP/changed-paths"
+          node --experimental-strip-types scripts/release-pr-scope.ts \
+            < "$RUNNER_TEMP/changed-paths" >> "$GITHUB_OUTPUT"
+
   static:
     name: Static checks
     runs-on: ubuntu-24.04
@@ -405,6 +459,9 @@ jobs:
 
   docs-installations:
     name: Documentation installation journeys
+    needs: release-scope
+    # The commit a release is versioned from already ran these; main CI repeats them after the merge.
+    if: ${{ !cancelled() && needs.release-scope.outputs.version_only != 'true' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions:
@@ -463,10 +520,12 @@ jobs:
 
   contributor-quickstart:
     name: Contributor quickstart
-    needs: quickstart-changes
+    needs: [quickstart-changes, release-scope]
     if: >-
       !cancelled() &&
-      (github.event_name != 'pull_request' || needs.quickstart-changes.outputs.changed == 'true')
+      (github.event_name != 'pull_request' ||
+       (needs.quickstart-changes.outputs.changed == 'true' &&
+        needs.release-scope.outputs.version_only != 'true'))
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -506,11 +565,13 @@ jobs:
 
   release-readiness:
     name: Release readiness
-    needs: auto-changeset
+    needs: [auto-changeset, release-scope]
     if: >-
       !cancelled() &&
       (needs.auto-changeset.result == 'success' || needs.auto-changeset.result == 'skipped')
     uses: ./.github/workflows/release-readiness.yml
+    with:
+      version_only: ${{ needs.release-scope.outputs.version_only == 'true' }}
     permissions:
       contents: read
 
@@ -651,6 +712,8 @@ jobs:
       [
         auto-changeset,
         dependency-update,
+        tested-tree,
+        release-scope,
         static,
         types-and-tests,
         workspace-typecheck,
@@ -672,6 +735,9 @@ jobs:
     timeout-minutes: 5
     permissions: {}
     env:
+      TESTED_TREE_RESULT: ${{ needs.tested-tree.result }}
+      RELEASE_SCOPE_RESULT: ${{ needs.release-scope.result }}
+      VERSION_ONLY: ${{ needs.release-scope.outputs.version_only }}
       STATIC_RESULT: ${{ needs.static.result }}
       TYPES_RESULT: ${{ needs.types-and-tests.result }}
       WORKSPACE_TYPECHECK_RESULT: ${{ needs.workspace-typecheck.result }}
@@ -693,6 +759,8 @@ jobs:
     steps:
       - name: Require fast safety jobs
         run: |
+          test "$TESTED_TREE_RESULT" = success
+          test "$RELEASE_SCOPE_RESULT" = success || test "$RELEASE_SCOPE_RESULT" = skipped
           test "$STATIC_RESULT" = success
           test "$TYPES_RESULT" = success
           test "$WORKSPACE_TYPECHECK_RESULT" = success
@@ -700,7 +768,12 @@ jobs:
           test "$RUNTIME_HTTP_RESULT" = success
           test "$NODE_CREATION_RESULT" = success
           test "$INSPECTOR_CONTAINER_RESULT" = success
-          test "$DOCS_INSTALLATIONS_RESULT" = success
+          # A version-only release pull request skips the journeys; every other run requires them.
+          if test "$VERSION_ONLY" = true; then
+            test "$DOCS_INSTALLATIONS_RESULT" = skipped
+          else
+            test "$DOCS_INSTALLATIONS_RESULT" = success
+          fi
           test "$DEPENDENCY_REVIEW_RESULT" = success || test "$DEPENDENCY_REVIEW_RESULT" = skipped
           test "$AUTO_CHANGESET_RESULT" = success || test "$AUTO_CHANGESET_RESULT" = skipped
           test "$RELEASE_READINESS_RESULT" = success

@@ -6,15 +6,17 @@ import { runBenchmarkMain } from "./dev-readiness/benchmark-main.js";
 import { automationCommand, prepareOperation } from "./pr-automation-io.js";
 import { findReleaseRecovery, recoverRelease } from "./release-recovery.js";
 import { readReleasePlan } from "./release-plan.js";
+import { releasePullBuiltOn } from "./release-pull-authority.js";
 import {
   currentMain,
   pendingChangesets,
+  releaseAuthority,
   releaseComplete,
   releaseGit,
   releaseSource,
   successfulReleaseCi,
 } from "./release-source.js";
-import type { ReleaseApi, ReleaseDecision } from "./release-automation.types.js";
+import type { ReleaseApi, ReleaseAuthority, ReleaseDecision } from "./release-automation.types.js";
 
 /**
  * Converts admitted original archives into the fixed workflow output contract.
@@ -28,6 +30,35 @@ function recoveryDecision(original: Awaited<ReturnType<typeof recoverRelease>>):
     artifact_id: original.artifactId,
     artifact_run_id: original.runId,
   };
+}
+
+/**
+ * Names the full CI run whose creation measurements describe a batch verified by a pull request run.
+ * The release pull request runs a reduced suite, so the measurements come from the commit it was
+ * versioned from.
+ * @param root - Immutable execution checkout.
+ * @param repository - Trusted workflow repository.
+ * @param sha - Batch source commit.
+ * @param ci - Run that verified the batch source.
+ * @param read - Bounded authenticated API adapter.
+ * @param signal - Owning native cancellation.
+ * @returns The extra evidence run, or nothing when the verifying run is a full main run.
+ */
+async function measuredEvidence(
+  root: string,
+  repository: string,
+  sha: string,
+  ci: ReleaseAuthority,
+  read: ReleaseApi,
+  signal: AbortSignal,
+): Promise<Pick<ReleaseDecision, "evidence_run_id">> {
+  if (ci.source !== "pull_request") return {};
+  const [, ...parents] = (
+    await releaseGit(root, ["rev-list", "--parents", "-n", "1", sha], signal)
+  ).split(" ");
+  if (parents.length !== 1) return {};
+  const measured = await releaseAuthority(root, repository, parents[0]!, read, signal);
+  return measured && measured.run !== ci.run ? { evidence_run_id: measured.run } : {};
 }
 
 /**
@@ -56,7 +87,8 @@ async function selectRelease(
   const plan = await readReleasePlan(root);
   if (plan && !(await releaseComplete(root, repository, plan.version, signal))) {
     const sha = await releaseSource(root, plan, signal);
-    if (!(await successfulReleaseCi(repository, sha, read))) return { mode: "none", sha: head };
+    const ci = await releaseAuthority(root, repository, sha, read, signal);
+    if (!ci) return { mode: "none", sha: head };
     // An older queued execution must also discover packs made by a newer execution.
     await releaseGit(root, ["fetch", "--no-tags", "origin", "main"], signal);
     const original = await findReleaseRecovery(
@@ -67,12 +99,19 @@ async function selectRelease(
       read,
     );
     if (original) return recoveryDecision(original);
-    return { mode: "publish", sha };
+    return {
+      mode: "publish",
+      sha,
+      ci_run_id: ci.run,
+      ...(await measuredEvidence(root, repository, sha, ci, read, signal)),
+    };
   }
   if (
     (await pendingChangesets(root)) &&
     head === (await currentMain(repository, read)) &&
-    (await successfulReleaseCi(repository, head, read))
+    (await releaseAuthority(root, repository, head, read, signal)) &&
+    // The merge and its later main CI both start Release; only the first versions this commit.
+    !(await releasePullBuiltOn(repository, head, read))
   )
     return { mode: "version", sha: head };
   return { mode: "none", sha: head };
@@ -98,6 +137,7 @@ async function reconcileRelease(
   const execution = await releaseGit(root, ["rev-parse", "HEAD"], signal);
   const main = await currentMain(repository, read);
   if (main === execution && (!publishedSource || main === publishedSource)) return undefined;
+  // A dispatch is verified as a main run; a pull request run acts through its merge's own Release run.
   const ci = await successfulReleaseCi(repository, main, read);
   if (!ci) return undefined;
   await automationCommand(

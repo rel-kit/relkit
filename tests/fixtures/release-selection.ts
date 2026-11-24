@@ -29,6 +29,8 @@ async function copySelector(root: string) {
     "release-plan.ts",
     "release-recovery.ts",
     "release-source.ts",
+    "release-pull-authority.ts",
+    "release-pr-scope.ts",
     "release-automation.schemas.ts",
     "release-automation.types.ts",
     "release-ci-verification.ts",
