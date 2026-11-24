@@ -98,6 +98,7 @@ function makeStartLive(defaults: StartOptions) {
                 RELKIT_GRAPH_HASH: artifacts.graphHash,
               },
               stopTimeoutMs,
+              ...(options.output === undefined ? {} : { output: options.output }),
             });
             yield* waitForStartHealthEffect(hostname, port, healthTimeoutMs, owned.child).pipe(
               Effect.provideService(CliStartNative, native),

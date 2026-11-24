@@ -53,13 +53,23 @@ export function startProcessLive(spawn: RuntimeProcesses["spawn"] = runtime.proc
             // Only piped output belongs to this owner. A compatible custom spawn may
             // inherit either stream; that borrowed terminal has no reader to release.
             // Pipe failures are observed immediately and release joins their receipts.
+            // Output goes to the caller's line sinks when given, and is discarded otherwise.
+            const streams = [
+              [owned.child.stdout, request.output?.stdout],
+              [owned.child.stderr, request.output?.stderr],
+            ] as const;
             yield* Effect.forEach(
-              [owned.child.stdout, owned.child.stderr].filter(
-                (stream) => stream instanceof ReadableStream,
+              streams.filter(
+                (entry): entry is readonly [ReadableStream<Uint8Array>, (typeof entry)[1]] =>
+                  entry[0] instanceof ReadableStream,
               ),
-              (stream) =>
+              ([stream, sink]) =>
                 cliTry("start.readers", () => {
-                  const drained = stream.pipeTo(new WritableStream<Uint8Array>({ write() {} }));
+                  const drained = stream.pipeTo(
+                    sink === undefined
+                      ? new WritableStream<Uint8Array>({ write() {} })
+                      : lineSink(sink),
+                  );
                   void drained.catch(() => undefined);
                   return drained;
                 }).pipe(
@@ -75,6 +85,32 @@ export function startProcessLive(spawn: RuntimeProcesses["spawn"] = runtime.proc
       });
     }),
   );
+}
+
+/**
+ * Splits a child's byte stream into lines for a line-oriented sink.
+ * @param write - Borrowed sink receiving each line without its newline.
+ * @returns A writable that also passes on a last line with no trailing newline.
+ */
+export function lineSink(write: (line: string) => void): WritableStream<Uint8Array> {
+  const decoder = new TextDecoder();
+  let pending = "";
+  const emit = (text: string) => {
+    pending += text;
+    const lines = pending.split(/\r?\n/);
+    pending = lines.pop() ?? "";
+    for (const line of lines) write(line);
+  };
+  return new WritableStream<Uint8Array>({
+    write(chunk) {
+      emit(decoder.decode(chunk, { stream: true }));
+    },
+    close() {
+      emit(decoder.decode());
+      if (pending !== "") write(pending);
+      pending = "";
+    },
+  });
 }
 
 /**
